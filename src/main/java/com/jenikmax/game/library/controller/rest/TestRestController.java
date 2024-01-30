@@ -1,4 +1,4 @@
-package com.jenikmax.game.library.controller;
+package com.jenikmax.game.library.controller.rest;
 
 import com.jenikmax.game.library.service.api.ScanerService;
 import org.apache.logging.log4j.LogManager;

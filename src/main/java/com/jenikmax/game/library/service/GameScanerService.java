@@ -1,6 +1,5 @@
 package com.jenikmax.game.library.service;
 
-import com.jenikmax.game.library.controller.TestRestController;
 import com.jenikmax.game.library.service.api.ScanerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

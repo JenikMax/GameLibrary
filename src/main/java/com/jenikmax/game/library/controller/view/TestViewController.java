@@ -1,4 +1,4 @@
-package com.jenikmax.game.library.controller;
+package com.jenikmax.game.library.controller.view;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
