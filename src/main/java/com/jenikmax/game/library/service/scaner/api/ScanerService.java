@@ -1,4 +1,4 @@
-package com.jenikmax.game.library.service.api;
+package com.jenikmax.game.library.service.scaner.api;
 
 public interface ScanerService {
 

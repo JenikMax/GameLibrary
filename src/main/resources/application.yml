@@ -1,3 +1,11 @@
 game-library:
   games:
     directory: D:\Work\MyProjects\gametest
+
+
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/game-library?searchpath=library
+    username: library-manager-user
+    password: 2wq345tgfiNcbBBwee3

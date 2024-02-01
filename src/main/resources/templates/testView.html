@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Game List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+
+    <!-- Поиск -->
+    <div class="row">
+        <div class="col-md-4">
+            <form action="/search" method="post">
+                <input type="text" class="form-control" placeholder="Введите название игры" name="searchText" th:value="${searchText}">
+                <button type="submit" class="btn btn-primary mt-2">Поиск</button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <form action="/refresh" method="post">
+                <button type="submit" class="btn btn-secondary mt-2">Выполнить сканирование</button>
+            </form>
+        </div>
+    </div>
+    <!-- Фильтры -->
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <form action="/filter" method="post">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Платформы</h5>
+                        <div th:each="platform : ${platforms}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selectedPlatforms" value="${platform}" th:checked="${selectedPlatforms.contains(platform)}">
+                                <label class="form-check-label" th:text="${platform}"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Годы выпуска</h5>
+                        <div th:each="year : ${years}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selectedYears" value="${year}" th:checked="${selectedYears.contains(year)}">
+                                <label class="form-check-label" th:text="${year}"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Жанры</h5>
+                        <div th:each="genre : ${genres}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selectedGenres" value="${genre}" th:checked="${selectedGenres.contains(genre)}">
+                                <label class="form-check-label" th:text="${genre}"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Применить</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Список игр -->
+    <div class="row mt-3">
+        <div th:each="game : ${games}" class="col-md-4 mb-4">
+            <div class="card">
+                <img th:src="${game.imageUrl}" class="card-img-top" alt="Game Image">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${game.name}"></h5>
+                    <p class="card-text" th:text="'(' + ${game.releaseYear} + ')'"></p>
+                    <p class="card-platform" th:text="${game.platform}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Пагинация -->
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${page == 1} ? 'disabled' : ''">
+                        <a class="page-link" th:href="'?page=' + (${page} - 1)" tabindex="-1" aria-disabled="true">Previous</a>
+                    </li>
+                    <li class="page-item" th:classappend="${number == page} ? 'active' : ''" th:each="number : ${#numbers.sequence(1, totalPages)}">
+                        <a class="page-link" th:href="'?page=' + ${number}" th:text="${number}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${page == totalPages} ? 'disabled' : ''">
+                        <a class="page-link" th:href="'?page=' + (${page} + 1)">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</body>
+</html>

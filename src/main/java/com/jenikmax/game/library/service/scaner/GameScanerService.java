@@ -1,6 +1,6 @@
-package com.jenikmax.game.library.service;
+package com.jenikmax.game.library.service.scaner;
 
-import com.jenikmax.game.library.service.api.ScanerService;
+import com.jenikmax.game.library.service.scaner.api.ScanerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
