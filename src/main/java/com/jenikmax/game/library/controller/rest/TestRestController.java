@@ -1,5 +1,7 @@
 package com.jenikmax.game.library.controller.rest;
 
+import com.jenikmax.game.library.service.api.LibraryService;
+import com.jenikmax.game.library.service.data.api.GameService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,19 +15,27 @@ public class TestRestController {
 
     static final Logger logger = LogManager.getLogger(TestRestController.class.getName());
 
-    private final ScanerService service;
+    private final GameService service;
+    private final ScanerService scanerService;
+    private final LibraryService libraryService;
 
-    public TestRestController(ScanerService service) {
+    public TestRestController(GameService service, ScanerService scanerService, LibraryService libraryService) {
         this.service = service;
+        this.scanerService = scanerService;
+        this.libraryService = libraryService;
     }
 
-    @GetMapping("/")
-    public String test(){
-        logger.info("Start test!!!");
-        service.scan();
-        logger.info("End test!!!");
-        return "Hello World!";
-    }
+    //@GetMapping("/")
+    //public GameDto test(){
+    //    logger.info("Start test!!!");
+    //    return service.testCreate();
+    //}
 
+
+    @GetMapping("/scan")
+    public void testScan(){
+        logger.info("Start scan!!!");
+        libraryService.scanLibrary();
+    }
 
 }

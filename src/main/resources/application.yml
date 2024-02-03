@@ -1,11 +1,21 @@
 game-library:
   games:
-    directory: D:\Work\MyProjects\gametest
+    directory: D:/Work/MyProjects/gametest
 
 
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/game-library?searchpath=library
+    url: jdbc:postgresql://localhost:5432/game-library?currentSchema=library
     username: library-manager-user
     password: 2wq345tgfiNcbBBwee3
+jpa:
+  properties:
+    hibernate.default_schema: library
+hibernate:
+  default_schema: library
+
+entitymanager:
+  packages:
+    to:
+      scan: com.jenikmax.game.library.model.entity

@@ -1,11 +1,12 @@
 \c "game-library"
-SET search_path TO library;
+--SET search_path TO library;
 
 create sequence game_data_id_seq start 1;
 drop table if exists library.game_data;
 create table library.game_data
 (
     id                bigserial primary key,
+    create_ts         timestamp without time zone,
     name              varchar(225),
     release_date      varchar(20),
     directory_path    varchar(255),
@@ -28,16 +29,17 @@ COMMENT ON TABLE library.game_genre IS '';
 COMMENT ON COLUMN library.game_genre.code IS '';
 COMMENT ON COLUMN library.game_genre.description IS '';
 
-INSERT INTO library.game_genre (code, description) VALUES ('GAME_GENRE_1', '');
-INSERT INTO library.game_genre (code, description) VALUES ('GAME_GENRE_2', '');
-INSERT INTO library.game_genre (code, description) VALUES ('GAME_GENRE_3', '');
+INSERT INTO library.game_genre (code, description) VALUES ('RPG', 'rpg');
+INSERT INTO library.game_genre (code, description) VALUES ('ACTION', 'action');
+INSERT INTO library.game_genre (code, description) VALUES ('JRPG', 'jrpg');
 INSERT INTO library.game_genre (code, description) VALUES ('GAME_GENRE_4', '');
 
 
-
+create sequence game_data_genre_id_seq start 1;
 drop table if exists library.game_data_genre;
 create table library.game_data_genre
 (
+    id bigserial primary key,
     game_id      bigint           not null references library.game_data (id),
     genre_code   varchar(200)      not null references library.game_genre (code)
 );
@@ -65,3 +67,4 @@ select release_date from library.game_data group by release_date;
 
 GRANT ALL ON ALL TABLES IN SCHEMA library TO "library-manager-user";
 GRANT ALL ON ALL SEQUENCES IN SCHEMA library TO "library-manager-user";
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO "library-manager-user";

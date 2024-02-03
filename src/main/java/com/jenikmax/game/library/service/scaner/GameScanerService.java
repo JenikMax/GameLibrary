@@ -1,25 +1,228 @@
 package com.jenikmax.game.library.service.scaner;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.jenikmax.game.library.model.entity.Game;
+import com.jenikmax.game.library.model.entity.GameGenre;
+import com.jenikmax.game.library.model.entity.Screenshot;
+import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class GameScanerService implements ScanerService {
 
     static final Logger logger = LogManager.getLogger(GameScanerService.class.getName());
 
+    private final static String GAME_INFO_PREFIX = "/information";
+    private final static String GAME_SCREEN_PREFIX = "/img";
+    private final static String GAME_INFO_FILE_NAME = "/information.json";
+    private final static String GAME_LOGO_FILE_NAME = "/logo.jpg";
 
-    private final String rootDirectory;
 
-    public GameScanerService(@Value("${game-library.games.directory}") String rootDirectory) {
-        this.rootDirectory = rootDirectory;
+
+    public List<Game> scanDirectory(String path) {
+        List<Game> findGames = new ArrayList<>();
+        File directory = new File(path);
+        if (!directory.isDirectory()) return findGames;
+
+        List<File> platforms = Arrays.asList(directory.listFiles(File::isDirectory));
+        for(File platformDir : platforms){
+            String platformName = platformDir.getName();
+            logger.info("platformName - {}",platformName);
+            List<File> games = Arrays.asList(platformDir.listFiles(File::isDirectory));
+            for(File gameDir : games){
+                Game game = new Game();
+                game.setDirectoryPath(gameDir.getAbsolutePath());
+                game.setName(gameDir.getName());
+                game.setPlatform(platformName);
+                findGames.add(game);
+            }
+        }
+        return findGames;
     }
 
-    @Override
-    public void scan() {
-        logger.info("Start scan directory - {}",this.rootDirectory);
+    public Game getAdditinalGameInfo(Game game){
+        File gameinfoDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX);
+        if(gameinfoDir.exists()){
+            File logo = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_LOGO_FILE_NAME);
+            if(logo.exists()) game.setLogo(readImage(logo));
+            File information = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME);
+            if(information.exists()){
+                GameInfo gameInfo = getAdditinalGameInfo(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME);
+                game.setName(gameInfo.getName() != null && !gameInfo.getName().isEmpty() ? gameInfo.getName() : game.getName());
+                game.setReleaseDate(gameInfo.getReleaseDate());
+                game.setTrailerUrl(gameInfo.getTrailerUrl());
+                game.setDescription(gameInfo.getDescription());
+                game.setInstruction(gameInfo.getInstruction());
+                game.setGenres(new ArrayList<>());
+                for(String genre : gameInfo.getGenres()){
+                    GameGenre gameGenre = new GameGenre();
+                    gameGenre.setGame(game);
+                    gameGenre.setGenre(Genre.valueOf(genre.toUpperCase()));
+                    game.getGenres().add(gameGenre);
+                }
+            }
+            File screenDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_SCREEN_PREFIX);
+            if(screenDir.exists()){
+                List<File> screenImgFiles = Arrays.asList(screenDir.listFiles());
+                game.setScreenshots(new ArrayList<>());
+                int count = 1;
+                for(File img : screenImgFiles){
+                    Screenshot screenshot = new Screenshot();
+                    screenshot.setGame(game);
+                    screenshot.setName("image" + count + "jpg");
+                    screenshot.setSource(readImage(img));
+                    game.getScreenshots().add(screenshot);
+                }
+            }
+
+        }
+        if(game.getGenres() == null) game.setGenres(new ArrayList<>());
+        if(game.getScreenshots() == null) game.setScreenshots(new ArrayList<>());
+        if(game.getLogo() == null) game.setLogo(getDefaultLogo());
+        if(game.getReleaseDate() == null) game.setReleaseDate("N/A");
+        if(game.getTrailerUrl() == null) game.setTrailerUrl("N/A");
+        if(game.getDescription() == null) game.setDescription("N/A");
+        if(game.getInstruction() == null) game.setInstruction("N/A");
+        return game;
     }
+
+    public void storeAdditinalGameInfo(Game game){
+        GameInfo gameInfo = new GameInfo();
+        gameInfo.setName(game.getName());
+        gameInfo.setPlatform(game.getPlatform());
+        gameInfo.setReleaseDate(game.getReleaseDate());
+        gameInfo.setGenres(new ArrayList<>());
+        for(GameGenre gameGenre : game.getGenres()){
+            gameInfo.getGenres().add(gameGenre.getGenre().toString());
+        }
+        gameInfo.setTrailerUrl(game.getTrailerUrl());
+        gameInfo.setDescription(game.getDescription());
+        gameInfo.setInstruction(game.getInstruction());
+        // Создание объекта ObjectMapper с использованием YAMLFactory
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            // Запись объекта в YAML файл
+            objectMapper.writeValue(new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME), gameInfo);
+            System.out.println("Объект успешно записан в YAML файл.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public GameInfo getAdditinalGameInfo(String path){
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // Чтение объекта из файла JSON
+            GameInfo gameInfo = objectMapper.readValue(new File(path), GameInfo.class);
+            return gameInfo;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+    private byte[] getDefaultLogo(){
+        ClassPathResource resource = new ClassPathResource("static/img/default.jpg");
+        try {
+            return Files.readAllBytes(resource.getFile().toPath());
+        } catch (IOException e) {
+            logger.error("GetDefaultImg Error - ",e);
+            return null;
+        }
+    }
+
+    private byte[] readImage(File image){
+        try {
+            return Files.readAllBytes(image.toPath());
+        } catch (IOException e) {
+            logger.error("GetDefaultImg Error - ",e);
+            return null;
+        }
+    }
+
+
+    public static class GameInfo{
+        private String name;
+        private String platform;
+        private String releaseDate;
+        private String trailerUrl;
+        private List<String> genres;
+        private String description;
+        private String instruction;
+
+        public GameInfo() {
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getPlatform() {
+            return platform;
+        }
+
+        public void setPlatform(String platform) {
+            this.platform = platform;
+        }
+
+        public String getReleaseDate() {
+            return releaseDate;
+        }
+
+        public void setReleaseDate(String releaseDate) {
+            this.releaseDate = releaseDate;
+        }
+
+        public List<String> getGenres() {
+            return genres;
+        }
+
+        public void setGenres(List<String> genres) {
+            this.genres = genres;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getInstruction() {
+            return instruction;
+        }
+
+        public void setInstruction(String instruction) {
+            this.instruction = instruction;
+        }
+
+        public String getTrailerUrl() {
+            return trailerUrl;
+        }
+
+        public void setTrailerUrl(String trailerUrl) {
+            this.trailerUrl = trailerUrl;
+        }
+    }
+
 }
