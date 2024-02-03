@@ -3,8 +3,10 @@ package com.jenikmax.game.library.service.data;
 import com.jenikmax.game.library.dao.api.GameGenreRepository;
 import com.jenikmax.game.library.dao.api.GameRepository;
 import com.jenikmax.game.library.dao.api.ScreenshotRepository;
+import com.jenikmax.game.library.dao.api.SqlDao;
 import com.jenikmax.game.library.model.converter.GameConverter;
 import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
 import com.jenikmax.game.library.model.entity.Screenshot;
@@ -29,15 +31,24 @@ public class GameDataService implements GameService {
 
     static final Logger logger = LogManager.getLogger(GameDataService.class.getName());
 
+    private final SqlDao sqlDao;
     private final GameRepository gameRepository;
     private final GameGenreRepository gameGenreRepository;
     private final ScreenshotRepository screenshotRepository;
 
-    public GameDataService(GameRepository gameRepository, GameGenreRepository gameGenreRepository, ScreenshotRepository screenshotRepository) {
+    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, ScreenshotRepository screenshotRepository) {
+        this.sqlDao = sqlDao;
         this.gameRepository = gameRepository;
         this.gameGenreRepository = gameGenreRepository;
         this.screenshotRepository = screenshotRepository;
     }
+
+
+
+    public List<GameShortDto> getGameShortList(){
+        return sqlDao.executeShortGame("select * from game_data");
+    }
+
 
     @Transactional
     public GameDto testCreate() {

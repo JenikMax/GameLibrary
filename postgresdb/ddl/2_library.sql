@@ -32,7 +32,7 @@ COMMENT ON COLUMN library.game_genre.description IS '';
 INSERT INTO library.game_genre (code, description) VALUES ('RPG', 'rpg');
 INSERT INTO library.game_genre (code, description) VALUES ('ACTION', 'action');
 INSERT INTO library.game_genre (code, description) VALUES ('JRPG', 'jrpg');
-INSERT INTO library.game_genre (code, description) VALUES ('GAME_GENRE_4', '');
+INSERT INTO library.game_genre (code, description) VALUES ('ADVENTURE', 'adventure');
 
 
 create sequence game_data_genre_id_seq start 1;

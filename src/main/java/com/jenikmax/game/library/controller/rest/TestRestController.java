@@ -1,5 +1,6 @@
 package com.jenikmax.game.library.controller.rest;
 
+import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.GameService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
@@ -8,6 +9,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/test")
@@ -25,11 +28,11 @@ public class TestRestController {
         this.libraryService = libraryService;
     }
 
-    //@GetMapping("/")
-    //public GameDto test(){
-    //    logger.info("Start test!!!");
-    //    return service.testCreate();
-    //}
+    @GetMapping("/")
+    public List<GameShortDto> test(){
+        logger.info("Start test!!!");
+        return service.getGameShortList();
+    }
 
 
     @GetMapping("/scan")

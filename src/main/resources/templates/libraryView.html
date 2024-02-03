@@ -61,51 +61,13 @@
     <div class="games">
         <h3>Список игр</h3>
         <ul>
+        <div th:each="game : ${gameList}" class="col-md-4 mb-4">
             <li>
-                <span>PC, PS5, PS4, Xbox</span>
-                <img src="cyberpunk.jpg" alt="Cyberpunk 2077">
-                <p>Cyberpunk 2077 (2020)</p>
+                <span th:text="${game.platform}"></span>
+                <img th:src="${game.logo}" th:alt="${game.name}">
+                <p th:text="${game.name} + ' ('+ ${game.releaseDate} + ')'"></p>
             </li>
-            <li>
-                <span>PC, PS5, PS4, Xbox, Switch</span>
-                <img src="witcher.jpg" alt="The Witcher 3: Wild Hunt">
-                <p>The Witcher 3: Wild Hunt (2015)</p>
-            </li>
-            <li>
-                <span>PC, PS5, PS4, Xbox</span>
-                <img src="reddead.jpg" alt="Red Dead Redemption 2">
-                <p>Red Dead Redemption 2 (2018)</p>
-            </li>
-            <li>
-                <span>PS5, PS4</span>
-                <img src="godofwar.jpg" alt="God of War">
-                <p>God of War (2018)</p>
-            </li>
-            <li>
-                <span>PS5, PS4</span>
-                <img src="lastofus.jpg" alt="The Last of Us Part II">
-                <p>The Last of Us Part II (2020)</p>
-            </li>
-            <li>
-                <span>PC, Xbox</span>
-                <img src="halo.jpg" alt="Halo Infinite">
-                <p>Halo Infinite (2022)</p>
-            </li>
-            <li>
-                <span>Switch</span>
-                <img src="zelda.jpg" alt="The Legend of Zelda: Breath of the Wild">
-                <p>The Legend of Zelda: Breath of the Wild (2017)</p>
-            </li>
-            <li>
-                <span>Switch</span>
-                <img src="mario.jpg" alt="Super Mario Odyssey">
-                <p>Super Mario Odyssey (2017)</p>
-            </li>
-            <li>
-                <span>PC, Mobile</span>
-                <img src="amongus.jpg" alt="Among Us">
-                <p>Among Us (2018)</p>
-            </li>
+        </div>
         </ul>
         <div class="pagination">
             <a href="#">«</a>

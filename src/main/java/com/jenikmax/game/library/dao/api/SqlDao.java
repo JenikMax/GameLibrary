@@ -1,9 +1,15 @@
 package com.jenikmax.game.library.dao.api;
 
+import com.jenikmax.game.library.model.dto.GameShortDto;
+
 import java.util.List;
 import java.util.Map;
 
 public interface SqlDao {
+
+    List<GameShortDto> executeShortGame(String query);
+
+    List<GameShortDto> executeShortGame(String query,  Object[] params);
 
     List<Map<String, Object>> execute(String query);
 

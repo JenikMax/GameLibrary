@@ -47,7 +47,7 @@ public class LibraryOperationService implements LibraryService {
 
     @Override
     public List<GameShortDto> getGameList() {
-        return null;
+        return gameService.getGameShortList();
     }
 
     @Override

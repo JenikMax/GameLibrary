@@ -21,8 +21,9 @@ public class LibraryViewController {
     }
 
     @GetMapping("/library")
-    public String main() {
+    public String main(Model model) {
         logger.info("Open library");
+        model.addAttribute("gameList",libraryService.getGameList());
         return "libraryView";
     }
 
