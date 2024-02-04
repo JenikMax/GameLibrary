@@ -1,4 +1,4 @@
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <link rel="stylesheet" href="css/library.css">
 </head>
@@ -70,14 +70,24 @@
         </div>
         </ul>
         <div class="pagination">
-            <a href="#">«</a>
-            <a href="#" class="active">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
-            <a href="#">»</a>
+            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=' + (${page} - 1)" tabindex="-1" aria-disabled="true">«</a>
+            <a class="disabled" th:if="${page > 4}">...</a>
+            <a th:each="number : ${pages}" th:classappend="${number == page} ? 'active' : ''" th:href="'?page=' + ${number}" th:text="${number}"></a>
+            <a class="disabled" th:if="${page < totalPages - 3}">...</a>
+            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + (${page} + 1)">»</a>
         </div>
+        <!--<div class="pagination">
+            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=' + (${page} - 1)" tabindex="-1" aria-disabled="true">«</a>
+            <a th:if="${page > 4}">...</a>
+            <a th:each="number : ${#numbers.sequence(Math.max(1, page - 3), Math.min(totalPages, page + 3))}" th:classappend="${number == page} ? 'active' : ''" th:href="'?page=' + ${number}" th:text="${number}"></a>
+            <a th:if="${page < totalPages - 3}">...</a>
+            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + (${page} + 1)">»</a>
+        </div>-->
+        <!--<div class="pagination">
+            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=' + (${page} - 1)" tabindex="-1" aria-disabled="true">«</a>
+            <a th:each="number : ${#numbers.sequence(1, totalPages)}" th:classappend="${number == page} ? 'active' : ''" th:href="'?page=' + ${number}" th:text="${number}"></a>
+            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + (${page} + 1)">»</a>
+        </div>-->
     </div>
 </div>
 </body>
