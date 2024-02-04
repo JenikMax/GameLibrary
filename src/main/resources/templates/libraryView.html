@@ -1,6 +1,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <link rel="stylesheet" href="css/library.css">
+
+
+    <script>
+        document.getElementById("searchText").addEventListener("keyup", function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                document.getElementById("submitButton").click();
+            }
+        });
+    </script>
 </head>
 <body>
 <div class="container">
@@ -14,52 +24,52 @@
             <button type="button">Выйти</button>
         </div>
     </div>
-    <div class="scann">
-        <button type="submit">Выполнить сканирование</button>
-    </div>
-    <div class="search">
-        <input type="text" name="query" placeholder="Поиск игр по названию, жанру, платформе или дате выпуска">
-        <button type="submit">Поиск</button>
-    </div>
+
     <div class="filter">
-        <h3>Фильтр по жанру</h3>
-        <ul>
-            <li><input type="checkbox" name="genre" value="action">Action</li>
-            <li><input type="checkbox" name="genre" value="adventure">Adventure</li>
-            <li><input type="checkbox" name="genre" value="rpg">RPG</li>
-            <li><input type="checkbox" name="genre" value="strategy">Strategy</li>
-            <li><input type="checkbox" name="genre" value="simulation">Simulation</li>
-            <li><input type="checkbox" name="genre" value="sports">Sports</li>
-            <li><input type="checkbox" name="genre" value="racing">Racing</li>
-            <li><input type="checkbox" name="genre" value="puzzle">Puzzle</li>
-            <li><input type="checkbox" name="genre" value="casual">Casual</li>
-        </ul>
-        <h3>Фильтр по дате выпуска</h3>
-        <ul>
-            <li><input type="radio" name="date" value="2023">2023</li>
-            <li><input type="radio" name="date" value="2022">2022</li>
-            <li><input type="radio" name="date" value="2021">2021</li>
-            <li><input type="radio" name="date" value="2020">2020</li>
-            <li><input type="radio" name="date" value="2019">2019</li>
-            <li><input type="radio" name="date" value="2018">2018</li>
-            <li><input type="radio" name="date" value="2017">2017</li>
-            <li><input type="radio" name="date" value="2016">2016</li>
-            <li><input type="radio" name="date" value="2015">2015</li>
-        </ul>
-        <h3>Фильтр по платформе</h3>
-        <ul>
-            <li><input type="checkbox" name="platform" value="pc">PC</li>
-            <li><input type="checkbox" name="platform" value="ps5">PS5</li>
-            <li><input type="checkbox" name="platform" value="ps4">PS4</li>
-            <li><input type="checkbox" name="platform" value="xbox">Xbox</li>
-            <li><input type="checkbox" name="platform" value="switch">Switch</li>
-            <li><input type="checkbox" name="platform" value="mobile">Mobile</li>
-        </ul>
-        <button type="submit">Фильтр</button>
-        <button type="reset">Сбросить</button>
+        <form action="/filter" method="post">
+            <h3>Поиск</h3>
+            <div class="search">
+                <input type="text" placeholder="Введите название игры" name="searchText" id="searchText" th:value="${searchText}">
+            </div>
+            <h3>Платформы</h3>
+            <ul th:each="platform : ${platforms}">
+                <li>
+                    <input class="form-check-input" type="checkbox" th:id="'platformCheckbox-' + ${platform}" name="selectedPlatforms" th:value="${platform}" th:checked="${selectedPlatforms.contains(platform)}">
+                    <label class="form-check-label" th:for="'platformCheckbox-' + ${platform}" th:text="${platform}"></label>
+                </li>
+            </ul>
+            <h3>Жанры</h3>
+            <ul th:each="genre : ${genres}">
+                <li>
+                    <input class="form-check-input" type="checkbox" th:id="'genreCheckbox-' + ${genre}" name="selectedGenres" th:value="${genre}" th:checked="${selectedGenres.contains(genre)}">
+                    <label class="form-check-label" th:for="'genreCheckbox-' + ${genre}" th:text="${genre.toLowerCase()}"></label>
+                </li>
+            </ul>
+            <h3>Годы выпуска</h3>
+            <ul th:each="year : ${years}">
+                <li>
+                    <input class="form-check-input" type="checkbox" th:id="'yearCheckbox-' + ${year}" name="selectedYears" th:value="${year}" th:checked="${selectedYears.contains(year)}">
+                    <label class="form-check-label" th:for="'yearCheckbox-' + ${year}" th:text="${year}"></label>
+                </li>
+            </ul>
+            <button type="submit">Найти</button>
+            <button type="reset">Сбросить</button>
+        </form>
+        <form action="/scan" method="post">
+            <button type="submit">Обновить библиотеку</button>
+        </form>
     </div>
     <div class="games">
         <h3>Список игр</h3>
+        <div class="pagination">
+            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=1'" tabindex="-1" aria-disabled="true">««</a>
+            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=' + (${page} - 1)" tabindex="-1" aria-disabled="true">«</a>
+            <a class="disabled" th:if="${page > 4}">...</a>
+            <a th:each="number : ${pages}" th:classappend="${number == page} ? 'active' : ''" th:href="'?page=' + ${number}" th:text="${number}"></a>
+            <a class="disabled" th:if="${page < totalPages - 3}">...</a>
+            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + (${page} + 1)">»</a>
+            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + ${totalPages}">»»</a>
+        </div>
         <ul>
         <div th:each="game : ${gameList}" class="col-md-4 mb-4">
             <li>
@@ -70,24 +80,14 @@
         </div>
         </ul>
         <div class="pagination">
+            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=1'" tabindex="-1" aria-disabled="true">««</a>
             <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=' + (${page} - 1)" tabindex="-1" aria-disabled="true">«</a>
             <a class="disabled" th:if="${page > 4}">...</a>
             <a th:each="number : ${pages}" th:classappend="${number == page} ? 'active' : ''" th:href="'?page=' + ${number}" th:text="${number}"></a>
             <a class="disabled" th:if="${page < totalPages - 3}">...</a>
             <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + (${page} + 1)">»</a>
+            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + ${totalPages}">»»</a>
         </div>
-        <!--<div class="pagination">
-            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=' + (${page} - 1)" tabindex="-1" aria-disabled="true">«</a>
-            <a th:if="${page > 4}">...</a>
-            <a th:each="number : ${#numbers.sequence(Math.max(1, page - 3), Math.min(totalPages, page + 3))}" th:classappend="${number == page} ? 'active' : ''" th:href="'?page=' + ${number}" th:text="${number}"></a>
-            <a th:if="${page < totalPages - 3}">...</a>
-            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + (${page} + 1)">»</a>
-        </div>-->
-        <!--<div class="pagination">
-            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=' + (${page} - 1)" tabindex="-1" aria-disabled="true">«</a>
-            <a th:each="number : ${#numbers.sequence(1, totalPages)}" th:classappend="${number == page} ? 'active' : ''" th:href="'?page=' + ${number}" th:text="${number}"></a>
-            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + (${page} + 1)">»</a>
-        </div>-->
     </div>
 </div>
 </body>

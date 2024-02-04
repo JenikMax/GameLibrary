@@ -133,13 +133,13 @@ public class TestViewController {
     return genres;
 }
 
-    @PostMapping("/search")
+    @PostMapping("/searchqq")
     public String searchGames(Model model, @RequestParam("searchText") String searchText) {
         clearFilters();
         return "redirect:/test?searchText=" + searchText;
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/refreshqq")
     public String refreshGames(Model model) {
         clearFilters();
         // Обновление списка игр
@@ -147,7 +147,7 @@ public class TestViewController {
         return "redirect:/test";
     }
 
-    @PostMapping("/filter")
+    @PostMapping("/filterqq")
     public String applyFilters(Model model,
                                @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
                                @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,

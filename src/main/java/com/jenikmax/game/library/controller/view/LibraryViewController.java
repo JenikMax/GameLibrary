@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.expression.Numbers;
 import org.thymeleaf.util.NumberUtils;
 
@@ -29,17 +30,13 @@ public class LibraryViewController {
     }
 
     @GetMapping("/library")
-    public String main(Model model, @RequestParam(value = "page", defaultValue = "1") int page) {
+    public String main(Model model, @RequestParam(value = "page", defaultValue = "1") int page,
+                       @RequestParam(value = "searchText", required = false) String searchText,
+                       @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
+                       @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
+                       @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres) {
         logger.info("Open library");
         List<GameShortDto> gameList = libraryService.getGameList();
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
         gameList.addAll(gameList);
         gameList.addAll(gameList);
         gameList.addAll(gameList);
@@ -57,6 +54,14 @@ public class LibraryViewController {
         List<String> years = libraryService.getReleaseDates();
         List<String> platforms = libraryService.getGamesPlatforms();
         List<String> genres = libraryService.getGameGenres();
+
+        selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
+        selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
+        selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
+
+        model.addAttribute("selectedPlatforms", selectedPlatforms);
+        model.addAttribute("selectedYears", selectedYears);
+        model.addAttribute("selectedGenres", selectedGenres);
         model.addAttribute("gameList",paginatedGames);
         model.addAttribute("years", years);
         model.addAttribute("platforms", platforms);
@@ -67,11 +72,6 @@ public class LibraryViewController {
         return "libraryView";
     }
 
-    //@PostMapping("/library")
-    //public String scanLibrary(Map<String,Object> formData) {
-    //    logger.info("Scan library");
-    //    return "redirect:/library";
-    //}
 
 
     @PostMapping("/scan")
@@ -79,6 +79,20 @@ public class LibraryViewController {
         logger.info("Scan library");
         libraryService.scanLibrary();
         model.addAttribute("message","scan library in progress");
+        return "redirect:/library";
+    }
+
+
+    @PostMapping("/filter")
+    public String applyFilters(Model model, RedirectAttributes redirectAttributes,
+                               @RequestParam(value = "searchText", required = false) String searchText,
+                               @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
+                               @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
+                               @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres) {
+        redirectAttributes.addAttribute("searchText",searchText);
+        redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
         return "redirect:/library";
     }
 

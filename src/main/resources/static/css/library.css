@@ -75,12 +75,13 @@ body {
 }
 
 .search input {
-    width: 80%;
+    width: 100%;
     height: 40px;
-    margin: 10px;
+    margin: 0px;
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
+    margin-right: 1px;
 }
 
 .search button {
@@ -108,7 +109,7 @@ body {
 }
 
 .filter {
-    width: 20%;
+    width: 30%;
     float: left;
     padding: 20px;
 }
@@ -132,7 +133,7 @@ body {
 }
 
 .filter button {
-    width: 45%;
+    width: 90%;
     height: 40px;
     margin: 10px 2.5%;
     background-color: #007bff;
@@ -144,7 +145,7 @@ body {
 }
 
 .games {
-    width: 75%;
+    width: 70%;
     float: right;
     padding: 20px;
 }
@@ -199,7 +200,7 @@ body {
 
 .pagination a {
     display: inline-block;
-    width: 30px;
+    width: 45px;
     height: 30px;
     margin: 5px;
     border: 1px solid #ccc;

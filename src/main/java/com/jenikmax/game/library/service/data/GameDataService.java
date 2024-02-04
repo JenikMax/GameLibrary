@@ -49,6 +49,20 @@ public class GameDataService implements GameService {
         return sqlDao.executeShortGame("select * from game_data");
     }
 
+    @Override
+    public List<String> getReleaseDates() {
+        return sqlDao.executeByStringList("select release_date from library.game_data group by release_date","release_date");
+    }
+
+    @Override
+    public List<String> getGamesPlatforms() {
+        return sqlDao.executeByStringList("select platform from library.game_data group by platform","platform");
+    }
+
+    @Override
+    public List<String> getGameGenres() {
+        return sqlDao.executeByStringList("select code from library.game_genre group by code","code");
+    }
 
     @Transactional
     public GameDto testCreate() {

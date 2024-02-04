@@ -15,4 +15,11 @@ public interface GameService {
 
     void storeNewGameInLibrary(List<Game> games);
 
+
+    List<String> getReleaseDates();
+
+    List<String> getGamesPlatforms();
+
+    List<String> getGameGenres();
+
 }

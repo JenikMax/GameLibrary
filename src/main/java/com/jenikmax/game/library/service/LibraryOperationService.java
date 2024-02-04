@@ -62,16 +62,16 @@ public class LibraryOperationService implements LibraryService {
 
     @Override
     public List<String> getReleaseDates() {
-        return null;
+        return gameService.getReleaseDates();
     }
 
     @Override
     public List<String> getGamesPlatforms() {
-        return null;
+        return gameService.getGamesPlatforms();
     }
 
     @Override
     public List<String> getGameGenres() {
-        return null;
+        return gameService.getGameGenres();
     }
 }
