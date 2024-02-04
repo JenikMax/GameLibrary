@@ -1,16 +1,21 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <link rel="stylesheet" href="css/library.css">
-
-
     <script>
-        document.getElementById("searchText").addEventListener("keyup", function(event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                document.getElementById("submitButton").click();
-            }
-        });
+        function gotoPage(button) {
+            const page = button.getAttribute('data-page');
+
+            const form = document.getElementById('paginationForm');
+            const searchText = document.getElementsByName('searchText')[0].value;
+            const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
+            const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
+            const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
+
+            form.action = `/filter?searchText=${searchText}&selectedPlatforms=${selectedPlatforms.join(',')}&selectedGenres=${selectedGenres.join(',')}&selectedYears=${selectedYears.join(',')}&page=${page}`;
+            form.submit();
+        }
     </script>
+
 </head>
 <body>
 <div class="container">
@@ -27,6 +32,14 @@
 
     <div class="filter">
         <form action="/filter" method="post">
+            <script>
+                document.getElementById("searchText").addEventListener("keyup", function(event) {
+                    if (event.keyCode === 13) {
+                        event.preventDefault();
+                        document.getElementById("submitButton").click();
+                    }
+                });
+            </script>
             <h3>Поиск</h3>
             <div class="search">
                 <input type="text" placeholder="Введите название игры" name="searchText" id="searchText" th:value="${searchText}">
@@ -80,13 +93,13 @@
         </div>
         </ul>
         <div class="pagination">
-            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=1'" tabindex="-1" aria-disabled="true">««</a>
-            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=' + (${page} - 1)" tabindex="-1" aria-disabled="true">«</a>
-            <a class="disabled" th:if="${page > 4}">...</a>
-            <a th:each="number : ${pages}" th:classappend="${number == page} ? 'active' : ''" th:href="'?page=' + ${number}" th:text="${number}"></a>
-            <a class="disabled" th:if="${page < totalPages - 3}">...</a>
-            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + (${page} + 1)">»</a>
-            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + ${totalPages}">»»</a>
+            <form id="paginationForm" action="/filter" method="post">
+                <button type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage(this)">««</button>
+                <button type="submit" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="gotoPage(this)">«</button>
+                <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="gotoPage(this)" th:text="${number}"></button>
+                <button type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${page + 1}" onclick="gotoPage(this)">»</button>
+                <button type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${totalPages}" onclick="gotoPage(this)">»»</button>
+            </form>
         </div>
     </div>
 </div>

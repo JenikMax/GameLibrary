@@ -85,10 +85,12 @@ public class LibraryViewController {
 
     @PostMapping("/filter")
     public String applyFilters(Model model, RedirectAttributes redirectAttributes,
+                               @RequestParam(value = "page", defaultValue = "1") int page,
                                @RequestParam(value = "searchText", required = false) String searchText,
                                @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
                                @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
                                @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres) {
+        redirectAttributes.addAttribute("page",page);
         redirectAttributes.addAttribute("searchText",searchText);
         redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
         redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());

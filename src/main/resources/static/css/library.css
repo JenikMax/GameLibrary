@@ -222,3 +222,30 @@ body {
 .pagination a.disabled {
     pointer-events: none;
 }
+
+
+
+.pagination button {
+    display: inline-block;
+    width: 45px;
+    height: 30px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: #007bff;
+    text-decoration: none;
+    line-height: 30px;
+}
+
+.pagination button:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination button.active {
+    background-color: #007bff;
+    color: white;
+}
+.pagination button.disabled {
+    pointer-events: none;
+}
