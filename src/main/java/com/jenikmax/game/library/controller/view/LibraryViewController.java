@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -36,7 +37,15 @@ public class LibraryViewController {
                        @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
                        @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres) {
         logger.info("Open library");
-        List<GameShortDto> gameList = libraryService.getGameList();
+
+        searchText = searchText != null ? searchText : "";
+        selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
+        selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
+        selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
+
+
+
+        List<GameShortDto> gameList = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres);
         gameList.addAll(gameList);
         gameList.addAll(gameList);
         gameList.addAll(gameList);
@@ -55,10 +64,11 @@ public class LibraryViewController {
         List<String> platforms = libraryService.getGamesPlatforms();
         List<String> genres = libraryService.getGameGenres();
 
-        selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
-        selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
-        selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
 
+
+
+
+        model.addAttribute("searchText", searchText);
         model.addAttribute("selectedPlatforms", selectedPlatforms);
         model.addAttribute("selectedYears", selectedYears);
         model.addAttribute("selectedGenres", selectedGenres);
@@ -98,9 +108,24 @@ public class LibraryViewController {
         return "redirect:/library";
     }
 
+
+    @GetMapping("library/game/{id}")
+    public String viewGame(@PathVariable("id") Long id, Model model) {
+        logger.info("Open game - {}",id);
+        //GameDto gameDto = gameService.getGameById(id);
+        //model.addAttribute("game", gameDto);
+        return "gameView";
+    }
+
     private List<Integer> initPages(int page, int totalPage){
         return Arrays.asList(NumberUtils.sequence(Math.max(1, page - 3),Math.min(totalPage, page + 3)));
     }
+
+
+
+
+
+
 
     // ${#numbers.sequence(Math.max(1, page - 3), Math.min(totalPages, page + 3))}"
 

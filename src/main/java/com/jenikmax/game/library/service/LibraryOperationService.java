@@ -51,6 +51,12 @@ public class LibraryOperationService implements LibraryService {
     }
 
     @Override
+    public List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres) {
+        if(searchText.isEmpty() && selectedPlatforms.size() == 0 && selectedYears.size() == 0 && selectedGenres.size() == 0) return getGameList();
+        return gameService.getGameShortList(searchText,selectedPlatforms,selectedYears,selectedGenres);
+    }
+
+    @Override
     public GameDto getGameInfo(Long gameId) {
         return null;
     }

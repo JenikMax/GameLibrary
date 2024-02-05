@@ -2,10 +2,23 @@
 <head>
     <link rel="stylesheet" href="css/library.css">
     <script>
-        function gotoPage(button) {
+        function gotoPage1(button) {
             const page = button.getAttribute('data-page');
 
-            const form = document.getElementById('paginationForm');
+            const form = document.getElementById('paginationForm1');
+            const searchText = document.getElementsByName('searchText')[0].value;
+            const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
+            const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
+            const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
+
+            form.action = `/filter?searchText=${searchText}&selectedPlatforms=${selectedPlatforms.join(',')}&selectedGenres=${selectedGenres.join(',')}&selectedYears=${selectedYears.join(',')}&page=${page}`;
+            form.submit();
+        }
+
+        function gotoPage2(button) {
+            const page = button.getAttribute('data-page');
+
+            const form = document.getElementById('paginationForm2');
             const searchText = document.getElementsByName('searchText')[0].value;
             const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
             const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
@@ -31,7 +44,7 @@
     </div>
 
     <div class="filter">
-        <form action="/filter" method="post">
+        <form action="/filter" id="filterForm" method="post">
             <script>
                 document.getElementById("searchText").addEventListener("keyup", function(event) {
                     if (event.keyCode === 13) {
@@ -39,6 +52,18 @@
                         document.getElementById("submitButton").click();
                     }
                 });
+
+                function submitForm() {
+                    document.getElementById("filterForm").submit();
+                }
+
+                function resetForm() {
+                    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach(checkbox => checkbox.checked = false);
+
+                    document.getElementById("searchText").value = "";
+                    submitForm();
+                }
             </script>
             <h3>Поиск</h3>
             <div class="search">
@@ -47,26 +72,26 @@
             <h3>Платформы</h3>
             <ul th:each="platform : ${platforms}">
                 <li>
-                    <input class="form-check-input" type="checkbox" th:id="'platformCheckbox-' + ${platform}" name="selectedPlatforms" th:value="${platform}" th:checked="${selectedPlatforms.contains(platform)}">
+                    <input class="form-check-input" type="checkbox" th:id="'platformCheckbox-' + ${platform}" name="selectedPlatforms" th:value="${platform}" th:checked="${selectedPlatforms.contains(platform)}" onclick="submitForm()">
                     <label class="form-check-label" th:for="'platformCheckbox-' + ${platform}" th:text="${platform}"></label>
                 </li>
             </ul>
             <h3>Жанры</h3>
             <ul th:each="genre : ${genres}">
                 <li>
-                    <input class="form-check-input" type="checkbox" th:id="'genreCheckbox-' + ${genre}" name="selectedGenres" th:value="${genre}" th:checked="${selectedGenres.contains(genre)}">
+                    <input class="form-check-input" type="checkbox" th:id="'genreCheckbox-' + ${genre}" name="selectedGenres" th:value="${genre}" th:checked="${selectedGenres.contains(genre)}" onclick="submitForm()">
                     <label class="form-check-label" th:for="'genreCheckbox-' + ${genre}" th:text="${genre.toLowerCase()}"></label>
                 </li>
             </ul>
             <h3>Годы выпуска</h3>
             <ul th:each="year : ${years}">
                 <li>
-                    <input class="form-check-input" type="checkbox" th:id="'yearCheckbox-' + ${year}" name="selectedYears" th:value="${year}" th:checked="${selectedYears.contains(year)}">
+                    <input class="form-check-input" type="checkbox" th:id="'yearCheckbox-' + ${year}" name="selectedYears" th:value="${year}" th:checked="${selectedYears.contains(year)}" onclick="submitForm()">
                     <label class="form-check-label" th:for="'yearCheckbox-' + ${year}" th:text="${year}"></label>
                 </li>
             </ul>
             <button type="submit">Найти</button>
-            <button type="reset">Сбросить</button>
+            <button type="reset"  onclick="resetForm()" >Сбросить</button>
         </form>
         <form action="/scan" method="post">
             <button type="submit">Обновить библиотеку</button>
@@ -75,30 +100,32 @@
     <div class="games">
         <h3>Список игр</h3>
         <div class="pagination">
-            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=1'" tabindex="-1" aria-disabled="true">««</a>
-            <a th:classappend="${page == 1} ? 'disabled' : ''" th:href="'?page=' + (${page} - 1)" tabindex="-1" aria-disabled="true">«</a>
-            <a class="disabled" th:if="${page > 4}">...</a>
-            <a th:each="number : ${pages}" th:classappend="${number == page} ? 'active' : ''" th:href="'?page=' + ${number}" th:text="${number}"></a>
-            <a class="disabled" th:if="${page < totalPages - 3}">...</a>
-            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + (${page} + 1)">»</a>
-            <a th:classappend="${page == totalPages} ? 'disabled' : ''" th:href="'?page=' + ${totalPages}">»»</a>
+            <form id="paginationForm1" action="/filter" method="post">
+                <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage1(this)">««</button>
+                <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="gotoPage1(this)">«</button>
+                <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="gotoPage1(this)" th:text="${number}"></button>
+                <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${page + 1}" onclick="gotoPage1(this)">»</button>
+                <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${totalPages}" onclick="gotoPage1(this)">»»</button>
+            </form>
         </div>
         <ul>
         <div th:each="game : ${gameList}" class="col-md-4 mb-4">
             <li>
+                <a th:href="'/library/game/' + ${game.id}" style="text-decoration: none; color: inherit;">
                 <span th:text="${game.platform}"></span>
                 <img th:src="${game.logo}" th:alt="${game.name}">
                 <p th:text="${game.name} + ' ('+ ${game.releaseDate} + ')'"></p>
+                </a>
             </li>
         </div>
         </ul>
         <div class="pagination">
-            <form id="paginationForm" action="/filter" method="post">
-                <button type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage(this)">««</button>
-                <button type="submit" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="gotoPage(this)">«</button>
-                <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="gotoPage(this)" th:text="${number}"></button>
-                <button type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${page + 1}" onclick="gotoPage(this)">»</button>
-                <button type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${totalPages}" onclick="gotoPage(this)">»»</button>
+            <form id="paginationForm2" action="/filter" method="post">
+                <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage2(this)">««</button>
+                <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="gotoPage2(this)">«</button>
+                <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="gotoPage2(this)" th:text="${number}"></button>
+                <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${page + 1}" onclick="gotoPage2(this)">»</button>
+                <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${totalPages}" onclick="gotoPage2(this)">»»</button>
             </form>
         </div>
     </div>

@@ -21,9 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -47,6 +45,29 @@ public class GameDataService implements GameService {
 
     public List<GameShortDto> getGameShortList(){
         return sqlDao.executeShortGame("select * from game_data");
+    }
+
+    @Override
+    public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres) {
+        List<Object> params = new ArrayList<>();
+        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from game_data where name like ?";
+        params.add('%' + searchText + '%');
+        if(selectedPlatforms.size() != 0){
+            String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
+            sql += String.format(" and platform in (%s)",platformSql);
+            params.addAll(selectedPlatforms);
+        }
+        if(selectedYears.size() != 0){
+            String yearsSql = String.join(",", Collections.nCopies(selectedYears.size(), "?"));
+            sql += String.format(" and release_date in (%s)",yearsSql);
+            params.addAll(selectedYears);
+        }
+        if(selectedGenres.size() != 0){
+            String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
+            sql += String.format(" and id in (select game_id from library.game_data_genre where genre_code in (%s))",genresSql);
+            params.addAll(selectedGenres);
+        }
+        return sqlDao.executeShortGame(sql,params.toArray());
     }
 
     @Override

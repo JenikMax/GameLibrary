@@ -11,6 +11,8 @@ public interface LibraryService {
 
     List<GameShortDto> getGameList();
 
+    List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres);
+
     GameDto getGameInfo(Long gameId);
 
     GameDto updateGameInfo(GameDto gameDto);

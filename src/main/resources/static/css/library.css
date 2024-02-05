@@ -162,7 +162,7 @@ body {
 
 .games li {
     width: 30%;
-    height: 300px;
+    height: 400px;
     margin: 10px;
     float: left;
     border: 1px solid #ccc;
@@ -173,7 +173,7 @@ body {
 
 .games img {
     width: 100%;
-    height: 80%;
+    height: 75%;
 }
 
 .games p {
@@ -184,6 +184,8 @@ body {
 }
 
 .games span {
+    line-height: 30px;
+    height: 30px;
     display: block;
     margin: 0;
     text-align: center;

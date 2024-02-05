@@ -49,7 +49,19 @@ public class SqlDaoImpl implements SqlDao {
 
     @Override
     public List<GameShortDto> executeShortGame(String query, Object[] params) {
-        return null;
+        List<GameShortDto> gameShortDtoList = jdbcTemplate.query(query, (rs, rowNum) -> {
+            GameShortDto dto = new GameShortDto();
+            dto.setId(rs.getLong("id"));
+            dto.setCreateTs(rs.getTimestamp("create_ts"));
+            dto.setName(rs.getString("name"));
+            dto.setDirectoryPath(rs.getString("directory_path"));
+            dto.setPlatform(rs.getString("platform"));
+            dto.setReleaseDate(rs.getString("release_date"));
+            dto.setGenres(new ArrayList<>());
+            dto.setLogo("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(rs.getBytes("logo")));
+            return dto;
+        }, params);
+        return gameShortDtoList;
     }
 
     @Override

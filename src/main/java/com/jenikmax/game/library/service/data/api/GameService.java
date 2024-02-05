@@ -9,6 +9,8 @@ public interface GameService {
 
     List<GameShortDto> getGameShortList();
 
+    List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres);
+
     List<Game> getGameList();
 
     void storeGame(Game game);
