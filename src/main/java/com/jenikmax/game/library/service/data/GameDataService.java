@@ -129,6 +129,11 @@ public class GameDataService implements GameService {
         return gameRepository.findAll();
     }
 
+    @Override
+    public Game getGameById(Long gameId) {
+        return gameRepository.getReferenceById(gameId);
+    }
+
     @Transactional
     @Override
     public void storeGame(Game game) {

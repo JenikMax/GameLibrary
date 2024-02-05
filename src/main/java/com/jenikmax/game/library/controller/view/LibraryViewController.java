@@ -1,5 +1,6 @@
 package com.jenikmax.game.library.controller.view;
 
+import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
@@ -46,13 +47,13 @@ public class LibraryViewController {
 
 
         List<GameShortDto> gameList = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
-        gameList.addAll(gameList);
+        //gameList.addAll(gameList);
+        //gameList.addAll(gameList);
+        //gameList.addAll(gameList);
+        //gameList.addAll(gameList);
+        //gameList.addAll(gameList);
+        //gameList.addAll(gameList);
+        //gameList.addAll(gameList);
         int pageSize = 12;
         int totalPages = (gameList.size() + pageSize - 1) / pageSize;
         int startIndex = (page - 1) * pageSize;
@@ -112,8 +113,8 @@ public class LibraryViewController {
     @GetMapping("library/game/{id}")
     public String viewGame(@PathVariable("id") Long id, Model model) {
         logger.info("Open game - {}",id);
-        //GameDto gameDto = gameService.getGameById(id);
-        //model.addAttribute("game", gameDto);
+        GameDto gameDto = libraryService.getGameInfo(id);
+        model.addAttribute("game", gameDto);
         return "gameView";
     }
 

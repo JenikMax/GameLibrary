@@ -1,32 +1,26 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" href="css/library.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/library.css}">
     <script>
         function gotoPage1(button) {
-            const page = button.getAttribute('data-page');
-
-            const form = document.getElementById('paginationForm1');
-            const searchText = document.getElementsByName('searchText')[0].value;
-            const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
-            const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
-            const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
-
-            form.action = `/filter?searchText=${searchText}&selectedPlatforms=${selectedPlatforms.join(',')}&selectedGenres=${selectedGenres.join(',')}&selectedYears=${selectedYears.join(',')}&page=${page}`;
-            form.submit();
+            goToPage(button,'paginationForm1');
         }
 
         function gotoPage2(button) {
-            const page = button.getAttribute('data-page');
+            goToPage(button,'paginationForm2');
+        }
 
-            const form = document.getElementById('paginationForm2');
+        function goToPage(button,gormId){
+            const page = button.getAttribute('data-page');
+            const form = document.getElementById(gormId);
             const searchText = document.getElementsByName('searchText')[0].value;
             const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
             const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
             const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
-
             form.action = `/filter?searchText=${searchText}&selectedPlatforms=${selectedPlatforms.join(',')}&selectedGenres=${selectedGenres.join(',')}&selectedYears=${selectedYears.join(',')}&page=${page}`;
             form.submit();
         }
+
     </script>
 
 </head>

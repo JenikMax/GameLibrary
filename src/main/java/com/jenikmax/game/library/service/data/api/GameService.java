@@ -13,6 +13,8 @@ public interface GameService {
 
     List<Game> getGameList();
 
+    Game getGameById(Long gameId);
+
     void storeGame(Game game);
 
     void storeNewGameInLibrary(List<Game> games);

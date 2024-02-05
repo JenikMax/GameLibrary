@@ -1,5 +1,6 @@
 package com.jenikmax.game.library.service;
 
+import com.jenikmax.game.library.model.converter.GameConverter;
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.Game;
@@ -58,7 +59,7 @@ public class LibraryOperationService implements LibraryService {
 
     @Override
     public GameDto getGameInfo(Long gameId) {
-        return null;
+        return GameConverter.gameToDtoConverter(gameService.getGameById(gameId));
     }
 
     @Override

@@ -1,176 +1,6 @@
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            width: 1200px;
-            margin: 50px auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-        }
-
-        .logo {
-            text-align: center;
-        }
-
-        .logo img {
-            width: 100px;
-            height: 100px;
-        }
-
-        .user {
-            display: flex;
-            align-items: center;
-        }
-
-        .user img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        .user a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .user a:hover {
-            text-decoration: underline;
-        }
-
-        .user button {
-            width: 100px;
-            height: 40px;
-            margin-left: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .game {
-            padding: 20px;
-        }
-
-        .game h1 {
-            margin: 10px;
-        }
-
-        .game span {
-            display: inline-block;
-            margin: 10px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            color: white;
-            background-color: #404040;
-        }
-
-        .game button {
-            width: 200px;
-            height: 50px;
-            margin: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            float: right;
-        }
-
-        .game img {
-            width: 500px;
-            height: 500px;
-            margin: 10px;
-            float: left;
-        }
-
-        .game p {
-            width: 600px;
-            margin: 10px;
-            float: right;
-        }
-
-        .game ul {
-            list-style: none;
-            margin: 10px;
-            padding: 0;
-            clear: both;
-        }
-
-        .game li {
-            display: inline-block;
-            width: 100px;
-            height: 30px;
-            margin: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            color: #007bff;
-            text-align: center;
-            line-height: 30px;
-        }
-
-        .game li img {
-            width: 100%;
-            height: 100%;
-        }
-
-        .game iframe {
-            width: 800px;
-            height: 450px;
-            margin: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .game pre {
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f0f0f0;
-            font-family: monospace;
-        }
-
-        .game a {
-            display: inline-block;
-            width: 100px;
-            height: 40px;
-            margin: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-            line-height: 40px;
-            text-decoration: none;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/game.css}">
 </head>
 <body>
 <div class="container">
@@ -185,35 +15,32 @@
         </div>
     </div>
     <div class="game">
-        <h1>Cyberpunk 2077</h1>
-        <span>2020</span>
-        <span>PC, PS5, PS4, Xbox</span>
-        <button type="button">Скачать</button>
-        <img src="cyberpunk.jpg" alt="Cyberpunk 2077">
-        <p>Cyberpunk 2077 — это приключенческая ролевая игра в открытом мире, действие которой происходит в Найт-Сити — мегаполисе, управляемом корпорациями, в котором ничто не стоит на пути технологического прогресса. Вы играете за V — наемника, ищущего уникальный имплант, позволяющий обрести бессмертие. Вы сами можете выбрать свой пол, внешность, класс, биографию и стиль игры, а также исследовать огромный открытый мир, где ваши поступки влияют на ход сюжета и все, что вас окружает.</p>
-        <ul>
-            <li>Action</li>
-            <li>Adventure</li>
-            <li>RPG</li>
-        </ul>
-        <li><img src="screenshot1.jpg" alt="Screenshot 1"></li>
-        <li><img src="screenshot2.jpg" alt="Screenshot 2"></li>
-        <li><img src="screenshot3.jpg" alt="Screenshot 3"></li>
-        <li><img src="screenshot4.jpg" alt="Screenshot 4"></li>
-        <li><img src="screenshot5.jpg" alt="Screenshot 5"></li>
-        <iframe src="https://www.youtube.com/embed/qIcTM8WXFjk" title="Cyberpunk 2077 — Official Trailer"></iframe>
-        <pre>
-Инструкция по установке игры:
-
-1. Скачайте файлы игры с помощью торрент-клиента.
-2. Распакуйте архив в удобное место на вашем компьютере.
-3. Запустите файл setup.exe и следуйте инструкциям установщика.
-4. Скопируйте содержимое папки Crack в папку с игрой, с заменой файлов.
-5. Запустите игру с ярлыка на рабочем столе или из папки с игрой.
-6. Наслаждайтесь игрой!
-</pre>
-        <a href="index.html">Назад</a>
-        <a href="edit.html">Редактировать</a>
+        <div class="game_ifgo">
+            <h1 th:text="${game.name}"></h1>
+            <span th:text="${game.releaseDate}"></span>
+            <span th:text="${game.platform}"></span>
+            <button type="button">Скачать</button>
+            <img th:src="${game.logo}" th:alt="${game.name}">
+            <p th:text="${game.description}"></p>
+        <div>
+        <div class="game_genre">
+            <ul th:each="genre : ${game.genres}">
+                <li th:text="${genre.genreDescription}"></li>
+            </ul>
+        <div>
+        <div class="game_screenshots">
+            <li th:each="screenshot : ${game.screenshots}"><img th:src="${screenshot.source}" th:alt="${screenshot.name}"></li>
+        <div>
+        <div class="game_trailer" th:unless="${game.trailerUrl == null or game.trailerUrl == ''}">
+            <iframe th:src="${game.trailerUrl}" th:title="${game.name}"></iframe>
+        </div>
+        <div class="game_instruction">
+            <pre th:text="${game.instruction}"></pre>
+        </div>
+        <div class="game_navigation">
+            <a href="index.html">Назад</a>
+            <a href="edit.html">Редактировать</a>
+        </div>
     </div>
 </div>
 </body>
