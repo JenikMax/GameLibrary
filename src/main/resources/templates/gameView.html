@@ -15,22 +15,27 @@
         </div>
     </div>
     <div class="game">
-        <div class="game_ifgo">
-            <h1 th:text="${game.name}"></h1>
-            <span th:text="${game.releaseDate}"></span>
-            <span th:text="${game.platform}"></span>
-            <button type="button">Скачать</button>
-            <img th:src="${game.logo}" th:alt="${game.name}">
-            <p th:text="${game.description}"></p>
-        <div>
+        <div class="game_info">
+            <div class="title">
+                <h1 th:text="${game.name} + ' (' + ${game.releaseDate} + ')'"></h1>
+            </div>
+            <div class="logo">
+                <img th:src="${game.logo}" th:alt="${game.name}">
+            </div>
+            <div class="description">
+                <span th:text="${game.platform}"></span>
+                <button type="button">Скачать</button>
+                <p th:text="${game.description}"></p>
+            </div>
+        </div>
         <div class="game_genre">
-            <ul th:each="genre : ${game.genres}">
-                <li th:text="${genre.genreDescription}"></li>
+            <ul>
+                <li th:each="genre : ${game.genres}" th:text="${genre.genreDescription}"></li>
             </ul>
-        <div>
+        </div>
         <div class="game_screenshots">
             <li th:each="screenshot : ${game.screenshots}"><img th:src="${screenshot.source}" th:alt="${screenshot.name}"></li>
-        <div>
+        </div>
         <div class="game_trailer" th:unless="${game.trailerUrl == null or game.trailerUrl == ''}">
             <iframe th:src="${game.trailerUrl}" th:title="${game.name}"></iframe>
         </div>
