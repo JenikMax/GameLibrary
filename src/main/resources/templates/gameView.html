@@ -8,53 +8,14 @@
 
             modal.style.display = "block";
             modalImg.src = img.src;
-            modalImg.dataset.index = img.dataset.index;
+            modalImg.style.width = "auto";
+            modalImg.style.height = "auto";
         }
 
         function closeModal() {
             var modal = document.getElementById("modal");
             modal.style.display = "none";
         }
-
-        function prevImage() {
-            var modal = document.getElementById("modal");
-            var modalImg = document.getElementById("modalImg");
-            var currentIndex = parseInt(modalImg.dataset.index);
-            var prevIndex = currentIndex - 1;
-
-            var screenshots = document.querySelectorAll(".game_screenshots img");
-            if (prevIndex >= 0 && prevIndex < screenshots.length) {
-                modalImg.src = screenshots[prevIndex].src;
-                modalImg.dataset.index = prevIndex;
-            }
-        }
-
-        function nextImage() {
-            var modal = document.getElementById("modal");
-            var modalImg = document.getElementById("modalImg");
-            var currentIndex = parseInt(modalImg.dataset.index);
-            var nextIndex = currentIndex + 1;
-
-            var screenshots = document.querySelectorAll(".game_screenshots img");
-            if (nextIndex >= 0 && nextIndex < screenshots.length) {
-                modalImg.src = screenshots[nextIndex].src;
-                modalImg.dataset.index = nextIndex;
-            }
-        }
-
-        // Добавляем обработчики для переключения изображений с помощью клавиатуры
-        document.addEventListener("keydown", function(event) {
-            var modal = document.getElementById("modal");
-            if (modal.style.display === "block") {
-                if (event.keyCode === 37) {
-                    prevImage(); // Нажатие на клавишу влево
-                } else if (event.keyCode === 39) {
-                    nextImage(); // Нажатие на клавишу вправо
-                } else if (event.keyCode === 27) {
-                    closeModal(); // Нажатие на клавишу Esc
-                }
-            }
-        });
     </script>
 </head>
 <body>
@@ -79,7 +40,9 @@
             </div>
             <div id="modal" class="modal">
                 <span class="close" onclick="closeModal()">&times;</span>
-                <img id="modalImg" class="modal-content" onclick="closeModal()">
+                <div class="modal-content">
+                    <img id="modalImg" onclick="closeModal()">
+                </div>
             </div>
             <div class="description">
                 <span th:text="${game.platform}"></span>
