@@ -16,6 +16,11 @@
             var modal = document.getElementById("modal");
             modal.style.display = "none";
         }
+
+        function goBack() {
+            window.history.back();
+        }
+
     </script>
 </head>
 <body>
@@ -67,8 +72,8 @@
             <pre th:text="${game.instruction}"></pre>
         </div>
         <div class="game_navigation">
-            <a href="index.html">Назад</a>
-            <a href="edit.html">Редактировать</a>
+            <a href="#" onclick="goBack()">Назад</a>
+            <a th:href="${game.id} + '/edit'">Редактировать</a>
         </div>
     </div>
 </div>

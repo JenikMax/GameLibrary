@@ -118,6 +118,14 @@ public class LibraryViewController {
         return "gameView";
     }
 
+    @GetMapping("library/game/{id}/edit")
+    public String editGame(@PathVariable("id") Long id, Model model) {
+        logger.info("Open game - {}",id);
+        GameDto gameDto = libraryService.getGameInfo(id);
+        model.addAttribute("game", gameDto);
+        return "gameEditView";
+    }
+
     private List<Integer> initPages(int page, int totalPage){
         return Arrays.asList(NumberUtils.sequence(Math.max(1, page - 3),Math.min(totalPage, page + 3)));
     }
