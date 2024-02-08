@@ -11,6 +11,8 @@ public interface SqlDao {
 
     List<String> executeByStringList(String query, String column);
 
+    List<String> executeByLowerStringList(String query, String column);
+
     List<GameShortDto> executeShortGame(String query,  Object[] params);
 
     List<Map<String, Object>> execute(String query);

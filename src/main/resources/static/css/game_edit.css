@@ -1,0 +1,174 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 1200px;
+    margin: 50px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.logo {
+    text-align: center;
+}
+
+.logo img {
+    width: 100px;
+    height: 100px;
+}
+
+.user {
+    display: flex;
+    align-items: center;
+}
+
+.user img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.user a:hover {
+    text-decoration: underline;
+}
+
+.user button {
+    width: 100px;
+    height: 40px;
+    margin-left: 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.edit {
+    padding: 20px;
+}
+
+.edit h1 {
+    margin: 10px;
+}
+
+.edit label {
+    display: block;
+    margin: 10px;
+}
+
+.edit input {
+    width: 80%;
+    height: 40px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.edit select {
+    width: 80%;
+    height: auto;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.edit textarea {
+    width: 80%;
+    height: 200px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.edit button {
+    width: 200px;
+    height: 50px;
+    margin: 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.edit a {
+    display: block;
+    width: 100px;
+    height: 40px;
+    margin: 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    line-height: 40px;
+    text-decoration: none;
+}
+
+.data {
+    padding: 20px;
+}
+
+.data h2 {
+    margin: 10px;
+}
+
+.data label {
+    display: block;
+    margin: 10px;
+}
+
+.data select {
+    width: 80%;
+    height: 40px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.data button {
+    width: 200px;
+    height: 50px;
+    margin: 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.selected {
+    background-color: yellow;
+    font-weight: bold;
+}

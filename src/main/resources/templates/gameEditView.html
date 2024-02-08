@@ -1,176 +1,6 @@
 <html>
 <head>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            width: 1200px;
-            margin: 50px auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-        }
-
-        .logo {
-            text-align: center;
-        }
-
-        .logo img {
-            width: 100px;
-            height: 100px;
-        }
-
-        .user {
-            display: flex;
-            align-items: center;
-        }
-
-        .user img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        .user a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .user a:hover {
-            text-decoration: underline;
-        }
-
-        .user button {
-            width: 100px;
-            height: 40px;
-            margin-left: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .edit {
-            padding: 20px;
-        }
-
-        .edit h1 {
-            margin: 10px;
-        }
-
-        .edit label {
-            display: block;
-            margin: 10px;
-        }
-
-        .edit input {
-            width: 80%;
-            height: 40px;
-            margin: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-        }
-
-        .edit select {
-            width: 80%;
-            height: 40px;
-            margin: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-        }
-
-        .edit textarea {
-            width: 80%;
-            height: 200px;
-            margin: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-        }
-
-        .edit button {
-            width: 200px;
-            height: 50px;
-            margin: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .edit a {
-            display: block;
-            width: 100px;
-            height: 40px;
-            margin: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-            line-height: 40px;
-            text-decoration: none;
-        }
-
-        .data {
-            padding: 20px;
-        }
-
-        .data h2 {
-            margin: 10px;
-        }
-
-        .data label {
-            display: block;
-            margin: 10px;
-        }
-
-        .data select {
-            width: 80%;
-            height: 40px;
-            margin: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-        }
-
-        .data button {
-            width: 200px;
-            height: 50px;
-            margin: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/game_edit.css}">
     <script>
         function goBack() {
             window.history.back();
@@ -201,50 +31,37 @@
                 <option value="stopgame">Stopgame.ru</option>
             </select>
             <button type="submit">Применить</button>
+        </form>
     </div>
     <div class="edit">
         <h1>Редактирование плитки</h1>
         <form action="save.html" method="post">
             <label for="title">Название игры</label>
-            <input type="text" id="title" name="title" value="Cyberpunk 2077">
+            <input type="text" id="title" name="name" th:value="${game.name}">
             <label for="year">Год выпуска</label>
-            <input type="number" id="year" name="year" value="2020">
+            <input type="text" id="year" name="releaseDate" th:value="${game.releaseDate}">
             <label for="platform">Платформа</label>
-            <select id="platform" name="platform" multiple>
-                <option value="pc" selected>PC</option>
-                <option value="ps5" selected>PS5</option>
-                <option value="ps4" selected>PS4</option>
-                <option value="xbox" selected>Xbox</option>
-                <option value="switch">Switch</option>
-                <option value="mobile">Mobile</option>
+            <select id="platform" name="platform">
+                <option th:each="platform : ${platforms}" th:value="${platform}" th:text="${platform.toUpperCase()}"></option>
             </select>
             <label for="poster">Постер игры</label>
-            <input type="file" id="poster" name="poster" accept="image/*">
+            <input type="file" id="poster" name="logo" accept="image/*">
             <label for="description">Описание игры</label>
-            <textarea id="description" name="description">Cyberpunk 2077 — это приключенческая ролевая игра в открытом мире, действие которой происходит в Найт-Сити — мегаполисе, управляемом корпорациями, в котором ничто не стоит на пути технологического прогресса. Вы играете за V — наемника, ищущего уникальный имплант, позволяющий обрести бессмертие. Вы сами можете выбрать свой пол, внешность, класс, биографию и стиль игры, а также исследовать огромный открытый мир, где ваши поступки влияют на ход сюжета и все, что вас окружает.</textarea>
-            <label for="genre">Жанр</label>
-            <select id="genre" name="genre" multiple>
-                <option value="action" selected>Action</option>
-                <option value="adventure" selected>Adventure</option>
-                <option value="rpg" selected>RPG</option>
-                <option value="strategy">Strategy</option>
-                <option value="simulation">Simulation</option>
-                <option value="sports">Sports</option>
-                <option value="racing">Racing</option>
-                <option value="puzzle">Puzzle</option>
-                <option value="casual">Casual</option>
+            <textarea id="description" name="description" th:value="${game.description}"></textarea>
+            <label for="genres">Жанр</label>
+            <select id="genres" name="genres" multiple>
+                <option th:each="genre : ${genres}"
+                        th:value="${genre}"
+                        th:text="${genre}"
+                        th:selected="${game.genres.contains(genre)}"
+                        th:classappend="${game.genres.contains(genre)} ? 'selected'"></option>
             </select>
             <label for="screenshots">Скриншоты игры</label>
             <input type="file" id="screenshots" name="screenshots" accept="image/*" multiple>
             <label for="video">Видео игры</label>
-            <input type="url" id="video" name="video" value="https://www.youtube.com/embed/qIcTM8WXFjk">
+            <input type="url" id="video" name="trailerUrl" th:value="${game.trailerUrl}">
             <label for="instructions">Инструкция по установке игры</label>
-            <textarea id="instructions" name="instructions">1. Скачайте файлы игры с помощью торрент-клиента.
-2. Распакуйте архив в удобное место на вашем компьютере.
-3. Запустите файл setup.exe и следуйте инструкциям установщика.
-4. Скопируйте содержимое папки Crack в папку с игрой, с заменой файлов.
-5. Запустите игру с ярлыка на рабочем столе или из папки с игрой.
-6. Наслаждайтесь игрой!</textarea>
+            <textarea id="instructions" name="instruction" th:value="${game.instruction}">!</textarea>
             <button type="submit">Сохранить</button>
         </form>
         <a href="#" onclick="goBack()">Отмена</a>

@@ -12,7 +12,7 @@ public class GameDto extends GameShortDto {
 
     public GameDto(){}
 
-    public GameDto(Long id, Timestamp createTs, String name, String directoryPath, String platform, String releaseDate, List<GameGenreDto> genres, String logo, String trailerUrl, String description, String instruction, List<ScreenshotDto> screenshots) {
+    public GameDto(Long id, Timestamp createTs, String name, String directoryPath, String platform, String releaseDate, List<String> genres, String logo, String trailerUrl, String description, String instruction, List<ScreenshotDto> screenshots) {
         super(id, createTs, name, directoryPath, platform, releaseDate, genres, logo);
         this.trailerUrl = trailerUrl;
         this.description = description;

@@ -48,6 +48,14 @@ public class SqlDaoImpl implements SqlDao {
     }
 
     @Override
+    public List<String> executeByLowerStringList(String query, String column) {
+        return jdbcTemplate.query(query, (rs, rowNum) -> {
+            String result = rs.getString(column);
+            return result != null ? result.toLowerCase() : "";
+        });
+    }
+
+    @Override
     public List<GameShortDto> executeShortGame(String query, Object[] params) {
         List<GameShortDto> gameShortDtoList = jdbcTemplate.query(query, (rs, rowNum) -> {
             GameShortDto dto = new GameShortDto();

@@ -40,8 +40,8 @@ public class GameConverter {
         entity.setPlatform(dto.getPlatform());
         entity.setLogo(Base64.getDecoder().decode(dto.getLogo()));
         entity.setGenres(new ArrayList<>());
-        for(GameGenreDto genreDto : dto.getGenres()){
-            entity.getGenres().add(dtoToGameGenreEntityConverter(genreDto,entity));
+        for(String genre: dto.getGenres()){
+            entity.getGenres().add(dtoToGameGenreEntityConverter(genre,entity));
         }
         return entity;
     }
@@ -86,26 +86,25 @@ public class GameConverter {
             entity.getScreenshots().add(dtoToScreenshotEntityConverter(screenshotDto,entity));
         }
         entity.setGenres(new ArrayList<>());
-        for(GameGenreDto genreDto : dto.getGenres()){
-            entity.getGenres().add(dtoToGameGenreEntityConverter(genreDto,entity));
+        for(String genre : dto.getGenres()){
+            entity.getGenres().add(dtoToGameGenreEntityConverter(genre,entity));
         }
         return entity;
     }
 
-    public static GameGenreDto gameGenreToDtoConverter(GameGenre entity){
-        GameGenreDto dto = new GameGenreDto();
-        dto.setId(entity.getId());
-        dto.setGameId(entity.getGame().getId());
-        dto.setGenreCode(entity.getGenre().toString());
-        dto.setGenreDescription(entity.getGenre().getName());
-        return dto;
+    public static String gameGenreToDtoConverter(GameGenre entity){
+        //GameGenreDto dto = new GameGenreDto();
+        //dto.setId(entity.getId());
+        //dto.setGameId(entity.getGame().getId());
+        //dto.setGenreCode(entity.getGenre().toString());
+        //dto.setGenreDescription(entity.getGenre().getName());
+        return entity.getGenre().toString().toLowerCase();
     }
 
-    public static GameGenre dtoToGameGenreEntityConverter(GameGenreDto dto, Game game){
+    public static GameGenre dtoToGameGenreEntityConverter(String genre, Game game){
         GameGenre entity = new GameGenre();
-        entity.setId(dto.getId());
         entity.setGame(game);
-        entity.setGenre(Genre.valueOf(dto.getGenreCode().toUpperCase()));
+        entity.setGenre(Genre.valueOf(genre.toUpperCase()));
         return entity;
     }
 

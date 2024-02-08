@@ -11,13 +11,13 @@ public class GameShortDto {
     protected String directoryPath;
     protected String platform;
     protected String releaseDate;
-    protected List<GameGenreDto> genres;
+    protected List<String> genres;
     protected String logo;
 
     public GameShortDto() {
     }
 
-    public GameShortDto(Long id, Timestamp createTs, String name, String directoryPath, String platform, String releaseDate, List<GameGenreDto> genres, String logo) {
+    public GameShortDto(Long id, Timestamp createTs, String name, String directoryPath, String platform, String releaseDate, List<String> genres, String logo) {
         this.id = id;
         this.createTs = createTs;
         this.name = name;
@@ -76,11 +76,11 @@ public class GameShortDto {
         this.releaseDate = releaseDate;
     }
 
-    public List<GameGenreDto> getGenres() {
+    public List<String> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<GameGenreDto> genres) {
+    public void setGenres(List<String> genres) {
         this.genres = genres;
     }
 

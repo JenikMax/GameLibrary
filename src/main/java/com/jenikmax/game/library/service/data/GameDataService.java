@@ -82,7 +82,7 @@ public class GameDataService implements GameService {
 
     @Override
     public List<String> getGameGenres() {
-        return sqlDao.executeByStringList("select code from library.game_genre group by code","code");
+        return sqlDao.executeByLowerStringList("select code from library.game_genre group by code","code");
     }
 
     @Transactional
