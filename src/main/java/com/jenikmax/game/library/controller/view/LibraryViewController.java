@@ -130,6 +130,18 @@ public class LibraryViewController {
         return "gameEditView";
     }
 
+    @PostMapping("library/game/{id}/edit")
+    public String saveGame(@PathVariable("id") Long id, GameDto game,Model model) {
+        logger.info("Open game - {} ",id);
+        GameDto gameDto = libraryService.getGameInfo(id);
+        List<String> platforms = libraryService.getGamesPlatforms();
+        List<String> genres = libraryService.getGameGenres();
+        model.addAttribute("game", gameDto);
+        model.addAttribute("platforms", platforms);
+        model.addAttribute("genres", genres);
+        return "gameEditView";
+    }
+
     private List<Integer> initPages(int page, int totalPage){
         return Arrays.asList(NumberUtils.sequence(Math.max(1, page - 3),Math.min(totalPage, page + 3)));
     }

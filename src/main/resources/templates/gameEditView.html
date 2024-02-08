@@ -5,6 +5,74 @@
         function goBack() {
             window.history.back();
         }
+
+        function addGenre() {
+            var selectedGenre = document.getElementById("genre");
+            var genreList = document.getElementById("genreList");
+
+            if (selectedGenre.value !== "" && !checkDuplicateGenre(selectedGenre.value)) {
+                var genreDiv = document.createElement("div");
+                genreDiv.innerHTML = "<span>" + selectedGenre.value + "</span>"
+                    + "<button type='button' onclick='removeGenre(this)'>Удалить</button>";
+                genreList.appendChild(genreDiv);
+
+                var hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = "genres";
+                hiddenInput.value = selectedGenre.value;
+                genreDiv.appendChild(hiddenInput);
+
+                selectedGenre.selectedIndex = 0;
+            } else {
+                // Обработка ошибки выбора дубликата или невалидного жанра
+            }
+        }
+
+        function removeGenre(element) {
+            element.parentElement.remove();
+        }
+
+        function checkDuplicateGenre(genreValue) {
+            var genreList = document.querySelectorAll("#genreList span");
+            for (var i = 0; i < genreList.length; i++) {
+                if (genreList[i].textContent === genreValue) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+
+        function previewImage(input) {
+            var imagePreview = document.getElementById("imagePreview");
+            imagePreview.innerHTML = "";
+
+            var file = input.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var imgElement = document.createElement("img");
+                    imgElement.src = e.target.result;
+
+                    var removeButton = document.createElement("button");
+                    removeButton.type = "button";
+                    removeButton.innerText = "Удалить";
+                    removeButton.onclick = function () {
+                        imagePreview.innerHTML = "";
+                        input.value = "";
+                        logoInput.value = "";
+                    };
+
+                    imagePreview.appendChild(imgElement);
+                    imagePreview.appendChild(removeButton);
+
+                    // Обновляем значение поля logo при загрузке нового изображения
+                    logoInput.value = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
     </script>
 </head>
 <body>
@@ -35,7 +103,9 @@
     </div>
     <div class="edit">
         <h1>Редактирование плитки</h1>
-        <form action="save.html" method="post">
+        <form th:action="@{'/library/game/' + ${game.id} + '/edit'}" method="post">
+            <input type="hidden" id="directoryPath" name="directoryPath" th:value="${game.directoryPath}">
+
             <label for="title">Название игры</label>
             <input type="text" id="title" name="name" th:value="${game.name}">
             <label for="year">Год выпуска</label>
@@ -45,19 +115,49 @@
                 <option th:each="platform : ${platforms}" th:value="${platform}" th:text="${platform.toUpperCase()}"></option>
             </select>
             <label for="poster">Постер игры</label>
-            <input type="file" id="poster" name="logo" accept="image/*">
+            <input type="file" id="poster" name="poster" accept="image/*" onchange="previewImage(this)">
+            <div id="imagePreview"></div>
+            <input type="hidden" id="logo" name="logo" th:value="${game.logo}">
+            <script>
+                var logoInput = document.getElementById("logo");
+
+                // Проверяем, есть ли значение в поле logo при загрузке формы
+                if (logoInput.value) {
+                    var imagePreview = document.getElementById("imagePreview");
+                    var imgElement = document.createElement("img");
+                    imgElement.src = logoInput.value;
+
+                    var removeButton = document.createElement("button");
+                    removeButton.type = "button";
+                    removeButton.innerText = "Удалить";
+                    removeButton.onclick = function () {
+                        imagePreview.innerHTML = "";
+                        logoInput.value = "";
+                    };
+
+                    imagePreview.appendChild(imgElement);
+                    imagePreview.appendChild(removeButton);
+                }
+            </script>
             <label for="description">Описание игры</label>
             <textarea id="description" name="description" th:value="${game.description}"></textarea>
-            <label for="genres">Жанр</label>
-            <select id="genres" name="genres" multiple>
+            <label for="genre">Жанр</label>
+            <select id="genre" name="genre">
+                <option value="">Выберите жанр</option>
                 <option th:each="genre : ${genres}"
                         th:value="${genre}"
-                        th:text="${genre}"
-                        th:selected="${game.genres.contains(genre)}"
-                        th:classappend="${game.genres.contains(genre)} ? 'selected'"></option>
+                        th:text="${genre}"></option>
             </select>
-            <label for="screenshots">Скриншоты игры</label>
-            <input type="file" id="screenshots" name="screenshots" accept="image/*" multiple>
+            <button type="button" onclick="addGenre()">Добавить</button>
+            <div id="genreList">
+                <div th:each="genre : ${game.genres}">
+                    <span th:text="${genre}"></span>
+                    <button type="button" onclick="removeGenre(this)">Удалить</button>
+                    <input type="hidden" th:name="genres" th:value="${genre}">
+                </div>
+            </div>
+            <!--<label for="screenshots">Скриншоты игры</label>
+            <input type="file" id="screenshots" name="screenshots" accept="image/*" multiple> -->
             <label for="video">Видео игры</label>
             <input type="url" id="video" name="trailerUrl" th:value="${game.trailerUrl}">
             <label for="instructions">Инструкция по установке игры</label>
