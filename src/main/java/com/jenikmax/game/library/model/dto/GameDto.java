@@ -8,11 +8,11 @@ public class GameDto extends GameShortDto {
     private String trailerUrl;
     private String description;
     private String instruction;
-    private List<ScreenshotDto> screenshots;
+    private List<String> screenshots;
 
     public GameDto(){}
 
-    public GameDto(Long id, Timestamp createTs, String name, String directoryPath, String platform, String releaseDate, List<String> genres, String logo, String trailerUrl, String description, String instruction, List<ScreenshotDto> screenshots) {
+    public GameDto(Long id, Timestamp createTs, String name, String directoryPath, String platform, String releaseDate, List<String> genres, String logo, String trailerUrl, String description, String instruction, List<String> screenshots) {
         super(id, createTs, name, directoryPath, platform, releaseDate, genres, logo);
         this.trailerUrl = trailerUrl;
         this.description = description;
@@ -45,11 +45,11 @@ public class GameDto extends GameShortDto {
         this.instruction = instruction;
     }
 
-    public List<ScreenshotDto> getScreenshots() {
+    public List<String> getScreenshots() {
         return screenshots;
     }
 
-    public void setScreenshots(List<ScreenshotDto> screenshots) {
+    public void setScreenshots(List<String> screenshots) {
         this.screenshots = screenshots;
     }
 }

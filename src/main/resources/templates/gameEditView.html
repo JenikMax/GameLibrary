@@ -73,6 +73,48 @@
                 reader.readAsDataURL(file);
             }
         }
+
+
+        function previewScreenshots(input) {
+            var screenshotList = document.getElementById("screenshotsList");
+
+            var files = input.files;
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var screenshotDiv = document.createElement("div");
+                    screenshotDiv.className = "screenshot-item";
+
+                    var imgElement = document.createElement("img");
+                    imgElement.src = e.target.result;
+
+                    var removeButton = document.createElement("button");
+                    removeButton.type = "button";
+                    removeButton.innerText = "Удалить";
+                    removeButton.onclick = function () {
+                        screenshotDiv.remove();
+                    };
+
+                    var hiddenInput = document.createElement("input");
+                    hiddenInput.type = "hidden";
+                    hiddenInput.name = "screenshots";
+                    hiddenInput.value = e.target.result;
+
+                    screenshotDiv.appendChild(imgElement);
+                    screenshotDiv.appendChild(removeButton);
+                    screenshotDiv.appendChild(hiddenInput);
+
+                    screenshotList.appendChild(screenshotDiv);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeScreenshot(button) {
+            var screenshotDiv = button.parentElement;
+            screenshotDiv.remove();
+        }
     </script>
 </head>
 <body>
@@ -156,8 +198,15 @@
                     <input type="hidden" th:name="genres" th:value="${genre}">
                 </div>
             </div>
-            <!--<label for="screenshots">Скриншоты игры</label>
-            <input type="file" id="screenshots" name="screenshots" accept="image/*" multiple> -->
+            <label for="screenshotsUpl">Скриншоты игры</label>
+            <input type="file" id="screenshotsUpl" name="screenshotsUpl" accept="image/*" multiple onchange="previewScreenshots(this)">
+            <div id="screenshotsList">
+                <div th:each="screenshot : ${game.screenshots}" class="screenshot-item">
+                    <img th:src="${screenshot}" alt="screenshot">
+                    <button type="button" onclick="removeScreenshot(this)">Удалить</button>
+                    <input type="hidden" name="screenshots" th:value="${screenshot}">
+                </div>
+            </div>
             <label for="video">Видео игры</label>
             <input type="url" id="video" name="trailerUrl" th:value="${game.trailerUrl}">
             <label for="instructions">Инструкция по установке игры</label>
