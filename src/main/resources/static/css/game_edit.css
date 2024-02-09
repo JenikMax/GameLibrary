@@ -265,8 +265,8 @@ body {
 
 
 .game_poster img{
-    width: 300;
-    height: 500;
+    width: 94%;
+    height: auto;
     margin: 10px ;
     background-color: white;
     border-radius: 10px;
@@ -274,21 +274,21 @@ body {
 }
 
 .game_poster button{
-    width: 300px;
+    width: 94%;
     height: 50px;
 }
 
 .game_poster .imagePreview{
-    width: 320px;
-    height: 100px auto;
-    margin: 30px ;
+    width: 30%;
+    height: auto;
+    margin: 20px ;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .genreList div{
-    width: 300px;
+    width: 23%;
     height: 50px ;
     margin: 10px ;
     background-color: white;
@@ -344,6 +344,11 @@ body {
 }
 
 .game_screenshots .screenshotsList{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.game_genre .genreList{
     display: flex;
     flex-wrap: wrap;
 }
