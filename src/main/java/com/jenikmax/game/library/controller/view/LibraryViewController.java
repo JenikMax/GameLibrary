@@ -122,10 +122,10 @@ public class LibraryViewController {
     public String editGame(@PathVariable("id") Long id, Model model) {
         logger.info("Open game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
-        List<String> platforms = libraryService.getGamesPlatforms();
+        //List<String> platforms = libraryService.getGamesPlatforms();
         List<String> genres = libraryService.getGameGenres();
         model.addAttribute("game", gameDto);
-        model.addAttribute("platforms", platforms);
+        //model.addAttribute("platforms", platforms);
         model.addAttribute("genres", genres);
         return "gameEditView";
     }

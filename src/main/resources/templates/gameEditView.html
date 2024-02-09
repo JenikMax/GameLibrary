@@ -147,70 +147,100 @@
         <h1>Редактирование плитки</h1>
         <form th:action="@{'/library/game/' + ${game.id} + '/edit'}" method="post">
             <input type="hidden" id="directoryPath" name="directoryPath" th:value="${game.directoryPath}">
+            <input type="hidden" id="platform" name="platform" th:value="${game.platform}">
+            <div class="game_name">
+                <div class="label-container">
+                    <label for="title">Название игры</label>
+                </div>
+                <input type="text" id="title" name="name" th:value="${game.name}">
+            </div>
+            <div class="game_year">
+                <div class="label-container">
+                    <label for="year">Год выпуска</label>
+                </div>
+                <input type="text" id="year" name="releaseDate" th:value="${game.releaseDate}">
+            </div>
+            <div class="game_poster">
+                <div class="label-container">
+                    <label for="poster">Постер игры</label>
+                </div>
+                <input type="file" id="poster" name="poster" accept="image/*" onchange="previewImage(this)">
+                <div class="imagePreview-container">
+                    <div id="imagePreview" class="imagePreview"></div>
+                </div>
+                <input type="hidden" id="logo" name="logo" th:value="${game.logo}">
+                <script>
+                    var logoInput = document.getElementById("logo");
 
-            <label for="title">Название игры</label>
-            <input type="text" id="title" name="name" th:value="${game.name}">
-            <label for="year">Год выпуска</label>
-            <input type="text" id="year" name="releaseDate" th:value="${game.releaseDate}">
-            <label for="platform">Платформа</label>
-            <select id="platform" name="platform">
-                <option th:each="platform : ${platforms}" th:value="${platform}" th:text="${platform.toUpperCase()}"></option>
-            </select>
-            <label for="poster">Постер игры</label>
-            <input type="file" id="poster" name="poster" accept="image/*" onchange="previewImage(this)">
-            <div id="imagePreview"></div>
-            <input type="hidden" id="logo" name="logo" th:value="${game.logo}">
-            <script>
-                var logoInput = document.getElementById("logo");
+                    // Проверяем, есть ли значение в поле logo при загрузке формы
+                    if (logoInput.value) {
+                        var imagePreview = document.getElementById("imagePreview");
+                        var imgElement = document.createElement("img");
+                        imgElement.src = logoInput.value;
 
-                // Проверяем, есть ли значение в поле logo при загрузке формы
-                if (logoInput.value) {
-                    var imagePreview = document.getElementById("imagePreview");
-                    var imgElement = document.createElement("img");
-                    imgElement.src = logoInput.value;
+                        var removeButton = document.createElement("button");
+                        removeButton.type = "button";
+                        removeButton.innerText = "Удалить";
+                        removeButton.onclick = function () {
+                            imagePreview.innerHTML = "";
+                            logoInput.value = "";
+                        };
 
-                    var removeButton = document.createElement("button");
-                    removeButton.type = "button";
-                    removeButton.innerText = "Удалить";
-                    removeButton.onclick = function () {
-                        imagePreview.innerHTML = "";
-                        logoInput.value = "";
-                    };
-
-                    imagePreview.appendChild(imgElement);
-                    imagePreview.appendChild(removeButton);
-                }
-            </script>
-            <label for="description">Описание игры</label>
-            <textarea id="description" name="description" th:value="${game.description}"></textarea>
-            <label for="genre">Жанр</label>
-            <select id="genre" name="genre">
-                <option value="">Выберите жанр</option>
-                <option th:each="genre : ${genres}"
-                        th:value="${genre}"
-                        th:text="${genre}"></option>
-            </select>
-            <button type="button" onclick="addGenre()">Добавить</button>
-            <div id="genreList">
-                <div th:each="genre : ${game.genres}">
-                    <span th:text="${genre}"></span>
-                    <button type="button" onclick="removeGenre(this)">Удалить</button>
-                    <input type="hidden" th:name="genres" th:value="${genre}">
+                        imagePreview.appendChild(imgElement);
+                        imagePreview.appendChild(removeButton);
+                    }
+                </script>
+            </div>
+            <div class="game_description">
+                <div class="label-container">
+                    <label for="description">Описание игры</label>
+                </div>
+                <textarea id="description" name="description" th:value="${game.description}" th:text="${game.description}"></textarea>
+            </div>
+            <div class="game_genre">
+                <div class="label-container">
+                    <label for="genre">Жанр</label>
+                </div>
+                <select id="genre" name="genre">
+                    <option value="">Выберите жанр</option>
+                    <option th:each="genre : ${genres}"
+                            th:value="${genre}"
+                            th:text="${genre}"></option>
+                </select>
+                <button type="button" class="add_button" onclick="addGenre()">Добавить</button>
+                <div class="genreList-container">
+                    <div id="genreList">
+                        <div th:each="genre : ${game.genres}">
+                            <span th:text="${genre}"></span>
+                            <button type="button" onclick="removeGenre(this)">Удалить</button>
+                            <input type="hidden" th:name="genres" th:value="${genre}">
+                        </div>
+                    </div>
                 </div>
             </div>
-            <label for="screenshotsUpl">Скриншоты игры</label>
-            <input type="file" id="screenshotsUpl" name="screenshotsUpl" accept="image/*" multiple onchange="previewScreenshots(this)">
-            <div id="screenshotsList">
-                <div th:each="screenshot : ${game.screenshots}" class="screenshot-item">
-                    <img th:src="${screenshot}" alt="screenshot">
-                    <button type="button" onclick="removeScreenshot(this)">Удалить</button>
-                    <input type="hidden" name="screenshots" th:value="${screenshot}">
+            <div class="game_screenshots">
+                <label for="screenshotsUpl">Скриншоты игры</label>
+                <input type="file" id="screenshotsUpl" name="screenshotsUpl" accept="image/*" multiple onchange="previewScreenshots(this)">
+                <div id="screenshotsList">
+                    <div th:each="screenshot : ${game.screenshots}" class="screenshot-item">
+                        <img th:src="${screenshot}" alt="screenshot">
+                        <button type="button" onclick="removeScreenshot(this)">Удалить</button>
+                        <input type="hidden" name="screenshots" th:value="${screenshot}">
+                    </div>
                 </div>
             </div>
-            <label for="video">Видео игры</label>
-            <input type="url" id="video" name="trailerUrl" th:value="${game.trailerUrl}">
-            <label for="instructions">Инструкция по установке игры</label>
-            <textarea id="instructions" name="instruction" th:value="${game.instruction}">!</textarea>
+            <div class="game_video">
+                <div class="label-container">
+                    <label for="video">Видео игры</label>
+                </div>
+                <input type="url" id="video" name="trailerUrl" th:value="${game.trailerUrl}">
+            </div>
+            <div class="game_instruction">
+                <div class="label-container">
+                    <label for="instructions">Инструкция по установке игры</label>
+                </div>
+                <textarea id="instructions" name="instruction" th:utext="${game.instruction}"></textarea>
+            </div>
             <button type="submit">Сохранить</button>
         </form>
         <a href="#" onclick="goBack()">Отмена</a>

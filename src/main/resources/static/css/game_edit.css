@@ -178,3 +178,107 @@ body {
     margin-bottom: 10px;
     border: 1px solid #ccc;
 }
+
+.data{
+    width: 1150px;
+    height: 50px auto;
+    margin: 30px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.edit{
+    width: 1150px;
+    height: 50px auto;
+    margin: 30px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.game_name ,
+.game_poster ,
+.game_description ,
+.game_video ,
+.game_instruction ,
+.game_genre ,
+.game_year{
+    width: 1050px;
+    height: 60px auto;
+    margin: 30px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.game_name .label-container,
+.game_poster .label-container,
+.game_poster .imagePreview-container,
+.game_description .label-container,
+.game_video .label-container,
+.game_instruction .label-container,
+.game_genre .label-container,
+.game_year .label-container{
+    display: flex;
+    align-items: center;
+}
+
+.game_name label,
+.game_poster label,
+.game_description label,
+.game_video label,
+.game_instruction label,
+.game_genre label,
+.game_year label{
+    margin: 15px 15px;
+    font-size: 25px;
+    vertical-align: middle;
+}
+
+.game_name input,
+.game_poster input,
+.game_video input,
+.game_year input{
+    width: 98%;
+}
+
+.game_description textarea,
+.game_instruction textarea{
+    width: 98%;
+}
+
+.game_genre select{
+    width: 70%;
+}
+
+.game_genre .add_button{
+    width: 25%;
+    height: 40px
+}
+
+
+
+.game_poster img{
+    width: 300;
+    height: 500;
+    margin: 10px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.game_poster button{
+    width: 300px;
+    height: 50px;
+}
+
+.game_poster .imagePreview{
+    width: 320px;
+    height: 100px auto;
+    margin: 30px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
