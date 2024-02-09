@@ -199,6 +199,7 @@ body {
 
 .game_name ,
 .game_poster ,
+.game_screenshots ,
 .game_description ,
 .game_video ,
 .game_instruction ,
@@ -213,12 +214,14 @@ body {
 }
 
 .game_name .label-container,
+.game_screenshots .label-container,
 .game_poster .label-container,
 .game_poster .imagePreview-container,
 .game_description .label-container,
 .game_video .label-container,
 .game_instruction .label-container,
 .game_genre .label-container,
+.game_genre .genreList-container,
 .game_year .label-container{
     display: flex;
     align-items: center;
@@ -226,6 +229,7 @@ body {
 
 .game_name label,
 .game_poster label,
+.game_screenshots label,
 .game_description label,
 .game_video label,
 .game_instruction label,
@@ -238,6 +242,7 @@ body {
 
 .game_name input,
 .game_poster input,
+.game_screenshots input,
 .game_video input,
 .game_year input{
     width: 98%;
@@ -282,3 +287,63 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.genreList div{
+    width: 300px;
+    height: 50px ;
+    margin: 10px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.genreList button{
+    width: 300px ;
+    height: 40px;
+    margin: 10px;
+    text-align: center;
+}
+
+.genreList span{
+    text-align: left;
+    margin: 10px;
+    width: 450px;
+    margin: 30px;
+}
+
+.game_screenshots .screenshot-item{
+    width: 20% ;
+    height: auto;
+    margin: 5px ;
+    flex-basis: 24%; /* Ширина элемента на одной строке, здесь на 4 элемента */
+    box-sizing: border-box;
+    padding: 10px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+}
+
+.game_screenshots img{
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 5x ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+}
+
+.game_screenshots button{
+    width: 90%;
+    height: 40px;
+    margin: 5x ;
+}
+
+.game_screenshots .screenshotsList{
+    display: flex;
+    flex-wrap: wrap;
+}

@@ -209,7 +209,7 @@
                 </select>
                 <button type="button" class="add_button" onclick="addGenre()">Добавить</button>
                 <div class="genreList-container">
-                    <div id="genreList">
+                    <div id="genreList" class="genreList">
                         <div th:each="genre : ${game.genres}">
                             <span th:text="${genre}"></span>
                             <button type="button" onclick="removeGenre(this)">Удалить</button>
@@ -219,9 +219,11 @@
                 </div>
             </div>
             <div class="game_screenshots">
-                <label for="screenshotsUpl">Скриншоты игры</label>
+                <div class="label-container">
+                    <label for="screenshotsUpl">Скриншоты игры</label>
+                </div>
                 <input type="file" id="screenshotsUpl" name="screenshotsUpl" accept="image/*" multiple onchange="previewScreenshots(this)">
-                <div id="screenshotsList">
+                <div id="screenshotsList" class="screenshotsList">
                     <div th:each="screenshot : ${game.screenshots}" class="screenshot-item">
                         <img th:src="${screenshot}" alt="screenshot">
                         <button type="button" onclick="removeScreenshot(this)">Удалить</button>
