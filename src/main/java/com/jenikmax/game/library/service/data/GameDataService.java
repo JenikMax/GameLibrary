@@ -44,11 +44,11 @@ public class GameDataService implements GameService {
 
 
     public List<GameShortDto> getGameShortList(){
-        return sqlDao.executeShortGame("select * from game_data");
+        return sqlDao.executeShortGame("select * from game_data order by name");
     }
 
     @Override
-    public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres) {
+    public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         List<Object> params = new ArrayList<>();
         String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from game_data where name like ?";
         params.add('%' + searchText + '%');
@@ -66,6 +66,15 @@ public class GameDataService implements GameService {
             String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
             sql += String.format(" and id in (select game_id from library.game_data_genre where genre_code in (%s))",genresSql);
             params.addAll(selectedGenres);
+        }
+        if(!sortField.isEmpty()){
+            if(sortField.equals("year")) sortField = "release_date";
+            if(sortField.equals("create")) sortField = "create_ts";
+            sql += " order by " + sortField + " " + sortType;
+
+        }
+        else{
+            sql += " order by name";
         }
         return sqlDao.executeShortGame(sql,params.toArray());
     }
@@ -138,6 +147,12 @@ public class GameDataService implements GameService {
     @Override
     public void storeGame(Game game) {
         game.setCreateTs(new Timestamp(new Date().getTime()));
+        gameRepository.save(game);
+    }
+
+    @Transactional
+    @Override
+    public void updateGame(Game game) {
         gameRepository.save(game);
     }
 

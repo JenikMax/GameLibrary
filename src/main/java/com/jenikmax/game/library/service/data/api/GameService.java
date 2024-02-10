@@ -9,13 +9,15 @@ public interface GameService {
 
     List<GameShortDto> getGameShortList();
 
-    List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres);
+    List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
 
     List<Game> getGameList();
 
     Game getGameById(Long gameId);
 
     void storeGame(Game game);
+
+    void updateGame(Game game);
 
     void storeNewGameInLibrary(List<Game> games);
 

@@ -16,6 +16,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.expression.Numbers;
 import org.thymeleaf.util.NumberUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,24 +39,21 @@ public class LibraryViewController {
                        @RequestParam(value = "searchText", required = false) String searchText,
                        @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
                        @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
-                       @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres) {
+                       @RequestParam(value = "message", required = false) String message,
+                       @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                       @RequestParam(value = "sortField", required = false) String sortField,
+                       @RequestParam(value = "sortType", required = false) String sortType) {
         logger.info("Open library");
 
         searchText = searchText != null ? searchText : "";
         selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
         selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
         selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
+        sortField = sortField != null ? sortField : "";
+        sortType = sortType != null ? sortType : "";
 
+        List<GameShortDto> gameList = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
 
-
-        List<GameShortDto> gameList = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres);
-        //gameList.addAll(gameList);
-        //gameList.addAll(gameList);
-        //gameList.addAll(gameList);
-        //gameList.addAll(gameList);
-        //gameList.addAll(gameList);
-        //gameList.addAll(gameList);
-        //gameList.addAll(gameList);
         int pageSize = 12;
         int totalPages = (gameList.size() + pageSize - 1) / pageSize;
         int startIndex = (page - 1) * pageSize;
@@ -64,10 +64,6 @@ public class LibraryViewController {
         List<String> years = libraryService.getReleaseDates();
         List<String> platforms = libraryService.getGamesPlatforms();
         List<String> genres = libraryService.getGameGenres();
-
-
-
-
 
         model.addAttribute("searchText", searchText);
         model.addAttribute("selectedPlatforms", selectedPlatforms);
@@ -80,16 +76,19 @@ public class LibraryViewController {
         model.addAttribute("page", page);
         model.addAttribute("pages", initPages(page,totalPages));
         model.addAttribute("totalPages", totalPages);
+        model.addAttribute("message", message);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortType", sortType);
         return "libraryView";
     }
 
 
 
     @PostMapping("/scan")
-    public String scanLibrary(Model model) {
+    public String scanLibrary(RedirectAttributes redirectAttributes) {
         logger.info("Scan library");
         libraryService.scanLibrary();
-        model.addAttribute("message","scan library in progress");
+        redirectAttributes.addAttribute("message","Scan library in progress");
         return "redirect:/library";
     }
 
@@ -100,14 +99,39 @@ public class LibraryViewController {
                                @RequestParam(value = "searchText", required = false) String searchText,
                                @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
                                @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
-                               @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres) {
+                               @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                               @RequestParam(value = "sortField", required = false) String sortField,
+                               @RequestParam(value = "sortType", required = false) String sortType) {
         redirectAttributes.addAttribute("page",page);
         redirectAttributes.addAttribute("searchText",searchText);
         redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
         redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
         redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
+        redirectAttributes.addAttribute("sortField",sortField != null ? sortField : "");
+        redirectAttributes.addAttribute("sortType",sortType != null ? sortType : "");
         return "redirect:/library";
     }
+
+
+    @PostMapping("/sort")
+    public String applySort(Model model, RedirectAttributes redirectAttributes,
+                               @RequestParam(value = "page", defaultValue = "1") int page,
+                               @RequestParam(value = "searchText", required = false) String searchText,
+                               @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
+                               @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
+                               @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                               @RequestParam(value = "sortField", required = false) String sortField,
+                               @RequestParam(value = "sortType", required = false) String sortType) {
+        redirectAttributes.addAttribute("page",page);
+        redirectAttributes.addAttribute("searchText",searchText);
+        redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
+        redirectAttributes.addAttribute("sortField",sortField != null ? sortField : "");
+        redirectAttributes.addAttribute("sortType",sortType != null ? sortType : "");
+        return "redirect:/library";
+    }
+
 
 
     @GetMapping("library/game/{id}")
@@ -131,27 +155,21 @@ public class LibraryViewController {
     }
 
     @PostMapping("library/game/{id}/edit")
-    public String saveGame(@PathVariable("id") Long id, GameDto game,Model model) {
+    public String saveGame(@PathVariable("id") Long id, GameDto game,RedirectAttributes redirectAttributes, Model model) {
         logger.info("Open game - {} ",id);
-        GameDto gameDto = libraryService.getGameInfo(id);
-        List<String> platforms = libraryService.getGamesPlatforms();
-        List<String> genres = libraryService.getGameGenres();
-        model.addAttribute("game", gameDto);
-        model.addAttribute("platforms", platforms);
-        model.addAttribute("genres", genres);
-        return "gameEditView";
+        try{
+            libraryService.updateGameInfo(game);
+            redirectAttributes.addAttribute("message","Game card save success");
+        }
+        catch (Exception e){
+            logger.error("SaveGame Error - ",e);
+            redirectAttributes.addAttribute("message","Game card save failed");
+        }
+        return "redirect:/library";
     }
 
     private List<Integer> initPages(int page, int totalPage){
         return Arrays.asList(NumberUtils.sequence(Math.max(1, page - 3),Math.min(totalPage, page + 3)));
     }
-
-
-
-
-
-
-
-    // ${#numbers.sequence(Math.max(1, page - 3), Math.min(totalPages, page + 3))}"
 
 }

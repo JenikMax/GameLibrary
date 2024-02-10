@@ -13,8 +13,11 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -98,7 +101,14 @@ public class GameScanerService implements ScanerService {
         return game;
     }
 
-    public void storeAdditinalGameInfo(Game game){
+    public void storeGame(Game game){
+        this.storeAdditinalGameInfo(game);
+        this.storeLogoGameInfo(game);
+        this.storeScreenshotsGameInfo(game);
+    }
+
+
+    private void storeAdditinalGameInfo(Game game){
         GameInfo gameInfo = new GameInfo();
         gameInfo.setName(game.getName());
         gameInfo.setPlatform(game.getPlatform());
@@ -112,15 +122,56 @@ public class GameScanerService implements ScanerService {
         gameInfo.setInstruction(game.getInstruction());
         // Создание объекта ObjectMapper с использованием YAMLFactory
         ObjectMapper objectMapper = new ObjectMapper();
-
         try {
+            File gameInfiFile = getGameInfoFile(game.getDirectoryPath());
             // Запись объекта в YAML файл
-            objectMapper.writeValue(new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME), gameInfo);
+            objectMapper.writeValue(gameInfiFile, gameInfo);
             System.out.println("Объект успешно записан в YAML файл.");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private void storeLogoGameInfo(Game game){
+        try {
+            this.saveImage(game.getDirectoryPath() + GAME_INFO_PREFIX, "logo.jpg", game.getLogo());
+        }
+        catch (Exception e){
+            logger.error("Error storeLogoGameInfo logo - ",e);
+        }
+    }
+
+    private void storeScreenshotsGameInfo(Game game){
+        try {
+            for (Screenshot screenshot : game.getScreenshots()) {
+                saveImage(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_SCREEN_PREFIX, screenshot.getName(), screenshot.getSource());
+            }
+        }
+        catch (Exception e){
+            logger.error("Error storeScreenshotsGameInfo screenshot - ",e);
+        }
+    }
+
+    private void saveImage(String directory, String fileName, byte[] imageData) throws IOException {
+        Path dirPath = Paths.get(directory);
+        Path filePath = Paths.get(directory, fileName);
+        if (!Files.exists(dirPath)) {
+            Files.createDirectories(dirPath);
+        }
+        try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
+            fos.write(imageData);
+        }
+    }
+
+    private File getGameInfoFile(String gameDir) throws IOException {
+        File gameInfoFile = new File(gameDir + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME);
+        if(!gameInfoFile.exists()){
+            gameInfoFile.getParentFile().mkdirs();
+            gameInfoFile.createNewFile();
+        }
+        return gameInfoFile;
+    }
+
 
     public GameInfo getAdditinalGameInfo(String path){
         ObjectMapper objectMapper = new ObjectMapper();

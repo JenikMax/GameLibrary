@@ -10,5 +10,5 @@ public interface ScanerService {
 
     Game getAdditinalGameInfo(Game game);
 
-    void storeAdditinalGameInfo(Game game);
+    void storeGame(Game game);
 }

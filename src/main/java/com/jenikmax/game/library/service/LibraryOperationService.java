@@ -52,9 +52,9 @@ public class LibraryOperationService implements LibraryService {
     }
 
     @Override
-    public List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres) {
-        if(searchText.isEmpty() && selectedPlatforms.size() == 0 && selectedYears.size() == 0 && selectedGenres.size() == 0) return getGameList();
-        return gameService.getGameShortList(searchText,selectedPlatforms,selectedYears,selectedGenres);
+    public List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
+        if(searchText.isEmpty() && selectedPlatforms.size() == 0 && selectedYears.size() == 0 && selectedGenres.size() == 0 && sortField.isEmpty()) return getGameList();
+        return gameService.getGameShortList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
     }
 
     @Override
@@ -64,7 +64,10 @@ public class LibraryOperationService implements LibraryService {
 
     @Override
     public GameDto updateGameInfo(GameDto gameDto) {
-        return null;
+        Game game = GameConverter.dtoToGameEntityConverter(gameDto);
+        gameService.updateGame(game);
+        scanerService.storeGame(game);
+        return getGameInfo(gameDto.getId());
     }
 
     @Override

@@ -82,7 +82,7 @@ public class GameConverter {
         entity.setPlatform(dto.getPlatform());
         entity.setDescription(dto.getDescription());
         entity.setInstruction(dto.getInstruction());
-        entity.setLogo(Base64.getDecoder().decode(dto.getLogo()));
+        entity.setLogo(Base64.getDecoder().decode(dto.getLogo().replaceAll(BASE_64_PREFIX,"")));
         entity.setScreenshots(new ArrayList<>());
         for (String screenshot : dto.getScreenshots()){
             entity.getScreenshots().add(dtoToScreenshotEntityConverter(screenshot,entity));

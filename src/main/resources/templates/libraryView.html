@@ -18,14 +18,51 @@
             const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
             const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
             const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
-            form.action = `/filter?searchText=${searchText}&selectedPlatforms=${selectedPlatforms.join(',')}&selectedGenres=${selectedGenres.join(',')}&selectedYears=${selectedYears.join(',')}&page=${page}`;
+            const curField = document.getElementById('sortField').value;
+            const curSrtType = document.getElementById('sortType').value;
+            form.action = `/filter?searchText=${searchText}&selectedPlatforms=${selectedPlatforms.join(',')}&selectedGenres=${selectedGenres.join(',')}&selectedYears=${selectedYears.join(',')}&page=${page}&sortField=${curField}&sortType=${curSrtType}`;
             form.submit();
+        }
+
+        function gotoSort(field){
+            const curField = document.getElementById('sortField').value;
+            const curSrtType = document.getElementById('sortType').value;
+            var srtType = "asc";
+            if(field === curField){
+                if(srtType === curSrtType) srtType = 'desc';
+            }
+            const form = document.getElementById('sortForm');
+            const searchText = document.getElementsByName('searchText')[0].value;
+            const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
+            const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
+            const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
+            form.action = "/sort?searchText=" + searchText + "&selectedPlatforms=" + selectedPlatforms.join(',') + "&selectedGenres=" + selectedGenres.join(',') + "&selectedYears=" + selectedYears.join(',') + "&sortField=" + field + "&sortType=" + srtType;
+            form.submit();
+        }
+
+        function showPopup() {
+            var message = document.getElementById("message").value;
+            if (message) {
+                var popup = document.getElementById("popup");
+                popup.innerHTML = message + '<span class="popup-close" onclick="closePopup()">&times;</span>';
+                popup.style.display = "block";
+                setTimeout(function() {
+                    closePopup();
+                }, 5000);
+            }
+        }
+
+        function closePopup() {
+            var popup = document.getElementById("popup");
+            popup.style.display = "none";
         }
 
     </script>
 
 </head>
-<body>
+<body onload="showPopup()">
+<div id="popup" class="popup"></div>
+<input type="hidden" id="message" th:value="${message}"/>
 <div class="container">
     <div class="header">
         <div class="logo">
@@ -98,6 +135,17 @@
     </div>
     <div class="games">
         <h3>Список игр</h3>
+        <div class="sort-type">
+            <form id="sortForm" action="/sort" method="post">
+                <input type="hidden" id="sortField" name="sortFieldCurent" th:value="${sortField}"/>
+                <input type="hidden" id="sortType" name="sortTypeCurent" th:value="${sortType}"/>
+                <div class="sort-container">
+                    <button type="submit" onclick="gotoSort('name')" th:text="${sortType == 'asc' && sortField == 'name' ? 'Имя ▲' : (sortType == 'desc' && sortField == 'name' ? 'Имя ▼' : 'Имя')}"></button>
+                    <button type="submit" onclick="gotoSort('year')" th:text="${sortType == 'asc' && sortField == 'year' ? 'Год ▲' : (sortType == 'desc' && sortField == 'year' ? 'Год ▼' : 'Год')}"></button>
+                    <button type="submit" onclick="gotoSort('create')" th:text="${sortType == 'asc' && sortField == 'create' ? 'Дата добавления ▲' : (sortType == 'desc' && sortField == 'create' ? 'Дата добавления ▼' : 'Дата добавления')}"></button>
+                </div>
+            </form>
+        </div>
         <div class="pagination">
             <form id="paginationForm1" action="/filter" method="post">
                 <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage1(this)">««</button>

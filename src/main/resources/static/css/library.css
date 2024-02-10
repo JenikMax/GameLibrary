@@ -98,6 +98,8 @@ body {
     cursor: pointer;
 }
 
+
+
 .games {
     width: 68%;
     float: right;
@@ -212,4 +214,48 @@ body {
 }
 .pagination button.disabled {
     pointer-events: none;
+}
+
+.sort-container{
+    width: 98%;
+    height: 75px;
+    float: left;
+    padding: 20px;
+    background-color: white;
+    margin: 10px ;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sort-container button{
+    display: inline-block;
+    width: 220px;
+    height: 30px;
+    margin: 5px;
+    border-radius: 5px;
+    text-decoration: none;
+    line-height: 30px;
+    background-color: #4da3ff;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+.popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+}
+
+.popup-close {
+    float: right;
+    cursor: pointer;
 }
