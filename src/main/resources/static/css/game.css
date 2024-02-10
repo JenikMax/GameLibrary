@@ -11,63 +11,16 @@ body {
 
 .container {
     width: 1200px;
-    margin: 50px auto;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-}
-
-.logo {
-    text-align: center;
-}
-
-.logo img {
-    width: 100px;
-    height: 100px;
-}
-
-.user {
-    display: flex;
-    align-items: center;
-}
-
-.user img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 10px;
-}
-
-.user a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.user a:hover {
-    text-decoration: underline;
-}
-
-.user button {
-    width: 100px;
-    height: 40px;
-    margin-left: 10px;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
+    margin: 20px auto;
 }
 
 .game {
+    width: 1180px;
     padding: 20px;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .game_info{
