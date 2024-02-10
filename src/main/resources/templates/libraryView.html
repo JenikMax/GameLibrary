@@ -28,10 +28,14 @@
 <div class="container">
     <div class="header">
         <div class="logo">
-            <img src="logo.png" alt="Logo">
+            <a href="/library" style="text-decoration: none; color: inherit;">
+                <img src="/img/logo.jpg" alt="Logo">
+            </a>
         </div>
         <div class="user">
-            <img src="user.png" alt="User">
+            <a href="profile.html" style="text-decoration: none; color: inherit;">
+                <img src="/img/user.png" alt="User">
+            </a>
             <a href="profile.html">Иван Иванов</a>
             <button type="button">Выйти</button>
         </div>
@@ -103,14 +107,16 @@
             </form>
         </div>
         <ul>
-        <div th:each="game : ${gameList}" class="col-md-4 mb-4">
-            <li>
-                <a th:href="'/library/game/' + ${game.id}" style="text-decoration: none; color: inherit;">
-                <span th:text="${game.platform}"></span>
-                <img th:src="${game.logo}" th:alt="${game.name}">
-                <p th:text="${game.name} + ' ('+ ${game.releaseDate} + ')'"></p>
-                </a>
-            </li>
+        <div class="game-list">
+            <div th:each="game : ${gameList}" class="game-item">
+                <li>
+                    <a th:href="'/library/game/' + ${game.id}" style="text-decoration: none; color: inherit;">
+                    <span th:text="${game.platform}"></span>
+                    <img th:src="${game.logo}" th:alt="${game.name}">
+                    <p th:text="${game.name} + ' ('+ ${game.releaseDate} + ')'"></p>
+                    </a>
+                </li>
+            </div>
         </div>
         </ul>
         <div class="pagination">

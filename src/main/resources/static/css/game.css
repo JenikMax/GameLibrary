@@ -4,7 +4,7 @@
 }
 
 body {
-    background-color: #f0f0f0;
+    background-image: url("/img/background/pattern-doted-wide-honeycomb.png");
     margin: 0;
     padding: 0;
 }
@@ -75,15 +75,16 @@ body {
 }
 
 .title {
+    width: 100%;
     display: flex;
     align-items: center;
 }
 
 .title h1 {
-    margin: 20px 20px;
+    margin: 5px 20px;
 }
 
-.game span {
+.game_info span {
     display: inline-block;
     height: 50px;
     width: 100px;
@@ -121,17 +122,32 @@ body {
     float: right;
 }
 
-.game img {
-    width: 500px;
-    height: 500px;
-    margin: 10px;
-    float: left;
+.poster{
+    width: 35%;
+    height: auto
 }
 
-.game p {
-    width: 600px;
+.poster img {
+    width: 90%;
+    height: auto;
     margin: 10px;
     float: right;
+}
+
+.game_info{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.description{
+    width: 64%;
+    height: auto
+}
+
+.description p {
+    width: 99%;
+    margin: 10px;
+    float: inherit;
 }
 
 .game ul {
@@ -250,8 +266,8 @@ body {
 
 .game .game_screenshots li {
     display: inline-block;
-    width: 150px;
-    height: 150px;
+    width: 15%;
+    height: auto;
     margin: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -261,8 +277,9 @@ body {
 }
 
 .game li img {
-    width: 90%;
-    height: 90%;
+    width: 85%;
+    height: auto;
+    margin: 10px
 }
 
 .game iframe {

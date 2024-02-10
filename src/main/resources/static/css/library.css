@@ -4,24 +4,26 @@
 }
 
 body {
-    background-color: #f0f0f0;
+    background-image: url("/img/background/pattern-doted-wide-honeycomb.png");
     margin: 0;
     padding: 0;
 }
 
 .container {
     width: 1200px;
-    margin: 50px auto;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
 }
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 1180px;
     padding: 20px;
+    margin: 10px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
@@ -109,9 +111,14 @@ body {
 }
 
 .filter {
-    width: 30%;
+    width: 28%;
     float: left;
     padding: 20px;
+    background-color: white;
+    margin: 10px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .filter h3 {
@@ -145,9 +152,14 @@ body {
 }
 
 .games {
-    width: 70%;
+    width: 68%;
     float: right;
     padding: 20px;
+    background-color: white;
+    margin: 10px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .games h3 {
