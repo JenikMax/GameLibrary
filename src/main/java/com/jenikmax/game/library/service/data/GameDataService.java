@@ -10,7 +10,6 @@ import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
 import com.jenikmax.game.library.model.entity.Screenshot;
-import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.data.api.GameService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 
 @Service
@@ -111,11 +113,11 @@ public class GameDataService implements GameService {
 
         GameGenre gameGenre = new GameGenre();
         gameGenre.setGame(game);
-        gameGenre.setGenre(Genre.JRPG);
+        //gameGenre.setGenre(Genre.JRPG);
         game.getGenres().add(gameGenre);
         gameGenre = new GameGenre();
         gameGenre.setGame(game);
-        gameGenre.setGenre(Genre.ACTION);
+        //gameGenre.setGenre(Genre.ACTION);
         game.getGenres().add(gameGenre);
 
 

@@ -136,7 +136,7 @@
     </div>
     <div class="data">
         <h2>Выбор источника данных</h2>
-        <form action="get.html" method="get">
+        <form th:action="@{'/library/game/' + ${game.id} + '/grab'}" method="post">
             <label for="source">Источник данных</label>
             <select id="source" name="source">
                 <option value="manual">Ручной ввод</option>

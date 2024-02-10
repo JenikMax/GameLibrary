@@ -1,4 +1,4 @@
-package com.jenikmax.game.library.service.scraper;
+package com.jenikmax.game.library.service.scraper.scrapers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,5 +1,4 @@
-package com.jenikmax.game.library.service.scraper;
-
+package com.jenikmax.game.library.service.scraper.scrapers;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -10,7 +9,8 @@ import org.jsoup.select.Elements;
 
 import java.util.Scanner;
 
-public class IgromaniaScraper {
+
+public class SGScraper {
 
     public void scrap(){
         try (WebClient webClient = new WebClient()) {
@@ -18,7 +18,7 @@ public class IgromaniaScraper {
             webClient.getOptions().setJavaScriptEnabled(true);
 
             // Получение страницы поиска
-            HtmlPage searchPage = webClient.getPage("https://www.igromania.ru/search/?q=");
+            HtmlPage searchPage = webClient.getPage("https://stopgame.ru/search?search=");
 
             // Ввод названия игры в строку поиска
             Scanner scanner = new Scanner(System.in);
@@ -26,7 +26,7 @@ public class IgromaniaScraper {
             String gameName = scanner.nextLine();
 
             // Заполнение строки поиска
-            HtmlForm searchForm = searchPage.getFirstByXPath("//form[@name='search-block']");
+            HtmlForm searchForm = searchPage.getFirstByXPath("//form[@class='searchtop search-form']");
             if (searchForm == null) {
                 System.out.println("Форма поиска не найдена.");
                 return;
@@ -43,11 +43,11 @@ public class IgromaniaScraper {
             Document doc = Jsoup.parse(html);
 
             // Парсинг и обработка данных с помощью Jsoup
-            Elements newsElements = doc.select(".gel-layout > .list-preview");
+            Elements newsElements = doc.select(".tiles-item");
 
             for (Element element : newsElements) {
-                String title = element.selectFirst("a").text();
-                String imageURL = element.selectFirst("img").absUrl("src");
+                String title = element.selectFirst(".tiles-item-title").text();
+                String imageURL = element.selectFirst(".tiles-item-pic").absUrl("data-background-image");
 
                 System.out.println("Заголовок: " + title);
                 System.out.println("URL изображения: " + imageURL);
@@ -58,4 +58,5 @@ public class IgromaniaScraper {
             e.printStackTrace();
         }
     }
+
 }

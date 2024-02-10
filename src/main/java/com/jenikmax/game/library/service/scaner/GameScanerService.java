@@ -1,7 +1,6 @@
 package com.jenikmax.game.library.service.scaner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
 import com.jenikmax.game.library.model.entity.Screenshot;

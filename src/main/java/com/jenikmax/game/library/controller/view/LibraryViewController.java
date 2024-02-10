@@ -3,7 +3,6 @@ package com.jenikmax.game.library.controller.view;
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.service.api.LibraryService;
-import com.jenikmax.game.library.service.scaner.api.ScanerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -13,12 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.thymeleaf.expression.Numbers;
 import org.thymeleaf.util.NumberUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -166,6 +161,20 @@ public class LibraryViewController {
             redirectAttributes.addAttribute("message","Game card save failed");
         }
         return "redirect:/library";
+    }
+
+    @PostMapping("library/game/{id}/grab")
+    public String grabGameData(@PathVariable("id") Long id,
+                               @RequestParam(value = "source") String source,
+                               RedirectAttributes redirectAttributes,
+                               Model model) {
+        logger.info("Grab game data game - {}, source - {}",id,source);
+        GameDto gameDto = libraryService.grabGameInfo(id,source);
+
+        List<String> genres = libraryService.getGameGenres();
+        model.addAttribute("game", gameDto);
+        model.addAttribute("genres", genres);
+        return "gameEditView";
     }
 
     private List<Integer> initPages(int page, int totalPage){

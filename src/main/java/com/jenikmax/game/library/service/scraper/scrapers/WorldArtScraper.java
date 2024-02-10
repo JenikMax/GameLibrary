@@ -1,4 +1,4 @@
-package com.jenikmax.game.library.service.scraper;
+package com.jenikmax.game.library.service.scraper.scrapers;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;

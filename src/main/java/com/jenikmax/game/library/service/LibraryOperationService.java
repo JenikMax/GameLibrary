@@ -7,6 +7,7 @@ import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.GameService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
+import com.jenikmax.game.library.service.scraper.ScraperFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +22,14 @@ public class LibraryOperationService implements LibraryService {
 
     private final GameService gameService;
     private final ScanerService scanerService;
+    private final ScraperFactory scraperFactory;
 
     public LibraryOperationService(@Value("${game-library.games.directory}") String rootDirectory,
-                                   GameService gameService, ScanerService scanerService) {
+                                   GameService gameService, ScanerService scanerService, ScraperFactory scraperFactory) {
         this.rootDirectory = rootDirectory;
         this.gameService = gameService;
         this.scanerService = scanerService;
+        this.scraperFactory = scraperFactory;
     }
 
     @Override
@@ -68,6 +71,16 @@ public class LibraryOperationService implements LibraryService {
         gameService.updateGame(game);
         scanerService.storeGame(game);
         return getGameInfo(gameDto.getId());
+    }
+
+    @Override
+    public GameDto grabGameInfo(Long id, String source) {
+        return scraperFactory.getScraper(source).scrap(getGameInfo(id));
+    }
+
+    @Override
+    public GameDto grabGameInfo(GameDto gameDto, String source) {
+        return scraperFactory.getScraper(source).scrap(gameDto);
     }
 
     @Override

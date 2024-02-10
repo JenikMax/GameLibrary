@@ -1,9 +1,7 @@
 package com.jenikmax.game.library.model.converter;
 
 import com.jenikmax.game.library.model.dto.GameDto;
-import com.jenikmax.game.library.model.dto.GameGenreDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
-import com.jenikmax.game.library.model.dto.ScreenshotDto;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
 import com.jenikmax.game.library.model.entity.Screenshot;
@@ -15,6 +13,7 @@ import java.util.Base64;
 public class GameConverter {
 
     private final static String BASE_64_PREFIX = "data:image/jpeg;base64,";
+    private final static String BASE_64_EMPTY = "data:image/jpeg;base64";
 
     public static GameShortDto gameShortToDtoConverter(Game entity){
         GameShortDto dto = new GameShortDto();
@@ -84,12 +83,16 @@ public class GameConverter {
         entity.setInstruction(dto.getInstruction());
         entity.setLogo(Base64.getDecoder().decode(dto.getLogo().replaceAll(BASE_64_PREFIX,"")));
         entity.setScreenshots(new ArrayList<>());
-        for (String screenshot : dto.getScreenshots()){
-            entity.getScreenshots().add(dtoToScreenshotEntityConverter(screenshot,entity));
+        if(dto.getScreenshots() != null){
+            for (String screenshot : dto.getScreenshots()){
+                if(!screenshot.equals(BASE_64_EMPTY)) entity.getScreenshots().add(dtoToScreenshotEntityConverter(screenshot,entity));
+            }
         }
         entity.setGenres(new ArrayList<>());
-        for(String genre : dto.getGenres()){
-            entity.getGenres().add(dtoToGameGenreEntityConverter(genre,entity));
+        if(dto.getGenres() != null){
+            for(String genre : dto.getGenres()){
+                entity.getGenres().add(dtoToGameGenreEntityConverter(genre,entity));
+            }
         }
         return entity;
     }

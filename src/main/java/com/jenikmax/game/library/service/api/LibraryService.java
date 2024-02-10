@@ -17,6 +17,10 @@ public interface LibraryService {
 
     GameDto updateGameInfo(GameDto gameDto);
 
+    GameDto grabGameInfo(Long id, String source);
+
+    GameDto grabGameInfo(GameDto gameDto, String source);
+
     List<String> getReleaseDates();
 
     List<String> getGamesPlatforms();
