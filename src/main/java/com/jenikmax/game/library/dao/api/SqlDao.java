@@ -1,6 +1,7 @@
 package com.jenikmax.game.library.dao.api;
 
 import com.jenikmax.game.library.model.dto.GameShortDto;
+import com.jenikmax.game.library.model.entity.enums.Genre;
 
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,8 @@ public interface SqlDao {
     List<GameShortDto> executeShortGame(String query);
 
     List<String> executeByStringList(String query, String column);
+
+    List<Genre> getGenreList(String query, String column);
 
     List<String> executeByLowerStringList(String query, String column);
 

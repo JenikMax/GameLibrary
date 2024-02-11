@@ -259,3 +259,8 @@ body {
     float: right;
     cursor: pointer;
 }
+
+.scrollable {
+    overflow-y: scroll;
+    max-height: 300px; /* you can adjust the height as needed */
+}

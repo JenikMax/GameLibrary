@@ -2,6 +2,7 @@ package com.jenikmax.game.library.dao;
 
 import com.jenikmax.game.library.dao.api.SqlDao;
 import com.jenikmax.game.library.model.dto.GameShortDto;
+import com.jenikmax.game.library.model.entity.enums.Genre;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,11 @@ public class SqlDaoImpl implements SqlDao {
     @Override
     public List<String> executeByStringList(String query, String column) {
         return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString(column));
+    }
+
+    @Override
+    public List<Genre> getGenreList(String query, String column) {
+        return jdbcTemplate.query(query, (rs, rowNum) ->  Genre.valueOf(rs.getString(column)));
     }
 
     @Override

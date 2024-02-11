@@ -62,7 +62,7 @@
         </div>
         <div class="game_genre">
             <ul>
-                <li th:each="genre : ${game.genres}" th:text="${genre}"></li>
+                <li th:each="genre : ${current_genres}" th:text="${genre.getName()}"></li>
             </ul>
         </div>
         <div class="game_screenshots">

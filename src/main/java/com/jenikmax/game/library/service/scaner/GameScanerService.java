@@ -71,7 +71,7 @@ public class GameScanerService implements ScanerService {
                 for(String genre : gameInfo.getGenres()){
                     GameGenre gameGenre = new GameGenre();
                     gameGenre.setGame(game);
-                    gameGenre.setGenre(Genre.valueOf(genre.toUpperCase()));
+                    gameGenre.setGenre(Genre.valueOf(genre));
                     game.getGenres().add(gameGenre);
                 }
             }

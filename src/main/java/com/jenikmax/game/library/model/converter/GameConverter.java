@@ -103,13 +103,13 @@ public class GameConverter {
         //dto.setGameId(entity.getGame().getId());
         //dto.setGenreCode(entity.getGenre().toString());
         //dto.setGenreDescription(entity.getGenre().getName());
-        return entity.getGenre().toString().toLowerCase();
+        return entity.getGenre().toString();
     }
 
     public static GameGenre dtoToGameGenreEntityConverter(String genre, Game game){
         GameGenre entity = new GameGenre();
         entity.setGame(game);
-        entity.setGenre(Genre.valueOf(genre.toUpperCase()));
+        entity.setGenre(Genre.valueOf(genre));
         return entity;
     }
 

@@ -88,19 +88,22 @@ body {
 }
 
 .game_info{
+    height: auto;
     display: flex;
     flex-wrap: wrap;
 }
 
 .description{
     width: 64%;
-    height: auto
+    min-height: fit-content;
 }
 
 .description p {
     width: 99%;
+    height: auto
     margin: 10px;
     float: inherit;
+    margin-bottom: 10px;
 }
 
 .game ul {
@@ -112,7 +115,7 @@ body {
 
 .game .game_genre li {
     display: inline-block;
-    width: 100px;
+    width: 100px auto;
     height: 30px;
     margin: 10px;
     border: 1px solid #ccc;
@@ -132,29 +135,24 @@ body {
 
 .game .game_info {
     width: 1150px;
-    height: 600px;
     margin: 10px auto;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-height: fit-content;
 }
+
+
 
 .game .game_genre {
     width: 1150px;
-    height: 50px;
+    height: 50px auto;
     margin: 10px auto;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.game .game_genre {
-    width: 1150px;
-    height: 50px;
-    margin: 10px auto;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .game .game_trailer {

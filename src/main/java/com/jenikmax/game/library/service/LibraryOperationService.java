@@ -4,6 +4,7 @@ import com.jenikmax.game.library.model.converter.GameConverter;
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.Game;
+import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.GameService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
@@ -11,6 +12,7 @@ import com.jenikmax.game.library.service.scraper.ScraperFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,7 +76,8 @@ public class LibraryOperationService implements LibraryService {
     }
 
     @Override
-    public GameDto grabGameInfo(Long id, String source) {
+    public GameDto grabGameInfo(Long id, String source, String url) {
+        if(url != null) return scraperFactory.getScraper(source).scrap(getGameInfo(id),url);
         return scraperFactory.getScraper(source).scrap(getGameInfo(id));
     }
 
@@ -93,6 +96,17 @@ public class LibraryOperationService implements LibraryService {
         return gameService.getGamesPlatforms();
     }
 
+    @Override
+    public List<Genre> getGenres() {
+        return gameService.getGenres();
+    }
+
+    @Override
+    public List<Genre> getGenres(GameDto gameDto) {
+        List<Genre> genres = new ArrayList<>();
+        for(String genre : gameDto.getGenres()) genres.add(Genre.valueOf(genre));
+        return genres;
+    }
     @Override
     public List<String> getGameGenres() {
         return gameService.getGameGenres();

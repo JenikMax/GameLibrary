@@ -60,7 +60,7 @@ INSERT INTO library.game_genre (code, description) VALUES ('platform','Плат�
 INSERT INTO library.game_genre (code, description) VALUES ('sandbox','Песочница');
 INSERT INTO library.game_genre (code, description) VALUES ('open_world','Открытый мир');
 INSERT INTO library.game_genre (code, description) VALUES ('third_person','От третьего лица');
-INSERT INTO library.game_genre (code, description) VALUES ('first_person ','От первого лица');
+INSERT INTO library.game_genre (code, description) VALUES ('first_person','От первого лица');
 INSERT INTO library.game_genre (code, description) VALUES ('sci_fi','Научная фантастика');
 INSERT INTO library.game_genre (code, description) VALUES ('board_game','Настольная');
 INSERT INTO library.game_genre (code, description) VALUES ('online','Мультиплеер');
@@ -91,7 +91,6 @@ INSERT INTO library.game_genre (code, description) VALUES ('adventure','Адве
 INSERT INTO library.game_genre (code, description) VALUES ('auto','Автомобили');
 INSERT INTO library.game_genre (code, description) VALUES ('flight','Авиация');
 INSERT INTO library.game_genre (code, description) VALUES ('tower_defence','Tower defence');
-INSERT INTO library.game_genre (code, description) VALUES ('rts','RTS');
 INSERT INTO library.game_genre (code, description) VALUES ('mmo','MMO');
 INSERT INTO library.game_genre (code, description) VALUES ('jrpg','jRpg');
 

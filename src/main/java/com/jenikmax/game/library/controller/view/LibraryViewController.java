@@ -2,6 +2,7 @@ package com.jenikmax.game.library.controller.view;
 
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
+import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,7 +59,7 @@ public class LibraryViewController {
 
         List<String> years = libraryService.getReleaseDates();
         List<String> platforms = libraryService.getGamesPlatforms();
-        List<String> genres = libraryService.getGameGenres();
+        List<Genre> genres = libraryService.getGenres();
 
         model.addAttribute("searchText", searchText);
         model.addAttribute("selectedPlatforms", selectedPlatforms);
@@ -133,7 +134,9 @@ public class LibraryViewController {
     public String viewGame(@PathVariable("id") Long id, Model model) {
         logger.info("Open game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
+        List<Genre> currentGenres = libraryService.getGenres(gameDto);
         model.addAttribute("game", gameDto);
+        model.addAttribute("current_genres", currentGenres);
         return "gameView";
     }
 
@@ -142,10 +145,12 @@ public class LibraryViewController {
         logger.info("Open game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
         //List<String> platforms = libraryService.getGamesPlatforms();
-        List<String> genres = libraryService.getGameGenres();
+        List<Genre> genres = libraryService.getGenres();
+        List<Genre> currentGenres = libraryService.getGenres(gameDto);
         model.addAttribute("game", gameDto);
         //model.addAttribute("platforms", platforms);
         model.addAttribute("genres", genres);
+        model.addAttribute("current_genres", currentGenres);
         return "gameEditView";
     }
 
@@ -166,14 +171,17 @@ public class LibraryViewController {
     @PostMapping("library/game/{id}/grab")
     public String grabGameData(@PathVariable("id") Long id,
                                @RequestParam(value = "source") String source,
+                               @RequestParam(value = "url") String url,
                                RedirectAttributes redirectAttributes,
                                Model model) {
-        logger.info("Grab game data game - {}, source - {}",id,source);
-        GameDto gameDto = libraryService.grabGameInfo(id,source);
+        logger.info("Grab game data game - {}, source - {}, url - {}",id,source,url);
+        GameDto gameDto = libraryService.grabGameInfo(id,source,url);
 
-        List<String> genres = libraryService.getGameGenres();
+        List<Genre> genres = libraryService.getGenres();
+        List<Genre> currentGenres = libraryService.getGenres(gameDto);
         model.addAttribute("game", gameDto);
         model.addAttribute("genres", genres);
+        model.addAttribute("current_genres", currentGenres);
         return "gameEditView";
     }
 

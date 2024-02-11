@@ -10,6 +10,7 @@ import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
 import com.jenikmax.game.library.model.entity.Screenshot;
+import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.data.api.GameService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -83,17 +84,22 @@ public class GameDataService implements GameService {
 
     @Override
     public List<String> getReleaseDates() {
-        return sqlDao.executeByStringList("select release_date from library.game_data group by release_date","release_date");
+        return sqlDao.executeByStringList("select release_date from library.game_data group by release_date order by release_date","release_date");
     }
 
     @Override
     public List<String> getGamesPlatforms() {
-        return sqlDao.executeByStringList("select platform from library.game_data group by platform","platform");
+        return sqlDao.executeByStringList("select platform from library.game_data group by platform order by platform","platform");
+    }
+
+    @Override
+    public List<Genre> getGenres() {
+        return sqlDao.getGenreList("select code from library.game_genre group by code order by description","code");
     }
 
     @Override
     public List<String> getGameGenres() {
-        return sqlDao.executeByLowerStringList("select code from library.game_genre group by code","code");
+        return sqlDao.executeByLowerStringList("select code from library.game_genre group by code order by description","code");
     }
 
     @Transactional

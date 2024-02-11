@@ -2,6 +2,7 @@ package com.jenikmax.game.library.service.api;
 
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
+import com.jenikmax.game.library.model.entity.enums.Genre;
 
 import java.util.List;
 
@@ -17,13 +18,17 @@ public interface LibraryService {
 
     GameDto updateGameInfo(GameDto gameDto);
 
-    GameDto grabGameInfo(Long id, String source);
+    GameDto grabGameInfo(Long id, String source, String url);
 
     GameDto grabGameInfo(GameDto gameDto, String source);
 
     List<String> getReleaseDates();
 
     List<String> getGamesPlatforms();
+
+    List<Genre> getGenres();
+
+    List<Genre> getGenres(GameDto gameDto);
 
     List<String> getGameGenres();
 

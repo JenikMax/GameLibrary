@@ -9,11 +9,12 @@
 
         function addGenre() {
             var selectedGenre = document.getElementById("genre");
+            var selectedOptionGenre = selectedGenre.options[selectedGenre.selectedIndex];
             var genreList = document.getElementById("genreList");
 
             if (selectedGenre.value !== "" && !checkDuplicateGenre(selectedGenre.value)) {
                 var genreDiv = document.createElement("div");
-                genreDiv.innerHTML = "<span>" + selectedGenre.value + "</span>"
+                genreDiv.innerHTML = "<span>" + selectedOptionGenre.textContent + "</span>"
                     + "<button type='button' onclick='removeGenre(this)'>Удалить</button>";
                 genreList.appendChild(genreDiv);
 
@@ -116,6 +117,17 @@
             var screenshotDiv = button.parentElement;
             screenshotDiv.remove();
         }
+
+
+        function toggleUrlField() {
+            var urlField = document.querySelector(".url-field");
+            var selectedValue = document.getElementById("source").value;
+            if (selectedValue === "playground" || selectedValue === "igromania" || selectedValue === "stopgame") {
+                urlField.classList.remove("hidden");
+            } else {
+                urlField.classList.add("hidden");
+            }
+        }
     </script>
 </head>
 <body>
@@ -138,13 +150,17 @@
         <h2>Выбор источника данных</h2>
         <form th:action="@{'/library/game/' + ${game.id} + '/grab'}" method="post">
             <label for="source">Источник данных</label>
-            <select id="source" name="source">
+            <select id="source" name="source"  onchange="toggleUrlField()">
                 <option value="manual">Ручной ввод</option>
                 <option value="iddb">IDDB</option>
                 <option value="playground">Playground.ru</option>
                 <option value="igromania">Igromania.ru</option>
                 <option value="stopgame">Stopgame.ru</option>
             </select>
+            <div class="url-field hidden">
+                <label for="url">URL страницы игры</label>
+                <input type="text" id="url" name="url">
+            </div>
             <button type="submit">Применить</button>
         </form>
     </div>
@@ -209,16 +225,16 @@
                 <select id="genre" name="genre">
                     <option value="">Выберите жанр</option>
                     <option th:each="genre : ${genres}"
-                            th:value="${genre}"
-                            th:text="${genre}"></option>
+                            th:value="${genre.toString()}"
+                            th:text="${genre.getName()}"></option>
                 </select>
                 <button type="button" class="add_button" onclick="addGenre()">Добавить</button>
                 <div class="genreList-container">
                     <div id="genreList" class="genreList">
-                        <div th:each="genre : ${game.genres}">
-                            <span th:text="${genre}"></span>
+                        <div th:each="genre : ${current_genres}">
+                            <span th:text="${genre.getName()}"></span>
                             <button type="button" onclick="removeGenre(this)">Удалить</button>
-                            <input type="hidden" th:name="genres" th:value="${genre}">
+                            <input type="hidden" th:name="genres" th:value="${genre.toString()}">
                         </div>
                     </div>
                 </div>

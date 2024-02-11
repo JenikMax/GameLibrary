@@ -106,26 +106,32 @@
                 <input type="text" placeholder="Введите название игры" name="searchText" id="searchText" th:value="${searchText}">
             </div>
             <h3>Платформы</h3>
+            <div class="platform-list" th:classappend="${platforms.size() > 10} ? 'scrollable' : ''">
             <ul th:each="platform : ${platforms}">
                 <li>
                     <input class="form-check-input" type="checkbox" th:id="'platformCheckbox-' + ${platform}" name="selectedPlatforms" th:value="${platform}" th:checked="${selectedPlatforms.contains(platform)}" onclick="submitForm()">
                     <label class="form-check-label" th:for="'platformCheckbox-' + ${platform}" th:text="${platform}"></label>
                 </li>
             </ul>
+            </div>
             <h3>Жанры</h3>
-            <ul th:each="genre : ${genres}">
+            <div class="genre-list" th:classappend="${genres.size() > 10} ? 'scrollable' : ''">
+            <ul th:each="genre : ${genres}"  >
                 <li>
-                    <input class="form-check-input" type="checkbox" th:id="'genreCheckbox-' + ${genre}" name="selectedGenres" th:value="${genre}" th:checked="${selectedGenres.contains(genre)}" onclick="submitForm()">
-                    <label class="form-check-label" th:for="'genreCheckbox-' + ${genre}" th:text="${genre.toLowerCase()}"></label>
+                    <input class="form-check-input" type="checkbox" th:id="'genreCheckbox-' + ${genre.toString()}" name="selectedGenres" th:value="${genre.toString()}" th:checked="${selectedGenres.contains(genre.toString())}" onclick="submitForm()">
+                    <label class="form-check-label" th:for="'genreCheckbox-' + ${genre.toString()}" th:text="${genre.getName()}"></label>
                 </li>
             </ul>
+            </div>
             <h3>Годы выпуска</h3>
+            <div class="year-list" th:classappend="${years.size() > 10} ? 'scrollable' : ''">
             <ul th:each="year : ${years}">
                 <li>
                     <input class="form-check-input" type="checkbox" th:id="'yearCheckbox-' + ${year}" name="selectedYears" th:value="${year}" th:checked="${selectedYears.contains(year)}" onclick="submitForm()">
                     <label class="form-check-label" th:for="'yearCheckbox-' + ${year}" th:text="${year}"></label>
                 </li>
             </ul>
+            </div>
             <button type="submit">Найти</button>
             <button type="reset"  onclick="resetForm()" >Сбросить</button>
         </form>

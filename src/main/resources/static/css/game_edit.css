@@ -126,6 +126,21 @@ body {
     cursor: pointer;
 }
 
+.data label{
+    margin: 15px 15px;
+    font-size: 25px;
+    vertical-align: middle;
+}
+
+.data input{
+    width: 80%;
+    height: 40px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
 .selected {
     background-color: yellow;
     font-weight: bold;
@@ -292,4 +307,8 @@ body {
 .game_genre .genreList{
     display: flex;
     flex-wrap: wrap;
+}
+
+.hidden {
+    display: none;
 }
