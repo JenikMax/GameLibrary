@@ -7,9 +7,13 @@ import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.GameService;
+import com.jenikmax.game.library.service.downloads.api.DownloadService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
 import com.jenikmax.game.library.service.scraper.ScraperFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,13 +29,15 @@ public class LibraryOperationService implements LibraryService {
     private final GameService gameService;
     private final ScanerService scanerService;
     private final ScraperFactory scraperFactory;
+    private final DownloadService downloadService;
 
     public LibraryOperationService(@Value("${game-library.games.directory}") String rootDirectory,
-                                   GameService gameService, ScanerService scanerService, ScraperFactory scraperFactory) {
+                                   GameService gameService, ScanerService scanerService, ScraperFactory scraperFactory, DownloadService downloadService) {
         this.rootDirectory = rootDirectory;
         this.gameService = gameService;
         this.scanerService = scanerService;
         this.scraperFactory = scraperFactory;
+        this.downloadService = downloadService;
     }
 
     @Override
@@ -110,5 +116,23 @@ public class LibraryOperationService implements LibraryService {
     @Override
     public List<String> getGameGenres() {
         return gameService.getGameGenres();
+    }
+
+    @Override
+    public ResponseEntity<Resource> downloadGame(GameDto game) {
+        ByteArrayResource resource;
+        String name = game.getName();
+        if(downloadService.getDirectorySizeRecursively(game.getDirectoryPath()) > 1000000000L){
+            resource = downloadService.downloadTorrent(game.getDirectoryPath());
+            name += ".torrent";
+        }
+        else {
+            resource = downloadService.downloadZip(game.getDirectoryPath());
+            name += ".zip";
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(ContentDisposition.attachment().filename(name).build());
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return new ResponseEntity<Resource>((Resource) resource, headers, HttpStatus.OK);
     }
 }

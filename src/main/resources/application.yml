@@ -1,7 +1,12 @@
 game-library:
   games:
     directory: D:/Work/MyProjects/gametest
-
+    torrent:
+      directory: D:/Work/MyProjects/gametest/torrentDir
+      transmission:
+        rpc-url: http://localhost:9091/transmission/rpc
+        rpc-username: your_username
+        rpc-password: your_password
 
 
 spring:

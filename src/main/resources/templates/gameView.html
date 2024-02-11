@@ -56,7 +56,8 @@
             </div>
             <div class="description">
                 <span th:text="${game.platform}"></span>
-                <button type="button">Скачать</button>
+                <a target="_blank" th:href="@{'/library/game/' + ${game.id} + '/download'}">Скачать</a>
+                <!--<button type="button" target="_blank" th:href="@{'/library/game/' + ${game.id} + '/download'}" >Скачать</button>-->
                 <p th:text="${game.description}"></p>
             </div>
         </div>

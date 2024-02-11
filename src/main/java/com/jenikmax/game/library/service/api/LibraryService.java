@@ -3,7 +3,10 @@ package com.jenikmax.game.library.service.api;
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.enums.Genre;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 
+import javax.xml.ws.Response;
 import java.util.List;
 
 public interface LibraryService {
@@ -31,6 +34,8 @@ public interface LibraryService {
     List<Genre> getGenres(GameDto gameDto);
 
     List<String> getGameGenres();
+
+    ResponseEntity<Resource> downloadGame(GameDto game);
 
 
 }

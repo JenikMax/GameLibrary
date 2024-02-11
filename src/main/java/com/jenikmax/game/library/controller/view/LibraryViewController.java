@@ -6,6 +6,8 @@ import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -183,6 +185,13 @@ public class LibraryViewController {
         model.addAttribute("genres", genres);
         model.addAttribute("current_genres", currentGenres);
         return "gameEditView";
+    }
+
+    @GetMapping("library/game/{id}/download")
+    public ResponseEntity<Resource> editGame(@PathVariable("id") Long id) {
+        GameDto gameDto = libraryService.getGameInfo(id);
+        return libraryService.downloadGame(gameDto);
+
     }
 
     private List<Integer> initPages(int page, int totalPage){
