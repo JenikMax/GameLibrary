@@ -30,18 +30,9 @@ import java.util.zip.ZipOutputStream;
 public class DownloadFileService implements DownloadService {
 
     private final String torrentDir;
-    private final String rpcUrl;
-    private final String rpcUsername;
-    private final String rpcPassword;
 
-    public DownloadFileService(@Value("${game-library.games.torrent.directory}") String torrentDir,
-                               @Value("${game-library.games.torrent.transmission.rpc-url}") String rpcUrl,
-                               @Value("${game-library.games.torrent.transmission.rpc-username}") String rpcUsername,
-                               @Value("${game-library.games.torrent.transmission.rpc-password}") String rpcPassword) {
+    public DownloadFileService(@Value("${game-library.games.torrent.directory}") String torrentDir) {
         this.torrentDir = torrentDir;
-        this.rpcUrl = rpcUrl;
-        this.rpcUsername = rpcUsername;
-        this.rpcPassword = rpcPassword;
     }
 
     @Override
@@ -80,11 +71,10 @@ public class DownloadFileService implements DownloadService {
 
     @Override
     public ByteArrayResource downloadTorrent(String path) {
-        return downloadTorrentTransmission(path);
+        return downloadTorrentCommon(path);
     }
 
-    //@Override
-    public ByteArrayResource downloadTorrent1(String path) {
+    public ByteArrayResource downloadTorrentCommon(String path) {
         try{
             // Создание объекта SharedTorrent
             File directory = new File(path);
@@ -112,86 +102,7 @@ public class DownloadFileService implements DownloadService {
     }
 
 
-    public ByteArrayResource downloadTorrentTransmission(String path) {
-        try{
-            File torrentFile = createTorrentFile(path, torrentDir);
-            if (torrentFile != null && addTorrentToTransmissionDaemon(rpcUrl, rpcUsername, rpcPassword, torrentFile)) {
-                byte[] fileData = new byte[(int) torrentFile.length()];
-                try (InputStream inputStream = new FileInputStream(torrentFile)) {
-                    inputStream.read(fileData);
-                }
-                return new ByteArrayResource(fileData);
-            }
-            return null;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
-    }
 
-    private File createTorrentFile(String path, String torrentDir) throws IOException {
-        File directory = new File(path);
-
-        ProcessBuilder processBuilder = new ProcessBuilder(
-                "transmission-create",
-                "-o", torrentDir + File.separator + directory.getName() + ".torrent",
-                "-t", "udp://tracker.example.com:1234",
-                directory.getAbsolutePath()
-        );
-
-        Process process = processBuilder.start();
-        try {
-            process.waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return new File(torrentDir, directory.getName() + ".torrent");
-    }
-
-    private boolean addTorrentToTransmissionDaemon(String rpcUrl, String rpcUsername, String rpcPassword, File torrentFile) throws IOException {
-        JSONObject requestBody = new JSONObject()
-                .put("method", "torrent-add")
-                .put("arguments", new JSONObject().put("filename", torrentFile.getAbsolutePath()));
-
-        URL url = new URL(rpcUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        connection.setRequestProperty("Authorization", "Basic " +
-                new String(Base64.getEncoder().encode((rpcUsername + ":" + rpcPassword).getBytes(StandardCharsets.UTF_8))));
-
-        connection.setDoOutput(true);
-        try (OutputStream outputStream = connection.getOutputStream()) {
-            outputStream.write(requestBody.toString().getBytes(StandardCharsets.UTF_8));
-        }
-
-        int responseCode = connection.getResponseCode();
-        if (responseCode != HttpURLConnection.HTTP_OK) {
-            // Обработка ошибки при добавлении торрент-файла в Transmission
-            System.out.println("Ошибка добавления торрент-файла");
-            return false;
-        }
-
-        // Чтение ответа
-        try (InputStream inputStream = connection.getInputStream();
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            StreamUtils.copy(inputStream, outputStream);
-            String responseBody = outputStream.toString(StandardCharsets.UTF_8.toString());
-
-            JSONTokener tokener = new JSONTokener(responseBody);
-            JSONObject responseJson = new JSONObject(tokener);
-
-            if (responseJson.has("result") && "success".equals(responseJson.getString("result"))) {
-                System.out.println("Торрент-файл успешно добавлен в Transmission");
-                return true;
-            } else {
-                // Обработка ошибки при добавлении торрент-файла в Transmission
-                System.out.println("Ошибка добавления торрент-файла: " + responseJson.optString("result"));
-                return false;
-            }
-        }
-    }
 
     private void searchFiles(File directory, List<File> files) {
         if (directory.isDirectory()) {
