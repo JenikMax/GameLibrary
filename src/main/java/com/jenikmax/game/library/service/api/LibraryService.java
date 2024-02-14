@@ -6,7 +6,6 @@ import com.jenikmax.game.library.model.entity.enums.Genre;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 
-import javax.xml.ws.Response;
 import java.util.List;
 
 public interface LibraryService {

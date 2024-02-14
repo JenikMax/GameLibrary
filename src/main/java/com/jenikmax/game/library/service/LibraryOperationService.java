@@ -10,9 +10,9 @@ import com.jenikmax.game.library.service.data.api.GameService;
 import com.jenikmax.game.library.service.downloads.api.DownloadService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
 import com.jenikmax.game.library.service.scraper.ScraperFactory;
-import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 

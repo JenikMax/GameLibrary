@@ -2,11 +2,8 @@ game-library:
   games:
     directory: D:/Work/MyProjects/gametest
     torrent:
+      ttl: 180000
       directory: D:/Work/MyProjects/gametest/torrentDir
-      transmission:
-        rpc-url: http://localhost:9091/transmission/rpc
-        rpc-username: your_username
-        rpc-password: your_password
 
 
 spring:
@@ -24,3 +21,4 @@ entitymanager:
   packages:
     to:
       scan: com.jenikmax.game.library.model.entity
+

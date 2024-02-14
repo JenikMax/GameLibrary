@@ -1,7 +1,5 @@
 package com.jenikmax.game.library.service.scraper.scrapers;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.*;
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.service.scraper.api.Scraper;
 import org.jsoup.Jsoup;
