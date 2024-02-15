@@ -1,4 +1,4 @@
-package com.jenikmax.game.library.controller.user;
+package com.jenikmax.game.library.config.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -13,7 +13,7 @@ import java.io.IOException;
 public class CustomLoginSuccessHandler  extends SimpleUrlAuthenticationSuccessHandler {
 
     @Override
-    protected void handle(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException, IOException {
+    protected void handle(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         String targetUrl = determineTargetUrl(authentication);
 
         if (response.isCommitted()) {

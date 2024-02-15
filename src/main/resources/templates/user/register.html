@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}">
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('form').submit(function (event) { // При отправке формы
+                var password = $('input[name="password"]').val(); // Получаем значение поля "password"
+                var passwordRepeate = $('input[name="passwordRepeate"]').val(); // Получаем значение поля "passwordRepeate"
+
+                if (password !== passwordRepeate) { // Если пароли не совпадают
+                    event.preventDefault(); // Отменяем отправку формы
+                    $('#error').html('<p>Passwords do not match.</p>'); // Выводим сообщение об ошибке в блок <div id="error"/>
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="logo">
+        <img src="img/logo.jpg" alt="Logo">
+    </div>
+    <div th:if="${param.error}">
+        <p>Invalid username and password.</p>
+    </div>
+    <div th:if="${param.logout}">
+        <p>You have been logged out.</p>
+    </div>
+    <div id="error"/>
+    <div class="form">
+        <form th:action="@{/register}" method="post" th:object="${registrationForm}">
+            <input type="text" name="username" placeholder="Введите имя пользователя" required th:field="*{username}">
+            <input type="password" name="password" placeholder="Введите пароль" required th:field="*{password}">
+            <input type="password" name="passwordRepeate" placeholder="Повторите пароль" required >
+
+            <button type="submit" value="Register">Зарегистрироваться</button>
+            <a href="/login">Войти</a>
+        </form>
+    </div>
+</div>
+</body>
+</html>

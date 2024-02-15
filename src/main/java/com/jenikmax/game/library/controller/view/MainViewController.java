@@ -18,9 +18,9 @@ public class MainViewController {
         return "indexView";
     }
 
-    @PostMapping("/login")
-    public String login(){
-        logger.info("login in app");
-        return "redirect:/library";
-    }
+    //@PostMapping("/login")
+    //public String login(){
+    //    logger.info("login in app");
+    //    return "redirect:/library";
+    //}
 }

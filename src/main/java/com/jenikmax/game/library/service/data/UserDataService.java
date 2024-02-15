@@ -2,18 +2,20 @@ package com.jenikmax.game.library.service.data;
 
 import com.jenikmax.game.library.dao.api.UserRepository;
 import com.jenikmax.game.library.model.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.jenikmax.game.library.service.data.api.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDataService {
+public class UserDataService implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserDataService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public void registerUser(User user) {
         // Проверяйте уникальность имени пользователя и другие правила валидации
@@ -24,5 +26,6 @@ public class UserDataService {
         // Сохраняете пользователя в базе данных
         userRepository.save(user);
     }
+
 
 }

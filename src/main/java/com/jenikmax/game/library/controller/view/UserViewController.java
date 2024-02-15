@@ -1,10 +1,9 @@
 package com.jenikmax.game.library.controller.view;
 
-import com.jenikmax.game.library.controller.user.RegistrationForm;
+import com.jenikmax.game.library.model.dto.RegistrationForm;
 import com.jenikmax.game.library.service.data.UserDataService;
 import com.jenikmax.game.library.dao.api.UserRepository;
 import com.jenikmax.game.library.model.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -16,15 +15,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class UserViewController {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
+    private final UserRepository userRepository;
+    private final UserDataService userService;
 
-    private UserDataService userService;
+    public UserViewController(UserRepository userRepository, UserDataService userService) {
+        this.userRepository = userRepository;
+        this.userService = userService;
+    }
 
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "user/login";
     }
 
     @GetMapping("/admin")
@@ -48,7 +49,7 @@ public class UserViewController {
 
     @GetMapping("/register")
     public String registerUserv(@ModelAttribute("registrationForm") RegistrationForm registrationForm) {
-        return "register";
+        return "user/register";
     }
 
     @PostMapping("/register")

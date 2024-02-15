@@ -1,4 +1,4 @@
-package com.jenikmax.game.library.controller.user;
+package com.jenikmax.game.library.model.dto;
 
 public class RegistrationForm {
 

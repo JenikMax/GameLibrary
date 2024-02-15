@@ -1,7 +1,7 @@
 package com.jenikmax.game.library.config;
 
 
-import com.jenikmax.game.library.controller.user.CustomLoginSuccessHandler;
+import com.jenikmax.game.library.config.security.CustomLoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,9 +39,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
+                .antMatchers("/resources/**").permitAll()
+                .antMatchers("/css/**").permitAll()
+                .antMatchers("/img/**").permitAll()
+                .antMatchers("/js/**").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/register").permitAll()
+                .antMatchers("/library").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
+
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
