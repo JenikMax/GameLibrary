@@ -23,6 +23,7 @@ body {
 }
 
 .logo img {
+    margin: 30px;
     width: 300px;
     height: 300px;
     border-radius: 10px;
@@ -62,4 +63,17 @@ body {
 
 .form a:hover {
     text-decoration: underline;
+}
+
+.info{
+    width: 350px;
+    height: 40px auto;
+    margin: 0px 30px auto;
+}
+
+.error{
+    width: 350px;
+    height: 40px auto;
+    margin: 0px 30px auto;
+    color: red;
 }

@@ -2,6 +2,7 @@ package com.jenikmax.game.library.controller.view;
 
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
+import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import org.apache.logging.log4j.LogManager;
@@ -54,6 +55,7 @@ public class LibraryViewController {
 
         int pageSize = 12;
         int totalPages = (gameList.size() + pageSize - 1) / pageSize;
+        totalPages = totalPages == 0 ? 1 : totalPages;
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min((startIndex + pageSize), gameList.size());
 
@@ -62,6 +64,7 @@ public class LibraryViewController {
         List<String> years = libraryService.getReleaseDates();
         List<String> platforms = libraryService.getGamesPlatforms();
         List<Genre> genres = libraryService.getGenres();
+        ShortUser user = libraryService.getUserInfo();
 
         model.addAttribute("searchText", searchText);
         model.addAttribute("selectedPlatforms", selectedPlatforms);
@@ -77,6 +80,7 @@ public class LibraryViewController {
         model.addAttribute("message", message);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortType", sortType);
+        model.addAttribute("user", user);
         return "libraryView";
     }
 

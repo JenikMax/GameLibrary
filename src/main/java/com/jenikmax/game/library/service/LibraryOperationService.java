@@ -3,10 +3,14 @@ package com.jenikmax.game.library.service;
 import com.jenikmax.game.library.model.converter.GameConverter;
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
+import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.Game;
+import com.jenikmax.game.library.model.entity.User;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
+import com.jenikmax.game.library.service.data.UserDataService;
 import com.jenikmax.game.library.service.data.api.GameService;
+import com.jenikmax.game.library.service.data.api.UserService;
 import com.jenikmax.game.library.service.downloads.api.DownloadService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
 import com.jenikmax.game.library.service.scraper.ScraperFactory;
@@ -14,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,14 +33,16 @@ public class LibraryOperationService implements LibraryService {
     private final static String LIBRARY_PREFIX = "/games";
 
     private final GameService gameService;
+    private final UserService userService;
     private final ScanerService scanerService;
     private final ScraperFactory scraperFactory;
     private final DownloadService downloadService;
 
     public LibraryOperationService(@Value("${game-library.games.directory}") String rootDirectory,
-                                   GameService gameService, ScanerService scanerService, ScraperFactory scraperFactory, DownloadService downloadService) {
+                                   GameService gameService, UserService userService, ScanerService scanerService, ScraperFactory scraperFactory, DownloadService downloadService) {
         this.rootDirectory = rootDirectory;
         this.gameService = gameService;
+        this.userService = userService;
         this.scanerService = scanerService;
         this.scraperFactory = scraperFactory;
         this.downloadService = downloadService;
@@ -134,5 +142,12 @@ public class LibraryOperationService implements LibraryService {
         headers.setContentDisposition(ContentDisposition.attachment().filename(name).build());
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         return new ResponseEntity<Resource>((Resource) resource, headers, HttpStatus.OK);
+    }
+
+    @Override
+    public ShortUser getUserInfo() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        return userService.getUserInfoByName(username);
     }
 }

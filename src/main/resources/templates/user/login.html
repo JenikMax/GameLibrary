@@ -8,17 +8,17 @@
     <div class="logo">
         <img src="img/logo.jpg" alt="Logo">
     </div>
-    <div th:if="${param.error}">
+    <div class="error" th:if="${param.error}">
         <p>Invalid username and password.</p>
     </div>
-    <div th:if="${param.logout}">
+    <div class="info" th:if="${param.logout}">
         <p>You have been logged out.</p>
     </div>
     <div class="form">
-        <form action="/login" method="post">
+        <form th:action="@{/login}" method="post">
             <input type="text" name="username" placeholder="Введите имя пользователя" required>
             <input type="password" name="password" placeholder="Введите пароль" required>
-            <button type="submit">Войти</button>
+            <button type="submit" value="Log in">Войти</button>
             <a href="/register">Зарегистрироваться</a>
             <!--<a href="forgot.php">Забыли пароль?</a>-->
         </form>

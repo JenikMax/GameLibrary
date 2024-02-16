@@ -30,7 +30,7 @@ public class UserViewController {
 
     @GetMapping("/admin")
     public String admin() {
-        return "admin";
+        return "user/admin";
     }
 
     @GetMapping("/user")
@@ -44,7 +44,7 @@ public class UserViewController {
 
         model.addAttribute("user", user);
 
-        return "user";
+        return "user/user";
     }
 
     @GetMapping("/register")

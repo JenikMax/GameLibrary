@@ -2,7 +2,9 @@ package com.jenikmax.game.library.service.api;
 
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
+import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.enums.Genre;
+import com.jenikmax.game.library.service.data.UserDataService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 
@@ -36,5 +38,6 @@ public interface LibraryService {
 
     ResponseEntity<Resource> downloadGame(GameDto game);
 
+    ShortUser getUserInfo();
 
 }

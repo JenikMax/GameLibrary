@@ -2,20 +2,40 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}">
-    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
 
     <script>
         $(document).ready(function () {
-            $('form').submit(function (event) { // При отправке формы
-                var password = $('input[name="password"]').val(); // Получаем значение поля "password"
-                var passwordRepeate = $('input[name="passwordRepeate"]').val(); // Получаем значение поля "passwordRepeate"
 
-                if (password !== passwordRepeate) { // Если пароли не совпадают
-                    event.preventDefault(); // Отменяем отправку формы
-                    $('#error').html('<p>Passwords do not match.</p>'); // Выводим сообщение об ошибке в блок <div id="error"/>
+            document.getElementById('form').addEventListener('submit', function(e) {
+                e.preventDefault(); // Отменить переход на другую страницу
+
+                var username = document.getElementById('username').value; // Имя пользователя
+                var password = document.getElementById('password').value; // Пароль
+                var passwordRepeate = document.getElementById('password_repeate').value; // Повторный пароль
+
+                // Проверка имени пользователя
+                if (username.length < 3 || username.length > 20) {
+                    document.getElementById('error').innerText = 'Имя пользователя должно содержать от 3 до 20 символов';
+                    return; // Остановить выполнение кода
                 }
+
+                // Проверка пароля
+                if (password.length < 6) {
+                    document.getElementById('error').innerText = 'Пароль должен содержать не менее 6 символов';
+                    return; // Остановить выполнение кода
+                }
+
+                if (password !== passwordRepeate) {
+                    document.getElementById('error').innerText = 'Пароли не совпадают';
+                    return; // Остановить выполнение кода
+                }
+
+                e.target.submit();
             });
+
         });
+
     </script>
 </head>
 <body>
@@ -23,18 +43,12 @@
     <div class="logo">
         <img src="img/logo.jpg" alt="Logo">
     </div>
-    <div th:if="${param.error}">
-        <p>Invalid username and password.</p>
-    </div>
-    <div th:if="${param.logout}">
-        <p>You have been logged out.</p>
-    </div>
-    <div id="error"/>
+    <div class="error" id="error" th:text="${param.error != null ? param.error : ''}"></div>
     <div class="form">
-        <form th:action="@{/register}" method="post" th:object="${registrationForm}">
-            <input type="text" name="username" placeholder="Введите имя пользователя" required th:field="*{username}">
-            <input type="password" name="password" placeholder="Введите пароль" required th:field="*{password}">
-            <input type="password" name="passwordRepeate" placeholder="Повторите пароль" required >
+        <form id="form" th:action="@{/register}" method="post" th:object="${registrationForm}">
+            <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required th:field="*{username}">
+            <input type="password" id="password" name="password" placeholder="Введите пароль" required th:field="*{password}">
+            <input type="password" id="password_repeate" name="password_repeate" placeholder="Повторите пароль" required >
 
             <button type="submit" value="Register">Зарегистрироваться</button>
             <a href="/login">Войти</a>

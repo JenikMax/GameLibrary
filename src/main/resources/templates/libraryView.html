@@ -2,7 +2,30 @@
 <head>
     <link rel="stylesheet" type="text/css" th:href="@{/css/library.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
     <script>
+
+        $(document).ready(function () {
+            document.getElementById("searchText").addEventListener("keyup", function(event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    document.getElementById("submitButton").click();
+                }
+            });
+        });
+
+        function submitForm() {
+            document.getElementById("filterForm").submit();
+        }
+
+        function resetForm() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => checkbox.checked = false);
+
+            document.getElementById("searchText").value = "";
+            submitForm();
+        }
+
         function gotoPage1(button) {
             goToPage(button,'paginationForm1');
         }
@@ -71,35 +94,20 @@
             </a>
         </div>
         <div class="user">
-            <a href="user/profile.html" style="text-decoration: none; color: inherit;">
-                <img src="/img/user.png" alt="User">
-            </a>
-            <a href="user/profile.html">Иван Иванов</a>
-            <button type="button">Выйти</button>
+            <form th:action="@{/logout}" method="post">
+                <a href="user/profile.html" style="text-decoration: none; color: inherit;">
+                    <img th:src="${user.avatar}" alt="User"/>
+                </a>
+                <a href="user/profile.html" th:text="${user.name}"></a>
+                <button type="submit">Выйти</button>
+            </form>
         </div>
     </div>
 
     <div class="filter">
-        <form action="/filter" id="filterForm" method="post">
+        <form th:action="@{/filter}" id="filterForm" method="post">
             <script>
-                document.getElementById("searchText").addEventListener("keyup", function(event) {
-                    if (event.keyCode === 13) {
-                        event.preventDefault();
-                        document.getElementById("submitButton").click();
-                    }
-                });
 
-                function submitForm() {
-                    document.getElementById("filterForm").submit();
-                }
-
-                function resetForm() {
-                    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                    checkboxes.forEach(checkbox => checkbox.checked = false);
-
-                    document.getElementById("searchText").value = "";
-                    submitForm();
-                }
             </script>
             <h3>Поиск</h3>
             <div class="search">
@@ -135,14 +143,14 @@
             <button type="submit">Найти</button>
             <button type="reset"  onclick="resetForm()" >Сбросить</button>
         </form>
-        <form action="/scan" method="post">
+        <form th:if="${user != null && user.isAdmin}" th:action="@{/scan}" method="post">
             <button type="submit">Обновить библиотеку</button>
         </form>
     </div>
     <div class="games">
         <h3>Список игр</h3>
         <div class="sort-type">
-            <form id="sortForm" action="/sort" method="post">
+            <form id="sortForm" th:action="@{/sort}" method="post">
                 <input type="hidden" id="sortField" name="sortFieldCurent" th:value="${sortField}"/>
                 <input type="hidden" id="sortType" name="sortTypeCurent" th:value="${sortType}"/>
                 <div class="sort-container">
@@ -153,7 +161,7 @@
             </form>
         </div>
         <div class="pagination">
-            <form id="paginationForm1" action="/filter" method="post">
+            <form id="paginationForm1" th:action="@{/filter}" method="post">
                 <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage1(this)">««</button>
                 <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="gotoPage1(this)">«</button>
                 <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="gotoPage1(this)" th:text="${number}"></button>
@@ -175,7 +183,7 @@
         </div>
         </ul>
         <div class="pagination">
-            <form id="paginationForm2" action="/filter" method="post">
+            <form id="paginationForm2" th:action="@{/filter}" method="post">
                 <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage2(this)">««</button>
                 <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="gotoPage2(this)">«</button>
                 <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="gotoPage2(this)" th:text="${number}"></button>
