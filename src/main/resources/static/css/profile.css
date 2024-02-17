@@ -1,0 +1,117 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-image: url("/img/background/pattern-doted-wide-honeycomb.png");
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 1200px;
+    margin: 20px auto;
+}
+
+.profile {
+    width: 1180px;
+    padding: 20px;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile h1 {
+    margin: 10px;
+}
+
+.profile label {
+    display: block;
+    margin: 10px;
+}
+
+.profile input {
+    width: 80%;
+    height: 40px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.profile button {
+    width: 200px;
+    height: 50px;
+    margin: 10px 30px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.user_pass,
+.user_name,
+.avatar_ico{
+    width: 1010px;
+    height: 60px auto;
+    margin: 30px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.user_pass .label-container,
+.user_name .label-container,
+.avatar_ico .label-container{
+    display: flex;
+    align-items: center;
+}
+
+.user_pass label,
+.user_name label,
+.avatar_ico label{
+    margin: 15px 15px;
+    font-size: 25px;
+    vertical-align: middle;
+}
+
+.user_pass input,
+.user_name input,
+.avatar_ico input{
+    width: 98%;
+}
+
+
+
+.avatar_ico img{
+    width: 94%;
+    height: auto;
+    margin: 10px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.avatar_ico button{
+    width: 94%;
+    height: 50px;
+    margin: 5px 10px;
+}
+
+.avatar_ico .imagePreview{
+    width: 30%;
+    height: auto;
+    margin: 20px ;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.hidden {
+    display: none;
+}

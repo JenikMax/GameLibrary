@@ -119,7 +119,7 @@ body {
 
 .game .game_genre li {
     display: inline-block;
-    width: 100px auto;
+    width: 200px;
     height: 30px;
     margin: 10px;
     border: 1px solid #ccc;

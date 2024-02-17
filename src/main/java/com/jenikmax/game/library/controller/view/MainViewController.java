@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class MainViewController {
@@ -14,13 +13,6 @@ public class MainViewController {
     @GetMapping("/")
     public String main() {
         logger.info("Open app");
-        //model.addAttribute("message", "Hello, World!");
-        return "indexView";
+        return "redirect:/library";
     }
-
-    //@PostMapping("/login")
-    //public String login(){
-    //    logger.info("login in app");
-    //    return "redirect:/library";
-    //}
 }

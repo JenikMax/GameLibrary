@@ -16,6 +16,7 @@ public class User implements Serializable {
     private String username;
     private String password;
     private boolean isAdmin;
+    private boolean isActive;
     private byte[] avatar;
 
     @Id
@@ -62,6 +63,15 @@ public class User implements Serializable {
 
     public void setAdmin(boolean admin) {
         isAdmin = admin;
+    }
+
+    @Column(name = "is_active")
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     @Column(name = "avatar")

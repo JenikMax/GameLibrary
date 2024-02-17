@@ -95,11 +95,19 @@
         </div>
         <div class="user">
             <form th:action="@{/logout}" method="post">
-                <a href="user/profile.html" style="text-decoration: none; color: inherit;">
-                    <img th:src="${user.avatar}" alt="User"/>
-                </a>
-                <a href="user/profile.html" th:text="${user.name}"></a>
-                <button type="submit">Выйти</button>
+                <div class="user_container">
+                    <div class="avatar">
+                        <a href="/profile" style="text-decoration: none; color: inherit;">
+                            <img th:src="${user.avatar}" alt="User"/>
+                        </a>
+                    </div>
+                    <div class="name_user">
+                        <a href="/profile" th:text="${user.name}"></a>
+                    </div>
+                    <div class="logout_button">
+                        <button type="submit">Выйти</button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>

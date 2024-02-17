@@ -1,10 +1,19 @@
 package com.jenikmax.game.library.model.dto;
 
 public class ShortUser{
-
+    private Long id;
     private String name;
-    private boolean isAdmin;
+    private Boolean isAdmin;
+    private Boolean isActive;
     private String avatar;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -14,12 +23,20 @@ public class ShortUser{
         this.name = name;
     }
 
-    public boolean isAdmin() {
+    public Boolean isAdmin() {
         return isAdmin;
     }
 
-    public void setAdmin(boolean admin) {
+    public void setAdmin(Boolean admin) {
         isAdmin = admin;
+    }
+
+    public Boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 
     public String getAvatar() {

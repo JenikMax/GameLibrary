@@ -141,8 +141,10 @@ public class LibraryViewController {
         logger.info("Open game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
+        ShortUser user = libraryService.getUserInfo();
         model.addAttribute("game", gameDto);
         model.addAttribute("current_genres", currentGenres);
+        model.addAttribute("user", user);
         return "gameView";
     }
 
@@ -153,10 +155,12 @@ public class LibraryViewController {
         //List<String> platforms = libraryService.getGamesPlatforms();
         List<Genre> genres = libraryService.getGenres();
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
+        ShortUser user = libraryService.getUserInfo();
         model.addAttribute("game", gameDto);
         //model.addAttribute("platforms", platforms);
         model.addAttribute("genres", genres);
         model.addAttribute("current_genres", currentGenres);
+        model.addAttribute("user", user);
         return "gameEditView";
     }
 

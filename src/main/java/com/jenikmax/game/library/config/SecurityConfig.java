@@ -5,6 +5,7 @@ import com.jenikmax.game.library.config.security.CustomLoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,7 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -46,9 +46,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/js/**").permitAll()
                     .antMatchers("/login").permitAll()
                     .antMatchers("/register").permitAll()
-                    .antMatchers("/library").hasAnyRole("ADMIN","USER")
-                    .antMatchers("/library/game/{id}").hasAnyRole("ADMIN","USER")
-                    .antMatchers("/library/game/{id}/edit").hasRole("ADMIN")
+                    .antMatchers(HttpMethod.GET,"/profile").hasAnyRole("ADMIN","USER")
+                    .antMatchers(HttpMethod.POST,"/profile").hasAnyRole("ADMIN","USER")
+                    .antMatchers(HttpMethod.POST,"/profile/pass").hasAnyRole("ADMIN","USER")
+                    .antMatchers(HttpMethod.POST,"/profile/update").hasRole("ADMIN")
+                    .antMatchers(HttpMethod.POST,"/profile/pass_reset").hasRole("ADMIN")
+                    .antMatchers(HttpMethod.GET,"/library").hasAnyRole("ADMIN","USER")
+                    .antMatchers(HttpMethod.GET,"/library/game/{id}").hasAnyRole("ADMIN","USER")
+                    .antMatchers(HttpMethod.GET,"/library/game/{id}/edit").hasRole("ADMIN")
+                    .antMatchers(HttpMethod.GET,"/library/game/{id}/download").hasAnyRole("ADMIN","USER")
+                    .antMatchers(HttpMethod.POST,"/library/game/{id}/edit").hasRole("ADMIN")
+                    .antMatchers(HttpMethod.POST,"/library/game/{id}/grab").hasRole("ADMIN")
+                    .antMatchers(HttpMethod.POST,"/filter").hasAnyRole("ADMIN","USER")
+                    .antMatchers(HttpMethod.POST,"/sort").hasAnyRole("ADMIN","USER")
+                    .antMatchers(HttpMethod.POST,"/scan").hasRole("ADMIN")
+
                     .antMatchers("/admin/**").hasRole("ADMIN")
 
                     .anyRequest().authenticated()

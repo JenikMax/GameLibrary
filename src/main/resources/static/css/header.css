@@ -22,8 +22,30 @@
 }
 
 .user {
+    width: 295px;
     display: flex;
     align-items: center;
+}
+
+.user_container {
+    display: flex;
+    align-items: center;
+}
+
+.avatar{
+    margin: 5px;
+    width: 60px;
+}
+
+.name_user{
+    margin: 5px;
+    width: 100px;
+}
+
+.logout_button{
+    margin: 5px;
+    width: 100px;
+    float: right;
 }
 
 .user img {
@@ -34,6 +56,7 @@
 }
 
 .user a {
+    font-size: 20px;
     color: #007bff;
     text-decoration: none;
 }

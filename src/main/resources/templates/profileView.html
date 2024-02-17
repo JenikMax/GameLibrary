@@ -1,0 +1,170 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script>
+
+        $(document).ready(function () {
+
+            document.getElementById('pass_form').addEventListener('submit', function(e) {
+                e.preventDefault(); // Отменить переход на другую страницу
+
+                var password = document.getElementById('password').value; // Пароль
+                var passwordRepeate = document.getElementById('password_repeate').value; // Повторный пароль
+
+
+                // Проверка пароля
+                if (password.length < 6) {
+                    document.getElementById('error').innerText = 'Пароль должен содержать не менее 6 символов';
+                    return; // Остановить выполнение кода
+                }
+
+                if (password !== passwordRepeate) {
+                    document.getElementById('error').innerText = 'Пароли не совпадают';
+                    return; // Остановить выполнение кода
+                }
+
+                e.target.submit();
+            });
+
+        });
+
+        function showPopup() {
+            var message = document.getElementById("message").value;
+            if (message) {
+                var popup = document.getElementById("popup");
+                popup.innerHTML = message + '<span class="popup-close" onclick="closePopup()">&times;</span>';
+                popup.style.display = "block";
+                setTimeout(function() {
+                    closePopup();
+                }, 5000);
+            }
+        }
+
+        function closePopup() {
+            var popup = document.getElementById("popup");
+            popup.style.display = "none";
+        }
+
+
+        function previewImage(input) {
+            var imagePreview = document.getElementById("imagePreview");
+            imagePreview.innerHTML = "";
+
+            var file = input.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var imgElement = document.createElement("img");
+                    imgElement.src = e.target.result;
+
+                    var removeButton = document.createElement("button");
+                    removeButton.type = "button";
+                    removeButton.innerText = "Удалить";
+                    removeButton.onclick = function () {
+                        imagePreview.innerHTML = "";
+                        input.value = "";
+                        logoInput.value = "";
+                    };
+
+                    imagePreview.appendChild(imgElement);
+                    imagePreview.appendChild(removeButton);
+
+                    // Обновляем значение поля logo при загрузке нового изображения
+                    logoInput.value = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+    </script>
+
+</head>
+<body onload="showPopup()">
+<div id="popup" class="popup"></div>
+<input type="hidden" id="message" th:value="${message}"/>
+<div class="container">
+    <div class="header">
+        <div class="logo">
+            <a href="/library" style="text-decoration: none; color: inherit;">
+                <img src="/img/logo.jpg" alt="Logo">
+            </a>
+        </div>
+        <div class="user">
+            <form th:action="@{/logout}" method="post">
+                <div class="user_container">
+                    <div class="avatar">
+                        <a href="/profile" style="text-decoration: none; color: inherit;">
+                            <img th:src="${user.avatar}" alt="User"/>
+                        </a>
+                    </div>
+                    <div class="name_user">
+                        <a href="/profile" th:text="${user.name}"></a>
+                    </div>
+                    <div class="logout_button">
+                        <button type="submit">Выйти</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="profile">
+        <h1 th:text="'Профиль пользователя ' + ${user.name}"></h1>
+        <form th:action="@{'/profile'}" method="post">
+            <input type="hidden" name="id" th:value="${user.id}">
+            <input type="hidden" name="name" th:value="${user.name}">
+            <div class="avatar_ico">
+                <div class="label-container">
+                    <label for="avatar_attach">Изображение пользователя</label>
+                </div>
+                <input type="file" id="avatar_attach" name="avatar_attach" accept="image/*" onchange="previewImage(this)">
+                <div class="imagePreview-container">
+                    <div id="imagePreview" class="imagePreview"></div>
+                </div>
+                <input type="hidden" id="avatar" name="avatar" th:value="${user.avatar}">
+                <script>
+                    var logoInput = document.getElementById("avatar");
+
+                    // Проверяем, есть ли значение в поле logo при загрузке формы
+                    if (logoInput.value) {
+                        var imagePreview = document.getElementById("imagePreview");
+                        var imgElement = document.createElement("img");
+                        imgElement.src = logoInput.value;
+
+                        var removeButton = document.createElement("button");
+                        removeButton.type = "button";
+                        removeButton.innerText = "Удалить";
+                        removeButton.onclick = function () {
+                            imagePreview.innerHTML = "";
+                            logoInput.value = "";
+                        };
+
+                        imagePreview.appendChild(imgElement);
+                        imagePreview.appendChild(removeButton);
+                    }
+                </script>
+            </div>
+            <div class="s_button">
+                <button type="submit" value="update">Обновить пользователя</button>
+            </div>
+        </form>
+        <form id="pass_form" th:action="@{'/profile/pass'}" method="post">
+            <input type="hidden" name="id" th:value="${user.id}">
+            <input type="hidden" name="name" th:value="${user.name}">
+            <div id="error" class="error"></div>
+            <div class="user_pass">
+                <div class="label-container">
+                    <label for="password">Пароль пользователя</label>
+                </div>
+                <input type="password" id="password" name="pass" placeholder="Введите новый пароль" required>
+                <input type="password" id="password_repeate" name="pass_repeate" placeholder="Повторите новый пароль" required >
+            </div>
+            <div class="s_button">
+                <button type="submit" value="update">Обновить пароль</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
