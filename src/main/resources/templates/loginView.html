@@ -16,9 +16,9 @@
     </div>
     <div class="form">
         <form th:action="@{/login}" method="post">
-            <input type="text" name="username" placeholder="Введите имя пользователя" required>
-            <input type="password" name="password" placeholder="Введите пароль" required>
-            <button type="submit" value="Log in">Войти</button>
+            <input type="text" name="username" th:placeholder="#{user.username.placeholder}" required>
+            <input type="password" name="password" th:placeholder="#{user.password.placeholder}" required>
+            <button type="submit" value="Log in" th:text="#{user.login.button}"></button>
             <a href="/register">Зарегистрироваться</a>
             <!--<a href="forgot.php">Забыли пароль?</a>-->
         </form>

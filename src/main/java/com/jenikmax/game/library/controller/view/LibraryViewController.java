@@ -152,12 +152,10 @@ public class LibraryViewController {
     public String editGame(@PathVariable("id") Long id, Model model) {
         logger.info("Open game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
-        //List<String> platforms = libraryService.getGamesPlatforms();
         List<Genre> genres = libraryService.getGenres();
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
         ShortUser user = libraryService.getUserInfo();
         model.addAttribute("game", gameDto);
-        //model.addAttribute("platforms", platforms);
         model.addAttribute("genres", genres);
         model.addAttribute("current_genres", currentGenres);
         model.addAttribute("user", user);
@@ -166,7 +164,7 @@ public class LibraryViewController {
 
     @PostMapping("library/game/{id}/edit")
     public String saveGame(@PathVariable("id") Long id, GameDto game,RedirectAttributes redirectAttributes, Model model) {
-        logger.info("Open game - {} ",id);
+        logger.info("Edit game - {} ",id);
         try{
             libraryService.updateGameInfo(game);
             redirectAttributes.addAttribute("message","Game card save success");
@@ -182,21 +180,22 @@ public class LibraryViewController {
     public String grabGameData(@PathVariable("id") Long id,
                                @RequestParam(value = "source") String source,
                                @RequestParam(value = "url") String url,
-                               RedirectAttributes redirectAttributes,
                                Model model) {
         logger.info("Grab game data game - {}, source - {}, url - {}",id,source,url);
         GameDto gameDto = libraryService.grabGameInfo(id,source,url);
-
         List<Genre> genres = libraryService.getGenres();
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
+        ShortUser user = libraryService.getUserInfo();
         model.addAttribute("game", gameDto);
         model.addAttribute("genres", genres);
         model.addAttribute("current_genres", currentGenres);
+        model.addAttribute("user", user);
         return "gameEditView";
     }
 
     @GetMapping("library/game/{id}/download")
-    public ResponseEntity<Resource> editGame(@PathVariable("id") Long id) {
+    public ResponseEntity<Resource> downloadGame(@PathVariable("id") Long id) {
+        logger.info("Download game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
         return libraryService.downloadGame(gameDto);
 

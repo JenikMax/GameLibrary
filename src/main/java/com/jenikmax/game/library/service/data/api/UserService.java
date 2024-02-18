@@ -1,14 +1,13 @@
 package com.jenikmax.game.library.service.data.api;
 
-import com.jenikmax.game.library.model.dto.ShortUser;
+import com.jenikmax.game.library.model.dto.RegistrationForm;
 import com.jenikmax.game.library.model.dto.UserDto;
-import com.jenikmax.game.library.model.entity.User;
 
 import java.util.List;
 
 public interface UserService {
 
-    void registerUser(User user);
+    void registerUser(RegistrationForm user);
 
     UserDto getUserInfoByName(String userName);
 

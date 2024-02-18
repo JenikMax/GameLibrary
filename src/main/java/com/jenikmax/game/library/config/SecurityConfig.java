@@ -1,6 +1,7 @@
 package com.jenikmax.game.library.config;
 
 
+import com.jenikmax.game.library.config.security.CustomAccessDeniedHandler;
 import com.jenikmax.game.library.config.security.CustomLoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable();
         http
                 .authorizeRequests()
                     .antMatchers("/resources/**").permitAll()
@@ -54,8 +56,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers(HttpMethod.GET,"/library").hasAnyRole("ADMIN","USER")
                     .antMatchers(HttpMethod.GET,"/library/game/{id}").hasAnyRole("ADMIN","USER")
                     .antMatchers(HttpMethod.GET,"/library/game/{id}/edit").hasRole("ADMIN")
-                    .antMatchers(HttpMethod.GET,"/library/game/{id}/download").hasAnyRole("ADMIN","USER")
                     .antMatchers(HttpMethod.POST,"/library/game/{id}/edit").hasRole("ADMIN")
+                    .antMatchers(HttpMethod.GET,"/library/game/{id}/download").hasAnyRole("ADMIN","USER")
                     .antMatchers(HttpMethod.POST,"/library/game/{id}/grab").hasRole("ADMIN")
                     .antMatchers(HttpMethod.POST,"/filter").hasAnyRole("ADMIN","USER")
                     .antMatchers(HttpMethod.POST,"/sort").hasAnyRole("ADMIN","USER")
@@ -75,7 +77,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .logoutSuccessUrl("/login?logout")
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
-                    .permitAll();
+                    .permitAll()
+                    .and()
+                .exceptionHandling()
+                    .accessDeniedHandler(new CustomAccessDeniedHandler());
     }
 
     @Bean

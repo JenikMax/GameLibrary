@@ -43,7 +43,7 @@
     <div class="logo">
         <img src="img/logo.jpg" alt="Logo">
     </div>
-    <div class="error" id="error" th:text="${param.error != null ? param.error : ''}"></div>
+    <div class="error" id="error" th:text="${message != null ? message : ''}"></div>
     <div class="form">
         <form id="form" th:action="@{/register}" method="post" th:object="${registrationForm}">
             <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required th:field="*{username}">

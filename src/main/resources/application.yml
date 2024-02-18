@@ -1,3 +1,10 @@
+server:
+  max-http-header-size: 10000KB
+  tomcat:
+    max-http-form-post-size: 50000KB
+    max-file-size: 10000KB
+    max-request-size: 10000KB
+
 game-library:
   games:
     directory: D:/Work/MyProjects/gametest

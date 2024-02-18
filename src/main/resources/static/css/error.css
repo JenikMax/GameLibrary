@@ -1,0 +1,26 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-image: url("/img/background/pattern-doted-wide-honeycomb.png");
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.container a {
+    display: block;
+    text-align: center;
+    color: #007bff;
+    text-decoration: none;
+}
