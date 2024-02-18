@@ -10,7 +10,7 @@ body {
 }
 
 .container {
-    width: 1200px;
+    width: 1020px;
     margin: 20px auto;
 }
 
@@ -63,7 +63,6 @@ body {
     padding: 20px;
     background-color: white;
     margin: 10px ;
-    background-color: white;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -123,22 +122,23 @@ body {
 
 .games li {
     width: 30%;
-    height: 400px;
+    height: 360px;
     margin: 10px;
     float: left;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 10px;
     overflow: hidden;
     background-color: #404040;
 }
 
 .games img {
     width: 100%;
-    height: 75%;
+    height: 70%;
 }
 
 .games p {
-    margin: 10px;
+    font-size: 14px;
+    margin: 5px;
     text-align: center;
     background-color: #404040;
     color: white;
@@ -203,6 +203,7 @@ body {
     cursor: pointer;
 }
 
+.sort-container button:hover,
 .pagination button:hover {
     background-color: #007bff;
     color: white;
@@ -229,7 +230,7 @@ body {
 
 .sort-container button{
     display: inline-block;
-    width: 220px;
+    width: 185px;
     height: 30px;
     margin: 5px;
     border-radius: 5px;

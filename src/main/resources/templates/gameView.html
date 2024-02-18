@@ -9,8 +9,8 @@
 
             modal.style.display = "block";
             modalImg.src = img.src;
-            modalImg.style.width = "auto";
-            modalImg.style.height = "auto";
+            modalImg.style.width = "90%";
+            modalImg.style.height = "90%";
         }
 
         function closeModal() {
@@ -89,7 +89,7 @@
         </div>
         <div class="game_navigation">
             <a href="#" onclick="goBack()">Назад</a>
-            <a th:href="${game.id} + '/edit'">Редактировать</a>
+            <a th:if="${user.isAdmin}" th:href="${game.id} + '/edit'">Редактировать</a>
         </div>
     </div>
 </div>

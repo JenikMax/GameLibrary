@@ -10,23 +10,23 @@ body {
 }
 
 .container {
-    width: 1200px;
+    width: 1000px;
     margin: 20px auto;
 }
 
 .profile {
-    width: 40%;
+    width: 35%;
     float: left;
-    padding: 20px;
+    padding: 5px;
     background-color: white;
-    margin: 10px ;
+    margin: 5px ;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 
 .users_list{
-    width: 56%;
+    width: 64%;
     height: auto;
     float: right;
     padding: 0px;
@@ -38,9 +38,9 @@ body {
 }
 
 .user_profile {
-    width: 47%;
+    width: 48%;
     height: 60px auto;
-    margin: 10px ;
+    margin: 5px ;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -52,7 +52,8 @@ body {
 }
 
 .user_profile form{
-    width: 99%
+    width: 99%;
+    margin: 0px
 }
 
 
@@ -104,7 +105,7 @@ body {
     width: 90%;
     height: 50px;
     margin-left: 10px;
-    margin: 5px 10px;
+    margin: 1px 10px;
     background-color: #007bff;
     border: none;
     border-radius: 5px;
@@ -116,7 +117,7 @@ body {
 
 
 .profile h1 {
-    margin: 10px;
+    margin: 15px;
 }
 
 .profile label {
@@ -125,18 +126,17 @@ body {
 }
 
 .profile input {
-    width: 80%;
     height: 40px;
-    margin: 10px;
+    margin: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
 }
 
 .profile button {
-    width: 200px;
+    width: 83%;
     height: 50px;
-    margin: 10px 30px;
+    margin: 1px 30px;
     background-color: #007bff;
     border: none;
     border-radius: 5px;
@@ -148,9 +148,10 @@ body {
 .user_pass,
 .user_name,
 .avatar_ico{
-    width: 90%;
+    width: 83%;
     height: 60px auto;
     margin: 30px ;
+    padding: 1px;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -174,13 +175,13 @@ body {
 .user_pass input,
 .user_name input,
 .avatar_ico input{
-    width: 95%;
+    width: 90%;
 }
 
 
 
 .avatar_ico img{
-    width: 94%;
+    width: 81%;
     height: auto;
     margin: 10px ;
     background-color: white;
@@ -190,13 +191,13 @@ body {
 
 
 .avatar_ico button{
-    width: 94%;
+    width: 85%;
     height: 50px;
-    margin: 5px 10px;
+    margin: 5px 8px;
 }
 
 .avatar_ico .imagePreview{
-    width: 30%;
+    width: 40%;
     height: auto;
     margin: 20px ;
     background-color: white;

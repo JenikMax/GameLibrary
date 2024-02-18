@@ -10,20 +10,23 @@ body {
 }
 
 .container {
-    width: 1200px;
+    width: 1000px;
     margin: 20px auto;
 }
 
 .profile {
-    width: 1180px;
-    padding: 20px;
+    width: 1000px;
+    padding: 40px;
     margin: 20px auto;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .profile h1 {
+    width: 98%;
     margin: 10px;
 }
 
@@ -42,9 +45,9 @@ body {
 }
 
 .profile button {
-    width: 200px;
+    width: 95%;
     height: 50px;
-    margin: 10px 30px;
+    margin: 10px 10px;
     background-color: #007bff;
     border: none;
     border-radius: 5px;
@@ -53,12 +56,24 @@ body {
     cursor: pointer;
 }
 
+.avatar_div,
+.pass_div{
+    width: 47%;
+    height: 60px auto;
+    margin: 20px 10px;
+    padding: 1px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
 .user_pass,
 .user_name,
 .avatar_ico{
-    width: 1010px;
+    width: 96%;
     height: 60px auto;
-    margin: 30px ;
+    margin: 20px 10px;
+    padding: 1px;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -82,13 +97,13 @@ body {
 .user_pass input,
 .user_name input,
 .avatar_ico input{
-    width: 98%;
+    width: 95%;
 }
 
 
 
 .avatar_ico img{
-    width: 94%;
+    width: 87%;
     height: auto;
     margin: 10px ;
     background-color: white;
@@ -98,13 +113,13 @@ body {
 
 
 .avatar_ico button{
-    width: 94%;
+    width: 87%;
     height: 50px;
     margin: 5px 10px;
 }
 
 .avatar_ico .imagePreview{
-    width: 30%;
+    width: 40%;
     height: auto;
     margin: 20px ;
     background-color: white;

@@ -111,59 +111,63 @@
     </div>
     <div class="profile">
         <h1 th:text="'Профиль пользователя ' + ${user.name}"></h1>
-        <form th:action="@{'/profile'}" method="post">
-            <input type="hidden" name="id" th:value="${user.id}">
-            <input type="hidden" name="name" th:value="${user.name}">
-            <div class="avatar_ico">
-                <div class="label-container">
-                    <label for="avatar_attach">Изображение пользователя</label>
-                </div>
-                <input type="file" id="avatar_attach" name="avatar_attach" accept="image/*" onchange="previewImage(this)">
-                <div class="imagePreview-container">
-                    <div id="imagePreview" class="imagePreview"></div>
-                </div>
-                <input type="hidden" id="avatar" name="avatar" th:value="${user.avatar}">
-                <script>
-                    var logoInput = document.getElementById("avatar");
+        <div class="avatar_div">
+            <form th:action="@{'/profile'}" method="post">
+                <input type="hidden" name="id" th:value="${user.id}">
+                <input type="hidden" name="name" th:value="${user.name}">
+                <div class="avatar_ico">
+                    <div class="label-container">
+                        <label for="avatar_attach">Изображение пользователя</label>
+                    </div>
+                    <input type="file" id="avatar_attach" name="avatar_attach" accept="image/*" onchange="previewImage(this)">
+                    <div class="imagePreview-container">
+                        <div id="imagePreview" class="imagePreview"></div>
+                    </div>
+                    <input type="hidden" id="avatar" name="avatar" th:value="${user.avatar}">
+                    <script>
+                        var logoInput = document.getElementById("avatar");
 
-                    // Проверяем, есть ли значение в поле logo при загрузке формы
-                    if (logoInput.value) {
-                        var imagePreview = document.getElementById("imagePreview");
-                        var imgElement = document.createElement("img");
-                        imgElement.src = logoInput.value;
+                        // Проверяем, есть ли значение в поле logo при загрузке формы
+                        if (logoInput.value) {
+                            var imagePreview = document.getElementById("imagePreview");
+                            var imgElement = document.createElement("img");
+                            imgElement.src = logoInput.value;
 
-                        var removeButton = document.createElement("button");
-                        removeButton.type = "button";
-                        removeButton.innerText = "Удалить";
-                        removeButton.onclick = function () {
-                            imagePreview.innerHTML = "";
-                            logoInput.value = "";
-                        };
+                            var removeButton = document.createElement("button");
+                            removeButton.type = "button";
+                            removeButton.innerText = "Удалить";
+                            removeButton.onclick = function () {
+                                imagePreview.innerHTML = "";
+                                logoInput.value = "";
+                            };
 
-                        imagePreview.appendChild(imgElement);
-                        imagePreview.appendChild(removeButton);
-                    }
-                </script>
-            </div>
-            <div class="s_button">
-                <button type="submit" value="update">Обновить пользователя</button>
-            </div>
-        </form>
-        <form id="pass_form" th:action="@{'/profile/pass'}" method="post">
-            <input type="hidden" name="id" th:value="${user.id}">
-            <input type="hidden" name="name" th:value="${user.name}">
-            <div id="error" class="error"></div>
-            <div class="user_pass">
-                <div class="label-container">
-                    <label for="password">Пароль пользователя</label>
+                            imagePreview.appendChild(imgElement);
+                            imagePreview.appendChild(removeButton);
+                        }
+                    </script>
                 </div>
-                <input type="password" id="password" name="pass" placeholder="Введите новый пароль" required>
-                <input type="password" id="password_repeate" name="pass_repeate" placeholder="Повторите новый пароль" required >
-            </div>
-            <div class="s_button">
-                <button type="submit" value="update">Обновить пароль</button>
-            </div>
-        </form>
+                <div class="s_button">
+                    <button type="submit" value="update">Обновить пользователя</button>
+                </div>
+            </form>
+        </div>
+        <div class="pass_div">
+            <form id="pass_form" th:action="@{'/profile/pass'}" method="post">
+                <input type="hidden" name="id" th:value="${user.id}">
+                <input type="hidden" name="name" th:value="${user.name}">
+                <div id="error" class="error"></div>
+                <div class="user_pass">
+                    <div class="label-container">
+                        <label for="password">Пароль пользователя</label>
+                    </div>
+                    <input type="password" id="password" name="pass" placeholder="Введите новый пароль" required>
+                    <input type="password" id="password_repeate" name="pass_repeate" placeholder="Повторите новый пароль" required >
+                </div>
+                <div class="s_button">
+                    <button type="submit" value="update">Обновить пароль</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 </body>
