@@ -138,7 +138,7 @@
             <ul th:each="genre : ${genres}"  >
                 <li>
                     <input class="form-check-input" type="checkbox" th:id="'genreCheckbox-' + ${genre.toString()}" name="selectedGenres" th:value="${genre.toString()}" th:checked="${selectedGenres.contains(genre.toString())}" onclick="submitForm()">
-                    <label class="form-check-label" th:for="'genreCheckbox-' + ${genre.toString()}" th:text="${genre.getName()}"></label>
+                    <label class="form-check-label" th:for="'genreCheckbox-' + ${genre.toString()}" th:text="${messageSource.getMessage('enum.genre.' + genre.toString(), null, locale)}"></label>
                 </li>
             </ul>
             </div>

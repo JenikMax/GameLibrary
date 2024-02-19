@@ -239,13 +239,13 @@
                     <option value="" th:text="#{view.game.edit.genre.select}"></option>
                     <option th:each="genre : ${genres}"
                             th:value="${genre.toString()}"
-                            th:text="${genre.getName()}"></option>
+                            th:text="${messageSource.getMessage('enum.genre.' + genre.toString(), null, locale)}"></option>
                 </select>
                 <button type="button" class="add_button" onclick="addGenre()" th:text="#{view.navigation.add.button}"></button>
                 <div class="genreList-container">
                     <div id="genreList" class="genreList">
                         <div th:each="genre : ${current_genres}">
-                            <span th:text="${genre.getName()}"></span>
+                            <span th:text="${messageSource.getMessage('enum.genre.' + genre.toString(), null, locale)}"></span>
                             <button type="button" onclick="removeGenre(this)" th:text="#{view.navigation.delete.button}"></button>
                             <input type="hidden" th:name="genres" th:value="${genre.toString()}">
                         </div>

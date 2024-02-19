@@ -4,9 +4,11 @@ import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.enums.Genre;
+import com.jenikmax.game.library.model.entity.enums.GenreLoc;
 import com.jenikmax.game.library.service.api.LibraryService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,13 +33,17 @@ public class LibraryViewController {
     static final Logger logger = LogManager.getLogger(LibraryViewController.class.getName());
 
     private final LibraryService libraryService;
+    //private final GenreLoc genreLoc;
+    private final MessageSource messageSource;
 
-    public LibraryViewController(LibraryService libraryService) {
+    public LibraryViewController(LibraryService libraryService, MessageSource messageSource) {
         this.libraryService = libraryService;
+        //this.genreLoc = genreLoc;
+        this.messageSource = messageSource;
     }
 
     @GetMapping("/library")
-    public String main(Model model, @RequestParam(value = "page", defaultValue = "1") int page,
+    public String main(Model model, Locale locale, @RequestParam(value = "page", defaultValue = "1") int page,
                        @RequestParam(value = "searchText", required = false) String searchText,
                        @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
                        @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
@@ -84,6 +90,10 @@ public class LibraryViewController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortType", sortType);
         model.addAttribute("user", user);
+
+        model.addAttribute("messageSource", messageSource);
+        model.addAttribute("locale", locale);
+
         return "libraryView";
     }
 
@@ -140,7 +150,7 @@ public class LibraryViewController {
 
 
     @GetMapping("library/game/{id}")
-    public String viewGame(@PathVariable("id") Long id, Model model) {
+    public String viewGame(@PathVariable("id") Long id, Model model,Locale locale) {
         logger.info("Open game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
@@ -148,11 +158,15 @@ public class LibraryViewController {
         model.addAttribute("game", gameDto);
         model.addAttribute("current_genres", currentGenres);
         model.addAttribute("user", user);
+
+        model.addAttribute("messageSource", messageSource);
+        model.addAttribute("locale", locale);
+
         return "gameView";
     }
 
     @GetMapping("library/game/{id}/edit")
-    public String editGame(@PathVariable("id") Long id, Model model) {
+    public String editGame(@PathVariable("id") Long id, Model model, Locale locale) {
         logger.info("Open game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
         List<Genre> genres = libraryService.getGenres();
@@ -162,6 +176,10 @@ public class LibraryViewController {
         model.addAttribute("genres", genres);
         model.addAttribute("current_genres", currentGenres);
         model.addAttribute("user", user);
+
+        model.addAttribute("messageSource", messageSource);
+        model.addAttribute("locale", locale);
+
         return "gameEditView";
     }
 

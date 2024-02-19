@@ -76,7 +76,7 @@
         </div>
         <div class="game_genre">
             <ul>
-                <li th:each="genre : ${current_genres}" th:text="${genre.getName()}"></li>
+                <li th:each="genre : ${current_genres}" th:text="${messageSource.getMessage('enum.genre.' + genre.toString(), null, locale)}"></li>
             </ul>
         </div>
         <div class="game_screenshots">

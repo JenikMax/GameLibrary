@@ -41,7 +41,6 @@ public class UserViewController {
     @GetMapping("/login")
     public String login(HttpServletRequest request, HttpServletResponse response) {
         logger.info("Open /login view");
-        //request.getHeader()
         Locale locale = request.getLocale();
         if(locale.toString().equals("ru") || locale.toString().equals("en")){
             LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
