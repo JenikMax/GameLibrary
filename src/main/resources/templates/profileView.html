@@ -16,12 +16,12 @@
 
                 // Проверка пароля
                 if (password.length < 6) {
-                    document.getElementById('error').innerText = 'Пароль должен содержать не менее 6 символов';
+                    document.getElementById('error').innerText = '[[#{view.user.pass.length.error.message}]]';
                     return; // Остановить выполнение кода
                 }
 
                 if (password !== passwordRepeate) {
-                    document.getElementById('error').innerText = 'Пароли не совпадают';
+                    document.getElementById('error').innerText = '[[#{view.user.pass.repeat.error.message}]]';
                     return; // Остановить выполнение кода
                 }
 
@@ -61,7 +61,7 @@
 
                     var removeButton = document.createElement("button");
                     removeButton.type = "button";
-                    removeButton.innerText = "Удалить";
+                    removeButton.innerText = '[[#{view.navigation.delete.button}]]';
                     removeButton.onclick = function () {
                         imagePreview.innerHTML = "";
                         input.value = "";
@@ -92,7 +92,7 @@
             </a>
         </div>
         <div class="information">
-            <h1 th:text="'Profile ' + ${user.name}"></h1>
+            <h1 th:text="#{view.profile.title.short} + ' ' + ${user.name}"></h1>
         </div>
         <div class="user">
             <form th:action="@{/logout}" method="post">
@@ -106,21 +106,21 @@
                         <a href="/profile" th:text="${user.name}"></a>
                     </div>
                     <div class="logout_button">
-                        <button type="submit">Выйти</button>
+                        <button type="submit" th:text="#{view.user.logout.button}"></button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
     <div class="profile">
-        <h1 th:text="'Профиль пользователя ' + ${user.name}"></h1>
+        <h1 th:text="#{view.profile.title} + ' ' + ${user.name}"></h1>
         <div class="avatar_div">
             <form th:action="@{'/profile'}" method="post">
                 <input type="hidden" name="id" th:value="${user.id}">
                 <input type="hidden" name="name" th:value="${user.name}">
                 <div class="avatar_ico">
                     <div class="label-container">
-                        <label for="avatar_attach">Изображение пользователя</label>
+                        <label for="avatar_attach" th:text="#{view.profile.picture}"></label>
                     </div>
                     <input type="file" id="avatar_attach" name="avatar_attach" accept="image/*" onchange="previewImage(this)">
                     <div class="imagePreview-container">
@@ -138,7 +138,7 @@
 
                             var removeButton = document.createElement("button");
                             removeButton.type = "button";
-                            removeButton.innerText = "Удалить";
+                            removeButton.innerText = '[[#{view.navigation.delete.button}]]';
                             removeButton.onclick = function () {
                                 imagePreview.innerHTML = "";
                                 logoInput.value = "";
@@ -150,7 +150,7 @@
                     </script>
                 </div>
                 <div class="s_button">
-                    <button type="submit" value="update">Обновить пользователя</button>
+                    <button type="submit" value="update" th:text="#{view.profile.update.button}"></button>
                 </div>
             </form>
         </div>
@@ -161,13 +161,13 @@
                 <div id="error" class="error"></div>
                 <div class="user_pass">
                     <div class="label-container">
-                        <label for="password">Пароль пользователя</label>
+                        <label for="password" th:text="#{view.profile.pass}"></label>
                     </div>
-                    <input type="password" id="password" name="pass" placeholder="Введите новый пароль" required>
-                    <input type="password" id="password_repeate" name="pass_repeate" placeholder="Повторите новый пароль" required >
+                    <input type="password" id="password" name="pass" th:placeholder="#{view.profile.pass.new}" required>
+                    <input type="password" id="password_repeate" name="pass_repeate" th:placeholder="#{view.profile.pass.new.repeat}" required >
                 </div>
                 <div class="s_button">
-                    <button type="submit" value="update">Обновить пароль</button>
+                    <button type="submit" value="update" th:text="#{view.profile.update.pass.button}"></button>
                 </div>
             </form>
         </div>

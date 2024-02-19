@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,8 +39,14 @@ public class UserViewController {
     }
 
     @GetMapping("/login")
-    public String login() {
+    public String login(HttpServletRequest request, HttpServletResponse response) {
         logger.info("Open /login view");
+        //request.getHeader()
+        Locale locale = request.getLocale();
+        if(locale.toString().equals("ru") || locale.toString().equals("en")){
+            LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
+            localeResolver.setLocale(request, response, locale);
+        }
         return "loginView";
     }
 

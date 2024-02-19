@@ -4,7 +4,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}">
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
 
-    <script>
+    <script th:inline="javascript">
         $(document).ready(function () {
 
             document.getElementById('form').addEventListener('submit', function(e) {
@@ -16,18 +16,18 @@
 
                 // Проверка имени пользователя
                 if (username.length < 3 || username.length > 20) {
-                    document.getElementById('error').innerText = 'Имя пользователя должно содержать от 3 до 20 символов';
+                    document.getElementById('error').innerText = '[[#{view.user.username.length.error.message}]]';
                     return; // Остановить выполнение кода
                 }
 
                 // Проверка пароля
                 if (password.length < 6) {
-                    document.getElementById('error').innerText = 'Пароль должен содержать не менее 6 символов';
+                    document.getElementById('error').innerText = '[[#{view.user.pass.length.error.message}]]';
                     return; // Остановить выполнение кода
                 }
 
                 if (password !== passwordRepeate) {
-                    document.getElementById('error').innerText = 'Пароли не совпадают';
+                    document.getElementById('error').innerText = '[[#{view.user.pass.repeat.error.message}]]';
                     return; // Остановить выполнение кода
                 }
 
@@ -46,12 +46,12 @@
     <div class="error" id="error" th:text="${message != null ? message : ''}"></div>
     <div class="form">
         <form id="form" th:action="@{/register}" method="post" th:object="${registrationForm}">
-            <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required th:field="*{username}">
-            <input type="password" id="password" name="password" placeholder="Введите пароль" required th:field="*{password}">
-            <input type="password" id="password_repeate" name="password_repeate" placeholder="Повторите пароль" required >
+            <input type="text" id="username" name="username" th:placeholder="#{view.user.username.placeholder}" required th:field="*{username}">
+            <input type="password" id="password" name="password" th:placeholder="#{view.user.password.placeholder}" required th:field="*{password}">
+            <input type="password" id="password_repeate" name="password_repeate" th:placeholder="#{view.user.repassword.placeholder}" required >
 
-            <button type="submit" value="Register">Зарегистрироваться</button>
-            <a href="/login">Войти</a>
+            <button type="submit" value="Register" th:text="#{view.user.register.button}"></button>
+            <a href="/login" th:text="#{view.user.login.button}"></a>
         </form>
     </div>
 </div>

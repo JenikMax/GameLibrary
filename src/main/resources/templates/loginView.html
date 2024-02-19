@@ -9,18 +9,17 @@
         <img src="img/logo.jpg" alt="Logo">
     </div>
     <div class="error" th:if="${param.error}">
-        <p>Invalid username and password.</p>
+        <p th:text="#{view.user.error.message}"></p>
     </div>
     <div class="info" th:if="${param.logout}">
-        <p>You have been logged out.</p>
+        <p th:text="#{view.user.logout.message}"></p>
     </div>
     <div class="form">
         <form th:action="@{/login}" method="post">
-            <input type="text" name="username" th:placeholder="#{user.username.placeholder}" required>
-            <input type="password" name="password" th:placeholder="#{user.password.placeholder}" required>
-            <button type="submit" value="Log in" th:text="#{user.login.button}"></button>
-            <a href="/register">Зарегистрироваться</a>
-            <!--<a href="forgot.php">Забыли пароль?</a>-->
+            <input type="text" name="username" th:placeholder="#{view.user.username.placeholder}" required>
+            <input type="password" name="password" th:placeholder="#{view.user.password.placeholder}" required>
+            <button type="submit" value="Log in" th:text="#{view.user.login.button}"></button>
+            <a href="/register" th:text="#{view.user.register.button}"></a>
         </form>
     </div>
 </div>

@@ -1,4 +1,4 @@
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <link rel="stylesheet" type="text/css" th:href="@{/css/game_edit.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
@@ -15,7 +15,7 @@
             if (selectedGenre.value !== "" && !checkDuplicateGenre(selectedGenre.value)) {
                 var genreDiv = document.createElement("div");
                 genreDiv.innerHTML = "<span>" + selectedOptionGenre.textContent + "</span>"
-                    + "<button type='button' onclick='removeGenre(this)'>Удалить</button>";
+                    + "<button type='button' onclick='removeGenre(this)'>[[#{view.navigation.delete.button}]]</button>";
                 genreList.appendChild(genreDiv);
 
                 var hiddenInput = document.createElement("input");
@@ -59,7 +59,7 @@
 
                     var removeButton = document.createElement("button");
                     removeButton.type = "button";
-                    removeButton.innerText = "Удалить";
+                    removeButton.innerText = "[[#{view.navigation.delete.button}]]";
                     removeButton.onclick = function () {
                         imagePreview.innerHTML = "";
                         input.value = "";
@@ -93,7 +93,7 @@
 
                     var removeButton = document.createElement("button");
                     removeButton.type = "button";
-                    removeButton.innerText = "Удалить";
+                    removeButton.innerText = "[[#{view.navigation.delete.button}]]";
                     removeButton.onclick = function () {
                         screenshotDiv.remove();
                     };
@@ -139,7 +139,7 @@
             </a>
         </div>
         <div class="information">
-            <h1 th:text="${game.name}"></h1>
+            <h1 th:text="#{view.profile.title.short} + ' ' + ${user.name}"></h1>
         </div>
         <div class="user">
             <form th:action="@{/logout}" method="post">
@@ -153,50 +153,50 @@
                         <a href="/profile" th:text="${user.name}"></a>
                     </div>
                     <div class="logout_button">
-                        <button type="submit">Выйти</button>
+                        <button type="submit" th:text="#{view.user.logout.button}"></button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
     <div class="data">
-        <h2>Выбор источника данных</h2>
+        <h2 th:text="#{view.game.edit.data.title}"></h2>
         <form th:action="@{'/library/game/' + ${game.id} + '/grab'}" method="post">
-            <label for="source">Источник данных</label>
+            <label for="source" th:text="#{view.game.edit.data.source.title}"></label>
             <select id="source" name="source"  onchange="toggleUrlField()">
-                <option value="manual">Ручной ввод</option>
+                <option value="manual" th:text="#{view.game.edit.data.source.manual}"></option>
                 <option value="iddb">IDDB</option>
                 <option value="playground">Playground.ru</option>
                 <option value="igromania">Igromania.ru</option>
                 <option value="stopgame">Stopgame.ru</option>
             </select>
             <div class="url-field hidden">
-                <label for="url">URL страницы игры</label>
+                <label for="url" th:text="#{view.game.edit.data.source.url}"></label>
                 <input type="text" id="url" name="url">
             </div>
-            <button type="submit">Применить</button>
+            <button type="submit" th:text="#{view.navigation.confirm}"></button>
         </form>
     </div>
     <div class="edit">
-        <h1>Редактирование плитки</h1>
+        <h1 th:text="#{view.game.edit.title}"></h1>
         <form th:action="@{'/library/game/' + ${game.id} + '/edit'}" method="post">
             <input type="hidden" id="directoryPath" name="directoryPath" th:value="${game.directoryPath}">
             <input type="hidden" id="platform" name="platform" th:value="${game.platform}">
             <div class="game_name">
                 <div class="label-container">
-                    <label for="title">Название игры</label>
+                    <label for="title" th:text="#{view.game.edit.name}"></label>
                 </div>
                 <input type="text" id="title" name="name" th:value="${game.name}">
             </div>
             <div class="game_year">
                 <div class="label-container">
-                    <label for="year">Год выпуска</label>
+                    <label for="year" th:text="#{view.game.edit.year}"></label>
                 </div>
                 <input type="text" id="year" name="releaseDate" th:value="${game.releaseDate}">
             </div>
             <div class="game_poster">
                 <div class="label-container">
-                    <label for="poster">Постер игры</label>
+                    <label for="poster" th:text="#{view.game.edit.poster}"></label>
                 </div>
                 <input type="file" id="poster" name="poster" accept="image/*" onchange="previewImage(this)">
                 <div class="imagePreview-container">
@@ -214,7 +214,7 @@
 
                         var removeButton = document.createElement("button");
                         removeButton.type = "button";
-                        removeButton.innerText = "Удалить";
+                        removeButton.innerText = "[[#{view.navigation.delete.button}]]";
                         removeButton.onclick = function () {
                             imagePreview.innerHTML = "";
                             logoInput.value = "";
@@ -227,26 +227,26 @@
             </div>
             <div class="game_description">
                 <div class="label-container">
-                    <label for="description">Описание игры</label>
+                    <label for="description" th:text="#{view.game.edit.description}"></label>
                 </div>
                 <textarea id="description" name="description" th:value="${game.description}" th:text="${game.description}"></textarea>
             </div>
             <div class="game_genre">
                 <div class="label-container">
-                    <label for="genre">Жанр</label>
+                    <label for="genre" th:text="#{view.game.edit.genre}"></label>
                 </div>
                 <select id="genre" name="genre">
-                    <option value="">Выберите жанр</option>
+                    <option value="" th:text="#{view.game.edit.genre.select}"></option>
                     <option th:each="genre : ${genres}"
                             th:value="${genre.toString()}"
                             th:text="${genre.getName()}"></option>
                 </select>
-                <button type="button" class="add_button" onclick="addGenre()">Добавить</button>
+                <button type="button" class="add_button" onclick="addGenre()" th:text="#{view.navigation.add.button}"></button>
                 <div class="genreList-container">
                     <div id="genreList" class="genreList">
                         <div th:each="genre : ${current_genres}">
                             <span th:text="${genre.getName()}"></span>
-                            <button type="button" onclick="removeGenre(this)">Удалить</button>
+                            <button type="button" onclick="removeGenre(this)" th:text="#{view.navigation.delete.button}"></button>
                             <input type="hidden" th:name="genres" th:value="${genre.toString()}">
                         </div>
                     </div>
@@ -254,32 +254,32 @@
             </div>
             <div class="game_screenshots">
                 <div class="label-container">
-                    <label for="screenshotsUpl">Скриншоты игры</label>
+                    <label for="screenshotsUpl" th:text="#{view.game.edit.screen}"></label>
                 </div>
                 <input type="file" id="screenshotsUpl" name="screenshotsUpl" accept="image/*" multiple onchange="previewScreenshots(this)">
                 <div id="screenshotsList" class="screenshotsList">
                     <div th:each="screenshot : ${game.screenshots}" class="screenshot-item">
                         <img th:src="${screenshot}" alt="screenshot">
-                        <button type="button" onclick="removeScreenshot(this)">Удалить</button>
+                        <button type="button" onclick="removeScreenshot(this)" th:text="#{view.navigation.delete.button}"></button>
                         <input type="hidden" name="screenshots" th:value="${screenshot}">
                     </div>
                 </div>
             </div>
             <div class="game_video">
                 <div class="label-container">
-                    <label for="video">Видео игры</label>
+                    <label for="video" th:text="#{view.game.edit.video}"></label>
                 </div>
                 <input type="text" id="video" name="trailerUrl" th:value="${game.trailerUrl}">
             </div>
             <div class="game_instruction">
                 <div class="label-container">
-                    <label for="instructions">Инструкция по установке игры</label>
+                    <label for="instructions" th:text="#{view.game.edit.instruction}"></label>
                 </div>
                 <textarea id="instructions" name="instruction" th:utext="${game.instruction}"></textarea>
             </div>
-            <button type="submit">Сохранить</button>
+            <button type="submit" th:text="#{view.navigation.save}"></button>
         </form>
-        <a href="#" onclick="goBack()">Отмена</a>
+        <a href="#" onclick="goBack()" th:text="#{view.navigation.cancel}"></a>
     </div>
 </div>
 </body>

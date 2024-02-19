@@ -33,7 +33,7 @@
             </a>
         </div>
         <div class="information">
-            <h1 th:text="${game.name}"></h1>
+            <h1 th:text="#{view.profile.title.short} + ' ' + ${user.name}"></h1>
         </div>
         <div class="user">
             <form th:action="@{/logout}" method="post">
@@ -47,7 +47,7 @@
                         <a href="/profile" th:text="${user.name}"></a>
                     </div>
                     <div class="logout_button">
-                        <button type="submit">Выйти</button>
+                        <button type="submit" th:text="#{view.user.logout.button}"></button>
                     </div>
                 </div>
             </form>
@@ -69,7 +69,7 @@
             </div>
             <div class="description">
                 <span th:text="${game.platform}"></span>
-                <a target="_blank" th:href="@{'/library/game/' + ${game.id} + '/download'}">Скачать</a>
+                <a target="_blank" th:href="@{'/library/game/' + ${game.id} + '/download'}" th:text="#{view.navigation.download}"></a>
                 <!--<button type="button" target="_blank" th:href="@{'/library/game/' + ${game.id} + '/download'}" >Скачать</button>-->
                 <p th:text="${game.description}"></p>
             </div>
@@ -91,8 +91,8 @@
             <pre th:text="${game.instruction}"></pre>
         </div>
         <div class="game_navigation">
-            <a href="#" onclick="goBack()">Назад</a>
-            <a th:if="${user.isAdmin}" th:href="${game.id} + '/edit'">Редактировать</a>
+            <a href="#" onclick="goBack()" th:text="#{view.navigation.back}"></a>
+            <a th:if="${user.isAdmin}" th:href="${game.id} + '/edit'" th:text="#{view.navigation.edit}"></a>
         </div>
     </div>
 </div>

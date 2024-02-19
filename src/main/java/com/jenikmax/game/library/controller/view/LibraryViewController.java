@@ -15,12 +15,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.util.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 public class LibraryViewController {
@@ -203,6 +206,11 @@ public class LibraryViewController {
 
     private List<Integer> initPages(int page, int totalPage){
         return Arrays.asList(NumberUtils.sequence(Math.max(1, page - 3),Math.min(totalPage, page + 3)));
+    }
+
+
+    private Locale getSessionLocale(){
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getLocale();
     }
 
 }

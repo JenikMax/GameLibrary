@@ -94,7 +94,7 @@
             </a>
         </div>
         <div class="information">
-            <h1>Game Library</h1>
+            <h1 th:text="#{view.profile.title.short} + ' ' + ${user.name}"></h1>
         </div>
         <div class="user">
             <form th:action="@{/logout}" method="post">
@@ -108,7 +108,7 @@
                         <a href="/profile" th:text="${user.name}"></a>
                     </div>
                     <div class="logout_button">
-                        <button type="submit">Выйти</button>
+                        <button type="submit" th:text="#{view.user.logout.button}"></button>
                     </div>
                 </div>
             </form>
@@ -120,11 +120,11 @@
             <script>
 
             </script>
-            <h3>Поиск</h3>
+            <h3 th:text="#{view.library.filter.search}"></h3>
             <div class="search">
-                <input type="text" placeholder="Введите название игры" name="searchText" id="searchText" th:value="${searchText}">
+                <input type="text" th:placeholder="#{view.library.filter.search.name.placeholder}" name="searchText" id="searchText" th:value="${searchText}">
             </div>
-            <h3>Платформы</h3>
+            <h3 th:text="#{view.library.filter.platforms}"></h3>
             <div class="platform-list" th:classappend="${platforms.size() > 10} ? 'scrollable' : ''">
             <ul th:each="platform : ${platforms}">
                 <li>
@@ -133,7 +133,7 @@
                 </li>
             </ul>
             </div>
-            <h3>Жанры</h3>
+            <h3 th:text="#{view.library.filter.genres}"></h3>
             <div class="genre-list" th:classappend="${genres.size() > 10} ? 'scrollable' : ''">
             <ul th:each="genre : ${genres}"  >
                 <li>
@@ -142,7 +142,7 @@
                 </li>
             </ul>
             </div>
-            <h3>Годы выпуска</h3>
+            <h3 th:text="#{view.library.filter.years}"></h3>
             <div class="year-list" th:classappend="${years.size() > 10} ? 'scrollable' : ''">
             <ul th:each="year : ${years}">
                 <li>
@@ -151,23 +151,23 @@
                 </li>
             </ul>
             </div>
-            <button type="submit">Найти</button>
-            <button type="reset"  onclick="resetForm()" >Сбросить</button>
+            <button type="submit" th:text="#{view.navigation.find}"></button>
+            <button type="reset"  onclick="resetForm()" th:text="#{view.navigation.reset}"></button>
         </form>
         <form th:if="${user != null && user.isAdmin}" th:action="@{/scan}" method="post">
-            <button type="submit">Обновить библиотеку</button>
+            <button type="submit" th:text="#{view.navigation.library.update}"></button>
         </form>
     </div>
     <div class="games">
-        <h3>Список игр</h3>
+        <h3 th:text="#{view.library.games.title}"></h3>
         <div class="sort-type">
             <form id="sortForm" th:action="@{/sort}" method="post">
                 <input type="hidden" id="sortField" name="sortFieldCurent" th:value="${sortField}"/>
                 <input type="hidden" id="sortType" name="sortTypeCurent" th:value="${sortType}"/>
                 <div class="sort-container">
-                    <button type="submit" onclick="gotoSort('name')" th:text="${sortType == 'asc' && sortField == 'name' ? 'Имя ▲' : (sortType == 'desc' && sortField == 'name' ? 'Имя ▼' : 'Имя')}"></button>
-                    <button type="submit" onclick="gotoSort('year')" th:text="${sortType == 'asc' && sortField == 'year' ? 'Год ▲' : (sortType == 'desc' && sortField == 'year' ? 'Год ▼' : 'Год')}"></button>
-                    <button type="submit" onclick="gotoSort('create')" th:text="${sortType == 'asc' && sortField == 'create' ? 'Дата добавления ▲' : (sortType == 'desc' && sortField == 'create' ? 'Дата добавления ▼' : 'Дата добавления')}"></button>
+                    <button type="submit" onclick="gotoSort('name')" th:text="#{view.library.games.sort.name} + ${sortType == 'asc' && sortField == 'name' ? ' ▲' : (sortType == 'desc' && sortField == 'name' ? ' ▼' : '')}"></button>
+                    <button type="submit" onclick="gotoSort('year')" th:text="#{view.library.games.sort.year} + ${sortType == 'asc' && sortField == 'year' ? ' ▲' : (sortType == 'desc' && sortField == 'year' ? ' ▼' : '')}"></button>
+                    <button type="submit" onclick="gotoSort('create')" th:text="#{view.library.games.sort.create} + ${sortType == 'asc' && sortField == 'create' ? ' ▲' : (sortType == 'desc' && sortField == 'create' ? ' ▼' : '')}"></button>
                 </div>
             </form>
         </div>
