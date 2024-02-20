@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Locale;
 
 public interface LibraryService {
 
@@ -30,6 +31,8 @@ public interface LibraryService {
     List<String> getGamesPlatforms();
 
     List<Genre> getGenres();
+
+    List<Genre> getGenres(Locale locale);
 
     List<Genre> getGenres(GameDto gameDto);
 

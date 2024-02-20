@@ -2,20 +2,22 @@ server:
   max-http-header-size: 10000KB
   tomcat:
     max-http-form-post-size: 50000KB
-    max-file-size: 10000KB
-    max-request-size: 10000KB
+    max-file-size: 50000KB
+    max-request-size: 50000KB
+  port: ${SERVER_PORT}
 
 game-library:
   games:
-    directory: D:/Work/MyProjects/gametest
+    directory: ${GAMES_DIRECTORY}
     torrent:
-      ttl: 180000
-      directory: D:/Work/MyProjects/gametest/torrentDir
+      tracker-port: ${TORRENT_TRACKER_PORT}
+      ttl: ${TORRENT_TTL}
+      directory: ${TORRENT_DIR}
 
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/game-library?currentSchema=library
+    url: jdbc:postgresql://localhost:${DB_PORT}/game-library?currentSchema=library
     username: library-manager-user
     password: 2wq345tgfiNcbBBwee3
 jpa:

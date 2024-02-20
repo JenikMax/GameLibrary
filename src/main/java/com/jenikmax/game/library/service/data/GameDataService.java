@@ -21,10 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -71,9 +68,20 @@ public class GameDataService implements GameService {
             params.addAll(selectedGenres);
         }
         if(!sortField.isEmpty()){
-            if(sortField.equals("year")) sortField = "release_date";
-            if(sortField.equals("create")) sortField = "create_ts";
-            sql += " order by " + sortField + " " + sortType;
+            if(sortField.equals("year")) {
+                sortField = "release_date";
+            }
+            else if(sortField.equals("create")) {
+                sortField = "create_ts";
+            }
+            else{
+                sortField = "name";
+            }
+
+            if(sortType == null || sortType.isEmpty() || (!sortType.equals("asc") && !sortType.equals("desc"))){
+                sortType = "";
+            }
+            sql += " order by " + sortField + (sortType.isEmpty() ? "" : " " + sortType);
 
         }
         else{
@@ -96,6 +104,16 @@ public class GameDataService implements GameService {
     public List<Genre> getGenres() {
         return sqlDao.getGenreList("select code from library.game_genre group by code order by description","code");
     }
+
+    public List<Genre> getGenres(Locale locale){
+        if(locale.toString().equals("ru")){
+            return sqlDao.getGenreList("select code from library.game_genre group by code order by description_ru","code");
+        }
+        else{
+            return getGenres();
+        }
+    }
+
 
     @Override
     public List<String> getGameGenres() {
@@ -157,6 +175,13 @@ public class GameDataService implements GameService {
         game.setCreateTs(new Timestamp(new Date().getTime()));
         gameRepository.save(game);
     }
+
+    @Transactional
+    @Override
+    public void deleteGameInfo(Long id){
+        gameRepository.deleteById(id);
+    }
+
 
     @Transactional
     @Override

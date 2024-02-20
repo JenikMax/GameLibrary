@@ -5,6 +5,7 @@ import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 
 import java.util.List;
+import java.util.Locale;
 
 public interface GameService {
 
@@ -18,6 +19,8 @@ public interface GameService {
 
     void storeGame(Game game);
 
+    void deleteGameInfo(Long id);
+
     void updateGame(Game game);
 
     void storeNewGameInLibrary(List<Game> games);
@@ -28,6 +31,8 @@ public interface GameService {
     List<String> getGamesPlatforms();
 
     List<Genre> getGenres();
+
+    List<Genre> getGenres(Locale locale);
 
     List<String> getGameGenres();
 

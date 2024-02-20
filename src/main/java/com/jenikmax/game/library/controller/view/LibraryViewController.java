@@ -72,7 +72,7 @@ public class LibraryViewController {
 
         List<String> years = libraryService.getReleaseDates();
         List<String> platforms = libraryService.getGamesPlatforms();
-        List<Genre> genres = libraryService.getGenres();
+        List<Genre> genres = libraryService.getGenres(locale);
         ShortUser user = libraryService.getUserInfo();
 
         model.addAttribute("searchText", searchText);
@@ -100,10 +100,10 @@ public class LibraryViewController {
 
 
     @PostMapping("/scan")
-    public String scanLibrary(RedirectAttributes redirectAttributes) {
+    public String scanLibrary(RedirectAttributes redirectAttributes,Locale locale) {
         logger.info("Scan library");
         libraryService.scanLibrary();
-        redirectAttributes.addAttribute("message","Scan library in progress");
+        redirectAttributes.addAttribute("message",messageSource.getMessage("view.library.scan.message",null,locale));
         return "redirect:/library";
     }
 
@@ -169,7 +169,7 @@ public class LibraryViewController {
     public String editGame(@PathVariable("id") Long id, Model model, Locale locale) {
         logger.info("Open game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
-        List<Genre> genres = libraryService.getGenres();
+        List<Genre> genres = libraryService.getGenres(locale);
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
         ShortUser user = libraryService.getUserInfo();
         model.addAttribute("game", gameDto);
@@ -184,15 +184,15 @@ public class LibraryViewController {
     }
 
     @PostMapping("library/game/{id}/edit")
-    public String saveGame(@PathVariable("id") Long id, GameDto game,RedirectAttributes redirectAttributes, Model model) {
+    public String saveGame(@PathVariable("id") Long id, GameDto game,RedirectAttributes redirectAttributes, Model model, Locale locale) {
         logger.info("Edit game - {} ",id);
         try{
             libraryService.updateGameInfo(game);
-            redirectAttributes.addAttribute("message","Game card save success");
+            redirectAttributes.addAttribute("message",messageSource.getMessage("view.game.save.message",null,locale));
         }
         catch (Exception e){
             logger.error("SaveGame Error - ",e);
-            redirectAttributes.addAttribute("message","Game card save failed");
+            redirectAttributes.addAttribute("message",messageSource.getMessage("view.system.error",null,locale));
         }
         return "redirect:/library";
     }
@@ -201,16 +201,20 @@ public class LibraryViewController {
     public String grabGameData(@PathVariable("id") Long id,
                                @RequestParam(value = "source") String source,
                                @RequestParam(value = "url") String url,
-                               Model model) {
+                               Model model, Locale locale) {
         logger.info("Grab game data game - {}, source - {}, url - {}",id,source,url);
         GameDto gameDto = libraryService.grabGameInfo(id,source,url);
-        List<Genre> genres = libraryService.getGenres();
+        List<Genre> genres = libraryService.getGenres(locale);
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
         ShortUser user = libraryService.getUserInfo();
         model.addAttribute("game", gameDto);
         model.addAttribute("genres", genres);
         model.addAttribute("current_genres", currentGenres);
         model.addAttribute("user", user);
+
+        model.addAttribute("messageSource", messageSource);
+        model.addAttribute("locale", locale);
+
         return "gameEditView";
     }
 

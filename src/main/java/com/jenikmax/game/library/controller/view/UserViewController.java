@@ -8,6 +8,7 @@ import com.jenikmax.game.library.model.exceptions.IllegalUsernameException;
 import com.jenikmax.game.library.service.data.UserDataService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,10 +33,12 @@ public class UserViewController {
     static final Logger logger = LogManager.getLogger(UserViewController.class.getName());
 
     private final UserDataService userService;
+    private final MessageSource messageSource;
 
 
-    public UserViewController(UserDataService userService) {
+    public UserViewController(UserDataService userService, MessageSource messageSource) {
         this.userService = userService;
+        this.messageSource = messageSource;
     }
 
     @GetMapping("/login")
@@ -58,7 +61,7 @@ public class UserViewController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("registrationForm") RegistrationForm registrationForm, RedirectAttributes redirectAttributes) {
+    public String registerUser(@ModelAttribute("registrationForm") RegistrationForm registrationForm, RedirectAttributes redirectAttributes, Locale locale) {
         logger.info("Process /register view");
         try{
             userService.registerUser(registrationForm);
@@ -67,12 +70,12 @@ public class UserViewController {
         }
         catch (IllegalPassException | IllegalUsernameException ex){
             logger.warn("Register new user " + registrationForm.getUsername() + " incomplete. " + ex.getMessage());
-            redirectAttributes.addAttribute("message",ex.getMessage());
+            redirectAttributes.addAttribute("message",messageSource.getMessage("view.user.error.or.message",null,locale));
             return "redirect:/register";
         }
         catch (Exception e){
             logger.error("Register new user " + registrationForm.getUsername() + " incomplete. ",e);
-            redirectAttributes.addAttribute("message","System error. Contact your administrator.");
+            redirectAttributes.addAttribute("message",messageSource.getMessage("view.system.error",null,locale));
             return "redirect:/register";
         }
 
@@ -95,14 +98,14 @@ public class UserViewController {
 
 
     @PostMapping("/profile")
-    public String profileUpdate(Model model, UserDto userDto) {
+    public String profileUpdate(Model model, Locale locale, UserDto userDto) {
         logger.info("Process /profile view");
         try {
             userService.updateUser(userDto);
-            model.addAttribute("message", "updated");
+            model.addAttribute("message", messageSource.getMessage("view.user.update.message",null,locale));
         }
         catch (Exception e){
-            model.addAttribute("message", "error");
+            model.addAttribute("message", messageSource.getMessage("view.system.error",null,locale));
         }
         ShortUser user = getCurentUser();
         model.addAttribute("user", user);
@@ -115,15 +118,15 @@ public class UserViewController {
     }
 
     @PostMapping("/profile/pass")
-    public String profilePassUpdate(Model model, UserDto userDto) {
+    public String profilePassUpdate(Model model, Locale locale, UserDto userDto) {
         logger.info("Process profile/pass view");
         try {
             userService.updateUserPass(userDto);
-            model.addAttribute("message", "Updated");
+            model.addAttribute("message", messageSource.getMessage("view.pass.update.message",null,locale));
         }
         catch (Exception e){
             logger.error("Error Process profile/pass view. ",e);
-            model.addAttribute("message", "System error. Contact your administrator.");
+            model.addAttribute("message",  messageSource.getMessage("view.system.error",null,locale));
         }
         ShortUser user = getCurentUser();
         model.addAttribute("user", user);
@@ -136,17 +139,18 @@ public class UserViewController {
     }
 
     @PostMapping("/profile/update")
-    public String profileAdminUpdate(Model model, @RequestParam(value = "id") Long id,
+    public String profileAdminUpdate(Model model, Locale locale,
+                                     @RequestParam(value = "id") Long id,
                                      @RequestParam(value = "isAdmin", required = false) boolean isAdmin,
                                      @RequestParam(value = "isActive", required = false) boolean isActive) {
         logger.info("Process /profile/update view");
         try{
             userService.updateUserProfile(id, isActive, isAdmin);
-            model.addAttribute("message", "Updated");
+            model.addAttribute("message", messageSource.getMessage("view.user.update.message",null,locale));
         }
         catch (Exception e){
             logger.error("Error Process /profile/update view. ",e);
-            model.addAttribute("message", "System error. Contact your administrator.");
+            model.addAttribute("message", messageSource.getMessage("view.system.error",null,locale));
         }
         ShortUser user = getCurentUser();
         model.addAttribute("user", user);
@@ -160,15 +164,15 @@ public class UserViewController {
 
 
     @PostMapping("/profile/pass_reset")
-    public String profileAdminReset(Model model, @RequestParam(value = "id") Long id) {
+    public String profileAdminReset(Model model, Locale locale, @RequestParam(value = "id") Long id) {
         logger.info("Process /profile/pass_reset view");
         try{
             userService.resetUserPass(id);
-            model.addAttribute("message", "updated");
+            model.addAttribute("message", messageSource.getMessage("view.pass.reset.message",null,locale));
         }
         catch (Exception e){
             logger.error("Error Process /profile/pass_reset view. ",e);
-            model.addAttribute("message", "error");
+            model.addAttribute("message", messageSource.getMessage("view.system.error",null,locale));
         }
         ShortUser user = getCurentUser();
         model.addAttribute("user", user);

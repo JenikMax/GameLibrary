@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,15 +53,23 @@ public class LibraryOperationService implements LibraryService {
         List<Game> storedGames = gameService.getGameList();
         List<Game> newGames = storedGames.isEmpty() ?
                 findGames :
-                findGames.stream().
-                        filter(newGame -> storedGames.stream().
-                                noneMatch(storedGame ->
+                findGames.stream()
+                        .filter(newGame -> storedGames.stream()
+                                .noneMatch(storedGame ->
                                         storedGame.getDirectoryPath().equals(newGame.getDirectoryPath())))
                         .collect(Collectors.toList());
+        List<Game> gamesToDelete = storedGames.stream()
+                .filter(storedGame -> findGames.stream()
+                                .noneMatch(findGame -> findGame.getDirectoryPath().equals(storedGame.getDirectoryPath())))
+                .collect(Collectors.toList());
         for(Game gameShort : newGames){
             Game game = scanerService.getAdditinalGameInfo(gameShort);
             gameService.storeGame(game);
         }
+        for(Game gameShort : gamesToDelete){
+            gameService.deleteGameInfo(gameShort.getId());
+        }
+
     }
 
     @Override
@@ -111,6 +120,10 @@ public class LibraryOperationService implements LibraryService {
     @Override
     public List<Genre> getGenres() {
         return gameService.getGenres();
+    }
+
+    public List<Genre> getGenres(Locale locale){
+        return gameService.getGenres(locale);
     }
 
     @Override

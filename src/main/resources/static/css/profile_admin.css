@@ -213,3 +213,20 @@ body {
     overflow-y: scroll;
     max-height: 900px; /* you can adjust the height as needed */
 }
+
+.popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+}
+
+.popup-close {
+    float: right;
+    cursor: pointer;
+}
