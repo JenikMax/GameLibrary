@@ -1,6 +1,7 @@
 
 .header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     width: 1000px;
@@ -11,18 +12,58 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.logo {
-    text-align: center;
+.header_library{
+    width: 10%
 }
 
-.logo img {
-    width: 85px;
-    height: 85px;
+.header_library img{
+    width: 83%;
     border-radius: 10px;
 }
 
-.user {
-    width: 320px;
+
+.header_search{
+    width: 59%;
+    padding: 1px;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0px 10px 0px 0px;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.search_container {
+    width: 220%;
+    margin: 20px 1px 1px;
+    display: flex;
+    align-items: center;
+}
+
+.header_search input{
+    width: 75%;
+    height: 40px;
+    margin: 1px 10px 1px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.header_search button{
+    width: 25%;
+    height: 40px;
+    margin: 1px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.header_user {
+    width: 285px;
     height: 80px;
     display: flex;
     align-items: center;
@@ -30,24 +71,10 @@
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.information{
-    width: 530px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.information h1{
-    margin: 30px;
 }
 
 .user_container {
+    width: 80%;
     margin: 25px 10px 10px;
     display: flex;
     align-items: center;
@@ -69,24 +96,24 @@
     float: right;
 }
 
-.user img {
+.header_user img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     margin-right: 10px;
 }
 
-.user a {
+.header_user a {
     font-size: 20px;
     color: #007bff;
     text-decoration: none;
 }
 
-.user a:hover {
+.header_user a:hover {
     text-decoration: underline;
 }
 
-.user button {
+.header_user button {
     width: 100px;
     height: 40px;
     margin-left: 10px;

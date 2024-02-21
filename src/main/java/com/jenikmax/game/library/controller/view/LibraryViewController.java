@@ -127,6 +127,13 @@ public class LibraryViewController {
         return "redirect:/library";
     }
 
+    @PostMapping("/search")
+    public String search(Model model, RedirectAttributes redirectAttributes,
+                               @RequestParam(value = "searchText", required = false) String searchText) {
+        redirectAttributes.addAttribute("searchText",searchText);
+        return "redirect:/library";
+    }
+
 
     @PostMapping("/sort")
     public String applySort(Model model, RedirectAttributes redirectAttributes,

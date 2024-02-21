@@ -9,7 +9,13 @@
             document.getElementById("searchText").addEventListener("keyup", function(event) {
                 if (event.keyCode === 13) {
                     event.preventDefault();
-                    document.getElementById("submitButton").click();
+                    document.getElementById("searchButton").click();
+                }
+            });
+            document.getElementById("h_searchText").addEventListener("keyup", function(event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    document.getElementById("h_searchButton").click();
                 }
             });
         });
@@ -88,15 +94,19 @@
 <input type="hidden" id="message" th:value="${message}"/>
 <div class="container">
     <div class="header">
-        <div class="logo">
+        <div class="header_library">
             <a href="/library" style="text-decoration: none; color: inherit;">
                 <img src="/img/logo.jpg" alt="Logo">
             </a>
         </div>
-        <div class="information">
-            <h1 th:text="#{view.profile.title.short} + ' ' + ${user.name}"></h1>
+        <div class="header_search">
+            <form th:action="@{/search}" method="post">
+                <div class="search_container">
+                    <input type="text" th:placeholder="#{view.library.filter.search.name.placeholder}" name="searchText" id="h_searchText" th:value="${searchText}"><button id="h_searchButton" type="submit" th:text="#{view.navigation.find}"></button>
+                </div>
+            </form>
         </div>
-        <div class="user">
+        <div class="header_user">
             <form th:action="@{/logout}" method="post">
                 <div class="user_container">
                     <div class="avatar">
@@ -112,7 +122,7 @@
                     </div>
                 </div>
             </form>
-        </div>
+        </div>                                                                                                                                                                                                      
     </div>
 
     <div class="filter">
@@ -151,7 +161,7 @@
                 </li>
             </ul>
             </div>
-            <button type="submit" th:text="#{view.navigation.find}"></button>
+            <button type="submit" id="searchButton" th:text="#{view.navigation.find}"></button>
             <button type="reset"  onclick="resetForm()" th:text="#{view.navigation.reset}"></button>
         </form>
         <form th:if="${user != null && user.isAdmin}" th:action="@{/scan}" method="post">
