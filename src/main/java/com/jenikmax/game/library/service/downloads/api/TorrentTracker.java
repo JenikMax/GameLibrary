@@ -6,39 +6,16 @@ import com.turn.ttorrent.tracker.Tracker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.net.InetSocketAddress;
-
 @Component
 public class TorrentTracker {
 
-    private Tracker tracker;
+    private final Tracker tracker;
 
-    @Value("${game-library.games.torrent.tracker-port}")
-    private int port;
-
-    private static TorrentTracker instance;
-
-    private TorrentTracker() {
-        // пустой конструктор
+    private TorrentTracker(Tracker tracker) {
+        this.tracker = tracker;
+        this.tracker.start();
     }
 
-    @PostConstruct
-    private void init() {
-        try {
-            tracker = new Tracker(new InetSocketAddress(port));
-            tracker.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static synchronized TorrentTracker getInstance() {
-        if (instance == null) {
-            instance = new TorrentTracker();
-        }
-        return instance;
-    }
 
     public void annonceTorrent(Torrent torrent) {
         try {

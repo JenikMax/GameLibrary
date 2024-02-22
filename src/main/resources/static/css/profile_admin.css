@@ -106,7 +106,7 @@ body {
     height: 50px;
     margin-left: 10px;
     margin: 1px 10px;
-    background-color: #007bff;
+    background-color: rgba(32, 33, 36, 0.87);
     border: none;
     border-radius: 5px;
     color: white;
@@ -137,12 +137,18 @@ body {
     width: 83%;
     height: 50px;
     margin: 1px 30px;
-    background-color: #007bff;
+    background-color:  rgba(32, 33, 36, 0.87);
     border: none;
     border-radius: 5px;
     color: white;
     font-weight: bold;
     cursor: pointer;
+}
+
+.profile button:hover,
+.users_list button:hover{
+    background-color: rgba(48, 49, 52, 0.76);
+    color: white;
 }
 
 .user_pass,

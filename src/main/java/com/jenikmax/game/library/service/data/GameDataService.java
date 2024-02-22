@@ -50,7 +50,7 @@ public class GameDataService implements GameService {
     @Override
     public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         List<Object> params = new ArrayList<>();
-        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from game_data where name like ?";
+        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from game_data where LOWER(name) like LOWER(?)";
         params.add('%' + searchText + '%');
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));

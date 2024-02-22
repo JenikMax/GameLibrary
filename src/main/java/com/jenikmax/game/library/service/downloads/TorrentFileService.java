@@ -29,11 +29,11 @@ public class TorrentFileService {
     private final Long torrentTtl;
     private final String torrentDir;
 
-    public TorrentFileService(@Value("${game-library.games.torrent.ttl}") Long torrentTtl,
+    public TorrentFileService(TorrentTracker tracker, @Value("${game-library.games.torrent.ttl}") Long torrentTtl,
                               @Value("${game-library.games.torrent.directory}") String torrentDir) {
+        this.tracker = tracker;
         this.torrentTtl = torrentTtl;
         this.torrentDir = torrentDir;
-        tracker = TorrentTracker.getInstance();
     }
 
     public String createAndShare(String dirPath){

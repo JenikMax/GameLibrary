@@ -54,12 +54,17 @@
     width: 25%;
     height: 40px;
     margin: 1px;
-    background-color: #007bff;
+    background-color: rgba(32, 33, 36, 0.87);
     border: none;
     border-radius: 5px;
     color: white;
     font-weight: bold;
     cursor: pointer;
+}
+
+.header_search button:hover{
+    background-color: rgba(48, 49, 52, 0.76);
+    color: white;
 }
 
 .header_user {
@@ -105,8 +110,12 @@
 
 .header_user a {
     font-size: 20px;
-    color: #007bff;
+    color:  rgba(32, 33, 36, 0.87);
     text-decoration: none;
+}
+
+.header_user a:hover{
+    color: rgba(48, 49, 52, 0.76);
 }
 
 .header_user a:hover {
@@ -117,10 +126,15 @@
     width: 100px;
     height: 40px;
     margin-left: 10px;
-    background-color: #007bff;
+    background-color: rgba(32, 33, 36, 0.87);
     border: none;
     border-radius: 5px;
     color: white;
     font-weight: bold;
     cursor: pointer;
+}
+
+.header_user button:hover{
+    background-color: rgba(48, 49, 52, 0.76);
+    color: white;
 }

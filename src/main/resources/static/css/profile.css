@@ -48,12 +48,17 @@ body {
     width: 95%;
     height: 50px;
     margin: 10px 10px;
-    background-color: #007bff;
+    background-color: rgba(32, 33, 36, 0.87);
     border: none;
     border-radius: 5px;
     color: white;
     font-weight: bold;
     cursor: pointer;
+}
+
+.profile button:hover{
+    background-color: rgba(48, 49, 52, 0.76);
+    color: white;
 }
 
 .avatar_div,

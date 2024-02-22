@@ -37,7 +37,7 @@ body {
     width: 15%;
     height: 40px;
     margin: 10px;
-    background-color: #007bff;
+    background-color: rgba(32, 33, 36, 0.87);
     border: none;
     border-radius: 5px;
     color: white;
@@ -49,7 +49,7 @@ body {
     width: 25%;
     height: 40px;
     margin: 10px;
-    background-color: #007bff;
+    background-color: rgba(32, 33, 36, 0.87);
     border: none;
     border-radius: 5px;
     color: white;
@@ -89,7 +89,7 @@ body {
     width: 90%;
     height: 40px;
     margin: 10px 2.5%;
-    background-color: #007bff;
+    background-color: rgba(32, 33, 36, 0.87);
     border: none;
     border-radius: 5px;
     color: white;
@@ -128,8 +128,9 @@ body {
     border: 1px solid #ccc;
     border-radius: 10px;
     overflow: hidden;
-    background-color: #404040;
+    background-color: rgba(32, 33, 36, 0.87);
 }
+
 
 .games img {
     width: 100%;
@@ -140,7 +141,6 @@ body {
     font-size: 14px;
     margin: 5px;
     text-align: center;
-    background-color: #404040;
     color: white;
 }
 
@@ -150,7 +150,6 @@ body {
     display: block;
     margin: 0;
     text-align: center;
-    background-color: #404040;
     color: white;
     font-weight: bold;
 }
@@ -168,22 +167,23 @@ body {
     margin: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    color: #007bff;
+    background-color: rgba(32, 33, 36, 0.87);
     text-decoration: none;
     line-height: 30px;
 }
 
 .pagination a:hover {
-    background-color: #007bff;
+    background-color: rgba(48, 49, 52, 0.76);
     color: white;
 }
 
-.pagination a.active {
-    background-color: #007bff;
+.pagination .active {
+    background-color: rgba(48, 49, 52, 0.76);
     color: white;
 }
-.pagination a.disabled {
+.pagination .disabled {
     pointer-events: none;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 
@@ -196,21 +196,15 @@ body {
     border-radius: 5px;
     text-decoration: none;
     line-height: 30px;
-    background-color: #4da3ff;
+    background-color: rgba(32, 33, 36, 0.87);
     border: none;
     color: white;
     font-weight: bold;
     cursor: pointer;
 }
 
-.sort-container button:hover,
-.pagination button:hover {
-    background-color: #007bff;
-    color: white;
-}
-
 .pagination button.active {
-    background-color: #007bff;
+    background-color: rgba(48, 49, 52, 0.76);
     color: white;
 }
 .pagination button.disabled {
@@ -236,7 +230,7 @@ body {
     border-radius: 5px;
     text-decoration: none;
     line-height: 30px;
-    background-color: #4da3ff;
+    background-color: rgba(32, 33, 36, 0.87);
     border: none;
     color: white;
     font-weight: bold;
@@ -264,4 +258,13 @@ body {
 .scrollable {
     overflow-y: scroll;
     max-height: 300px; /* you can adjust the height as needed */
+}
+
+
+.sort-container button:hover,
+.pagination button:hover,
+.games li:hover,
+.filter button:hover{
+    background-color: rgba(48, 49, 52, 0.76);
+    color: white;
 }
