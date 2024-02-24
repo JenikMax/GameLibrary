@@ -5,6 +5,7 @@ import com.jenikmax.game.library.service.scraper.api.Scraper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class PlaygroundScraper implements Scraper {
                 if(platforms.toUpperCase().contains(gameDto.getPlatform().toUpperCase())) gameDto.setReleaseDate(release.get(platforms));
             }
             gameDto.setGenres((List<String>) gameData.get("genres"));
+            gameDto.setScreenshots(getScreenshots(url));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,7 +57,7 @@ public class PlaygroundScraper implements Scraper {
 
         // Get game poster as base64
         String posterImageUrl = document.select("div.gp-game-cover > div.cover-link > img").attr("src");
-        String posterBase64 = imageToBase64(posterImageUrl);
+        String posterBase64 = imageToBase64(posterImageUrl.substring(0,posterImageUrl.lastIndexOf('?')));
         gameData.put("posterBase64", posterBase64);
 
         // Get release dates
@@ -78,6 +80,18 @@ public class PlaygroundScraper implements Scraper {
 
         return gameData;
     }
+
+    private List<String> getScreenshots(String gameUrl) throws IOException {
+        List<String> result = new ArrayList<>();
+        String screenUrl = gameUrl.substring(0,gameUrl.lastIndexOf('/')) + "/gallery" + gameUrl.substring(gameUrl.lastIndexOf('/'));
+        Document document = Jsoup.connect(screenUrl).get();
+        Elements screensA = document.select("div.gallery-item > a");
+        for(int i = 0 ; i <= screensA.size() && i <= 20 ; i++ ){ // добавлен лимит на 20 изображений
+            result.add(BASE_64_PREFIX + imageToBase64(screensA.get(i).attr("href")));
+        }
+        return result;
+    }
+
 
     public String imageToBase64(String imageUrl) throws IOException {
         byte[] imageBytes = Jsoup.connect(imageUrl).ignoreContentType(true).execute().bodyAsBytes();

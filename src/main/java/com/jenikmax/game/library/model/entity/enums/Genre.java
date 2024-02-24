@@ -3,8 +3,8 @@ package com.jenikmax.game.library.model.entity.enums;
 public enum Genre {
     rpg("Ролевая"),
     action("Экшен"),
-    mmo("mmo"),
-    moba("moba"),
+    mmo("MMO"),
+    moba("MOBA"),
     rts("RTS"),
     humour("Юмор"),
     economy("Экономика"),
@@ -64,7 +64,22 @@ public enum Genre {
     auto("Автомобили"),
     flight("Авиация"),
     tower_defence("Tower defence"),
-    jrpg("jRpg");
+    jrpg("JRpg"),
+    beat_em_up("Beat-em-Up"),
+    soulslike("Soulslike"),
+    fps("FPS"),
+    hack_and_slash("Hack And Slash"),
+    immersive_sim("Immersive Sim"),
+    point_click("Point and Click"),
+    roguelike("Roguelike"),
+    vizualnaia_novella("Визуальная новелла"),
+    interaktivnoe_kino("Интерактивное кино"),
+    istoriia("История"),
+    kki("ККИ"),
+    metroidvaniia("Метроидвания"),
+    pazzl("Паззл"),
+    other("Другое");
+
 
     private String name;
 

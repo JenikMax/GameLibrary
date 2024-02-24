@@ -99,7 +99,7 @@
             </li>
         </div>
         <div class="game_trailer" th:if="${game.trailerUrl != null and game.trailerUrl != '' and game.trailerUrl != 'N/A'}">
-            <iframe id="trailerFrame" th:src="${game.trailerUrl}" th:title="${game.name}"></iframe>
+            <iframe id="trailerFrame" th:src="${game.trailerUrl}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
         <div class="game_instruction">
             <pre th:text="${game.instruction}"></pre>

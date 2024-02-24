@@ -133,7 +133,7 @@
         function toggleUrlField() {
             var urlField = document.querySelector(".url-field");
             var selectedValue = document.getElementById("source").value;
-            if (selectedValue === "playground" || selectedValue === "igromania" || selectedValue === "stopgame") {
+            if (selectedValue === "playground" || selectedValue === "igromania") {
                 urlField.classList.remove("hidden");
             } else {
                 urlField.classList.add("hidden");
@@ -183,7 +183,6 @@
                 <option value="iddb">IDDB</option>
                 <option value="playground">Playground.ru</option>
                 <option value="igromania">Igromania.ru</option>
-                <option value="stopgame">Stopgame.ru</option>
             </select>
             <div class="url-field hidden">
                 <label for="url" th:text="#{view.game.edit.data.source.url}"></label>

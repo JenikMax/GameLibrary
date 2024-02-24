@@ -110,6 +110,7 @@ body {
 .description{
     width: 64%;
     min-height: fit-content;
+    padding: 10px;
 }
 
 .description p {

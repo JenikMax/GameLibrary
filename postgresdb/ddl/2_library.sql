@@ -42,7 +42,7 @@ INSERT INTO library.game_genre (code, description, description_ru) VALUES ('hock
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('fantasy','Fantasy','Фэнтези');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('football','Football','Футбол');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('fighting','Fighting','Файтинг');
-INSERT INTO library.game_genre (code, description, description_ru) VALUES ('free_to_play','Free to play','Условно-бесплатная');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('free_to_play','Free-to-play','Условно-бесплатная');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('horror','Horror','Ужасы');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('dance','Dance','Танцы');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('tactics','Tactics','Тактика');
@@ -90,11 +90,26 @@ INSERT INTO library.game_genre (code, description, description_ru) VALUES ('bask
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('arcade','Arcade','Аркада');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('anime','Anime','Аниме');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('adventure','Adventure','Адвенчура');
-INSERT INTO library.game_genre (code, description, description_ru) VALUES ('auto','auto','Автомобили');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('auto','Auto','Автомобили');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('flight','Flight','Авиация');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('tower_defence','Tower defence','Tower defence');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('mmo','MMO','MMO');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('jrpg','jRpg','jRpg');
+
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('beat_em_up','Beat-em-Up','Beat-em-Up');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('soulslike','Soulslike','Soulslike');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('fps','FPS','FPS');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('hack_and_slash','Hack And Slash','Hack And Slash');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('immersive_sim','Immersive Sim','Immersive Sim');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('point_click','Point and Click','Point and Click');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('roguelike','Roguelike','Roguelike');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('vizualnaia_novella','Visual novel','Визуальная новелла');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('interaktivnoe_kino','Interactive cinema','Интерактивное кино');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('istoriia','History','История');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('kki','Trading card game','Коллекционная карточная игра');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('metroidvaniia','Metroidvania','Метроидвания');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('pazzl','Puzzle','Паззл');
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('other','xxxxxOther','яяяяДругое');
 
 
 create sequence game_data_genre_id_seq start 1;
