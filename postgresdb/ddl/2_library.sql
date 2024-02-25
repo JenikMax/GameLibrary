@@ -111,6 +111,8 @@ INSERT INTO library.game_genre (code, description, description_ru) VALUES ('metr
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('pazzl','Puzzle','Паззл');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('other','xxxxxOther','яяяяДругое');
 
+INSERT INTO library.game_genre (code, description, description_ru) VALUES ('meha','Meha','Меха');
+
 
 create sequence game_data_genre_id_seq start 1;
 drop table if exists library.game_data_genre;

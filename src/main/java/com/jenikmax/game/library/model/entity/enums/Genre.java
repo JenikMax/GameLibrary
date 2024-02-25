@@ -78,6 +78,7 @@ public enum Genre {
     kki("ККИ"),
     metroidvaniia("Метроидвания"),
     pazzl("Паззл"),
+    meha("Меха"),
     other("Другое");
 
 

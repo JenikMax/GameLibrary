@@ -3,7 +3,7 @@ FROM tomcat:8-jre8-alpine
 
 # Установка переменной окружения для рабочей директории и копирование WAR-файла
 WORKDIR /usr/local/tomcat/webapps/
-COPY target/game-library-0.0.1-SNAPSHOT.war game-library.war
+COPY target/game-library.war game-library.war
 COPY tomcat/server.xml /usr/local/tomcat/conf/
 # Установка переменной окружения для временного каталога веб-приложения Tomcat
 ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
