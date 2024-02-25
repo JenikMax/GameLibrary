@@ -230,7 +230,7 @@
                 <div class="label-container">
                     <label for="poster" th:text="#{view.game.edit.poster}"></label>
                 </div>
-                <input type="file" id="poster" name="poster" accept="image/*" onchange="previewImage(this)">
+                <input type="file" id="poster" name="poster" accept="image/png, image/jpeg, image/jpg" onchange="previewImage(this)">
                 <div class="imagePreview-container">
                     <div id="imagePreview" class="imagePreview"></div>
                 </div>
@@ -288,7 +288,7 @@
                 <div class="label-container">
                     <label for="screenshotsUpl" th:text="#{view.game.edit.screen}"></label>
                 </div>
-                <input type="file" id="screenshotsUpl" name="screenshotsUpl" accept="image/*" multiple onchange="previewScreenshots(this)">
+                <input type="file" id="screenshotsUpl" name="screenshotsUpl" accept="image/png, image/jpeg, image/jpg" multiple onchange="previewScreenshots(this)">
                 <div id="screenshotsList" class="screenshotsList">
                     <div th:each="screenshot : ${game.screenshots}" class="screenshot-item">
                         <img th:src="${screenshot}" alt="screenshot">

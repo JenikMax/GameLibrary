@@ -130,7 +130,7 @@
                     <div class="label-container">
                         <label for="avatar_attach" th:text="#{view.profile.picture}"></label>
                     </div>
-                    <input type="file" id="avatar_attach" name="avatar_attach" accept="image/*" onchange="previewImage(this)">
+                    <input type="file" id="avatar_attach" name="avatar_attach" accept="image/png, image/jpeg, image/jpg" onchange="previewImage(this)">
                     <div class="imagePreview-container">
                         <div id="imagePreview" class="imagePreview"></div>
                     </div>
