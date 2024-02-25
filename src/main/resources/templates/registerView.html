@@ -51,7 +51,7 @@
             <input type="password" id="password_repeate" name="password_repeate" th:placeholder="#{view.user.repassword.placeholder}" required >
 
             <button type="submit" value="Register" th:text="#{view.user.register.button}"></button>
-            <a href="/login" th:text="#{view.user.login.button}"></a>
+            <a th:href="@{/login}" th:text="#{view.user.login.button}"></a>
         </form>
     </div>
 </div>

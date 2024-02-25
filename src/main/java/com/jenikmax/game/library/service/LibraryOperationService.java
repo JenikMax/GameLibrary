@@ -12,6 +12,7 @@ import com.jenikmax.game.library.service.data.api.UserService;
 import com.jenikmax.game.library.service.downloads.api.DownloadService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
 import com.jenikmax.game.library.service.scraper.ScraperFactory;
+import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -100,6 +101,13 @@ public class LibraryOperationService implements LibraryService {
     public GameDto grabGameInfo(Long id, String source, String url) {
         if(url != null) return scraperFactory.getScraper(source).scrap(getGameInfo(id),url);
         return scraperFactory.getScraper(source).scrap(getGameInfo(id));
+    }
+
+    @Override
+    public GameDto grabGameInfo(Long id, ScrapInfo scrapInfo) {
+        if(scrapInfo != null && scrapInfo.getUrl() != null)
+            return scraperFactory.getScraper(scrapInfo.getSource()).scrap(getGameInfo(id),scrapInfo);
+        return scraperFactory.getScraper(scrapInfo.getSource()).scrap(getGameInfo(id));
     }
 
     @Override

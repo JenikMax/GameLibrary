@@ -4,8 +4,8 @@ import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.enums.Genre;
-import com.jenikmax.game.library.model.entity.enums.GenreLoc;
 import com.jenikmax.game.library.service.api.LibraryService;
+import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.MessageSource;
@@ -208,9 +208,17 @@ public class LibraryViewController {
     public String grabGameData(@PathVariable("id") Long id,
                                @RequestParam(value = "source") String source,
                                @RequestParam(value = "url") String url,
+                               @RequestParam(value = "title", required = false, defaultValue = "false") Boolean titleAttr,
+                               @RequestParam(value = "poster", required = false, defaultValue = "false") Boolean posterAttr,
+                               @RequestParam(value = "description", required = false, defaultValue = "false") Boolean descriptionAttr,
+                               @RequestParam(value = "year", required = false, defaultValue = "false") Boolean yearAttr,
+                               @RequestParam(value = "genres", required = false, defaultValue = "false") Boolean genresAttr,
+                               @RequestParam(value = "screens", required = false, defaultValue = "false") Boolean screensAttr,
                                Model model, Locale locale) {
         logger.info("Grab game data game - {}, source - {}, url - {}",id,source,url);
-        GameDto gameDto = libraryService.grabGameInfo(id,source,url);
+
+        ScrapInfo scrapInfo = new ScrapInfo(url,source,titleAttr,posterAttr,descriptionAttr,yearAttr,genresAttr,screensAttr);
+        GameDto gameDto = libraryService.grabGameInfo(id,scrapInfo);
         List<Genre> genres = libraryService.getGenres(locale);
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
         ShortUser user = libraryService.getUserInfo();

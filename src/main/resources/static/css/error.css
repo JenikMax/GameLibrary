@@ -4,7 +4,7 @@
 }
 
 body {
-    background-image: url("/img/background/pattern-doted-wide-honeycomb.png");
+    background-image: url("../img/background/pattern-doted-wide-honeycomb.png");
     margin: 0;
     padding: 0;
 }

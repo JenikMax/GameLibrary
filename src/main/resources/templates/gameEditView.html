@@ -132,11 +132,14 @@
 
         function toggleUrlField() {
             var urlField = document.querySelector(".url-field");
+            var scrapAttr = document.querySelector(".scrap-attr-container");
             var selectedValue = document.getElementById("source").value;
             if (selectedValue === "playground" || selectedValue === "igromania") {
                 urlField.classList.remove("hidden");
+                scrapAttr.classList.remove("hidden");
             } else {
                 urlField.classList.add("hidden");
+                scrapAttr.classList.add("hidden");
             }
         }
     </script>
@@ -145,8 +148,8 @@
 <div class="container">
     <div class="header">
         <div class="header_library">
-            <a href="/library" style="text-decoration: none; color: inherit;">
-                <img src="/img/logo.jpg" alt="Logo">
+            <a th:href="@{/library}" style="text-decoration: none; color: inherit;">
+                <img th:src="@{/img/logo.jpg}" alt="Logo">
             </a>
         </div>
         <div class="header_search">
@@ -160,12 +163,12 @@
             <form th:action="@{/logout}" method="post">
                 <div class="user_container">
                     <div class="avatar">
-                        <a href="/profile" style="text-decoration: none; color: inherit;">
+                        <a th:href="@{/profile}" style="text-decoration: none; color: inherit;">
                             <img th:src="${user.avatar}" alt="User"/>
                         </a>
                     </div>
                     <div class="name_user">
-                        <a href="/profile" th:text="${user.name}"></a>
+                        <a th:href="@{/profile}" th:text="${user.name}"></a>
                     </div>
                     <div class="logout_button">
                         <button type="submit" th:text="#{view.user.logout.button}"></button>
@@ -180,10 +183,26 @@
             <label for="source" th:text="#{view.game.edit.data.source.title}"></label>
             <select id="source" name="source"  onchange="toggleUrlField()">
                 <option value="manual" th:text="#{view.game.edit.data.source.manual}"></option>
-                <option value="iddb">IDDB</option>
+                <!--<option value="iddb">IDDB</option>-->
                 <option value="playground">Playground.ru</option>
                 <option value="igromania">Igromania.ru</option>
             </select>
+            <div class="scrap-attr-container hidden">
+                <div class="scrap-attr">
+                    <input type="checkbox" id="scrap_title" name="title" checked="checked">
+                    <label for="scrap_title" th:text="#{view.game.edit.data.attr.title}"></label>
+                    <input type="checkbox" id="scrap_poster" name="poster" checked="checked">
+                    <label for="scrap_poster" th:text="#{view.game.edit.data.attr.poster}"></label>
+                    <input type="checkbox" id="scrap_description" name="description" checked="checked">
+                    <label for="scrap_description" th:text="#{view.game.edit.data.attr.description}"></label>
+                    <input type="checkbox" id="scrap_year" name="year" checked="checked">
+                    <label for="scrap_year" th:text="#{view.game.edit.data.attr.year}"></label>
+                    <input type="checkbox" id="scrap_genres" name="genres" checked="checked">
+                    <label for="scrap_genres" th:text="#{view.game.edit.data.attr.genres}"></label>
+                    <input type="checkbox" id="scrap_screens" name="screens" checked="checked">
+                    <label for="scrap_screens" th:text="#{view.game.edit.data.attr.screens}"></label>
+                </div>
+            </div>
             <div class="url-field hidden">
                 <label for="url" th:text="#{view.game.edit.data.source.url}"></label>
                 <input type="text" id="url" name="url">

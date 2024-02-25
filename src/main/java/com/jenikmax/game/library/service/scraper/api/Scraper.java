@@ -9,4 +9,6 @@ public interface Scraper {
     GameDto scrap(GameDto gameDto);
 
     GameDto scrap(GameDto gameDto, String url);
+
+    GameDto scrap(GameDto gameDto, ScrapInfo scrapInfo);
 }

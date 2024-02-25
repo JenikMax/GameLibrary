@@ -19,7 +19,7 @@
             <input type="text" name="username" th:placeholder="#{view.user.username.placeholder}" required>
             <input type="password" name="password" th:placeholder="#{view.user.password.placeholder}" required>
             <button type="submit" value="Log in" th:text="#{view.user.login.button}"></button>
-            <a href="/register" th:text="#{view.user.register.button}"></a>
+            <a th:href="@{/register}" th:text="#{view.user.register.button}"></a>
         </form>
     </div>
 </div>

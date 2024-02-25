@@ -6,6 +6,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import com.jenikmax.game.library.service.scraper.api.Scraper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,6 +26,35 @@ public class IgromaniaScraper implements Scraper {
     @Override
     public String getType() {
         return "igromania";
+    }
+
+
+    @Override
+    public GameDto scrap(GameDto gameDto, ScrapInfo scrapInfo) {
+        try {
+            Map<String, Object> gameData = scrapeGameInfoJson(scrapInfo.getUrl());
+            if(scrapInfo.isTitleAttr()){
+                gameDto.setName(gameData.get("title").toString());
+            }
+            if(scrapInfo.isPosterAttr()){
+                gameDto.setLogo(gameData.get("posterBase64").toString());
+            }
+            if(scrapInfo.isDescriptionAttr()){
+                gameDto.setDescription(gameData.get("description").toString());
+            }
+            if(scrapInfo.isYearAttrAttr()){
+                gameDto.setReleaseDate(gameData.get("year").toString());
+            }
+            if(scrapInfo.isGenresAttr()){
+                gameDto.setGenres((List<String>) gameData.get("genres"));
+            }
+            if(scrapInfo.isScreensAttr()){
+                gameDto.setScreenshots((List<String>)gameData.get("screens"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return gameDto;
     }
 
     @Override

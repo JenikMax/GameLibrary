@@ -4,7 +4,7 @@
 }
 
 body {
-    background-image: url("/img/background/pattern-doted-wide-honeycomb.png");
+    background-image: url("../img/background/pattern-doted-wide-honeycomb.png");
     margin: 0;
     padding: 0;
 }
@@ -139,6 +139,24 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
+}
+
+.data .scrap-attr{
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.data .scrap-attr input{
+    width: 3%;
+    height: 15px;
+    margin: 20px;
+}
+
+.data .scrap-attr label{
+    width: 88%;
+    font-size: 20px;
+    vertical-align: middle;
 }
 
 .selected {

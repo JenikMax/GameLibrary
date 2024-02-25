@@ -1,6 +1,7 @@
 package com.jenikmax.game.library.service.scraper.scrapers;
 
 import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import com.jenikmax.game.library.service.scraper.api.Scraper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,6 +16,37 @@ import java.util.*;
 public class PlaygroundScraper implements Scraper {
 
     private final static String BASE_64_PREFIX = "data:image/jpeg;base64,";
+
+    @Override
+    public GameDto scrap(GameDto gameDto, ScrapInfo scrapInfo) {
+        try {
+            Map<String, Object> gameData = scrapeGameInfo(scrapInfo.getUrl());
+            if(scrapInfo.isTitleAttr()){
+                gameDto.setName(gameData.get("title").toString());
+            }
+            if(scrapInfo.isYearAttrAttr()){
+                Map<String, String> release = (Map<String,String>) gameData.get("releaseDates");
+                for(String platforms : release.keySet()){
+                    if(platforms.toUpperCase().contains(gameDto.getPlatform().toUpperCase())) gameDto.setReleaseDate(release.get(platforms));
+                }
+            }
+            if(scrapInfo.isPosterAttr()){
+                gameDto.setLogo(BASE_64_PREFIX + gameData.get("posterBase64"));
+            }
+            if(scrapInfo.isDescriptionAttr()){
+                gameDto.setDescription(gameData.get("description").toString());
+            }
+            if(scrapInfo.isGenresAttr()){
+                gameDto.setGenres((List<String>) gameData.get("genres"));
+            }
+            if(scrapInfo.isScreensAttr()){
+                gameDto.setScreenshots(getScreenshots(scrapInfo.getUrl()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return gameDto;
+    }
 
     @Override
     public GameDto scrap(GameDto gameDto, String url) {
@@ -39,6 +71,8 @@ public class PlaygroundScraper implements Scraper {
     public GameDto scrap(GameDto gameDto) {
         return gameDto;
     }
+
+
 
 
 

@@ -1,6 +1,9 @@
+APP_HOST: 192.168.0.109
 GAMES_DIRECTORY: D:/Work/MyProjects/gametest
 TORRENT_TTL: 180000
 TORRENT_DIR: D:/Work/MyProjects/gametest/torrentDir
 DB_PORT: 5432
+DB_HOST: localhost
 SERVER_PORT: 8080
 TORRENT_TRACKER_PORT: 9000
+

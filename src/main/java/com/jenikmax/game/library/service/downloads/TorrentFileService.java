@@ -28,12 +28,15 @@ public class TorrentFileService {
     private final TorrentTracker tracker;
     private final Long torrentTtl;
     private final String torrentDir;
+    private final String trackerHost;
 
     public TorrentFileService(TorrentTracker tracker, @Value("${game-library.games.torrent.ttl}") Long torrentTtl,
-                              @Value("${game-library.games.torrent.directory}") String torrentDir) {
+                              @Value("${game-library.games.torrent.directory}") String torrentDir,
+                              @Value("${game-library.games.torrent.tracker-host}") String trackerHost) {
         this.tracker = tracker;
         this.torrentTtl = torrentTtl;
         this.torrentDir = torrentDir;
+        this.trackerHost = trackerHost;
     }
 
     public String createAndShare(String dirPath){
@@ -52,9 +55,8 @@ public class TorrentFileService {
         File directory = new File(directoryPath);
         List<File> files = new ArrayList<>();
         searchFiles(directory, files);
-
         // Указываем IP-адрес хоста, где раздача будет доступна
-        URI announceURI = URI.create("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + 9000 + "/announce");
+        URI announceURI = URI.create("http://" + trackerHost + ":" + 9000 + "/announce");
         Torrent torrent = Torrent.create(directory, files, announceURI, "GameLibrary");
         tracker.annonceTorrent(torrent);
         tracker.unAnnonceTorrent(torrent,torrentTtl);
@@ -74,6 +76,8 @@ public class TorrentFileService {
         try {
             File torrentFile = new File(torrentPath);
             File directoryFile = new File(directoryPath).getParentFile();
+
+            //CustomClient client = new CustomClient(InetAddress.getLocalHost(), SharedTorrent.fromFile(torrentFile, directoryFile));
             Client client = new Client(InetAddress.getLocalHost(), SharedTorrent.fromFile(torrentFile, directoryFile));
             client.setMaxDownloadRate(0);
             client.setMaxUploadRate(0);
