@@ -7,8 +7,8 @@ services:
     ports:
       - "8080:8080"
       #- "5432:5432"
-      - "9000:9000"
-      - "49152-49252:49152-49252"
+      #- "9000:9000"
+      #- "49152-49252:49152-49252"
     environment:
       - TORRENT_TRACKER_PORT=9000 #порт торрент трекера
       - SERVER_PORT=8080 # порт на котором будет запущено приложение в образе
@@ -26,11 +26,14 @@ services:
     #image: dev/game-library-postgresql:latest
     ports:
       - "5432:5432"
+    volumes:
+      - /host_mnt/d/Work/MyProjects/gametest/db/data:/var/lib/postgresql/data
     env_file:
       - ./postgresdb/env.list
-  #tracker:
-  #  image: opentracker/opentracker
-  #  ports:
-  #    - 6969:6969
-  #  volumes:
-  #    - /host_mnt/d/Work/MyProjects/gametest/tracker/data:/data
+  tracker:
+    image: lednerb/opentracker-docker
+    ports:
+      - "6969:6969"
+    volumes:
+      - /host_mnt/d/Work/MyProjects/gametest/tracker/data:/data
+      - /host_mnt/d/Work/MyProjects/gametest:/files
