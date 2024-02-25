@@ -10,14 +10,12 @@ server:
 game-library:
   games:
     directory: ${GAMES_DIRECTORY:/gameLibrary}
-    torrent:
-      tracker-host: ${APP_HOST}
-      tracker-port: ${TORRENT_TRACKER_PORT}
-      ttl: ${TORRENT_TTL}
-      directory: ${TORRENT_DIR:/torrentDir}
 
 
 spring:
+  mvc:
+    async:
+      request-timeout: 7680000
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/game-library?currentSchema=library
     username: library-manager-user

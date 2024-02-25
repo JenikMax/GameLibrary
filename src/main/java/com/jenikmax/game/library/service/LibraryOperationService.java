@@ -20,10 +20,15 @@ import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.async.DeferredResult;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -149,18 +154,36 @@ public class LibraryOperationService implements LibraryService {
     public ResponseEntity<Resource> downloadGame(GameDto game) {
         ByteArrayResource resource;
         String name = game.getName();
-        if(downloadService.getDirectorySizeRecursively(game.getDirectoryPath()) > 1000000000L){
-            resource = downloadService.downloadTorrent(game.getDirectoryPath());
-            name += ".torrent";
-        }
-        else {
-            resource = downloadService.downloadZip(game.getDirectoryPath());
-            name += ".zip";
-        }
+        // TODO добавить реализацию отличную от зип для случая downloadService.getDirectorySizeRecursively(game.getDirectoryPath()) > 1000000000L
+        resource = downloadService.downloadZip(game.getDirectoryPath());
+        name += ".zip";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(ContentDisposition.attachment().filename(name).build());
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         return new ResponseEntity<Resource>((Resource) resource, headers, HttpStatus.OK);
+    }
+
+    @Override
+    public CompletableFuture<ResponseEntity<StreamingResponseBody>> downloadGameInStream(GameDto game, HttpServletResponse response) {
+        CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture = new CompletableFuture<>();
+        // Создайте StreamingResponseBody для передачи данных
+        StreamingResponseBody streamingResponseBody = outputStream -> {
+            downloadService.downloadZipInStream(game.getDirectoryPath(),outputStream,completableFuture);
+        };
+        // Установите заголовки ответа
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + game.getName() + "(" + game.getReleaseDate() + ")" + ".zip\"");
+
+        // Запустите операцию формирования архива в отдельном потоке
+        CompletableFuture.runAsync(() -> {
+            try {
+                streamingResponseBody.writeTo(response.getOutputStream());
+                response.flushBuffer();
+            } catch (IOException e) {
+                completableFuture.completeExceptionally(e);
+            }
+        });
+
+        return completableFuture;
     }
 
     @Override

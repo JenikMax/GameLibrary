@@ -7,9 +7,13 @@ import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.async.DeferredResult;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 public interface LibraryService {
 
@@ -42,6 +46,8 @@ public interface LibraryService {
     List<String> getGameGenres();
 
     ResponseEntity<Resource> downloadGame(GameDto game);
+
+    CompletableFuture<ResponseEntity<StreamingResponseBody>> downloadGameInStream(GameDto game, HttpServletResponse response);
 
     ShortUser getUserInfo();
 

@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,13 +20,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.async.DeferredResult;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.util.NumberUtils;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 @Controller
 public class LibraryViewController {
@@ -234,10 +239,10 @@ public class LibraryViewController {
     }
 
     @GetMapping("library/game/{id}/download")
-    public ResponseEntity<Resource> downloadGame(@PathVariable("id") Long id) {
+    public CompletableFuture<ResponseEntity<StreamingResponseBody>> downloadGame(@PathVariable("id") Long id, HttpServletResponse response) {
         logger.info("Download game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
-        return libraryService.downloadGame(gameDto);
+        return libraryService.downloadGameInStream(gameDto,response);
 
     }
 
