@@ -1,11 +1,12 @@
 server:
-  max-http-header-size: 10000KB
+  max-http-header-size: 50000KB
   tomcat:
-    max-http-form-post-size: 50000KB
-    max-file-size: 50000KB
-    max-request-size: 50000KB
+    max-http-form-post-size: 100000KB
+    max-file-size: 100000KB
+    max-request-size: 100000KB
   port: ${SERVER_PORT}
-
+  servlet:
+    context-path: /game-library
 
 game-library:
   games:

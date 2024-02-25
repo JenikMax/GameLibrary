@@ -23,7 +23,7 @@
 
 
 .header_search{
-    width: 59%;
+    width: 65%;
     padding: 1px;
     display: flex;
     flex-wrap: wrap;
@@ -35,7 +35,7 @@
 }
 
 .search_container {
-    width: 220%;
+    width: 255%;
     margin: 20px 1px 1px;
     display: flex;
     align-items: center;
@@ -68,7 +68,7 @@
 }
 
 .header_user {
-    width: 285px;
+    width: 220px;
     height: 80px;
     display: flex;
     align-items: center;

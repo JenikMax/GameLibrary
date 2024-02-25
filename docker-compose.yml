@@ -1,6 +1,6 @@
 version: '3'
 services:
-  game-library-application:
+  application:
     build:
       context: .
       dockerfile: Dockerfile

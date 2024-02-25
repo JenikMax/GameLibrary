@@ -120,7 +120,7 @@ public class PlaygroundScraper implements Scraper {
         String screenUrl = gameUrl.substring(0,gameUrl.lastIndexOf('/')) + "/gallery" + gameUrl.substring(gameUrl.lastIndexOf('/'));
         Document document = Jsoup.connect(screenUrl).get();
         Elements screensA = document.select("div.gallery-item > a");
-        for(int i = 0 ; i <= screensA.size() && i <= 20 ; i++ ){ // добавлен лимит на 20 изображений
+        for(int i = 0 ; i < screensA.size() && i < 20 ; i++ ){ // добавлен лимит на 20 изображений
             result.add(BASE_64_PREFIX + imageToBase64(screensA.get(i).attr("href")));
         }
         return result;

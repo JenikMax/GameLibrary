@@ -96,7 +96,7 @@
 <div class="container">
     <div class="header">
         <div class="header_library">
-            <a href="library" style="text-decoration: none; color: inherit;">
+            <a th:href="@{/library}" style="text-decoration: none; color: inherit;">
                 <img th:src="@{/img/logo.jpg}" alt="Logo">
             </a>
         </div>
@@ -111,12 +111,9 @@
             <form th:action="@{/logout}" method="post">
                 <div class="user_container">
                     <div class="avatar">
-                        <a href="profile" style="text-decoration: none; color: inherit;">
-                            <img th:src="${user.avatar}" alt="User"/>
+                        <a th:href="@{/profile}" style="text-decoration: none; color: inherit;" th:alt="${user.name}">
+                            <img th:src="${user.avatar}"  th:alt="${user.name}"/>
                         </a>
-                    </div>
-                    <div class="name_user">
-                        <a href="profile" th:text="${user.name}"></a>
                     </div>
                     <div class="logout_button">
                         <button type="submit" th:text="#{view.user.logout.button}"></button>
