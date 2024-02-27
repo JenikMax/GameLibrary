@@ -9,6 +9,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface DownloadService {
 
+    void downloadTorrent(String path, OutputStream outputStream, CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture);
+
     ByteArrayResource downloadZip(String path);
 
     void downloadZipInStream(String path, OutputStream outputStream, CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture);

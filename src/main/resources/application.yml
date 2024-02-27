@@ -11,7 +11,12 @@ server:
 game-library:
   games:
     directory: ${GAMES_DIRECTORY:/gameLibrary}
-
+    torrent:
+      tracker-host: ${TORRENT_TRACKER_HOST}
+      tracker-port: ${TORRENT_TRACKER_PORT}
+      ttl: ${TORRENT_TTL:180000}
+      directory: ${TORRENT_DIR:/torrentDir}
+      directory-tmp: ${TORRENT_DIR_TMP:/torrentDirTmp}
 
 spring:
   mvc:

@@ -1,13 +1,13 @@
 package com.jenikmax.game.library.service.downloads;
 
 import com.jenikmax.game.library.service.downloads.api.DownloadService;
-import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.*;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,6 +20,36 @@ public class DownloadFileService implements DownloadService {
 
     private static final int BUFFER_SIZE = 8192;
 
+    private final DownloadTorrentService torrentService;
+
+    public DownloadFileService(DownloadTorrentService torrentService) {
+        this.torrentService = torrentService;
+    }
+
+    @Override
+    public void downloadTorrent(String path, OutputStream outputStream, CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture) {
+        try {
+            Path directoryPath = Paths.get(path);
+            String torrentFilePath = torrentService.createTorrent(path);
+            File torrentFile = new File(torrentFilePath);
+            if (!torrentFile.exists()) return;
+            try(FileInputStream fis = new FileInputStream(torrentFile)) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = fis.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }catch (Exception e) {
+                completableFuture.completeExceptionally(e);
+            } finally {
+                completableFuture.complete(ResponseEntity.ok().build());
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            completableFuture.completeExceptionally(e);
+        }
+    }
 
     @Override
     public ByteArrayResource downloadZip(String path) {

@@ -1,25 +1,69 @@
 version: '3'
 services:
-  application:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
+  deluge:
+    image: lscr.io/linuxserver/deluge:latest
+    container_name: deluge
     environment:
-      - SERVER_PORT=8080 # порт на котором будет запущено приложение в образе
-      - DB_HOST=postgresdb #хост для подключения к бд (совпадает с службой бд в докер компоус)
-      - DB_PORT=5432 #порт для подключения к бд
+      - PUID=197609
+      - PGID=197609
+      - TZ=Etc/UTC
+      - DELUGE_LOGLEVEL=error
     volumes:
-      - /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
+      - /host_mnt/d/Work/MyProjects/gametest/tracker/config:/config
+      - /host_mnt/d/Work/MyProjects/gametest/games:/downloads
+      - /host_mnt/d/Work/MyProjects/gametest/tracker/watch:/watch
+    ports:
+      - 8112:8112
+      - 6881:6881
+      - 6881:6881/udp
+      - 58846:58846
+    restart: unless-stopped
   postgresdb:
     build:
       context: .
       dockerfile: ./postgresdb/Dockerfile
-    #image: dev/game-library-postgresql:latest
     ports:
       - "5432:5432"
     volumes:
       - /host_mnt/d/Work/MyProjects/gametest/db/data:/var/lib/postgresql/data
     env_file:
       - ./postgresdb/env.list
+  application:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "9010:9010"
+    environment:
+      - SERVER_PORT=8080 # порт на котором будет запущено приложение в образе
+      - DB_HOST=postgresdb #хост для подключения к бд (совпадает с службой бд в докер компоус)
+      - DB_PORT=5432 #порт для подключения к бд
+      - TORRENT_TRACKER_HOST=192.168.0.109
+      - TORRENT_TRACKER_PORT=9010
+    volumes:
+      - /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
+      - /host_mnt/d/Work/MyProjects/gametest/tracker/torrents:/torrentDir
+      - /host_mnt/d/Work/MyProjects/gametest/tracker/watch:/torrentDirTmp
+
+
+  ##transmission:
+  ##  image: lscr.io/linuxserver/transmission:latest
+  ##  container_name: transmission
+  ##  environment:
+  ##    - PUID=197609
+  ##    - PGID=197121
+  ##    - TZ=Etc/UTC
+  ##    - USER=admin
+  ##    - PASS=admin1234
+  ##    - PEERPORT=31375
+  ##  volumes:
+  ##    - /host_mnt/d/Work/MyProjects/gametest/tracker/data:/config
+  ##    - /host_mnt/d/Work/MyProjects/gametest/games:/downloads
+  ##    - /host_mnt/d/Work/MyProjects/gametest/tracker/torrents:/watch
+  ##  ports:
+  ##    - 9091:9091
+  ##    - 31375:31375
+  ##    - 51413:51413
+  ##    - 51413:51413/udp
+  ##  restart: unless-stopped

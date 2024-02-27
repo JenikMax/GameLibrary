@@ -166,12 +166,19 @@ public class LibraryOperationService implements LibraryService {
     @Override
     public CompletableFuture<ResponseEntity<StreamingResponseBody>> downloadGameInStream(GameDto game, HttpServletResponse response) {
         CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture = new CompletableFuture<>();
+        String extension = "";
+        Long size = downloadService.getDirectorySizeRecursively(game.getDirectoryPath());// ?> 1000000000L
         // Создайте StreamingResponseBody для передачи данных
         StreamingResponseBody streamingResponseBody = outputStream -> {
-            downloadService.downloadZipInStream(game.getDirectoryPath(),outputStream,completableFuture);
+            if(size > 1000000000L){
+                downloadService.downloadTorrent(game.getDirectoryPath(),outputStream,completableFuture);
+            }
+            else{
+                downloadService.downloadZipInStream(game.getDirectoryPath(),outputStream,completableFuture);
+            }
         };
         // Установите заголовки ответа
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + game.getName() + "(" + game.getReleaseDate() + ")" + ".zip\"");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + game.getName() + "(" + game.getReleaseDate() + ")" +  (size > 1000000000L ? ".torrent\"" : ".zip\""));
 
         // Запустите операцию формирования архива в отдельном потоке
         CompletableFuture.runAsync(() -> {
