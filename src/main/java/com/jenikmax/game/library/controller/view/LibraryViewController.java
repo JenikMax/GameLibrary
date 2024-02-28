@@ -6,11 +6,10 @@ import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
+import com.jenikmax.game.library.service.utils.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.util.NumberUtils;
@@ -40,11 +38,13 @@ public class LibraryViewController {
     private final LibraryService libraryService;
     //private final GenreLoc genreLoc;
     private final MessageSource messageSource;
+    private final StringUtils stringUtils;
 
-    public LibraryViewController(LibraryService libraryService, MessageSource messageSource) {
+    public LibraryViewController(LibraryService libraryService, MessageSource messageSource, StringUtils stringUtils) {
         this.libraryService = libraryService;
         //this.genreLoc = genreLoc;
         this.messageSource = messageSource;
+        this.stringUtils = stringUtils;
     }
 
     @GetMapping("/library")
@@ -165,6 +165,7 @@ public class LibraryViewController {
     public String viewGame(@PathVariable("id") Long id, Model model,Locale locale) {
         logger.info("Open game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
+        //gameDto.setDescription(stringUtils.replaceSpacesWithHtmlEntities(gameDto.getDescription()));
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
         ShortUser user = libraryService.getUserInfo();
         model.addAttribute("game", gameDto);
@@ -172,6 +173,7 @@ public class LibraryViewController {
         model.addAttribute("user", user);
 
         model.addAttribute("messageSource", messageSource);
+        model.addAttribute("stringUtils", stringUtils);
         model.addAttribute("locale", locale);
 
         return "gameView";

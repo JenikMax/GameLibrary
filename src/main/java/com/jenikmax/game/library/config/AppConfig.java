@@ -1,5 +1,6 @@
 package com.jenikmax.game.library.config;
 
+import com.jenikmax.game.library.service.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,4 +24,5 @@ public class AppConfig {
     public NamedParameterJdbcTemplate namedParameterJdbcTemplate(){
         return new NamedParameterJdbcTemplate(dataSource);
     }
+
 }

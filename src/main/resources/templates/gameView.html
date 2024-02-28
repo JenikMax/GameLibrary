@@ -84,7 +84,7 @@
                 <span th:text="${game.platform}"></span>
                 <a target="_blank" th:href="@{'/library/game/' + ${game.id} + '/download'}" th:text="#{view.navigation.download}"></a>
                 <!--<button type="button" target="_blank" th:href="@{'/library/game/' + ${game.id} + '/download'}" >Скачать</button>-->
-                <p th:text="${game.description}"></p>
+                <p th:utext="${stringUtils.replaceSpacesWithHtmlEntities(game.description)}"></p>
             </div>
         </div>
         <div class="game_genre">

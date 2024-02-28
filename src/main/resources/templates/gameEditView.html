@@ -261,7 +261,7 @@
                 <div class="label-container">
                     <label for="description" th:text="#{view.game.edit.description}"></label>
                 </div>
-                <textarea id="description" name="description" th:value="${game.description}" th:text="${game.description}"></textarea>
+                <textarea id="description" name="description" th:value="${game.description}" th:utext="${game.description}"></textarea>
             </div>
             <div class="game_genre">
                 <div class="label-container">

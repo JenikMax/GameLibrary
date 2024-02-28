@@ -115,7 +115,9 @@ body {
 
 .description p {
     width: 99%;
-    height: auto
+    height: auto;
+    white-space: pre-line;
+    overflow-wrap: break-word;
     margin: 10px;
     float: inherit;
     margin-bottom: 10px;
