@@ -84,9 +84,31 @@ public class LibraryOperationService implements LibraryService {
     }
 
     @Override
+    public List<GameShortDto> getGameList(int startIndex, int endIndex) {
+        return gameService.getGameShortList(startIndex, endIndex);
+    }
+
+    @Override
+    public List<Long> getGameListId() {
+        return gameService.getGameShortIdList();
+    }
+
+    @Override
     public List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         if(searchText.isEmpty() && selectedPlatforms.size() == 0 && selectedYears.size() == 0 && selectedGenres.size() == 0 && sortField.isEmpty()) return getGameList();
         return gameService.getGameShortList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
+    }
+
+    @Override
+    public List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex) {
+        if(searchText.isEmpty() && selectedPlatforms.size() == 0 && selectedYears.size() == 0 && selectedGenres.size() == 0 && sortField.isEmpty()) return getGameList(startIndex,endIndex);
+        return gameService.getGameShortList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType,startIndex,endIndex);
+    }
+
+    @Override
+    public List<Long> getGameIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
+        if(searchText.isEmpty() && selectedPlatforms.size() == 0 && selectedYears.size() == 0 && selectedGenres.size() == 0 && sortField.isEmpty()) return getGameListId();
+        return gameService.getGameShortIdList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
     }
 
     @Override

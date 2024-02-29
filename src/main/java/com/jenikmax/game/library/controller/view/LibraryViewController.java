@@ -65,15 +65,15 @@ public class LibraryViewController {
         sortField = sortField != null ? sortField : "";
         sortType = sortType != null ? sortType : "";
 
-        List<GameShortDto> gameList = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
+        List<Long> gameIdList = libraryService.getGameIdList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
 
         int pageSize = 12;
-        int totalPages = (gameList.size() + pageSize - 1) / pageSize;
+        int totalPages = (gameIdList.size() + pageSize - 1) / pageSize;
         totalPages = totalPages == 0 ? 1 : totalPages;
         int startIndex = (page - 1) * pageSize;
-        int endIndex = Math.min((startIndex + pageSize), gameList.size());
+        int endIndex = Math.min((startIndex + pageSize), gameIdList.size());
 
-        List<GameShortDto> paginatedGames = gameList.subList(startIndex, endIndex);
+        List<GameShortDto> paginatedGames = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType, startIndex, endIndex);
 
         List<String> years = libraryService.getReleaseDates();
         List<String> platforms = libraryService.getGamesPlatforms();

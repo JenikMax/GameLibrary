@@ -47,6 +47,15 @@ public class GameDataService implements GameService {
         return sqlDao.executeShortGame("select * from game_data order by name");
     }
 
+    public List<GameShortDto> getGameShortList(int startIndex, int endIndex){
+        return sqlDao.executeShortGame("select * from game_data order by name" + (endIndex != 0 ? " OFFSET " + startIndex + " LIMIT " + (endIndex - startIndex) : ""));
+    }
+
+
+    public List<Long> getGameShortIdList(){
+        return sqlDao.executeIdGame("select id from game_data order by name");
+    }
+
     @Override
     public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         List<Object> params = new ArrayList<>();
@@ -88,6 +97,95 @@ public class GameDataService implements GameService {
             sql += " order by name";
         }
         return sqlDao.executeShortGame(sql,params.toArray());
+    }
+
+    @Override
+    public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType,int startIndex, int endIndex) {
+        List<Object> params = new ArrayList<>();
+        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from game_data where LOWER(name) like LOWER(?)";
+        params.add('%' + searchText + '%');
+        if(selectedPlatforms.size() != 0){
+            String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
+            sql += String.format(" and platform in (%s)",platformSql);
+            params.addAll(selectedPlatforms);
+        }
+        if(selectedYears.size() != 0){
+            String yearsSql = String.join(",", Collections.nCopies(selectedYears.size(), "?"));
+            sql += String.format(" and release_date in (%s)",yearsSql);
+            params.addAll(selectedYears);
+        }
+        if(selectedGenres.size() != 0){
+            String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
+            sql += String.format(" and id in (select game_id from library.game_data_genre where genre_code in (%s))",genresSql);
+            params.addAll(selectedGenres);
+        }
+        if(!sortField.isEmpty()){
+            if(sortField.equals("year")) {
+                sortField = "release_date";
+            }
+            else if(sortField.equals("create")) {
+                sortField = "create_ts";
+            }
+            else{
+                sortField = "name";
+            }
+
+            if(sortType == null || sortType.isEmpty() || (!sortType.equals("asc") && !sortType.equals("desc"))){
+                sortType = "";
+            }
+            sql += " order by " + sortField + (sortType.isEmpty() ? "" : " " + sortType);
+
+        }
+        else{
+            sql += " order by name";
+        }
+        if (endIndex != 0){
+            sql += " OFFSET " + startIndex + " LIMIT " + (endIndex - startIndex);
+        }
+        return sqlDao.executeShortGame(sql,params.toArray());
+    }
+
+    @Override
+    public List<Long> getGameShortIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
+        List<Object> params = new ArrayList<>();
+        String sql = "select id from game_data where LOWER(name) like LOWER(?)";
+        params.add('%' + searchText + '%');
+        if(selectedPlatforms.size() != 0){
+            String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
+            sql += String.format(" and platform in (%s)",platformSql);
+            params.addAll(selectedPlatforms);
+        }
+        if(selectedYears.size() != 0){
+            String yearsSql = String.join(",", Collections.nCopies(selectedYears.size(), "?"));
+            sql += String.format(" and release_date in (%s)",yearsSql);
+            params.addAll(selectedYears);
+        }
+        if(selectedGenres.size() != 0){
+            String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
+            sql += String.format(" and id in (select game_id from library.game_data_genre where genre_code in (%s))",genresSql);
+            params.addAll(selectedGenres);
+        }
+        if(!sortField.isEmpty()){
+            if(sortField.equals("year")) {
+                sortField = "release_date";
+            }
+            else if(sortField.equals("create")) {
+                sortField = "create_ts";
+            }
+            else{
+                sortField = "name";
+            }
+
+            if(sortType == null || sortType.isEmpty() || (!sortType.equals("asc") && !sortType.equals("desc"))){
+                sortType = "";
+            }
+            sql += " order by " + sortField + (sortType.isEmpty() ? "" : " " + sortType);
+
+        }
+        else{
+            sql += " order by name";
+        }
+        return sqlDao.executeShortGameId(sql,params.toArray());
     }
 
     @Override

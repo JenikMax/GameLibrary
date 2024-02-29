@@ -44,6 +44,12 @@ public class SqlDaoImpl implements SqlDao {
     }
 
     @Override
+    public List<Long> executeIdGame(String query) {
+        List<Long> gameIdList = jdbcTemplate.query(query, (rs, rowNum) -> rs.getLong("id"));
+        return gameIdList;
+    }
+
+    @Override
     public List<String> executeByStringList(String query, String column) {
         return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString(column));
     }
@@ -76,6 +82,12 @@ public class SqlDaoImpl implements SqlDao {
             return dto;
         }, params);
         return gameShortDtoList;
+    }
+
+    @Override
+    public List<Long> executeShortGameId(String query, Object[] params) {
+        List<Long> gameIdList = jdbcTemplate.query(query, (rs, rowNum) -> rs.getLong("id"), params);
+        return gameIdList;
     }
 
     @Override

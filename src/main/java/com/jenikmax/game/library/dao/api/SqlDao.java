@@ -10,6 +10,8 @@ public interface SqlDao {
 
     List<GameShortDto> executeShortGame(String query);
 
+    List<Long> executeIdGame(String query);
+
     List<String> executeByStringList(String query, String column);
 
     List<Genre> getGenreList(String query, String column);
@@ -17,6 +19,8 @@ public interface SqlDao {
     List<String> executeByLowerStringList(String query, String column);
 
     List<GameShortDto> executeShortGame(String query,  Object[] params);
+
+    List<Long> executeShortGameId(String query,  Object[] params);
 
     List<Map<String, Object>> execute(String query);
 
