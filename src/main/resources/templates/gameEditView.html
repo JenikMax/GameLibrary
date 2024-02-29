@@ -148,34 +148,7 @@
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <div class="header_library">
-            <a th:href="@{/library}" style="text-decoration: none; color: inherit;">
-                <img th:src="@{/img/logo.jpg}" alt="Logo">
-            </a>
-        </div>
-        <div class="header_search">
-            <form th:action="@{/search}" method="post">
-                <div class="search_container">
-                    <input type="text" th:placeholder="#{view.library.filter.search.name.placeholder}" name="searchText" id="h_searchText" th:value="${searchText}"><button id="h_searchButton" type="submit" th:text="#{view.navigation.find}"></button>
-                </div>
-            </form>
-        </div>
-        <div class="header_user">
-            <form th:action="@{/logout}" method="post">
-                <div class="user_container">
-                    <div class="avatar">
-                        <a th:href="@{/profile}" style="text-decoration: none; color: inherit;" th:alt="${user.name}">
-                            <img th:src="${user.avatar}"  th:alt="${user.name}"/>
-                        </a>
-                    </div>
-                    <div class="logout_button">
-                        <button type="submit" th:text="#{view.user.logout.button}"></button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+    <div class="header" th:include="header :: header"></div>
     <div class="data">
         <h2 th:text="#{view.game.edit.data.title}"></h2>
         <form th:action="@{'/library/game/' + ${game.id} + '/grab'}" method="post">
