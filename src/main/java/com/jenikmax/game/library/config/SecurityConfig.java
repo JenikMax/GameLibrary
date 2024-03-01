@@ -54,6 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers(HttpMethod.POST,"/profile/pass").hasAnyRole("ADMIN","USER")
                     .antMatchers(HttpMethod.POST,"/profile/update").hasRole("ADMIN")
                     .antMatchers(HttpMethod.POST,"/profile/pass_reset").hasRole("ADMIN")
+                    .antMatchers(HttpMethod.GET,"/library-games").hasAnyRole("ADMIN","USER")
                     .antMatchers(HttpMethod.GET,"/library").hasAnyRole("ADMIN","USER")
                     .antMatchers(HttpMethod.GET,"/library/game/{id}").hasAnyRole("ADMIN","USER")
                     .antMatchers(HttpMethod.GET,"/library/game/{id}/edit").hasRole("ADMIN")

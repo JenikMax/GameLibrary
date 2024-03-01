@@ -1,0 +1,45 @@
+<div class="games">
+    <h3 th:text="#{view.library.games.title}"></h3>
+    <div class="sort-type">
+        <form id="sortForm" th:action="@{/sort}" method="post">
+            <input type="hidden" id="sortField" name="sortFieldCurent" th:value="${sortField}"/>
+            <input type="hidden" id="sortType" name="sortTypeCurent" th:value="${sortType}"/>
+            <div class="sort-container">
+                <button type="button" onclick="gotoSort('name')" th:text="#{view.library.games.sort.name} + ${sortType == 'asc' && sortField == 'name' ? ' ▲' : (sortType == 'desc' && sortField == 'name' ? ' ▼' : '')}"></button>
+                <button type="button" onclick="gotoSort('year')" th:text="#{view.library.games.sort.year} + ${sortType == 'asc' && sortField == 'year' ? ' ▲' : (sortType == 'desc' && sortField == 'year' ? ' ▼' : '')}"></button>
+                <button type="button" onclick="gotoSort('create')" th:text="#{view.library.games.sort.create} + ${sortType == 'asc' && sortField == 'create' ? ' ▲' : (sortType == 'desc' && sortField == 'create' ? ' ▼' : '')}"></button>
+            </div>
+        </form>
+    </div>
+    <div class="pagination">
+        <form id="paginationForm1" th:action="@{/filter}" method="post">
+            <button th:classappend="${page == 1} ? 'disabled' : ''" type="button" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="goToPage(this)">««</button>
+            <button th:classappend="${page == 1} ? 'disabled' : ''" type="button" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="goToPage(this)">«</button>
+            <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="goToPage(this)" th:text="${number}"></button>
+            <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="button" th:disabled="${page == totalPages}" th:attr="data-page=${page + 1}" onclick="goToPage(this)">»</button>
+            <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="button" th:disabled="${page == totalPages}" th:attr="data-page=${totalPages}" onclick="goToPage(this)">»»</button>
+        </form>
+    </div>
+    <ul>
+        <div class="game-list">
+            <div th:each="game : ${gameList}" class="game-item">
+                <li>
+                    <a th:href="@{/} + 'library/game/' + ${game.id}" style="text-decoration: none; color: inherit;">
+                        <span th:text="${game.platform}"></span>
+                        <img th:src="${game.logo}" th:alt="${game.name}">
+                        <p th:text="${game.name} + ' ('+ ${game.releaseDate} + ')'"></p>
+                    </a>
+                </li>
+            </div>
+        </div>
+    </ul>
+    <div class="pagination">
+        <form id="paginationForm2" th:action="@{/filter}" method="post">
+            <button th:classappend="${page == 1} ? 'disabled' : ''" type="button" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="goToPage(this)">««</button>
+            <button th:classappend="${page == 1} ? 'disabled' : ''" type="button" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="goToPage(this)">«</button>
+            <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="goToPage(this)" th:text="${number}"></button>
+            <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="button" th:disabled="${page == totalPages}" th:attr="data-page=${page + 1}" onclick="goToPage(this)">»</button>
+            <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="button" th:disabled="${page == totalPages}" th:attr="data-page=${totalPages}" onclick="goToPage(this)">»»</button>
+        </form>
+    </div>
+</div>

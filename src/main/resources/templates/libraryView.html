@@ -8,7 +8,8 @@
     <script>
 
         $(document).ready(function () {
-            document.getElementById("searchText").addEventListener("keyup", function(event) {
+
+            document.getElementById("searchTextFilter").addEventListener("keydown", function(event) {
                 if (event.keyCode === 13) {
                     event.preventDefault();
                     document.getElementById("searchButton").click();
@@ -23,36 +24,39 @@
         });
 
         function submitForm() {
-            document.getElementById("filterForm").submit();
+            goToFiltre();
         }
 
         function resetForm() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(checkbox => checkbox.checked = false);
-
-            document.getElementById("searchText").value = "";
-            submitForm();
+            document.getElementById('searchTextFilter').value = "";
+            resetGames();
         }
 
-        function gotoPage1(button) {
-            goToPage(button,'paginationForm1');
-        }
-
-        function gotoPage2(button) {
-            goToPage(button,'paginationForm2');
-        }
-
-        function goToPage(button,gormId){
+        function goToPage(button){
             const page = button.getAttribute('data-page');
-            const form = document.getElementById(gormId);
-            const searchText = document.getElementsByName('searchText')[0].value;
+            const searchText = document.getElementById('searchTextFilter').value;
             const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
             const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
             const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
             const curField = document.getElementById('sortField').value;
             const curSrtType = document.getElementById('sortType').value;
-            form.action = `filter?searchText=${searchText}&selectedPlatforms=${selectedPlatforms.join(',')}&selectedGenres=${selectedGenres.join(',')}&selectedYears=${selectedYears.join(',')}&page=${page}&sortField=${curField}&sortType=${curSrtType}`;
-            form.submit();
+            $.get("library-games?searchText=" + searchText + "&selectedPlatforms=" + selectedPlatforms.join(',') + "&selectedGenres=" + selectedGenres.join(',') + "&selectedYears=" + selectedYears.join(',') + "&page=" + page + "&sortField=" + curField + "&sortType=" + curSrtType, function(data) {
+                $("#game-list-container").html(data);
+            });
+        }
+
+        function goToFiltre(){
+            const field = document.getElementById('sortField').value;
+            const srtType = document.getElementById('sortType').value;
+            const searchText = document.getElementById('searchTextFilter').value;
+            const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
+            const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
+            const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
+            $.get("library-games?searchText=" + searchText + "&selectedPlatforms=" + selectedPlatforms.join(',') + "&selectedGenres=" + selectedGenres.join(',') + "&selectedYears=" + selectedYears.join(',') + "&sortField=" + field + "&sortType=" + srtType, function(data) {
+                $("#game-list-container").html(data);
+            });
         }
 
         function gotoSort(field){
@@ -62,13 +66,13 @@
             if(field === curField){
                 if(srtType === curSrtType) srtType = 'desc';
             }
-            const form = document.getElementById('sortForm');
-            const searchText = document.getElementsByName('searchText')[0].value;
+            const searchText = document.getElementById('searchTextFilter').value;
             const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
             const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
             const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
-            form.action = "sort?searchText=" + searchText + "&selectedPlatforms=" + selectedPlatforms.join(',') + "&selectedGenres=" + selectedGenres.join(',') + "&selectedYears=" + selectedYears.join(',') + "&sortField=" + field + "&sortType=" + srtType;
-            form.submit();
+            $.get("library-games?searchText=" + searchText + "&selectedPlatforms=" + selectedPlatforms.join(',') + "&selectedGenres=" + selectedGenres.join(',') + "&selectedYears=" + selectedYears.join(',') + "&sortField=" + field + "&sortType=" + srtType, function(data) {
+                $("#game-list-container").html(data);
+            });
         }
 
         function showPopup() {
@@ -88,10 +92,29 @@
             popup.style.display = "none";
         }
 
+        function loadGames(){
+            const page = 1;
+            const searchText = document.getElementById('searchTextFilter').value;
+            const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
+            const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
+            const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
+            const curField = "";
+            const curSrtType = "";
+            $.get("library-games?searchText=" + searchText + "&selectedPlatforms=" + selectedPlatforms.join(',') + "&selectedGenres=" + selectedGenres.join(',') + "&selectedYears=" + selectedYears.join(',') + "&page=" + page + "&sortField=" + curField + "&sortType=" + curSrtType, function(data) {
+                $("#game-list-container").html(data);
+            });
+        }
+
+        function resetGames(){
+            $.get("library-games", function(data) {
+                $("#game-list-container").html(data);
+            });
+        }
+
     </script>
 
 </head>
-<body onload="showPopup()">
+<body onload="showPopup();loadGames();">
 <div id="popup" class="popup"></div>
 <input type="hidden" id="message" th:value="${message}"/>
 <div class="container">
@@ -99,12 +122,9 @@
 
     <div class="filter">
         <form th:action="@{/filter}" id="filterForm" method="post">
-            <script>
-
-            </script>
             <h3 th:text="#{view.library.filter.search}"></h3>
             <div class="search">
-                <input type="text" th:placeholder="#{view.library.filter.search.name.placeholder}" name="searchText" id="searchText" th:value="${searchText}">
+                <input type="text" th:placeholder="#{view.library.filter.search.name.placeholder}" name="searchTextFilter" id="searchTextFilter" th:value="${searchText}">
             </div>
             <h3 th:text="#{view.library.filter.platforms}"></h3>
             <div class="platform-list" th:classappend="${platforms.size() > 10} ? 'scrollable' : ''">
@@ -133,56 +153,58 @@
                 </li>
             </ul>
             </div>
-            <button type="submit" id="searchButton" th:text="#{view.navigation.find}"></button>
-            <button type="reset"  onclick="resetForm()" th:text="#{view.navigation.reset}"></button>
+            <button type="button" id="searchButton" th:text="#{view.navigation.find}" onclick="goToFiltre()"></button>
+            <button type="button"  onclick="resetForm()" th:text="#{view.navigation.reset}"></button>
         </form>
         <form th:if="${user != null && user.isAdmin}" th:action="@{/scan}" method="post">
             <button type="submit" th:text="#{view.navigation.library.update}"></button>
         </form>
     </div>
-    <div class="games">
-        <h3 th:text="#{view.library.games.title}"></h3>
-        <div class="sort-type">
-            <form id="sortForm" th:action="@{/sort}" method="post">
-                <input type="hidden" id="sortField" name="sortFieldCurent" th:value="${sortField}"/>
-                <input type="hidden" id="sortType" name="sortTypeCurent" th:value="${sortType}"/>
-                <div class="sort-container">
-                    <button type="submit" onclick="gotoSort('name')" th:text="#{view.library.games.sort.name} + ${sortType == 'asc' && sortField == 'name' ? ' ▲' : (sortType == 'desc' && sortField == 'name' ? ' ▼' : '')}"></button>
-                    <button type="submit" onclick="gotoSort('year')" th:text="#{view.library.games.sort.year} + ${sortType == 'asc' && sortField == 'year' ? ' ▲' : (sortType == 'desc' && sortField == 'year' ? ' ▼' : '')}"></button>
-                    <button type="submit" onclick="gotoSort('create')" th:text="#{view.library.games.sort.create} + ${sortType == 'asc' && sortField == 'create' ? ' ▲' : (sortType == 'desc' && sortField == 'create' ? ' ▼' : '')}"></button>
-                </div>
-            </form>
-        </div>
-        <div class="pagination">
-            <form id="paginationForm1" th:action="@{/filter}" method="post">
-                <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage1(this)">««</button>
-                <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="gotoPage1(this)">«</button>
-                <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="gotoPage1(this)" th:text="${number}"></button>
-                <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${page + 1}" onclick="gotoPage1(this)">»</button>
-                <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${totalPages}" onclick="gotoPage1(this)">»»</button>
-            </form>
-        </div>
-        <ul>
-        <div class="game-list">
-            <div th:each="game : ${gameList}" class="game-item">
-                <li>
-                    <a th:href="@{/} + 'library/game/' + ${game.id}" style="text-decoration: none; color: inherit;">
-                    <span th:text="${game.platform}"></span>
-                    <img th:src="${game.logo}" th:alt="${game.name}">
-                    <p th:text="${game.name} + ' ('+ ${game.releaseDate} + ')'"></p>
-                    </a>
-                </li>
+    <div id="game-list-container">
+        <div class="games">
+            <h3 th:text="#{view.library.games.title}"></h3>
+            <div class="sort-type">
+                <form id="sortForm" th:action="@{/sort}" method="post">
+                    <input type="hidden" id="sortField" name="sortFieldCurent" th:value="${sortField}"/>
+                    <input type="hidden" id="sortType" name="sortTypeCurent" th:value="${sortType}"/>
+                    <div class="sort-container">
+                        <button type="button" onclick="gotoSort('name')" th:text="#{view.library.games.sort.name} + ${sortType == 'asc' && sortField == 'name' ? ' ▲' : (sortType == 'desc' && sortField == 'name' ? ' ▼' : '')}"></button>
+                        <button type="button" onclick="gotoSort('year')" th:text="#{view.library.games.sort.year} + ${sortType == 'asc' && sortField == 'year' ? ' ▲' : (sortType == 'desc' && sortField == 'year' ? ' ▼' : '')}"></button>
+                        <button type="button" onclick="gotoSort('create')" th:text="#{view.library.games.sort.create} + ${sortType == 'asc' && sortField == 'create' ? ' ▲' : (sortType == 'desc' && sortField == 'create' ? ' ▼' : '')}"></button>
+                    </div>
+                </form>
             </div>
-        </div>
-        </ul>
-        <div class="pagination">
-            <form id="paginationForm2" th:action="@{/filter}" method="post">
-                <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage2(this)">««</button>
-                <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="gotoPage2(this)">«</button>
-                <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="gotoPage2(this)" th:text="${number}"></button>
-                <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${page + 1}" onclick="gotoPage2(this)">»</button>
-                <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="submit" th:disabled="${page == totalPages}" th:attr="data-page=${totalPages}" onclick="gotoPage2(this)">»»</button>
-            </form>
+            <div class="pagination">
+                <form id="paginationForm1" th:action="@{/filter}" method="post">
+                    <button th:classappend="${page == 1} ? 'disabled' : ''" type="button" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="goToPage(this)">««</button>
+                    <button th:classappend="${page == 1} ? 'disabled' : ''" type="button" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="goToPage(this)">«</button>
+                    <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="goToPage(this)" th:text="${number}"></button>
+                    <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="button" th:disabled="${page == totalPages}" th:attr="data-page=${page + 1}" onclick="goToPage(this)">»</button>
+                    <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="button" th:disabled="${page == totalPages}" th:attr="data-page=${totalPages}" onclick="goToPage(this)">»»</button>
+                </form>
+            </div>
+            <ul>
+                <div class="game-list">
+                    <div th:each="game : ${gameList}" class="game-item">
+                        <li>
+                            <a th:href="@{/} + 'library/game/' + ${game.id}" style="text-decoration: none; color: inherit;">
+                                <span th:text="${game.platform}"></span>
+                                <img th:src="${game.logo}" th:alt="${game.name}">
+                                <p th:text="${game.name} + ' ('+ ${game.releaseDate} + ')'"></p>
+                            </a>
+                        </li>
+                    </div>
+                </div>
+            </ul>
+            <div class="pagination">
+                <form id="paginationForm2" th:action="@{/filter}" method="post">
+                    <button th:classappend="${page == 1} ? 'disabled' : ''" type="button" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="goToPage(this)">««</button>
+                    <button th:classappend="${page == 1} ? 'disabled' : ''" type="button" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="goToPage(this)">«</button>
+                    <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="goToPage(this)" th:text="${number}"></button>
+                    <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="button" th:disabled="${page == totalPages}" th:attr="data-page=${page + 1}" onclick="goToPage(this)">»</button>
+                    <button th:classappend="${page == totalPages} ? 'disabled' : ''" type="button" th:disabled="${page == totalPages}" th:attr="data-page=${totalPages}" onclick="goToPage(this)">»»</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

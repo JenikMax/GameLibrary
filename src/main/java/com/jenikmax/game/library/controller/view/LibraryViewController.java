@@ -36,44 +36,32 @@ public class LibraryViewController {
     static final Logger logger = LogManager.getLogger(LibraryViewController.class.getName());
 
     private final LibraryService libraryService;
-    //private final GenreLoc genreLoc;
     private final MessageSource messageSource;
     private final StringUtils stringUtils;
 
     public LibraryViewController(LibraryService libraryService, MessageSource messageSource, StringUtils stringUtils) {
         this.libraryService = libraryService;
-        //this.genreLoc = genreLoc;
         this.messageSource = messageSource;
         this.stringUtils = stringUtils;
     }
 
     @GetMapping("/library")
     public String main(Model model, Locale locale, @RequestParam(value = "page", defaultValue = "1") int page,
-                       @RequestParam(value = "searchText", required = false) String searchText,
-                       @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
-                       @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
-                       @RequestParam(value = "message", required = false) String message,
-                       @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
-                       @RequestParam(value = "sortField", required = false) String sortField,
-                       @RequestParam(value = "sortType", required = false) String sortType) {
+                        @RequestParam(value = "searchText", required = false) String searchText,
+                        @RequestParam(value = "message", required = false) String message) {
         logger.info("Open library");
-
         searchText = searchText != null ? searchText : "";
-        selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
-        selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
-        selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
-        sortField = sortField != null ? sortField : "";
-        sortType = sortType != null ? sortType : "";
-
-        List<Long> gameIdList = libraryService.getGameIdList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
+        message = message != null ? message : "";
+        ArrayList<String> selectedPlatforms = new ArrayList<>();
+        ArrayList<String> selectedYears = new ArrayList<>();
+        ArrayList<String> selectedGenres = new ArrayList<>();
+        String sortField = "";
+        String sortType = "";
 
         int pageSize = 12;
-        int totalPages = (gameIdList.size() + pageSize - 1) / pageSize;
-        totalPages = totalPages == 0 ? 1 : totalPages;
-        int startIndex = (page - 1) * pageSize;
-        int endIndex = Math.min((startIndex + pageSize), gameIdList.size());
+        int totalPages = 1;
 
-        List<GameShortDto> paginatedGames = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType, startIndex, endIndex);
+        List<GameShortDto> paginatedGames = new ArrayList<>();
 
         List<String> years = libraryService.getReleaseDates();
         List<String> platforms = libraryService.getGamesPlatforms();
@@ -111,26 +99,7 @@ public class LibraryViewController {
         redirectAttributes.addAttribute("message",messageSource.getMessage("view.library.scan.message",null,locale));
         return "redirect:/library";
     }
-
-
-    @PostMapping("/filter")
-    public String applyFilters(Model model, RedirectAttributes redirectAttributes,
-                               @RequestParam(value = "page", defaultValue = "1") int page,
-                               @RequestParam(value = "searchText", required = false) String searchText,
-                               @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
-                               @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
-                               @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
-                               @RequestParam(value = "sortField", required = false) String sortField,
-                               @RequestParam(value = "sortType", required = false) String sortType) {
-        redirectAttributes.addAttribute("page",page);
-        redirectAttributes.addAttribute("searchText",searchText);
-        redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
-        redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
-        redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
-        redirectAttributes.addAttribute("sortField",sortField != null ? sortField : "");
-        redirectAttributes.addAttribute("sortType",sortType != null ? sortType : "");
-        return "redirect:/library";
-    }
+    
 
     @PostMapping("/search")
     public String search(Model model, RedirectAttributes redirectAttributes,
@@ -140,23 +109,43 @@ public class LibraryViewController {
     }
 
 
-    @PostMapping("/sort")
-    public String applySort(Model model, RedirectAttributes redirectAttributes,
-                               @RequestParam(value = "page", defaultValue = "1") int page,
-                               @RequestParam(value = "searchText", required = false) String searchText,
-                               @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
-                               @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
-                               @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
-                               @RequestParam(value = "sortField", required = false) String sortField,
-                               @RequestParam(value = "sortType", required = false) String sortType) {
-        redirectAttributes.addAttribute("page",page);
-        redirectAttributes.addAttribute("searchText",searchText);
-        redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
-        redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
-        redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
-        redirectAttributes.addAttribute("sortField",sortField != null ? sortField : "");
-        redirectAttributes.addAttribute("sortType",sortType != null ? sortType : "");
-        return "redirect:/library";
+
+    @GetMapping("/library-games")
+    public String applySortGet(Model model,
+                            @RequestParam(value = "page", defaultValue = "1") int page,
+                            @RequestParam(value = "searchText", required = false) String searchText,
+                            @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
+                            @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
+                            @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                            @RequestParam(value = "sortField", required = false) String sortField,
+                            @RequestParam(value = "sortType", required = false) String sortType) {
+
+        searchText = searchText != null ? searchText : "";
+        selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
+        selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
+        selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
+        sortField = sortField != null ? sortField : "";
+        sortType = sortType != null ? sortType : "";
+
+        List<Long> gameIdList = libraryService.getGameIdList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
+
+        int pageSize = 12;
+        int totalPages = (gameIdList.size() + pageSize - 1) / pageSize;
+        totalPages = totalPages == 0 ? 1 : totalPages;
+        int startIndex = (page - 1) * pageSize;
+        int endIndex = Math.min((startIndex + pageSize), gameIdList.size());
+
+        List<GameShortDto> paginatedGames = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType, startIndex, endIndex);
+
+        model.addAttribute("gameList",paginatedGames);
+        model.addAttribute("page", page);
+        model.addAttribute("pages", initPages(page,totalPages));
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortType", sortType);
+
+
+        return "libraryList";
     }
 
 
@@ -250,11 +239,6 @@ public class LibraryViewController {
 
     private List<Integer> initPages(int page, int totalPage){
         return Arrays.asList(NumberUtils.sequence(Math.max(1, page - 3),Math.min(totalPage, page + 3)));
-    }
-
-
-    private Locale getSessionLocale(){
-        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getLocale();
     }
 
 }

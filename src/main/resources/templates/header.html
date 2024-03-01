@@ -7,7 +7,7 @@
 <div class="header_search">
     <form th:action="@{/search}" method="post">
         <div class="search_container">
-            <input type="text" th:placeholder="#{view.library.filter.search.name.placeholder}" name="searchText" id="h_searchText" th:value="${searchText}"><button id="h_searchButton" type="submit" th:text="#{view.navigation.find}"></button>
+            <input type="text" th:placeholder="#{view.library.filter.search.name.placeholder}" name="searchText" id="h_searchText"><button id="h_searchButton" type="submit" th:text="#{view.navigation.find}"></button>
         </div>
     </form>
 </div>
