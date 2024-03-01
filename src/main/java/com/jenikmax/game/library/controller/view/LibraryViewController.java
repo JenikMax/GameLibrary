@@ -99,7 +99,7 @@ public class LibraryViewController {
         redirectAttributes.addAttribute("message",messageSource.getMessage("view.library.scan.message",null,locale));
         return "redirect:/library";
     }
-    
+
 
     @PostMapping("/search")
     public String search(Model model, RedirectAttributes redirectAttributes,
@@ -147,6 +147,7 @@ public class LibraryViewController {
 
         return "libraryList";
     }
+    
 
 
 
