@@ -51,8 +51,12 @@
             const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
             const curField = document.getElementById('sortField').value;
             const curSrtType = document.getElementById('sortType').value;
-            form.action = `filter?searchText=${searchText}&selectedPlatforms=${selectedPlatforms.join(',')}&selectedGenres=${selectedGenres.join(',')}&selectedYears=${selectedYears.join(',')}&page=${page}&sortField=${curField}&sortType=${curSrtType}`;
-            form.submit();
+            //form.action = `filter?searchText=${searchText}&selectedPlatforms=${selectedPlatforms.join(',')}&selectedGenres=${selectedGenres.join(',')}&selectedYears=${selectedYears.join(',')}&page=${page}&sortField=${curField}&sortType=${curSrtType}`;
+            $.get("filter?searchText=" + searchText + "&selectedPlatforms=" + selectedPlatforms.join(',') + "&selectedGenres=" + selectedGenres.join(',') + "&selectedYears=" + selectedYears.join(',') + "&page=" + page + "&sortField=" + curField + "&sortType=" + curSrtType, function(data) {
+                $("#game-list-container").html(data);
+            });
+
+            //form.submit();
         }
 
         function gotoSort(field){
@@ -67,8 +71,11 @@
             const selectedPlatforms = Array.from(document.querySelectorAll('input[name="selectedPlatforms"]:checked')).map(input => input.value);
             const selectedGenres = Array.from(document.querySelectorAll('input[name="selectedGenres"]:checked')).map(input => input.value);
             const selectedYears = Array.from(document.querySelectorAll('input[name="selectedYears"]:checked')).map(input => input.value);
-            form.action = "sort?searchText=" + searchText + "&selectedPlatforms=" + selectedPlatforms.join(',') + "&selectedGenres=" + selectedGenres.join(',') + "&selectedYears=" + selectedYears.join(',') + "&sortField=" + field + "&sortType=" + srtType;
-            form.submit();
+            //form.action = "sort?searchText=" + searchText + "&selectedPlatforms=" + selectedPlatforms.join(',') + "&selectedGenres=" + selectedGenres.join(',') + "&selectedYears=" + selectedYears.join(',') + "&sortField=" + field + "&sortType=" + srtType;
+            $.get("sort?searchText=" + searchText + "&selectedPlatforms=" + selectedPlatforms.join(',') + "&selectedGenres=" + selectedGenres.join(',') + "&selectedYears=" + selectedYears.join(',') + "&sortField=" + field + "&sortType=" + srtType, function(data) {
+                $("#game-list-container").html(data);
+            });
+            //form.submit();
         }
 
         function showPopup() {
@@ -87,6 +94,12 @@
             var popup = document.getElementById("popup");
             popup.style.display = "none";
         }
+
+        //function goToPage(page) {
+        //    $.get("/list?page=" + page, function(data) {
+        //        $("#game-list-container").html(data);
+        //    });
+        //}
 
     </script>
 
@@ -163,7 +176,7 @@
             </form>
         </div>
         <ul>
-        <div class="game-list">
+        <div class="game-list" id="game-list-container">
             <div th:each="game : ${gameList}" class="game-item">
                 <li>
                     <a th:href="@{/} + 'library/game/' + ${game.id}" style="text-decoration: none; color: inherit;">

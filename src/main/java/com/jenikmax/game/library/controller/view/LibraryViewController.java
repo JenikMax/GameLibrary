@@ -132,6 +132,25 @@ public class LibraryViewController {
         return "redirect:/library";
     }
 
+    @GetMapping("/filter")
+    public String applyFiltersGet(Model model, RedirectAttributes redirectAttributes,
+                               @RequestParam(value = "page", defaultValue = "1") int page,
+                               @RequestParam(value = "searchText", required = false) String searchText,
+                               @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
+                               @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
+                               @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                               @RequestParam(value = "sortField", required = false) String sortField,
+                               @RequestParam(value = "sortType", required = false) String sortType) {
+        redirectAttributes.addAttribute("page",page);
+        redirectAttributes.addAttribute("searchText",searchText);
+        redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
+        redirectAttributes.addAttribute("sortField",sortField != null ? sortField : "");
+        redirectAttributes.addAttribute("sortType",sortType != null ? sortType : "");
+        return "redirect:/library";
+    }
+
     @PostMapping("/search")
     public String search(Model model, RedirectAttributes redirectAttributes,
                                @RequestParam(value = "searchText", required = false) String searchText) {
@@ -149,6 +168,25 @@ public class LibraryViewController {
                                @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
                                @RequestParam(value = "sortField", required = false) String sortField,
                                @RequestParam(value = "sortType", required = false) String sortType) {
+        redirectAttributes.addAttribute("page",page);
+        redirectAttributes.addAttribute("searchText",searchText);
+        redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
+        redirectAttributes.addAttribute("sortField",sortField != null ? sortField : "");
+        redirectAttributes.addAttribute("sortType",sortType != null ? sortType : "");
+        return "redirect:/library";
+    }
+
+    @GetMapping("/sort")
+    public String applySortGet(Model model, RedirectAttributes redirectAttributes,
+                            @RequestParam(value = "page", defaultValue = "1") int page,
+                            @RequestParam(value = "searchText", required = false) String searchText,
+                            @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
+                            @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
+                            @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                            @RequestParam(value = "sortField", required = false) String sortField,
+                            @RequestParam(value = "sortType", required = false) String sortType) {
         redirectAttributes.addAttribute("page",page);
         redirectAttributes.addAttribute("searchText",searchText);
         redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
