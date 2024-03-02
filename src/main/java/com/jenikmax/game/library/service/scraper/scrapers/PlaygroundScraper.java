@@ -107,7 +107,11 @@ public class PlaygroundScraper implements Scraper {
         // Get genres
         List<String> genres = new ArrayList<>();
         for (Element genresElement : document.select("div.genres > a")) {
-            genres.add(genresElement.attr("href").replaceAll("/games/","").replaceAll("-","_"));
+            String genre = genresElement.attr("href").replaceAll("/games/","").replaceAll("-","_");
+            if(genre.toLowerCase(Locale.ROOT).equals("4x")){
+                genre = "_4X";
+            }
+            genres.add(genre);
         }
         //String genres = document.select("div.genres > a").text();
         gameData.put("genres", genres);
