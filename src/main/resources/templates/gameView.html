@@ -1,8 +1,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+
     <link rel="stylesheet" type="text/css" th:href="@{/css/game.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery.fancybox.min.css}"/>
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.fancybox.min.js}"></script>
     <link rel="icon" type="image/png" th:href="@{/img/app_ico.png}" />
     <title>Game Library App - Game View</title>
     <script>
@@ -14,22 +17,58 @@
                     document.getElementById("h_searchButton").click();
                 }
             });
+            $(".game_screenshots a").fancybox({
+                buttons: [
+                    "close",
+                    "slideShow",
+                    "zoom",
+                    "fullScreen",
+                    "thumbs",
+                    "share",
+                ],
+            });
+            $(".poster a").fancybox({
+                buttons: [
+                    "close",
+                    "zoom",
+                ],
+            });
         });
 
-        function openModal(img) {
-            var modal = document.getElementById("modal");
-            var modalImg = document.getElementById("modalImg");
+        //function openModal(img) {
+        //    $.fancybox.open({
+        //        src  : img.src,
+        //        type : "image"
+        //    });
+        //}
 
-            modal.style.display = "block";
-            modalImg.src = img.src;
-            modalImg.style.width = "90%";
-            modalImg.style.height = "90%";
-        }
-
-        function closeModal() {
-            var modal = document.getElementById("modal");
-            modal.style.display = "none";
-        }
+/*
+        $(".game_screenshots img").on("click", function() {
+            $.fancybox.open({
+                src  : $(this).attr("src"),
+                type : "image",
+                opts : {
+                    caption : $(this).attr("alt"),
+                    toolbar : "auto",
+                    // Размер изображения по умолчанию
+                    defaultType : "image",
+                    slideClass : '',
+                    // Закрытие окна с помощью ESC или по клику на overlay
+                    preventCaptionOverlap : true,
+                    bgOpacity : 0.85,
+                    // Адаптивность изображения для экранов разного размера
+                    thumbs: {
+                        autoStart: true,
+                        axis: 'x'
+                    }
+                },
+                // Закрытие окна при клике вне изображения
+                clickOutside : "close",
+                // Закрытие окна клавишей Esc
+                autoFocus : false
+            });
+        });
+*/
 
         function goBack() {
             window.history.back();
@@ -57,13 +96,9 @@
                 <h1 th:text="${game.name} + ' (' + ${game.releaseDate} + ')'"></h1>
             </div>
             <div class="poster">
-                <img th:src="${game.logo}" th:alt="${game.name}" onclick="openModal(this)">
-            </div>
-            <div id="modal" class="modal">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <div class="modal-content">
-                    <img id="modalImg" onclick="closeModal()">
-                </div>
+                <a th:href="${game.logo}" data-fancybox="poster">
+                    <img th:src="${game.logo}" th:alt="${game.name}">
+                </a>
             </div>
             <div class="description">
                 <span th:text="${game.platform}"></span>
@@ -79,7 +114,9 @@
         </div>
         <div class="game_screenshots">
             <li th:each="screenshot, stat : ${game.screenshots}">
-                <img th:src="${screenshot}" th:alt="'img' + ${stat.index} + '.jpg'" onclick="openModal(this)" data-index="${stat.index}">
+                <a th:href="${screenshot}" data-fancybox="gallery">
+                    <img th:src="${screenshot}" th:alt="'img' + ${stat.index} + '.jpg'" data-index="${stat.index}"/>
+                </a>
             </li>
         </div>
         <div class="game_trailer" th:if="${game.trailerUrl != null and game.trailerUrl != '' and game.trailerUrl != 'N/A'}">
