@@ -44,4 +44,5 @@ public interface GameService {
 
     List<String> getGameGenres();
 
+    byte[] getImageBytesById(Long id);
 }

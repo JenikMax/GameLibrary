@@ -218,6 +218,12 @@ public class GameDataService implements GameService {
         return sqlDao.executeByLowerStringList("select code from library.game_genre group by code order by description","code");
     }
 
+    @Override
+    public byte[] getImageBytesById(Long id) {
+        Screenshot screenshot = screenshotRepository.getReferenceById(id);
+        return screenshot != null ? screenshot.getSource() : null;
+    }
+
     @Transactional
     public GameDto testCreate() {
         Game game = new Game();

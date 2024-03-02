@@ -1,6 +1,7 @@
 package com.jenikmax.game.library.service.api;
 
 import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.enums.Genre;
@@ -33,6 +34,8 @@ public interface LibraryService {
 
     GameDto getGameInfo(Long gameId);
 
+    GameReadDto getGameReadInfo(Long gameId);
+
     GameDto updateGameInfo(GameDto gameDto);
 
     GameDto grabGameInfo(Long id, String source, String url);
@@ -51,12 +54,17 @@ public interface LibraryService {
 
     List<Genre> getGenres(GameDto gameDto);
 
+    List<Genre> getGenres(GameReadDto gameDto);
+
     List<String> getGameGenres();
 
     ResponseEntity<Resource> downloadGame(GameDto game);
 
     CompletableFuture<ResponseEntity<StreamingResponseBody>> downloadGameInStream(GameDto game, HttpServletResponse response);
 
+    byte[] getImageBytesById(Long id);
+
     ShortUser getUserInfo();
+
 
 }

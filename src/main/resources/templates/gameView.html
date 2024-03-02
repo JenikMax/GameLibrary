@@ -35,41 +35,6 @@
             });
         });
 
-        //function openModal(img) {
-        //    $.fancybox.open({
-        //        src  : img.src,
-        //        type : "image"
-        //    });
-        //}
-
-/*
-        $(".game_screenshots img").on("click", function() {
-            $.fancybox.open({
-                src  : $(this).attr("src"),
-                type : "image",
-                opts : {
-                    caption : $(this).attr("alt"),
-                    toolbar : "auto",
-                    // Размер изображения по умолчанию
-                    defaultType : "image",
-                    slideClass : '',
-                    // Закрытие окна с помощью ESC или по клику на overlay
-                    preventCaptionOverlap : true,
-                    bgOpacity : 0.85,
-                    // Адаптивность изображения для экранов разного размера
-                    thumbs: {
-                        autoStart: true,
-                        axis: 'x'
-                    }
-                },
-                // Закрытие окна при клике вне изображения
-                clickOutside : "close",
-                // Закрытие окна клавишей Esc
-                autoFocus : false
-            });
-        });
-*/
-
         function goBack() {
             window.history.back();
         }
@@ -114,8 +79,8 @@
         </div>
         <div class="game_screenshots">
             <li th:each="screenshot, stat : ${game.screenshots}">
-                <a th:href="${screenshot}" data-fancybox="gallery">
-                    <img th:src="${screenshot}" th:alt="'img' + ${stat.index} + '.jpg'" data-index="${stat.index}"/>
+                <a th:href="@{'/library/image/' + ${screenshot}}" data-fancybox="gallery">
+                    <img th:src="@{'/library/image/' + ${screenshot}}" th:alt="'img' + ${stat.index} + '.jpg'" data-index="${stat.index}"/>
                 </a>
             </li>
         </div>

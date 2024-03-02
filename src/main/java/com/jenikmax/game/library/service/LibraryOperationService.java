@@ -2,6 +2,7 @@ package com.jenikmax.game.library.service;
 
 import com.jenikmax.game.library.model.converter.GameConverter;
 import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.Game;
@@ -117,6 +118,12 @@ public class LibraryOperationService implements LibraryService {
     }
 
     @Override
+    public GameReadDto getGameReadInfo(Long gameId){
+        return GameConverter.gameToReadDtoConverter(gameService.getGameById(gameId));
+    }
+
+
+    @Override
     public GameDto updateGameInfo(GameDto gameDto) {
         Game game = GameConverter.dtoToGameEntityConverter(gameDto);
         gameService.updateGame(game);
@@ -167,6 +174,14 @@ public class LibraryOperationService implements LibraryService {
         for(String genre : gameDto.getGenres()) genres.add(Genre.valueOf(genre));
         return genres;
     }
+
+    @Override
+    public List<Genre> getGenres(GameReadDto gameDto) {
+        List<Genre> genres = new ArrayList<>();
+        for(String genre : gameDto.getGenres()) genres.add(Genre.valueOf(genre));
+        return genres;
+    }
+
     @Override
     public List<String> getGameGenres() {
         return gameService.getGameGenres();
@@ -213,6 +228,11 @@ public class LibraryOperationService implements LibraryService {
         });
 
         return completableFuture;
+    }
+
+    @Override
+    public byte[] getImageBytesById(Long id) {
+        return gameService.getImageBytesById(id);
     }
 
     @Override

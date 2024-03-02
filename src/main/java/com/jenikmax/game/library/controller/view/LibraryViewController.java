@@ -1,6 +1,7 @@
 package com.jenikmax.game.library.controller.view;
 
 import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.enums.Genre;
@@ -10,6 +11,9 @@ import com.jenikmax.game.library.service.utils.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -154,7 +158,7 @@ public class LibraryViewController {
     @GetMapping("library/game/{id}")
     public String viewGame(@PathVariable("id") Long id, Model model,Locale locale) {
         logger.info("Open game - {}",id);
-        GameDto gameDto = libraryService.getGameInfo(id);
+        GameReadDto gameDto = libraryService.getGameReadInfo(id);
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
         ShortUser user = libraryService.getUserInfo();
         model.addAttribute("game", gameDto);
@@ -240,5 +244,14 @@ public class LibraryViewController {
     private List<Integer> initPages(int page, int totalPage){
         return Arrays.asList(NumberUtils.sequence(Math.max(1, page - 3),Math.min(totalPage, page + 3)));
     }
+
+    @GetMapping("library/image/{id}")
+    public ResponseEntity<byte[]> getImage(@PathVariable("id") Long id) {
+        byte[] imageBytes = libraryService.getImageBytesById(id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+    }
+
 
 }

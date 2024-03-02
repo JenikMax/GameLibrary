@@ -1,6 +1,7 @@
 package com.jenikmax.game.library.model.converter;
 
 import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
@@ -77,6 +78,28 @@ public class GameConverter {
         }
         return dto;
     }
+    public static GameReadDto gameToReadDtoConverter(Game entity){
+        GameReadDto dto = new GameReadDto();
+        dto.setId(entity.getId());
+        dto.setCreateTs(entity.getCreateTs());
+        dto.setName(entity.getName());
+        dto.setDirectoryPath(entity.getDirectoryPath());
+        dto.setReleaseDate(entity.getReleaseDate());
+        dto.setTrailerUrl(entity.getTrailerUrl());
+        dto.setPlatform(entity.getPlatform());
+        dto.setDescription(entity.getDescription());
+        dto.setInstruction(entity.getInstruction());
+        dto.setLogo(BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(entity.getLogo()));
+        dto.setScreenshots(new ArrayList<>());
+        for (Screenshot screenshot : entity.getScreenshots()){
+            dto.getScreenshots().add(screenshot.getId());
+        }
+        dto.setGenres(new ArrayList<>());
+        for (GameGenre gameGenre : entity.getGenres()){
+            dto.getGenres().add(gameGenreToDtoConverter(gameGenre));
+        }
+        return dto;
+    }
 
     public static Game dtoToGameEntityConverter(GameDto dto){
         Game entity = new Game();
@@ -90,7 +113,6 @@ public class GameConverter {
         entity.setDescription(dto.getDescription());
         entity.setInstruction(dto.getInstruction());
         entity.setLogo(Base64.getDecoder().decode(dto.getLogo().replaceAll(BASE_64_JPG_PREFIX,"").replaceAll(BASE_64_JPEG_PREFIX,"").replaceAll(BASE_64_PNG_PREFIX,"")));
-        //entity.setLogo(Base64.getDecoder().decode(dto.getLogo().replaceFirst(BASE_64_JPEG_PREFIX + "|"+ BASE_64_JPG_PREFIX + "|" + BASE_64_PNG_PREFIX, "")));
         entity.setScreenshots(new ArrayList<>());
         if(dto.getScreenshots() != null){
             for (String screenshot : dto.getScreenshots()){
