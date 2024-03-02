@@ -126,6 +126,27 @@ body {
     cursor: pointer;
 }
 
+.scrap-source-container{
+    margin: 0px 10px 0px;
+    padding: 10px;
+}
+
+.scrap-source-container a.button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: rgba(32, 33, 36, 0.87);
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+a.button:hover {
+    background-color: rgba(48, 49, 52, 0.76);
+    color: white;
+}
+
 .data label{
     margin: 15px 15px;
     font-size: 25px;

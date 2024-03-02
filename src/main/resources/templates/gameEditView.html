@@ -135,15 +135,58 @@
         function toggleUrlField() {
             var urlField = document.querySelector(".url-field");
             var scrapAttr = document.querySelector(".scrap-attr-container");
+            var scrapSource = document.querySelector(".scrap-source-container");
             var selectedValue = document.getElementById("source").value;
-            if (selectedValue === "playground" || selectedValue === "igromania") {
+            if (selectedValue === "playground" || selectedValue === "igromania" || selectedValue === "kanobu") {
                 urlField.classList.remove("hidden");
                 scrapAttr.classList.remove("hidden");
+                scrapSource.classList.remove("hidden");
             } else {
                 urlField.classList.add("hidden");
                 scrapAttr.classList.add("hidden");
+                scrapSource.classList.add("hidden");
+            }
+            if(selectedValue === "playground"){
+                removeLink("scrap-source-href");
+                insertLink("scrap-source-href","Playground","https://www.playground.ru/games");
+            }
+            else if(selectedValue === "igromania"){
+                removeLink("scrap-source-href");
+                insertLink("scrap-source-href","Igromania","https://www.igromania.ru/games/");
+            }
+            else if(selectedValue === "kanobu"){
+                removeLink("scrap-source-href");
+                insertLink("scrap-source-href","Kanobu","https://kanobu.ru/games/popular/");
+            }
+            else{
+                removeLink("scrap-source-href");
             }
         }
+
+
+        function insertLink(divId, linkText, linkHref) {
+            var div = document.getElementById(divId);
+            if (!div) {
+                console.error('Div с id ' + divId + ' не найден');
+                return;
+            }
+            var link = document.createElement('a');
+            link.href = linkHref;
+            link.textContent = linkText;
+            link.target = '_blank'; // Открывать ссылку в новой вкладке
+            link.className = 'button'; // Добавляем класс 'button' к ссылке
+            div.appendChild(link);
+        }
+
+        function removeLink(divId) {
+            var div = document.getElementById(divId);
+            if (!div) {
+                console.error('Div с id ' + divId + ' не найден');
+                return;
+            }
+            div.innerHTML = '';
+        }
+
     </script>
 </head>
 <body>
@@ -158,7 +201,13 @@
                 <!--<option value="iddb">IDDB</option>-->
                 <option value="playground">Playground.ru</option>
                 <option value="igromania">Igromania.ru</option>
+                <option value="kanobu">Kanobu.ru</option>
             </select>
+            <div class="scrap-source-container hidden">
+                <div  id="scrap-source-href" class="scrap-source-href">
+
+                </div>
+            </div>
             <div class="scrap-attr-container hidden">
                 <div class="scrap-attr">
                     <input type="checkbox" id="scrap_title" name="title" checked="checked">

@@ -155,7 +155,6 @@ public class LibraryViewController {
     public String viewGame(@PathVariable("id") Long id, Model model,Locale locale) {
         logger.info("Open game - {}",id);
         GameDto gameDto = libraryService.getGameInfo(id);
-        //gameDto.setDescription(stringUtils.replaceSpacesWithHtmlEntities(gameDto.getDescription()));
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
         ShortUser user = libraryService.getUserInfo();
         model.addAttribute("game", gameDto);
