@@ -137,7 +137,8 @@
             var scrapAttr = document.querySelector(".scrap-attr-container");
             var scrapSource = document.querySelector(".scrap-source-container");
             var selectedValue = document.getElementById("source").value;
-            if (selectedValue === "playground" || selectedValue === "igromania" || selectedValue === "kanobu") {
+            if (selectedValue === "playground" || selectedValue === "igromania" ||
+                selectedValue === "kanobu" || selectedValue === "vgtimes") {
                 urlField.classList.remove("hidden");
                 scrapAttr.classList.remove("hidden");
                 scrapSource.classList.remove("hidden");
@@ -157,6 +158,10 @@
             else if(selectedValue === "kanobu"){
                 removeLink("scrap-source-href");
                 insertLink("scrap-source-href","Kanobu","https://kanobu.ru/games/popular/");
+            }
+            else if(selectedValue === "vgtimes"){
+                removeLink("scrap-source-href");
+                insertLink("scrap-source-href","VGTimes","https://vgtimes.ru/games/");
             }
             else{
                 removeLink("scrap-source-href");
@@ -202,6 +207,7 @@
                 <option value="playground">Playground.ru</option>
                 <option value="igromania">Igromania.ru</option>
                 <option value="kanobu">Kanobu.ru</option>
+                <option value="vgtimes">VGTimes.ru</option>
             </select>
             <div class="scrap-source-container hidden">
                 <div  id="scrap-source-href" class="scrap-source-href">

@@ -7,6 +7,7 @@
     <title>Game Library App - Game View</title>
     <script>
         $(document).ready(function () {
+            replaceNbsp();
             document.getElementById("h_searchText").addEventListener("keyup", function(event) {
                 if (event.keyCode === 13) {
                     event.preventDefault();
@@ -32,6 +33,17 @@
 
         function goBack() {
             window.history.back();
+        }
+
+        function replaceNbsp() {
+            var descriptionDiv = document.querySelector('.description');
+            if (descriptionDiv) {
+                var pElements = descriptionDiv.getElementsByTagName('p');
+                for (var i = 0; i < pElements.length; i++) {
+                    var p = pElements[i];
+                    p.innerHTML = p.innerHTML.replace(/&nbsp;/g, ' ');
+                }
+            }
         }
 
     </script>
