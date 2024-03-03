@@ -228,19 +228,17 @@ body {
 
 .game .game_screenshots li {
     display: inline-block;
+    padding: 1px;
     width: 22.4%;
     height: auto;
     margin: 10px;
-    border: 1px solid #ccc;
     border-radius: 5px;
     text-align: center;
     line-height: 30px;
 }
 
 .game li img {
-    width: 85%;
-    height: auto;
-    margin: 10px;
+    width: 99%;
     border-radius: 5px;
 }
 

@@ -1,17 +1,17 @@
 package com.jenikmax.game.library.service.data;
 
-import com.jenikmax.game.library.dao.api.GameGenreRepository;
-import com.jenikmax.game.library.dao.api.GameRepository;
-import com.jenikmax.game.library.dao.api.ScreenshotRepository;
-import com.jenikmax.game.library.dao.api.SqlDao;
+import com.jenikmax.game.library.dao.api.*;
 import com.jenikmax.game.library.model.converter.GameConverter;
 import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
+import com.jenikmax.game.library.model.entity.Poster;
 import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.data.api.GameService;
+import javafx.geometry.Pos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
@@ -32,34 +32,36 @@ public class GameDataService implements GameService {
     private final SqlDao sqlDao;
     private final GameRepository gameRepository;
     private final GameGenreRepository gameGenreRepository;
+    private final PosterRepository posterRepository;
     private final ScreenshotRepository screenshotRepository;
 
-    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, ScreenshotRepository screenshotRepository) {
+    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, PosterRepository posterRepository, ScreenshotRepository screenshotRepository) {
         this.sqlDao = sqlDao;
         this.gameRepository = gameRepository;
         this.gameGenreRepository = gameGenreRepository;
+        this.posterRepository = posterRepository;
         this.screenshotRepository = screenshotRepository;
     }
 
 
 
-    public List<GameShortDto> getGameShortList(){
-        return sqlDao.executeShortGame("select * from game_data order by name");
+    public List<GameReadDto> getGameShortList(){
+        return sqlDao.executeShortGame("select * from v_game_data order by name");
     }
 
-    public List<GameShortDto> getGameShortList(int startIndex, int endIndex){
-        return sqlDao.executeShortGame("select * from game_data order by name" + (endIndex != 0 ? " OFFSET " + startIndex + " LIMIT " + (endIndex - startIndex) : ""));
+    public List<GameReadDto> getGameShortList(int startIndex, int endIndex){
+        return sqlDao.executeShortGame("select * from v_game_data order by name" + (endIndex != 0 ? " OFFSET " + startIndex + " LIMIT " + (endIndex - startIndex) : ""));
     }
 
 
     public List<Long> getGameShortIdList(){
-        return sqlDao.executeIdGame("select id from game_data order by name");
+        return sqlDao.executeIdGame("select id from v_game_data order by name");
     }
 
     @Override
-    public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
+    public List<GameReadDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         List<Object> params = new ArrayList<>();
-        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from game_data where LOWER(name) like LOWER(?)";
+        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from v_game_data where LOWER(name) like LOWER(?)";
         params.add('%' + searchText + '%');
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
@@ -100,9 +102,9 @@ public class GameDataService implements GameService {
     }
 
     @Override
-    public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType,int startIndex, int endIndex) {
+    public List<GameReadDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType,int startIndex, int endIndex) {
         List<Object> params = new ArrayList<>();
-        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from game_data where LOWER(name) like LOWER(?)";
+        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from v_game_data where LOWER(name) like LOWER(?)";
         params.add('%' + searchText + '%');
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
@@ -148,7 +150,7 @@ public class GameDataService implements GameService {
     @Override
     public List<Long> getGameShortIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         List<Object> params = new ArrayList<>();
-        String sql = "select id from game_data where LOWER(name) like LOWER(?)";
+        String sql = "select id from v_game_data where LOWER(name) like LOWER(?)";
         params.add('%' + searchText + '%');
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
@@ -224,6 +226,13 @@ public class GameDataService implements GameService {
         return screenshot != null ? screenshot.getSource() : null;
     }
 
+    @Override
+    public byte[] getPosterBytesById(Long id){
+        Poster poster = posterRepository.getReferenceById(id);
+        return poster != null ? poster.getSource() : null;
+    }
+
+
     @Transactional
     public GameDto testCreate() {
         Game game = new Game();
@@ -298,9 +307,17 @@ public class GameDataService implements GameService {
     public void storeNewGameInLibrary(List<Game> games) {
         for(Game gameShort : games){
             if(gameShort.getGenres() == null) gameShort.setGenres(new ArrayList<>());
-            if(gameShort.getLogo() == null) gameShort.setLogo(getDefaultLogo());
+            if(gameShort.getPoster() == null) gameShort.setPoster(getDefaultPoster(gameShort));
             if(gameShort.getReleaseDate() == null) gameShort.setReleaseDate("N/A");
         }
+    }
+
+    private Poster getDefaultPoster(Game game){
+        Poster poster = new Poster();
+        poster.setName("poster.jpg");
+        poster.setGame(game);
+        poster.setSource(getDefaultLogo());
+        return poster;
     }
 
     private byte[] getDefaultLogo(){

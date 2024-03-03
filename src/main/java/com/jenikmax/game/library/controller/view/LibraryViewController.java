@@ -139,7 +139,7 @@ public class LibraryViewController {
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min((startIndex + pageSize), gameIdList.size());
 
-        List<GameShortDto> paginatedGames = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType, startIndex, endIndex);
+        List<GameReadDto> paginatedGames = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType, startIndex, endIndex);
 
         model.addAttribute("gameList",paginatedGames);
         model.addAttribute("page", page);
@@ -248,6 +248,14 @@ public class LibraryViewController {
     @GetMapping("library/image/{id}")
     public ResponseEntity<byte[]> getImage(@PathVariable("id") Long id) {
         byte[] imageBytes = libraryService.getImageBytesById(id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("library/poster/{id}")
+    public ResponseEntity<byte[]> getPoster(@PathVariable("id") Long id) {
+        byte[] imageBytes = libraryService.getPosterBytesById(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);

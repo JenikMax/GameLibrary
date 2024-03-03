@@ -12,7 +12,7 @@ public class GameReadDto {
     private String platform;
     private String releaseDate;
     private List<String> genres;
-    private String logo;
+    private Long logo;
     private String trailerUrl;
     private String description;
     private String instruction;
@@ -74,11 +74,11 @@ public class GameReadDto {
         this.genres = genres;
     }
 
-    public String getLogo() {
+    public Long getLogo() {
         return logo;
     }
 
-    public void setLogo(String logo) {
+    public void setLogo(Long logo) {
         this.logo = logo;
     }
 

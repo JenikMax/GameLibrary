@@ -3,6 +3,7 @@ package com.jenikmax.game.library.service.scaner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
+import com.jenikmax.game.library.model.entity.Poster;
 import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
@@ -58,7 +59,7 @@ public class GameScanerService implements ScanerService {
         File gameinfoDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX);
         if(gameinfoDir.exists()){
             File logo = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_LOGO_FILE_NAME);
-            if(logo.exists()) game.setLogo(readImage(logo));
+            if(logo.exists()) game.setPoster(getPoster(game,readImage(logo)));
             File information = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME);
             if(information.exists()){
                 GameInfo gameInfo = getAdditinalGameInfo(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME);
@@ -92,12 +93,20 @@ public class GameScanerService implements ScanerService {
         }
         if(game.getGenres() == null) game.setGenres(new ArrayList<>());
         if(game.getScreenshots() == null) game.setScreenshots(new ArrayList<>());
-        if(game.getLogo() == null) game.setLogo(getDefaultLogo());
+        if(game.getPoster() == null) game.setPoster(getPoster(game,getDefaultLogo()));
         if(game.getReleaseDate() == null) game.setReleaseDate("N/A");
         if(game.getTrailerUrl() == null) game.setTrailerUrl("N/A");
         if(game.getDescription() == null) game.setDescription("N/A");
         if(game.getInstruction() == null) game.setInstruction("N/A");
         return game;
+    }
+
+    private Poster getPoster(Game game, byte[] source){
+        Poster poster = new Poster();
+        poster.setGame(game);
+        poster.setName("poster.jpg");
+        poster.setSource(source);
+        return poster;
     }
 
     public void storeGame(Game game){
@@ -133,7 +142,7 @@ public class GameScanerService implements ScanerService {
 
     private void storeLogoGameInfo(Game game){
         try {
-            this.saveImage(game.getDirectoryPath() + GAME_INFO_PREFIX, "logo.jpg", game.getLogo());
+            this.saveImage(game.getDirectoryPath() + GAME_INFO_PREFIX, "logo.jpg", game.getPoster().getSource());
         }
         catch (Exception e){
             logger.error("Error storeLogoGameInfo logo - ",e);
@@ -198,9 +207,10 @@ public class GameScanerService implements ScanerService {
 
     private byte[] readImage(File image){
         try {
-            return Files.readAllBytes(image.toPath());
+            byte[] bytes = Files.readAllBytes(image.toPath());
+            return bytes;
         } catch (IOException e) {
-            logger.error("GetDefaultImg Error - ",e);
+            logger.error("GetDefaultImg Error - ", e);
             return null;
         }
     }

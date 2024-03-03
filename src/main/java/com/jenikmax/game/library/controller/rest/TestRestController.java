@@ -1,5 +1,6 @@
 package com.jenikmax.game.library.controller.rest;
 
+import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.GameService;
@@ -29,7 +30,7 @@ public class TestRestController {
     }
 
     @GetMapping("/")
-    public List<GameShortDto> test(){
+    public List<GameReadDto> test(){
         logger.info("Start test!!!");
         return service.getGameShortList();
     }

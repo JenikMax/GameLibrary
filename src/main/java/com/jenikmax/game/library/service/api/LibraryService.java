@@ -20,15 +20,15 @@ public interface LibraryService {
 
     void scanLibrary();
 
-    List<GameShortDto> getGameList();
+    List<GameReadDto> getGameList();
 
-    List<GameShortDto> getGameList(int startIndex, int endIndex);
+    List<GameReadDto> getGameList(int startIndex, int endIndex);
 
     List<Long> getGameListId();
 
-    List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
+    List<GameReadDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
 
-    List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex);
+    List<GameReadDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex);
 
     List<Long> getGameIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
 
@@ -63,6 +63,8 @@ public interface LibraryService {
     CompletableFuture<ResponseEntity<StreamingResponseBody>> downloadGameInStream(GameDto game, HttpServletResponse response);
 
     byte[] getImageBytesById(Long id);
+
+    byte[] getPosterBytesById(Long id);
 
     ShortUser getUserInfo();
 

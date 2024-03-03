@@ -13,8 +13,7 @@ create table library.game_data
     trailer_url       varchar(255),
     platform          varchar(225),
     description       text,
-    instruction       text,
-    logo              bytea
+    instruction       text
 );
 
 drop table if exists library.game_genre;
@@ -137,6 +136,16 @@ create table library.game_screenshot
     source              bytea
 );
 
+create sequence game_poster_id_seq start 1;
+drop table if exists library.game_poster;
+create table library.game_poster
+(
+    id bigserial primary key,
+    game_id      bigint           not null references library.game_data (id),
+    name        varchar(200)  not null,
+    source              bytea
+);
+
 
 drop view if exists library.v_platform;
 create or replace view library.v_platform as
@@ -145,6 +154,18 @@ select platform from library.game_data group by platform;
 drop view if exists library.v_release_date;
 create or replace view library.v_release_date as
 select release_date from library.game_data group by release_date;
+
+drop view if exists library.v_game_data;
+create or replace view library.v_game_data as
+select gd.id,
+       gd.create_ts,
+       gd.name,
+       gd.directory_path,
+       gd.platform,
+       gd.release_date,
+       post.id as poster_id
+from library.game_data gd
+left join library.game_poster post on gd.id = post.game_id;
 
 
 GRANT ALL ON ALL TABLES IN SCHEMA library TO "library-manager-user";

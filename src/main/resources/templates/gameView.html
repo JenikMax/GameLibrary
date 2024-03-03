@@ -61,8 +61,8 @@
                 <h1 th:text="${game.name} + ' (' + ${game.releaseDate} + ')'"></h1>
             </div>
             <div class="poster">
-                <a th:href="${game.logo}" data-fancybox="poster">
-                    <img th:src="${game.logo}" th:alt="${game.name}">
+                <a th:href="@{'/library/poster/' + ${game.logo}}" data-fancybox="poster">
+                    <img th:src="@{'/library/poster/' + ${game.logo}}" th:alt="${game.name}">
                 </a>
             </div>
             <div class="description">
