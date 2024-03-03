@@ -61,7 +61,7 @@ public class GameDataService implements GameService {
     @Override
     public List<GameReadDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         List<Object> params = new ArrayList<>();
-        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from v_game_data where LOWER(name) like LOWER(?)";
+        String sql = "select id, create_ts, name, directory_path, platform, release_date, poster_id from v_game_data where LOWER(name) like LOWER(?)";
         params.add('%' + searchText + '%');
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
@@ -104,7 +104,7 @@ public class GameDataService implements GameService {
     @Override
     public List<GameReadDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType,int startIndex, int endIndex) {
         List<Object> params = new ArrayList<>();
-        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from v_game_data where LOWER(name) like LOWER(?)";
+        String sql = "select id, create_ts, name, directory_path, platform, release_date, poster_id from v_game_data where LOWER(name) like LOWER(?)";
         params.add('%' + searchText + '%');
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
@@ -192,7 +192,7 @@ public class GameDataService implements GameService {
 
     @Override
     public List<String> getReleaseDates() {
-        return sqlDao.executeByStringList("select release_date from library.game_data group by release_date order by release_date","release_date");
+        return sqlDao.executeByStringList("select release_date from library.game_data group by release_date order by release_date desc","release_date");
     }
 
     @Override
