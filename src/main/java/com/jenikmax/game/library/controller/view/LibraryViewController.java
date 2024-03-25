@@ -133,7 +133,7 @@ public class LibraryViewController {
 
         List<Long> gameIdList = libraryService.getGameIdList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
 
-        int pageSize = 12;
+        int pageSize = 20;
         int totalPages = (gameIdList.size() + pageSize - 1) / pageSize;
         totalPages = totalPages == 0 ? 1 : totalPages;
         int startIndex = (page - 1) * pageSize;
