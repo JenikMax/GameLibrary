@@ -39,12 +39,14 @@
           label="Details"
           severity="help"
           size="small"
+          v-tooltip.left="'View details'"
           @click="goToGame"
         />
         <Button
           icon="pi pi-download"
           severity="success"
           size="small"
+          v-tooltip.left="'Download game'"
           @click="downloadGame"
         />
       </div>
