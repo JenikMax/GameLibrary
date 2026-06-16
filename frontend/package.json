@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@primevue/themes": "^4.0.0",
+    "@vueup/vue-quill": "^1.5.3",
     "axios": "^1.7.0",
     "pinia": "^2.1.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.0.0",
+    "quill": "^2.0.3",
     "vue": "^3.4.0",
     "vue-router": "^4.3.0"
   },

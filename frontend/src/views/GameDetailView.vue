@@ -197,6 +197,16 @@ function onViewerKeydown(e) {
   line-height: 1.6;
   white-space: pre-wrap;
 }
+.description-text ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.description-text ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
 .screenshots-section {
   margin-top: 1rem;
 }

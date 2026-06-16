@@ -51,9 +51,10 @@ public class ImageController {
         }
         Game game = gameRepository.getReferenceById(gameId);
         if (game != null && game.getLogo() != null) {
-            return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG)
-                    .body(game.getLogo());
+                    return ResponseEntity.ok()
+                            .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                            .contentType(MediaType.IMAGE_JPEG)
+                            .body(game.getLogo());
         }
         return ResponseEntity.notFound().build();
     }

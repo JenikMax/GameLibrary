@@ -12,6 +12,9 @@ public class GameEditRequest {
     private String instruction;
     private String trailerUrl;
     private List<String> genres;
+    private String logo;
+    private List<String> screenshots;
+    private List<Long> deleteScreenshotIds;
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -29,4 +32,10 @@ public class GameEditRequest {
     public void setTrailerUrl(String trailerUrl) { this.trailerUrl = trailerUrl; }
     public List<String> getGenres() { return genres; }
     public void setGenres(List<String> genres) { this.genres = genres; }
+    public String getLogo() { return logo; }
+    public void setLogo(String logo) { this.logo = logo; }
+    public List<String> getScreenshots() { return screenshots; }
+    public void setScreenshots(List<String> screenshots) { this.screenshots = screenshots; }
+    public List<Long> getDeleteScreenshotIds() { return deleteScreenshotIds; }
+    public void setDeleteScreenshotIds(List<Long> deleteScreenshotIds) { this.deleteScreenshotIds = deleteScreenshotIds; }
 }

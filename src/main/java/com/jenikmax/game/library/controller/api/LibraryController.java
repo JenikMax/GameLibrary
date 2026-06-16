@@ -1,10 +1,13 @@
 package com.jenikmax.game.library.controller.api;
 
 import com.jenikmax.game.library.dao.api.GameRepository;
+import com.jenikmax.game.library.dao.api.ScreenshotRepository;
+import com.jenikmax.game.library.model.converter.GameConverter;
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.api.*;
 import com.jenikmax.game.library.model.entity.Game;
+import com.jenikmax.game.library.model.entity.GameGenre;
 import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
@@ -15,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -27,10 +31,12 @@ public class LibraryController {
 
     private final LibraryService libraryService;
     private final GameRepository gameRepository;
+    private final ScreenshotRepository screenshotRepository;
 
-    public LibraryController(LibraryService libraryService, GameRepository gameRepository) {
+    public LibraryController(LibraryService libraryService, GameRepository gameRepository, ScreenshotRepository screenshotRepository) {
         this.libraryService = libraryService;
         this.gameRepository = gameRepository;
+        this.screenshotRepository = screenshotRepository;
     }
 
     @GetMapping
@@ -98,8 +104,18 @@ public class LibraryController {
     public ResponseEntity<ApiResponse<GameDetailResponse>> editGame(@PathVariable Long id, @RequestBody GameEditRequest gameEdit) {
         logger.info("REST edit game - {}", id);
         try {
+            // Delete screenshots by IDs before updating
+            if (gameEdit.getDeleteScreenshotIds() != null && !gameEdit.getDeleteScreenshotIds().isEmpty()) {
+                screenshotRepository.deleteAllById(gameEdit.getDeleteScreenshotIds());
+                screenshotRepository.flush();
+            }
+
+            // Load existing game DTO to preserve logo & screenshots not being deleted
+            GameDto existing = libraryService.getGameInfo(id);
+
             GameDto gameDto = new GameDto();
             gameDto.setId(id);
+            gameDto.setCreateTs(existing.getCreateTs());
             gameDto.setName(gameEdit.getName());
             gameDto.setPlatform(gameEdit.getPlatform());
             gameDto.setReleaseDate(gameEdit.getReleaseDate());
@@ -108,6 +124,23 @@ public class LibraryController {
             gameDto.setTrailerUrl(gameEdit.getTrailerUrl());
             gameDto.setGenres(gameEdit.getGenres() != null ? gameEdit.getGenres() : new ArrayList<>());
             gameDto.setDirectoryPath(gameEdit.getDirectoryPath());
+
+            // Handle logo: use new one if provided, else keep existing
+            if (gameEdit.getLogo() != null && !gameEdit.getLogo().isEmpty()) {
+                gameDto.setLogo(gameEdit.getLogo());
+            } else {
+                gameDto.setLogo(existing.getLogo());
+            }
+
+            // Preserve remaining screenshots + add new ones
+            List<String> finalScreenshots = new ArrayList<>();
+            if (existing.getScreenshots() != null) {
+                finalScreenshots.addAll(existing.getScreenshots());
+            }
+            if (gameEdit.getScreenshots() != null) {
+                finalScreenshots.addAll(gameEdit.getScreenshots());
+            }
+            gameDto.setScreenshots(finalScreenshots);
 
             GameDto updated = libraryService.updateGameInfo(gameDto);
             return ResponseEntity.ok(ApiResponse.ok(toGameDetailResponse(updated)));
