@@ -69,6 +69,7 @@ async function handleLogin() {
     router.push('/')
   } catch (e) {
     error.value = e.response?.data?.message || 'Invalid username or password'
+    setTimeout(() => { error.value = '' }, 7000)
   } finally {
     loading.value = false
   }
