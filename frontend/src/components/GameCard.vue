@@ -2,12 +2,10 @@
   <Card class="game-card">
     <template #header>
       <div class="game-card-img-wrapper" @click="goToGame">
-        <Image
+        <img
           :src="game.logoUrl || '/game-library/img/default.jpg'"
           :alt="game.name"
           class="game-card-img"
-          image-class="game-card-img"
-          preview
         />
       </div>
     </template>
@@ -59,7 +57,6 @@ import { useRouter } from 'vue-router'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
-import Image from 'primevue/image'
 import { gamesApi } from '../api/games'
 
 const props = defineProps({
@@ -89,8 +86,10 @@ function downloadGame() {
 .game-card-img-wrapper {
   overflow: hidden;
   cursor: pointer;
+  border-radius: 6px 6px 0 0;
 }
 .game-card-img {
+  display: block;
   width: 100%;
   height: 200px;
   object-fit: cover;

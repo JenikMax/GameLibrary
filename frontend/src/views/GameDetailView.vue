@@ -53,16 +53,31 @@
     <div v-if="game.screenshotUrls?.length" class="screenshots-section">
       <h3>Screenshots</h3>
       <div class="screenshot-grid">
-        <Image
+        <img
           v-for="(url, i) in game.screenshotUrls"
           :key="i"
           :src="url"
           alt="screenshot"
-          preview
           class="screenshot-thumb"
+          @click="openGallery(i)"
         />
       </div>
     </div>
+
+    <Dialog v-model:visible="viewerVisible" modal :style="{ width: '90vw', maxWidth: '1000px' }"
+      :header="`Screenshot ${viewerIndex + 1} of ${game.screenshotUrls.length}`"
+      :dismissableMask="true"
+    >
+      <div class="viewer-body" @keydown="onViewerKeydown" tabindex="0" ref="viewerRef">
+        <Button icon="pi pi-chevron-left" text severity="secondary" rounded
+          class="nav-btn" @click="prevImage" :disabled="viewerIndex <= 0" />
+        <div class="viewer-image-wrap">
+          <img :src="game.screenshotUrls[viewerIndex]" class="viewer-image" alt="screenshot" />
+        </div>
+        <Button icon="pi pi-chevron-right" text severity="secondary" rounded
+          class="nav-btn" @click="nextImage" :disabled="viewerIndex >= game.screenshotUrls.length - 1" />
+      </div>
+    </Dialog>
   </div>
   <div v-else class="text-center p-5">
     <i class="pi pi-exclamation-triangle text-6xl"></i>
@@ -72,7 +87,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { gamesApi } from '../api/games'
@@ -81,6 +96,7 @@ import Image from 'primevue/image'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import Divider from 'primevue/divider'
+import Dialog from 'primevue/dialog'
 import { useToast } from 'primevue/usetoast'
 import { downloadsApi } from '../api/downloads'
 
@@ -92,12 +108,19 @@ const game = ref(null)
 const loading = ref(true)
 const seeding = ref(false)
 const toast = useToast()
+const viewerVisible = ref(false)
+const viewerIndex = ref(0)
+const viewerRef = ref(null)
+
+watch(viewerVisible, (val) => {
+  if (val) nextTick(() => viewerRef.value?.focus())
+})
 
 const trailerEmbedUrl = computed(() => {
   if (!game.value?.trailerUrl) return ''
   const url = game.value.trailerUrl
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)
-  return match ? `https://www.youtube.com/embed/${match[1]}` : url
+  return match ? `https://www.youtube.com/embed/${match[1]}` : (url && url !== 'N/A' ? url : '')
 })
 
 onMounted(async () => {
@@ -134,6 +157,24 @@ async function seedGame() {
     seeding.value = false
   }
 }
+
+function openGallery(index) {
+  viewerIndex.value = index
+  viewerVisible.value = true
+}
+
+function prevImage() {
+  if (viewerIndex.value > 0) viewerIndex.value--
+}
+
+function nextImage() {
+  if (viewerIndex.value < game.value.screenshotUrls.length - 1) viewerIndex.value++
+}
+
+function onViewerKeydown(e) {
+  if (e.key === 'ArrowLeft') { prevImage(); e.preventDefault() }
+  if (e.key === 'ArrowRight') { nextImage(); e.preventDefault() }
+}
 </script>
 
 <style scoped>
@@ -165,19 +206,36 @@ async function seedGame() {
   gap: 0.5rem;
   margin-top: 1rem;
 }
-.screenshot-grid :deep(.p-image) {
-  overflow: hidden;
-  border-radius: 6px;
-}
-.screenshot-grid :deep(.p-image img) {
+.screenshot-thumb {
   width: 100%;
   height: 150px;
   object-fit: cover;
   cursor: pointer;
+  border-radius: 6px;
   transition: transform 0.2s;
 }
-.screenshot-grid :deep(.p-image img:hover) {
+.screenshot-thumb:hover {
   transform: scale(1.03);
+}
+.viewer-body {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  outline: none;
+}
+.viewer-image-wrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.viewer-image {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 4px;
+}
+.nav-btn {
+  flex-shrink: 0;
 }
 .video-wrapper {
   position: relative;
