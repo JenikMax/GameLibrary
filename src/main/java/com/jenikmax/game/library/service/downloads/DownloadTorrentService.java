@@ -1,16 +1,14 @@
 package com.jenikmax.game.library.service.downloads;
 
-import com.jenikmax.game.library.service.downloads.api.TorrentTracker;
+import com.jenikmax.game.library.service.downloads.aria2.Aria2Service;
 import com.turn.ttorrent.common.Torrent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.channels.FileChannel;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,88 +17,85 @@ import java.util.List;
 @Component
 public class DownloadTorrentService {
 
-    private final Long torrentTtl;
     private final String torrentDir;
-    private final String torrentWatch;
-    private final String trackerHost;
-    private final int trackerPort;
-    private final TorrentTracker tracker;
+    private final Aria2Service aria2Service;
 
-    public DownloadTorrentService(@Value("${game-library.games.torrent.ttl}") Long torrentTtl,
-                                  @Value("${game-library.games.torrent.directory-tmp}") String torrentDir,
-                                  @Value("${game-library.games.torrent.directory}") String torrentWatch,
-                                  @Value("${game-library.games.torrent.tracker-host}") String trackerHost,
-                                  @Value("${game-library.games.torrent.tracker-port}") int trackerPort, TorrentTracker tracker) {
-        this.torrentTtl = torrentTtl;
+    public DownloadTorrentService(
+            @Value("${game-library.games.torrent.directory-tmp:/torrentDirTmp}") String torrentDir,
+            Aria2Service aria2Service) {
         this.torrentDir = torrentDir;
-        this.torrentWatch = torrentWatch;
-
-        this.trackerHost = trackerHost;
-        this.trackerPort = trackerPort;
-        this.tracker = tracker;
+        this.aria2Service = aria2Service;
     }
 
-    public String createTorrent(String directoryPath) throws IOException, InterruptedException, NoSuchAlgorithmException {
+    /**
+     * Create a .torrent file (DHT-only, no external tracker) and optionally
+     * start seeding via aria2.
+     *
+     * @param directoryPath path to game directory
+     * @param seedViaAria2  if true, sends the torrent to aria2 for seeding
+     * @return result with torrent file path and optional aria2 GID
+     */
+    public TorrentResult createTorrent(String directoryPath, boolean seedViaAria2)
+            throws IOException, InterruptedException, NoSuchAlgorithmException {
         File directory = new File(directoryPath);
         List<File> files = new ArrayList<>();
         searchFiles(directory, files);
-        // Указываем IP-адрес хоста, где раздача будет доступна
-        URI announceURI = URI.create("http://" + trackerHost + ":" + trackerPort + "/announce");
-        Torrent torrent = Torrent.create(directory.getParentFile(), files, announceURI, "GameLibrary");
-        tracker.annonceTorrent(torrent);
-        //tracker.unAnnonceTorrent(torrent,torrentTtl);
 
-        File result = new File(torrentDir + File.separator + torrent.getName() + new Date().getTime() + ".torrent");
+        // DHT-only: use a placeholder announce URI (some clients require one)
+        // aria2 supports DHT + PEX without a tracker
+        URI announceURI = URI.create("dht:://GameLibrary");
+        Torrent torrent = Torrent.create(directory.getParentFile(), files, announceURI, "GameLibrary");
+
+        String torrentFileName = torrent.getName() + new Date().getTime() + ".torrent";
+        File result = new File(torrentDir + File.separator + torrentFileName);
         result.createNewFile();
-        try(FileOutputStream fileOutputStream = new FileOutputStream(result);){
-            torrent.save(fileOutputStream);
+        try (FileOutputStream fos = new FileOutputStream(result)) {
+            torrent.save(fos);
         }
-        copyFile(result.getAbsolutePath(),torrentWatch);
-        return result.getAbsolutePath();
+
+        String torrentPath = result.getAbsolutePath();
+        String gid = null;
+
+        if (seedViaAria2) {
+            gid = aria2Service.addTorrent(torrentPath, directoryPath);
+        }
+
+        return new TorrentResult(torrentPath, gid);
     }
 
-    private void copyFile(String sourceFilePath, String destinationDirectory) throws IOException {
-        File sourceFile = new File(sourceFilePath);
-        File destinationDir = new File(destinationDirectory);
-
-        // Создание директории, если она не существует
-        if (!destinationDir.exists()) {
-            destinationDir.mkdirs();
-        }
-
-        // Путь назначения для скопированного файла
-        String destinationFilePath = destinationDirectory + File.separator + sourceFile.getName();
-
-        FileChannel sourceChannel = null;
-        FileChannel destinationChannel = null;
-
-        try {
-            sourceChannel = new FileInputStream(sourceFile).getChannel();
-            destinationChannel = new FileOutputStream(destinationFilePath).getChannel();
-            // Копирование файла из исходного канала в канал назначения
-            destinationChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
-
-            System.out.println("Файл успешно скопирован в " + destinationFilePath);
-        } finally {
-            if (sourceChannel != null) {
-                sourceChannel.close();
-            }
-            if (destinationChannel != null) {
-                destinationChannel.close();
-            }
-        }
+    /**
+     * Legacy method: create torrent without aria2 seeding.
+     */
+    public String createTorrent(String directoryPath)
+            throws IOException, InterruptedException, NoSuchAlgorithmException {
+        return createTorrent(directoryPath, false).getTorrentPath();
     }
 
     private void searchFiles(File directory, List<File> files) {
         if (directory.isDirectory()) {
-            for (File file : directory.listFiles()) {
-                if (file.isDirectory()) {
-                    searchFiles(file, files);
-                } else {
-                    files.add(file);
+            File[] listed = directory.listFiles();
+            if (listed != null) {
+                for (File file : listed) {
+                    if (file.isDirectory()) {
+                        searchFiles(file, files);
+                    } else {
+                        files.add(file);
+                    }
                 }
             }
         }
     }
 
+    public static class TorrentResult {
+        private final String torrentPath;
+        private final String aria2Gid;
+
+        public TorrentResult(String torrentPath, String aria2Gid) {
+            this.torrentPath = torrentPath;
+            this.aria2Gid = aria2Gid;
+        }
+
+        public String getTorrentPath() { return torrentPath; }
+        public String getAria2Gid() { return aria2Gid; }
+    }
 }

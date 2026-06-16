@@ -1,6 +1,7 @@
 package com.jenikmax.game.library.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -24,6 +26,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Value("${game-library.images.directory:/gameLibrary/images}")
+    private String imagesDirectory;
 
     @Bean
     public MessageSource messageSource() {
@@ -47,15 +52,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(interceptor);
     }
 
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/api/images/**")
+                .addResourceLocations("file:" + imagesDirectory + "/");
+    }
+
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setPrefix("classpath:/templates/"); // задаем префикс пути к шаблонам
-        templateResolver.setSuffix(".html"); // задаем суффикс файла шаблона
-        templateResolver.setTemplateMode(TemplateMode.HTML); // указываем режим шаблонов (HTML, XML, TEXT, JAVASCRIPT, CSS)
-        templateResolver.setCharacterEncoding("UTF-8"); // задаем кодировку шаблонов
-        templateResolver.setCacheable(false); // устанавливаем, что шаблоны не кешируются (для разработки)
+        templateResolver.setPrefix("classpath:/templates/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+        templateResolver.setCharacterEncoding("UTF-8");
+        templateResolver.setCacheable(false);
         return templateResolver;
     }
 
@@ -64,7 +75,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setEnableSpringELCompiler(true);
         templateEngine.setTemplateResolver(templateResolver());
-        templateEngine.setTemplateEngineMessageSource(messageSource()); // Установите ваш настроенный MessageSource
+        templateEngine.setTemplateEngineMessageSource(messageSource());
         return templateEngine;
     }
 
@@ -74,6 +85,4 @@ public class WebMvcConfig implements WebMvcConfigurer {
         viewResolver.setTemplateEngine(templateEngine());
         return viewResolver;
     }
-
-
 }

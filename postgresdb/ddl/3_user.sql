@@ -22,8 +22,8 @@ COMMENT ON COLUMN library.library_user.is_admin IS 'Признак админи�
 COMMENT ON COLUMN library.library_user.is_active IS 'Признак активности пользователя';
 COMMENT ON COLUMN library.library_user.avatar IS 'Изображение пользователя';
 
-INSERT INTO library.library_user (create_ts, user_name,pass,is_admin,is_active,avatar) VALUES (now(),'admin','$2a$10$HY6v/GMARNj5SjG/78rWUuMFkfI857m5QeZA4tFDl7uu6pbDwnz6m',true,true,null);
-INSERT INTO library.library_user (create_ts, user_name,pass,is_admin,is_active,avatar) VALUES (now(),'guest','$2a$10$YM9C0a2eXfqMjmzOk5x2w.6HbJBSevV/qhLAprWghlsju6b0T/DSq',false,true,null);
+INSERT INTO library.library_user (create_ts, user_name,pass,is_admin,is_active,avatar) VALUES (now(),'admin','$2a$10$/bNwPlD5CXKG3JzRj.kiBuj5MWwSxKuYn7XviQDIJuAvDy/h.2R/K',true,true,null);
+INSERT INTO library.library_user (create_ts, user_name,pass,is_admin,is_active,avatar) VALUES (now(),'guest','$2a$10$cWAEr8.dvSuodlPNkNRSt.ZzM7CjkZv/5EVWW8JzvKAVbMo.1VbLG',false,true,null);
 
 GRANT ALL ON ALL TABLES IN SCHEMA library TO "library-manager-user";
 GRANT ALL ON ALL SEQUENCES IN SCHEMA library TO "library-manager-user";

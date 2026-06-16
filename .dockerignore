@@ -1,0 +1,11 @@
+.git/
+.gitignore
+node_modules/
+frontend/
+*.md
+AGENTS.md
+postgresdb/
+aria2-config/
+scripts/
+Dockerfile
+docker-compose.yml
