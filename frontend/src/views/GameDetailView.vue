@@ -19,14 +19,6 @@
           <Tag :value="game.releaseDate" severity="warn" />
           <Tag v-for="g in game.genres" :key="g" :value="g" severity="secondary" />
         </div>
-        <div v-if="game.trailerUrl" class="mb-3">
-          <Button
-            label="Watch Trailer"
-            icon="pi pi-video"
-            severity="info"
-            @click="showTrailer = true"
-          />
-        </div>
         <div class="flex gap-2 mb-3 flex-wrap">
           <Button label="Download" icon="pi pi-download" severity="success" @click="downloadGame" />
           <Button
@@ -48,43 +40,29 @@
         <Divider />
         <h3>Description</h3>
         <p v-html="game.description" class="description-text"></p>
+        <div v-if="trailerEmbedUrl" class="video-wrapper">
+          <iframe :src="trailerEmbedUrl" frameborder="0" allowfullscreen></iframe>
+        </div>
         <Divider v-if="game.instruction" />
         <h3 v-if="game.instruction">Installation Instructions</h3>
         <p v-if="game.instruction" v-html="game.instruction" class="description-text"></p>
       </div>
     </div>
 
-    <Divider v-if="game.screenshotUrls && game.screenshotUrls.length" />
-    <div v-if="game.screenshotUrls && game.screenshotUrls.length" class="screenshots-section">
+    <Divider v-if="game.screenshotUrls?.length" />
+    <div v-if="game.screenshotUrls?.length" class="screenshots-section">
       <h3>Screenshots</h3>
-      <Galleria
-        :value="game.screenshotUrls"
-        :responsiveOptions="responsiveOptions"
-        :numVisible="5"
-        containerStyle="max-width: 800px"
-        :showItemNavigators="true"
-        :showThumbnails="false"
-        :showItemNavigatorsOnHover="true"
-      >
-        <template #item="slotProps">
-          <Image :src="slotProps.item" alt="screenshot" preview image-class="screenshot-img" />
-        </template>
-        <template #thumbnail="slotProps">
-          <img :src="slotProps.item" alt="thumbnail" style="width:60px;height:40px;object-fit:cover" />
-        </template>
-      </Galleria>
-    </div>
-
-    <Dialog v-model:visible="showTrailer" :header="game.name" modal :style="{ width: '800px' }">
-      <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-        <iframe
-          :src="trailerEmbedUrl"
-          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
-          frameborder="0"
-          allowfullscreen
-        ></iframe>
+      <div class="screenshot-grid">
+        <Image
+          v-for="(url, i) in game.screenshotUrls"
+          :key="i"
+          :src="url"
+          alt="screenshot"
+          preview
+          class="screenshot-thumb"
+        />
       </div>
-    </Dialog>
+    </div>
   </div>
   <div v-else class="text-center p-5">
     <i class="pi pi-exclamation-triangle text-6xl"></i>
@@ -103,8 +81,6 @@ import Image from 'primevue/image'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import Divider from 'primevue/divider'
-import Galleria from 'primevue/galleria'
-import Dialog from 'primevue/dialog'
 import { useToast } from 'primevue/usetoast'
 import { downloadsApi } from '../api/downloads'
 
@@ -114,15 +90,8 @@ const authStore = useAuthStore()
 
 const game = ref(null)
 const loading = ref(true)
-const showTrailer = ref(false)
 const seeding = ref(false)
 const toast = useToast()
-
-const responsiveOptions = [
-  { breakpoint: '1024px', numVisible: 3 },
-  { breakpoint: '768px', numVisible: 2 },
-  { breakpoint: '560px', numVisible: 1 }
-]
 
 const trailerEmbedUrl = computed(() => {
   if (!game.value?.trailerUrl) return ''
@@ -188,11 +157,43 @@ async function seedGame() {
   white-space: pre-wrap;
 }
 .screenshots-section {
-  text-align: center;
+  margin-top: 1rem;
 }
-.screenshot-img {
-  max-height: 500px;
-  object-fit: contain;
+.screenshot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.screenshot-grid :deep(.p-image) {
+  overflow: hidden;
+  border-radius: 6px;
+}
+.screenshot-grid :deep(.p-image img) {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.screenshot-grid :deep(.p-image img:hover) {
+  transform: scale(1.03);
+}
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  max-width: 800px;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 @media (max-width: 768px) {
   .game-main {
