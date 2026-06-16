@@ -135,6 +135,7 @@ public class UserDataService implements UserService {
         if (user == null) return userDto;
         userDto.setId(user.getId());
         userDto.setName(user.getUsername());
+        userDto.setActive(user.isActive());
         userDto.setAdmin(user.isAdmin());
         userDto.setAvatar(user.getAvatar() != null ? BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(user.getAvatar()) : null);
         return userDto;
