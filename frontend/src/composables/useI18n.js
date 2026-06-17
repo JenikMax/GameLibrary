@@ -2,7 +2,6 @@ import { useLocaleStore } from '../stores/locale'
 
 const messages = {
   ru: {
-    'app.title': 'Game Library',
     'nav.library': 'Библиотека',
     'nav.downloads': 'Загрузки',
     'nav.admin': 'Администрирование',
@@ -46,7 +45,6 @@ const messages = {
     'login.invalid': 'Неверное имя пользователя или пароль',
   },
   en: {
-    'app.title': 'Game Library',
     'nav.library': 'Library',
     'nav.downloads': 'Downloads',
     'nav.admin': 'Admin',

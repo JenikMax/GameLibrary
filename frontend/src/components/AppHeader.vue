@@ -3,7 +3,6 @@
     <template #start>
       <router-link to="/" style="display:flex;align-items:center;gap:0.5rem">
         <img :src="'/game-library/img/logo_w.jpg'" height="32" alt="logo" />
-        <span class="font-bold text-xl">{{ t('app.title') }}</span>
       </router-link>
     </template>
     <template #end>
