@@ -5,7 +5,7 @@
   <div v-else-if="game" class="edit-container">
     <div class="flex align-items-center gap-3 mb-3">
       <Button icon="pi pi-arrow-left" text @click="$router.push(`/game/${game.id}`)" />
-      <h2 class="m-0">Edit: {{ game.name }}</h2>
+      <h2 class="m-0">{{ t('game.edit_title') }} {{ game.name }}</h2>
     </div>
 
     <Message v-if="error" severity="error" :closable="false" class="mb-3">{{ error }}</Message>
@@ -17,54 +17,54 @@
           <template #content>
             <div class="formgrid grid">
               <div class="field col-12 md:col-6">
-                <label for="name">Name</label>
+                <label for="name">{{ t('game.field.name') }}</label>
                 <InputText id="name" v-model="form.name" class="w-full" />
               </div>
               <div class="field col-12 md:col-6">
-                <label for="platform">Platform</label>
+                <label for="platform">{{ t('game.field.platform') }}</label>
                 <InputText id="platform" v-model="form.platform" class="w-full" />
               </div>
               <div class="field col-12 md:col-4">
-                <label for="releaseDate">Release Date</label>
+                <label for="releaseDate">{{ t('game.field.release_date') }}</label>
                 <InputText id="releaseDate" v-model="form.releaseDate" class="w-full" />
               </div>
               <div class="field col-12 md:col-4">
-                <label for="directoryPath">Directory Path</label>
+                <label for="directoryPath">{{ t('game.field.directory_path') }}</label>
                 <InputText id="directoryPath" v-model="form.directoryPath" class="w-full" />
               </div>
               <div class="field col-12 md:col-4">
-                <label for="trailerUrl">Trailer URL</label>
+                <label for="trailerUrl">{{ t('game.field.trailer_url') }}</label>
                 <InputText id="trailerUrl" v-model="form.trailerUrl" class="w-full" />
               </div>
               <div class="field col-12">
-                <label for="genres">Genres</label>
+                <label for="genres">{{ t('game.field.genres') }}</label>
                 <MultiSelect
                   id="genres"
                   v-model="form.genres"
                   :options="allGenres"
                   optionLabel="name"
                   optionValue="code"
-                  placeholder="Select genres"
+                  :placeholder="t('filter.genres_placeholder')"
                   display="chip"
                   filter
-                  filterPlaceholder="Search genres..."
+                  :filterPlaceholder="t('filter.genres_search')"
                   class="w-full"
                 />
               </div>
               <div class="field col-12">
-                <label for="description">Description</label>
+                <label for="description">{{ t('game.field.description') }}</label>
                 <QuillEditor v-model:content="form.description" content-type="html"
                   :options="editorOptions" class="quill-editor"
                   style="height:250px;display:flex;flex-direction:column" />
               </div>
               <div class="field col-12">
-                <label for="instruction">Instruction</label>
+                <label for="instruction">{{ t('game.field.instruction') }}</label>
                 <QuillEditor v-model:content="form.instruction" content-type="html"
                   :options="editorOptions" class="quill-editor"
                   style="height:250px;display:flex;flex-direction:column" />
               </div>
               <div class="field col-12">
-                <label>Screenshots</label>
+                <label>{{ t('game.field.screenshots') }}</label>
                 <div class="screenshots-grid">
                   <div v-for="ss in existingScreenshots" :key="ss.id" class="screenshot-item">
                     <img :src="ss.url" alt="screenshot" class="screenshot-thumb" />
@@ -78,7 +78,7 @@
                   </div>
                   <div class="screenshot-add-box" @click="$refs.screenshotsInput.click()">
                     <i class="pi pi-plus text-2xl"></i>
-                    <span class="text-sm">Add</span>
+                    <span class="text-sm">{{ t('game.field.screenshots_add') }}</span>
                   </div>
                 </div>
                 <input ref="screenshotsInput" type="file" accept="image/*" multiple
@@ -91,22 +91,22 @@
 
       <div class="col-12 md:col-4">
         <Card class="mb-3">
-          <template #title>Logo</template>
+          <template #title>{{ t('game.logo') }}</template>
           <template #content>
             <div class="flex flex-column align-items-center gap-2">
               <img v-if="logoPreview" :src="logoPreview" class="logo-preview" alt="logo preview" />
               <img v-else :src="game.logoUrl || '/game-library/img/default.jpg'" class="logo-preview" alt="current logo" />
-              <Button label="Change Logo" icon="pi pi-image" severity="secondary" size="small"
+              <Button :label="t('game.change_logo')" icon="pi pi-image" severity="secondary" size="small"
                 @click="$refs.logoInput.click()" />
               <input ref="logoInput" type="file" accept="image/*" class="hidden-input" @change="handleLogoUpload" />
             </div>
           </template>
         </Card>
         <Card>
-          <template #title>Scraper</template>
+          <template #title>{{ t('game.scraper') }}</template>
           <template #content>
             <div class="field">
-              <label for="scrapeSource">Source</label>
+              <label for="scrapeSource">{{ t('game.scraper.source') }}</label>
               <Select
                 id="scrapeSource"
                 v-model="scrape.source"
@@ -115,25 +115,25 @@
               />
             </div>
             <div class="field">
-              <label for="scrapeUrl">URL</label>
+              <label for="scrapeUrl">{{ t('game.scraper.url') }}</label>
               <InputText id="scrapeUrl" v-model="scrape.url" class="w-full" />
             </div>
             <div class="field flex flex-column gap-2">
-              <label>Fields to scrape</label>
+              <label>{{ t('game.scraper.fields') }}</label>
               <div v-for="opt in scrapeFields" :key="opt.key" class="flex align-items-center gap-2">
                 <Checkbox v-model="scrape[opt.key]" :binary="true" :inputId="opt.key" />
-                <label :for="opt.key">{{ opt.label }}</label>
+                <label :for="opt.key">{{ t(opt.labelKey) }}</label>
               </div>
             </div>
-            <Button label="Scrape" icon="pi pi-cloud-download" @click="handleScrape" :loading="scraping" class="w-full" />
+            <Button :label="t('game.scraper.scrape')" icon="pi pi-cloud-download" @click="handleScrape" :loading="scraping" class="w-full" />
           </template>
         </Card>
       </div>
     </div>
 
     <div class="flex justify-content-end mt-3 gap-2">
-      <Button label="Cancel" severity="secondary" @click="$router.push(`/game/${game.id}`)" />
-      <Button label="Save" icon="pi pi-check" @click="handleSave" :loading="saving" />
+      <Button :label="t('common.cancel')" severity="secondary" @click="$router.push(`/game/${game.id}`)" />
+      <Button :label="t('common.save')" icon="pi pi-check" @click="handleSave" :loading="saving" />
     </div>
   </div>
 </template>
@@ -141,6 +141,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from '../composables/useI18n'
 import { gamesApi } from '../api/games'
 import ProgressSpinner from 'primevue/progressspinner'
 import Button from 'primevue/button'
@@ -153,6 +154,7 @@ import Message from 'primevue/message'
 import { QuillEditor } from '@vueup/vue-quill'
 import 'quill/dist/quill.snow.css'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 
@@ -183,12 +185,12 @@ const logoPreview = ref('')
 const allGenres = ref([])
 const scrapeSources = ['Playground', 'Igromania']
 const scrapeFields = [
-  { key: 'title', label: 'Title' },
-  { key: 'poster', label: 'Poster' },
-  { key: 'description', label: 'Description' },
-  { key: 'year', label: 'Year' },
-  { key: 'genres', label: 'Genres' },
-  { key: 'screens', label: 'Screenshots' }
+  { key: 'title', labelKey: 'game.scraper.field.title' },
+  { key: 'poster', labelKey: 'game.scraper.field.poster' },
+  { key: 'description', labelKey: 'game.scraper.field.description' },
+  { key: 'year', labelKey: 'game.scraper.field.year' },
+  { key: 'genres', labelKey: 'game.scraper.field.genres' },
+  { key: 'screens', labelKey: 'game.scraper.field.screenshots' }
 ]
 const scrape = ref({
   source: 'Playground',
@@ -211,7 +213,7 @@ const editorOptions = {
       ['link', 'clean']
     ]
   },
-  placeholder: 'Write here...'
+  placeholder: t('game.editor_placeholder')
 }
 
 onMounted(async () => {
@@ -298,12 +300,12 @@ async function handleSave() {
     form.value.deleteScreenshotIds = []
     form.value.logo = ''
     logoPreview.value = ''
-    success.value = 'Game saved successfully'
+    success.value = t('game.save_success')
   } catch (e) {
     if (e.response?.status === 413) {
-      error.value = 'File size limit exceeded (max 50MB). Compress images or upload fewer screenshots.'
+      error.value = t('game.file_size_error')
     } else {
-      error.value = e.response?.data?.message || 'Failed to save game'
+      error.value = e.response?.data?.message || t('game.save_failed')
     }
   } finally {
     saving.value = false
@@ -326,9 +328,9 @@ async function handleScrape() {
       description: g.description || form.value.description,
       instruction: g.instruction || form.value.instruction
     }
-    success.value = 'Data scraped successfully'
+    success.value = t('game.scrape_success')
   } catch (e) {
-    error.value = e.response?.data?.message || 'Failed to scrape data'
+    error.value = e.response?.data?.message || t('game.scrape_failed')
   } finally {
     scraping.value = false
   }

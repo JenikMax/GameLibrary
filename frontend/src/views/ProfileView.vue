@@ -6,7 +6,10 @@
           <Avatar :image="authStore.avatarUrl" size="xlarge" shape="circle" />
           <div>
             <h2 class="m-0">{{ authStore.username }}</h2>
-            <Tag :value="authStore.isAdmin ? 'Admin' : 'User'" :severity="authStore.isAdmin ? 'danger' : 'info'" />
+            <Tag
+              :value="authStore.isAdmin ? t('profile.role_admin') : t('profile.role_user')"
+              :severity="authStore.isAdmin ? 'danger' : 'info'"
+            />
           </div>
         </div>
       </template>
@@ -14,7 +17,7 @@
         <Message v-if="message" :severity="messageSeverity" :closable="false" class="mb-3">{{ message }}</Message>
 
         <Accordion :activeIndex="0">
-          <AccordionTab header="Change Avatar">
+          <AccordionTab :header="t('profile.change_avatar')">
             <div class="flex flex-column align-items-center gap-3">
               <Avatar :image="previewUrl || authStore.avatarUrl" size="xlarge" shape="circle" />
               <FileUpload
@@ -22,29 +25,29 @@
                 accept="image/*"
                 :maxFileSize="2097152"
                 @select="onFileSelect"
-                chooseLabel="Select image"
+                :chooseLabel="t('profile.select_image')"
               />
               <Button
                 v-if="previewUrl"
-                label="Upload Avatar"
+                :label="t('profile.upload_avatar')"
                 icon="pi pi-upload"
                 @click="uploadAvatar"
                 :loading="saving"
               />
             </div>
           </AccordionTab>
-          <AccordionTab header="Change Password">
+          <AccordionTab :header="t('profile.change_password')">
             <div class="field">
-              <label for="newPass">New Password</label>
+              <label for="newPass">{{ t('profile.new_password') }}</label>
               <Password id="newPass" v-model="newPassword" class="w-full" toggleMask />
             </div>
-            <Button label="Change Password" icon="pi pi-key" @click="changePassword" :loading="changingPass" />
+            <Button :label="t('profile.change_password_btn')" icon="pi pi-key" @click="changePassword" :loading="changingPass" />
           </AccordionTab>
 
-          <AccordionTab v-if="authStore.isAdmin" header="Admin Actions">
+          <AccordionTab v-if="authStore.isAdmin" :header="t('profile.admin_actions')">
             <div class="flex flex-column gap-2">
-              <Button label="Scan Library" icon="pi pi-refresh" severity="warning" @click="scanLibrary" :loading="scanning" />
-              <Button label="Migrate Images" icon="pi pi-image" severity="info" @click="migrateImages" :loading="migrating" />
+              <Button :label="t('library.scan')" icon="pi pi-refresh" severity="warning" @click="scanLibrary" :loading="scanning" />
+              <Button :label="t('profile.migrate_images')" icon="pi pi-image" severity="info" @click="migrateImages" :loading="migrating" />
             </div>
           </AccordionTab>
         </Accordion>
@@ -56,6 +59,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
+import { useI18n } from '../composables/useI18n'
 import { profileApi } from '../api/profile'
 import { adminApi } from '../api/admin'
 import Card from 'primevue/card'
@@ -69,6 +73,7 @@ import Button from 'primevue/button'
 import Message from 'primevue/message'
 import { useToast } from 'primevue/usetoast'
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 const toast = useToast()
 
@@ -101,10 +106,10 @@ async function uploadAvatar() {
   try {
     await profileApi.updateProfile({ avatar: previewUrl.value })
     await authStore.checkAuth()
-    toast.add({ severity: 'success', summary: 'Avatar updated', life: 3000 })
+    toast.add({ severity: 'success', summary: t('profile.avatar_updated'), life: 3000 })
     previewUrl.value = ''
   } catch {
-    message.value = 'Failed to update avatar'
+    message.value = t('profile.avatar_update_failed')
     messageSeverity.value = 'error'
   } finally {
     saving.value = false
@@ -117,10 +122,10 @@ async function changePassword() {
   message.value = ''
   try {
     await profileApi.changePassword({ currentPassword: '', newPassword: newPassword.value })
-    toast.add({ severity: 'success', summary: 'Password changed', life: 3000 })
+    toast.add({ severity: 'success', summary: t('profile.password_changed'), life: 3000 })
     newPassword.value = ''
   } catch {
-    message.value = 'Failed to change password'
+    message.value = t('profile.password_change_failed')
     messageSeverity.value = 'error'
   } finally {
     changingPass.value = false
@@ -131,9 +136,9 @@ async function scanLibrary() {
   scanning.value = true
   try {
     await adminApi.scanLibrary()
-    toast.add({ severity: 'success', summary: 'Library scan complete', life: 3000 })
+    toast.add({ severity: 'success', summary: t('library.scan_complete'), life: 3000 })
   } catch {
-    toast.add({ severity: 'error', summary: 'Scan failed', life: 3000 })
+    toast.add({ severity: 'error', summary: t('library.scan_failed'), life: 3000 })
   } finally {
     scanning.value = false
   }
@@ -143,9 +148,9 @@ async function migrateImages() {
   migrating.value = true
   try {
     const res = await adminApi.migrateImages()
-    toast.add({ severity: 'success', summary: res.data.message || 'Migration complete', life: 5000 })
+    toast.add({ severity: 'success', summary: res.data.message || t('profile.migration_complete'), life: 5000 })
   } catch {
-    toast.add({ severity: 'error', summary: 'Migration failed', life: 3000 })
+    toast.add({ severity: 'error', summary: t('profile.migration_failed'), life: 3000 })
   } finally {
     migrating.value = false
   }

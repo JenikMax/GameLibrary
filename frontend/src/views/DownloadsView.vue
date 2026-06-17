@@ -3,7 +3,7 @@
     <div class="flex align-items-center justify-content-between mb-3">
       <div class="flex align-items-center gap-2">
         <i class="pi pi-download text-2xl"></i>
-        <h2 class="m-0">Downloads</h2>
+        <h2 class="m-0">{{ t('nav.downloads') }}</h2>
       </div>
       <div class="flex gap-2 align-items-center">
         <Tag v-if="globalStat" :value="'⬆ ' + formatSpeed(globalStat.uploadSpeed)" severity="info" />
@@ -13,35 +13,35 @@
     </div>
 
     <Message v-if="aria2Connected === false" severity="warn" :closable="false" class="mb-3">
-      aria2 is not connected. Large game seeding will not work.
-      <a :href="ariaNgUrl" target="_blank" class="ml-2">Open AriaNg</a>
+      {{ t('downloads.aria2_disconnected') }}
+      <a :href="ariaNgUrl" target="_blank" class="ml-2">{{ t('downloads.open_ariang') }}</a>
     </Message>
     <Message v-else severity="info" :closable="false" class="mb-3">
       <span class="flex align-items-center gap-2">
-        <i class="pi pi-check-circle text-green-500"></i> aria2 connected
+        <i class="pi pi-check-circle text-green-500"></i> {{ t('downloads.aria2_connected') }}
         <a :href="ariaNgUrl" target="_blank" class="ml-2">
-          <i class="pi pi-external-link"></i> AriaNg Web UI
+          <i class="pi pi-external-link"></i> {{ t('downloads.ariang_web_ui') }}
         </a>
       </span>
     </Message>
 
     <TabView>
-      <TabPanel header="Active">
+      <TabPanel :header="t('downloads.active')">
         <DataTable :value="activeDownloads" stripedRows :loading="loading">
-          <Column field="name" header="Name">
+          <Column field="name" :header="t('downloads.name')">
             <template #body="slotProps">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-file" />
-                {{ slotProps.data.name || 'Unknown' }}
+                {{ slotProps.data.name || t('common.unknown') }}
               </div>
             </template>
           </Column>
-          <Column field="status" header="Status" style="width:100px">
+          <Column field="status" :header="t('downloads.status')" style="width:100px">
             <template #body="slotProps">
               <Tag :value="slotProps.data.status" :severity="statusSeverity(slotProps.data.status)" />
             </template>
           </Column>
-          <Column field="progress" header="Progress" style="width:200px">
+          <Column field="progress" :header="t('downloads.progress')" style="width:200px">
             <template #body="slotProps">
               <div class="flex align-items-center gap-2">
                 <ProgressBar :value="slotProps.data.progress" style="height:12px;width:120px" />
@@ -49,13 +49,13 @@
               </div>
             </template>
           </Column>
-          <Column field="downloadSpeed" header="DL Speed" style="width:100px">
+          <Column field="downloadSpeed" :header="t('downloads.dl_speed')" style="width:100px">
             <template #body="slotProps">{{ formatSpeed(slotProps.data.downloadSpeed) }}</template>
           </Column>
-          <Column field="uploadSpeed" header="UL Speed" style="width:100px">
+          <Column field="uploadSpeed" :header="t('downloads.ul_speed')" style="width:100px">
             <template #body="slotProps">{{ formatSpeed(slotProps.data.uploadSpeed) }}</template>
           </Column>
-          <Column header="Actions" style="width:100px">
+          <Column :header="t('downloads.actions')" style="width:100px">
             <template #body="slotProps">
               <div class="flex gap-1">
                 <Button
@@ -64,7 +64,7 @@
                   severity="warn"
                   text
                   @click="pauseDownload(slotProps.data.gid)"
-                  v-tooltip.left="'Pause'"
+                  v-tooltip.left="t('downloads.pause')"
                 />
                 <Button
                   v-if="slotProps.data.status === 'paused'"
@@ -72,46 +72,46 @@
                   severity="success"
                   text
                   @click="unpauseDownload(slotProps.data.gid)"
-                  v-tooltip.left="'Resume'"
+                  v-tooltip.left="t('downloads.resume')"
                 />
                 <Button
                   icon="pi pi-times"
                   severity="danger"
                   text
                   @click="removeDownload(slotProps.data.gid)"
-                  v-tooltip.left="'Remove'"
+                  v-tooltip.left="t('downloads.remove')"
                 />
               </div>
             </template>
           </Column>
           <template #empty>
-            <div class="text-center p-4 text-gray-500">No active downloads</div>
+            <div class="text-center p-4 text-gray-500">{{ t('downloads.no_active') }}</div>
           </template>
         </DataTable>
       </TabPanel>
-      <TabPanel header="Waiting">
+      <TabPanel :header="t('downloads.waiting')">
         <DataTable :value="waitingDownloads" stripedRows>
-          <Column field="gid" header="GID"></Column>
-          <Column field="status" header="Status">
+          <Column field="gid" :header="t('downloads.gid')"></Column>
+          <Column field="status" :header="t('downloads.status')">
             <template #body="slotProps">
               <Tag :value="slotProps.data.status" severity="info" />
             </template>
           </Column>
           <template #empty>
-            <div class="text-center p-4 text-gray-500">No waiting downloads</div>
+            <div class="text-center p-4 text-gray-500">{{ t('downloads.no_waiting') }}</div>
           </template>
         </DataTable>
       </TabPanel>
-      <TabPanel header="Completed / Stopped">
+      <TabPanel :header="t('downloads.completed_stopped')">
         <DataTable :value="stoppedDownloads" stripedRows>
-          <Column field="gid" header="GID"></Column>
-          <Column field="status" header="Status">
+          <Column field="gid" :header="t('downloads.gid')"></Column>
+          <Column field="status" :header="t('downloads.status')">
             <template #body="slotProps">
               <Tag :value="slotProps.data.status" :severity="slotProps.data.status === 'complete' ? 'success' : 'secondary'" />
             </template>
           </Column>
           <template #empty>
-            <div class="text-center p-4 text-gray-500">No completed downloads</div>
+            <div class="text-center p-4 text-gray-500">{{ t('downloads.no_completed') }}</div>
           </template>
         </DataTable>
       </TabPanel>
@@ -121,6 +121,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useI18n } from '../composables/useI18n'
 import { downloadsApi } from '../api/downloads'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -132,6 +133,7 @@ import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import { useToast } from 'primevue/usetoast'
 
+const { t } = useI18n()
 const toast = useToast()
 const activeDownloads = ref([])
 const waitingDownloads = ref([])
@@ -187,30 +189,30 @@ async function fetchAll() {
 async function pauseDownload(gid) {
   try {
     await downloadsApi.pause(gid)
-    toast.add({ severity: 'success', summary: 'Download paused', life: 2000 })
+    toast.add({ severity: 'success', summary: t('downloads.paused'), life: 2000 })
     await fetchAll()
   } catch {
-    toast.add({ severity: 'error', summary: 'Failed to pause', life: 3000 })
+    toast.add({ severity: 'error', summary: t('downloads.pause_failed'), life: 3000 })
   }
 }
 
 async function unpauseDownload(gid) {
   try {
     await downloadsApi.unpause(gid)
-    toast.add({ severity: 'success', summary: 'Download resumed', life: 2000 })
+    toast.add({ severity: 'success', summary: t('downloads.resumed'), life: 2000 })
     await fetchAll()
   } catch {
-    toast.add({ severity: 'error', summary: 'Failed to resume', life: 3000 })
+    toast.add({ severity: 'error', summary: t('downloads.resume_failed'), life: 3000 })
   }
 }
 
 async function removeDownload(gid) {
   try {
     await downloadsApi.remove(gid)
-    toast.add({ severity: 'info', summary: 'Download removed', life: 2000 })
+    toast.add({ severity: 'info', summary: t('downloads.removed'), life: 2000 })
     await fetchAll()
   } catch {
-    toast.add({ severity: 'error', summary: 'Failed to remove', life: 3000 })
+    toast.add({ severity: 'error', summary: t('downloads.remove_failed'), life: 3000 })
   }
 }
 

@@ -20,38 +20,38 @@
           <Tag v-for="g in game.genres" :key="g" :value="genreName(g)" severity="secondary" />
         </div>
         <div class="flex gap-2 mb-3 flex-wrap">
-          <Button label="Download" icon="pi pi-download" severity="success" @click="downloadGame" />
+          <Button :label="t('game.download')" icon="pi pi-download" severity="success" @click="downloadGame" />
           <Button
-            label="Seed via aria2"
+            :label="t('game.seed')"
             icon="pi pi-seed-inverse"
             severity="info"
             @click="seedGame"
             :loading="seeding"
-            v-tooltip.bottom="'Create torrent and start seeding on NAS'"
+            v-tooltip.bottom="t('game.seed_tooltip')"
           />
           <Button
             v-if="authStore.isAdmin"
-            label="Edit"
+            :label="t('game.edit')"
             icon="pi pi-pencil"
             severity="help"
             @click="$router.push(`/game/${game.id}/edit`)"
           />
         </div>
         <Divider />
-        <h3>Description</h3>
+        <h3>{{ t('game.description') }}</h3>
         <p v-html="game.description" class="description-text"></p>
         <div v-if="trailerEmbedUrl" class="video-wrapper">
           <iframe :src="trailerEmbedUrl" frameborder="0" allowfullscreen></iframe>
         </div>
         <Divider v-if="game.instruction" />
-        <h3 v-if="game.instruction">Installation Instructions</h3>
+        <h3 v-if="game.instruction">{{ t('game.instructions') }}</h3>
         <p v-if="game.instruction" v-html="game.instruction" class="description-text"></p>
       </div>
     </div>
 
     <Divider v-if="game.screenshotUrls?.length" />
     <div v-if="game.screenshotUrls?.length" class="screenshots-section">
-      <h3>Screenshots</h3>
+      <h3>{{ t('game.screenshots') }}</h3>
       <div class="screenshot-grid">
         <img
           v-for="(url, i) in game.screenshotUrls"
@@ -65,7 +65,7 @@
     </div>
 
     <Dialog v-model:visible="viewerVisible" modal :style="{ width: '90vw', maxWidth: '1000px' }"
-      :header="`Screenshot ${viewerIndex + 1} of ${game.screenshotUrls.length}`"
+      :header="screenshotHeader"
       :dismissableMask="true"
     >
       <div class="viewer-body" @keydown="onViewerKeydown" tabindex="0" ref="viewerRef">
@@ -81,8 +81,8 @@
   </div>
   <div v-else class="text-center p-5">
     <i class="pi pi-exclamation-triangle text-6xl"></i>
-    <p>Game not found</p>
-    <Button label="Back to Library" @click="$router.push('/')" />
+    <p>{{ t('game.not_found') }}</p>
+    <Button :label="t('game.back_to_library')" @click="$router.push('/')" />
   </div>
 </template>
 
@@ -91,6 +91,7 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useLibraryStore } from '../stores/library'
+import { useI18n } from '../composables/useI18n'
 import { gamesApi } from '../api/games'
 import ProgressSpinner from 'primevue/progressspinner'
 import Image from 'primevue/image'
@@ -105,6 +106,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const libraryStore = useLibraryStore()
+const { t } = useI18n()
 
 const game = ref(null)
 const loading = ref(true)
@@ -117,6 +119,11 @@ const viewerRef = ref(null)
 function genreName(code) {
   return libraryStore.genreMap[code] || code
 }
+
+const screenshotHeader = computed(() => {
+  if (!game.value?.screenshotUrls) return ''
+  return t('game.screenshots') + ' ' + (viewerIndex.value + 1) + ' / ' + game.value.screenshotUrls.length
+})
 
 watch(viewerVisible, (val) => {
   if (val) nextTick(() => viewerRef.value?.focus())
@@ -151,15 +158,15 @@ async function seedGame() {
     const res = await downloadsApi.seedGame(game.value.id)
     toast.add({
       severity: 'success',
-      summary: 'Seeding started',
+      summary: t('game.seeding_started'),
       detail: `GID: ${res.data.data.aria2Gid}`,
       life: 5000
     })
   } catch {
     toast.add({
       severity: 'error',
-      summary: 'Seeding failed',
-      detail: 'aria2 may not be connected. Check Downloads page.',
+      summary: t('game.seeding_failed'),
+      detail: t('game.seeding_failed_detail'),
       life: 5000
     })
   } finally {
