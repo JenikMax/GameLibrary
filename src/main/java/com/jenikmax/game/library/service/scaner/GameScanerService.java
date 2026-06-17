@@ -10,10 +10,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,6 +58,9 @@ public class GameScanerService implements ScanerService {
 
     public Game getAdditinalGameInfo(Game game){
         File gameinfoDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX);
+        if(!gameinfoDir.exists()){
+            createDefaultGameInfo(game);
+        }
         if(gameinfoDir.exists()){
             File logo = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_LOGO_FILE_NAME);
             if(logo.exists()) game.setLogo(readImage(logo));
@@ -68,11 +73,13 @@ public class GameScanerService implements ScanerService {
                 game.setDescription(gameInfo.getDescription());
                 game.setInstruction(gameInfo.getInstruction());
                 game.setGenres(new ArrayList<>());
-                for(String genre : gameInfo.getGenres()){
-                    GameGenre gameGenre = new GameGenre();
-                    gameGenre.setGame(game);
-                    gameGenre.setGenre(Genre.valueOf(genre));
-                    game.getGenres().add(gameGenre);
+                if(gameInfo.getGenres() != null) {
+                    for(String genre : gameInfo.getGenres()){
+                        GameGenre gameGenre = new GameGenre();
+                        gameGenre.setGame(game);
+                        gameGenre.setGenre(Genre.valueOf(genre));
+                        game.getGenres().add(gameGenre);
+                    }
                 }
             }
             File screenDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_SCREEN_PREFIX);
@@ -83,9 +90,10 @@ public class GameScanerService implements ScanerService {
                 for(File img : screenImgFiles){
                     Screenshot screenshot = new Screenshot();
                     screenshot.setGame(game);
-                    screenshot.setName("image" + count + "jpg");
+                    screenshot.setName("image" + count + ".jpg");
                     screenshot.setSource(readImage(img));
                     game.getScreenshots().add(screenshot);
+                    count++;
                 }
             }
 
@@ -119,15 +127,13 @@ public class GameScanerService implements ScanerService {
         gameInfo.setTrailerUrl(game.getTrailerUrl());
         gameInfo.setDescription(game.getDescription());
         gameInfo.setInstruction(game.getInstruction());
-        // Создание объекта ObjectMapper с использованием YAMLFactory
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             File gameInfiFile = getGameInfoFile(game.getDirectoryPath());
-            // Запись объекта в YAML файл
             objectMapper.writeValue(gameInfiFile, gameInfo);
-            System.out.println("Объект успешно записан в YAML файл.");
+            logger.info("Game info saved for {}", game.getName());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error writing game info for {} - ", game.getName(), e);
         }
     }
 
@@ -176,22 +182,42 @@ public class GameScanerService implements ScanerService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             // Чтение объекта из файла JSON
-            GameInfo gameInfo = objectMapper.readValue(new File(path), GameInfo.class);
-            return gameInfo;
+            return objectMapper.readValue(new File(path), GameInfo.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error reading game info from {} - ", path, e);
         }
         return null;
     }
 
 
 
-    private byte[] getDefaultLogo(){
-        ClassPathResource resource = new ClassPathResource("static/img/default.jpg");
+    private void createDefaultGameInfo(Game game){
         try {
-            return Files.readAllBytes(resource.getFile().toPath());
+            new File(game.getDirectoryPath() + GAME_INFO_PREFIX).mkdirs();
+            byte[] defaultLogo = getDefaultLogo();
+            if (defaultLogo != null) {
+                saveImage(game.getDirectoryPath() + GAME_INFO_PREFIX, "logo.jpg", defaultLogo);
+            }
+            GameInfo gameInfo = new GameInfo();
+            gameInfo.setName(game.getName());
+            gameInfo.setPlatform(game.getPlatform());
+            gameInfo.setReleaseDate("N/A");
+            gameInfo.setTrailerUrl("N/A");
+            gameInfo.setDescription("N/A");
+            gameInfo.setInstruction("N/A");
+            gameInfo.setGenres(new ArrayList<>());
+            new ObjectMapper().writeValue(getGameInfoFile(game.getDirectoryPath()), gameInfo);
         } catch (IOException e) {
-            logger.error("GetDefaultImg Error - ",e);
+            logger.error("Error creating default game info - ", e);
+        }
+    }
+
+    private byte[] getDefaultLogo(){
+        ClassPathResource resource = new ClassPathResource("static/img/logo.jpg");
+        try (InputStream is = resource.getInputStream()) {
+            return StreamUtils.copyToByteArray(is);
+        } catch (IOException e) {
+            logger.error("GetDefaultImg Error - ", e);
             return null;
         }
     }
