@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useLocaleStore } from '../stores/locale'
 
 const api = axios.create({
   baseURL: '/game-library/api',
@@ -22,6 +23,12 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
+  }
+  const localeStore = useLocaleStore()
+  if (config.params) {
+    config.params.lang = localeStore.locale
+  } else {
+    config.params = { lang: localeStore.locale }
   }
   return config
 })

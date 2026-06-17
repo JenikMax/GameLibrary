@@ -34,17 +34,17 @@
       <div class="flex gap-2 justify-content-between">
         <Button
           icon="pi pi-info-circle"
-          label="Details"
+          :label="t('game.details')"
           severity="help"
           size="small"
-          v-tooltip.left="'View details'"
+          v-tooltip.left="t('game.details_tooltip')"
           @click="goToGame"
         />
         <Button
           icon="pi pi-download"
           severity="success"
           size="small"
-          v-tooltip.left="'Download game'"
+          v-tooltip.left="t('game.download_tooltip')"
           @click="downloadGame"
         />
       </div>
@@ -54,6 +54,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useI18n } from '../composables/useI18n'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -64,6 +65,7 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const { t } = useI18n()
 
 function goToGame() {
   router.push(`/game/${props.game.id}`)

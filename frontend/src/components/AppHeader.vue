@@ -3,18 +3,25 @@
     <template #start>
       <router-link to="/" style="display:flex;align-items:center;gap:0.5rem">
         <img :src="'/game-library/img/logo_w.jpg'" height="32" alt="logo" />
-        <span class="font-bold text-xl">Game Library</span>
+        <span class="font-bold text-xl">{{ t('app.title') }}</span>
       </router-link>
     </template>
     <template #end>
       <div class="flex align-items-center gap-2">
+        <SelectButton
+          v-model="lang"
+          :options="langOptions"
+          optionLabel="label"
+          optionValue="value"
+          class="lang-switcher"
+        />
         <Button
           :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
           severity="secondary"
           text
           rounded
           @click="toggleDarkMode"
-          v-tooltip.left="isDarkMode ? 'Light mode' : 'Dark mode'"
+          v-tooltip.left="isDarkMode ? t('nav.dark') : t('nav.light')"
         />
         <Avatar
           v-if="authStore.avatarUrl"
@@ -31,7 +38,7 @@
           text
           rounded
           @click="handleLogout"
-          v-tooltip.left="'Logout'"
+          v-tooltip.left="t('nav.logout')"
         />
       </div>
     </template>
@@ -39,57 +46,73 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useLocaleStore } from '../stores/locale'
 import { useDarkMode } from '../composables/useDarkMode'
+import { useI18n } from '../composables/useI18n'
 import { adminApi } from '../api/admin'
 import Menubar from 'primevue/menubar'
 import Button from 'primevue/button'
 import Avatar from 'primevue/avatar'
+import SelectButton from 'primevue/selectbutton'
 import { useToast } from 'primevue/usetoast'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const localeStore = useLocaleStore()
 const { isDarkMode, toggleDarkMode } = useDarkMode()
+const { t } = useI18n()
 const toast = useToast()
+
+const langOptions = [
+  { label: 'RU', value: 'ru' },
+  { label: 'EN', value: 'en' }
+]
+
+const lang = ref(localeStore.locale)
+watch(lang, (val) => {
+  localeStore.setLocale(val)
+  window.location.reload()
+})
 
 const items = computed(() => {
   const menu = [
     {
-      label: 'Library',
+      label: t('nav.library'),
       icon: 'pi pi-th-large',
       command: () => router.push('/')
     },
     {
-      label: 'Downloads',
+      label: t('nav.downloads'),
       icon: 'pi pi-download',
       command: () => router.push('/downloads')
     }
   ]
   if (authStore.isAdmin) {
     menu.push({
-      label: 'Admin',
+      label: t('nav.admin'),
       icon: 'pi pi-cog',
       items: [
         {
-          label: 'Users',
+          label: t('nav.users'),
           icon: 'pi pi-users',
           command: () => router.push('/admin/users')
         },
         {
-          label: 'Settings',
+          label: t('nav.settings'),
           icon: 'pi pi-sliders-h',
           items: [
             {
-              label: 'Scan Library',
+              label: t('nav.scan'),
               icon: 'pi pi-refresh',
               command: async () => {
                 try {
                   await adminApi.scanLibrary()
-                  toast.add({ severity: 'success', summary: 'Library scan started', life: 3000 })
+                  toast.add({ severity: 'success', summary: t('library.scan_start'), life: 3000 })
                 } catch {
-                  toast.add({ severity: 'error', summary: 'Scan failed', life: 3000 })
+                  toast.add({ severity: 'error', summary: t('library.scan_failed'), life: 3000 })
                 }
               }
             }
@@ -119,5 +142,8 @@ function handleLogout() {
   right: 0;
   z-index: 1000;
   border-radius: 0;
+}
+.lang-switcher {
+  height: 2rem;
 }
 </style>

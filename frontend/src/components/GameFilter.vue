@@ -1,9 +1,9 @@
 <template>
   <Accordion :activeIndex="0">
-    <AccordionTab header="Filters">
+    <AccordionTab :header="t('filter.search')">
       <div class="flex flex-column gap-3 p-2">
         <div class="field">
-          <label for="search">Search</label>
+          <label for="search">{{ t('filter.search') }}</label>
           <IconField>
             <InputIcon>
               <i class="pi pi-search" />
@@ -11,7 +11,7 @@
             <InputText
               id="search"
               v-model="searchText"
-              placeholder="Search games..."
+              :placeholder="t('filter.search_placeholder')"
               @keyup.enter="applyFilters"
               class="w-full"
             />
@@ -19,7 +19,7 @@
         </div>
 
         <div class="field">
-          <label>Platforms</label>
+          <label>{{ t('filter.platforms') }}</label>
           <div class="flex flex-wrap gap-2">
             <Chip
               v-for="p in options.platforms"
@@ -32,7 +32,7 @@
         </div>
 
         <div class="field">
-          <label>Years</label>
+          <label>{{ t('filter.years') }}</label>
           <div class="flex flex-wrap gap-2">
             <Chip
               v-for="y in options.years"
@@ -45,22 +45,22 @@
         </div>
 
         <div class="field">
-          <label>Genres</label>
+          <label>{{ t('filter.genres') }}</label>
           <MultiSelect
             v-model="selectedGenres"
             :options="options.genres"
             optionLabel="name"
             optionValue="code"
-            placeholder="Select genres"
+            :placeholder="t('filter.genres_placeholder')"
             filter
-            filterPlaceholder="Search genres..."
+            :filterPlaceholder="t('filter.genres_search')"
             display="chip"
             class="w-full"
           />
         </div>
 
         <div class="field">
-          <label>Sort by</label>
+          <label>{{ t('filter.sort_by') }}</label>
           <SelectButton
             v-model="sortField"
             :options="sortOptions"
@@ -80,8 +80,8 @@
         </div>
 
         <div class="flex gap-2">
-          <Button label="Apply" icon="pi pi-filter" @click="applyFilters" class="flex-1" />
-          <Button label="Reset" icon="pi pi-times" severity="secondary" @click="resetFilters" />
+          <Button :label="t('filter.apply')" icon="pi pi-filter" @click="applyFilters" class="flex-1" />
+          <Button :label="t('filter.reset')" icon="pi pi-times" severity="secondary" @click="resetFilters" />
         </div>
       </div>
     </AccordionTab>
@@ -90,6 +90,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useI18n } from '../composables/useI18n'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import InputText from 'primevue/inputtext'
@@ -99,6 +100,8 @@ import Chip from 'primevue/chip'
 import MultiSelect from 'primevue/multiselect'
 import SelectButton from 'primevue/selectbutton'
 import Button from 'primevue/button'
+
+const { t } = useI18n()
 
 const props = defineProps({
   options: { type: Object, required: true },
@@ -115,13 +118,13 @@ const sortField = ref(props.modelValue.sortField || '')
 const sortType = ref(props.modelValue.sortType || '')
 
 const sortOptions = [
-  { label: 'Name', value: 'name' },
-  { label: 'Year', value: 'year' },
-  { label: 'Date added', value: 'create' }
+  { label: t('filter.sort_name'), value: 'name' },
+  { label: t('filter.sort_year'), value: 'year' },
+  { label: t('filter.sort_date'), value: 'create' }
 ]
 const sortTypeOptions = [
-  { label: 'Asc', value: 'asc' },
-  { label: 'Desc', value: 'desc' }
+  { label: t('filter.asc'), value: 'asc' },
+  { label: t('filter.desc'), value: 'desc' }
 ]
 
 function togglePlatform(p) {

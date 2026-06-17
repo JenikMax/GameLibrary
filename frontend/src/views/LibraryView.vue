@@ -9,12 +9,12 @@
     </aside>
     <main class="library-main">
       <div class="flex align-items-center justify-content-between mb-3">
-        <h2 class="m-0">Game Library</h2>
+        <h2 class="m-0">{{ t('library.title') }}</h2>
         <div class="flex gap-2 align-items-center">
           <Badge :value="store.totalItems" severity="info" />
           <Button
             v-if="authStore.isAdmin"
-            label="Scan"
+            :label="t('library.scan')"
             icon="pi pi-refresh"
             severity="warning"
             size="small"
@@ -28,7 +28,7 @@
 
       <div v-if="!store.loading && store.games.length === 0" class="text-center p-5">
         <i class="pi pi-info-circle text-6xl text-gray-400"></i>
-        <p class="text-xl mt-3">No games found</p>
+        <p class="text-xl mt-3">{{ t('library.no_games') }}</p>
       </div>
 
       <div v-else class="game-grid">
@@ -52,6 +52,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLibraryStore } from '../stores/library'
 import { useAuthStore } from '../stores/auth'
+import { useI18n } from '../composables/useI18n'
 import { adminApi } from '../api/admin'
 import { useToast } from 'primevue/usetoast'
 import GameCard from '../components/GameCard.vue'
@@ -63,6 +64,7 @@ import Button from 'primevue/button'
 
 const store = useLibraryStore()
 const authStore = useAuthStore()
+const { t } = useI18n()
 const router = useRouter()
 const toast = useToast()
 const scanning = ref(false)
@@ -96,10 +98,10 @@ async function handleScan() {
   scanning.value = true
   try {
     await adminApi.scanLibrary()
-    toast.add({ severity: 'success', summary: 'Scan complete', life: 3000 })
+    toast.add({ severity: 'success', summary: t('library.scan_complete'), life: 3000 })
     await store.fetchGames()
   } catch {
-    toast.add({ severity: 'error', summary: 'Scan failed', life: 3000 })
+    toast.add({ severity: 'error', summary: t('library.scan_failed'), life: 3000 })
   } finally {
     scanning.value = false
   }
