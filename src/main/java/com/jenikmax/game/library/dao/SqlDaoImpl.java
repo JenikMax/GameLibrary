@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +37,20 @@ public class SqlDaoImpl implements SqlDao {
             dto.setDirectoryPath(rs.getString("directory_path"));
             dto.setPlatform(rs.getString("platform"));
             dto.setReleaseDate(rs.getString("release_date"));
-            dto.setGenres(new ArrayList<>());
-            dto.setLogo("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(rs.getBytes("logo")));
+            try {
+                String genreCodes = rs.getString("genre_codes");
+                if (genreCodes != null && !genreCodes.isEmpty()) {
+                    dto.setGenres(Arrays.asList(genreCodes.split(",")));
+                } else {
+                    dto.setGenres(new ArrayList<>());
+                }
+            } catch (java.sql.SQLException e) {
+                dto.setGenres(new ArrayList<>());
+            }
+            byte[] logoBytes = rs.getBytes("logo");
+            if (logoBytes != null) {
+                dto.setLogo("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(logoBytes));
+            }
             return dto;
         });
         return gameShortDtoList;
@@ -77,8 +90,20 @@ public class SqlDaoImpl implements SqlDao {
             dto.setDirectoryPath(rs.getString("directory_path"));
             dto.setPlatform(rs.getString("platform"));
             dto.setReleaseDate(rs.getString("release_date"));
-            dto.setGenres(new ArrayList<>());
-            dto.setLogo("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(rs.getBytes("logo")));
+            try {
+                String genreCodes = rs.getString("genre_codes");
+                if (genreCodes != null && !genreCodes.isEmpty()) {
+                    dto.setGenres(Arrays.asList(genreCodes.split(",")));
+                } else {
+                    dto.setGenres(new ArrayList<>());
+                }
+            } catch (java.sql.SQLException e) {
+                dto.setGenres(new ArrayList<>());
+            }
+            byte[] logoBytes = rs.getBytes("logo");
+            if (logoBytes != null) {
+                dto.setLogo("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(logoBytes));
+            }
             return dto;
         }, params);
         return gameShortDtoList;

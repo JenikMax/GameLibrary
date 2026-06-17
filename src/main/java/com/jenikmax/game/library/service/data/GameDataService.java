@@ -44,11 +44,20 @@ public class GameDataService implements GameService {
 
 
     public List<GameShortDto> getGameShortList(){
-        return sqlDao.executeShortGame("select * from game_data order by name");
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+                "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
+                "from game_data g left join library.game_data_genre dg on dg.game_id = g.id " +
+                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo order by g.name";
+        return sqlDao.executeShortGame(sql);
     }
 
     public List<GameShortDto> getGameShortList(int startIndex, int endIndex){
-        return sqlDao.executeShortGame("select * from game_data order by name" + (endIndex != 0 ? " OFFSET " + startIndex + " LIMIT " + (endIndex - startIndex) : ""));
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+                "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
+                "from game_data g left join library.game_data_genre dg on dg.game_id = g.id " +
+                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo order by g.name" +
+                (endIndex != 0 ? " offset " + startIndex + " limit " + (endIndex - startIndex) : "");
+        return sqlDao.executeShortGame(sql);
     }
 
 
@@ -59,32 +68,35 @@ public class GameDataService implements GameService {
     @Override
     public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         List<Object> params = new ArrayList<>();
-        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from game_data where LOWER(name) like LOWER(?)";
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+                "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
+                "from game_data g left join library.game_data_genre dg on dg.game_id = g.id where lower(g.name) like lower(?)";
         params.add('%' + searchText + '%');
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
-            sql += String.format(" and platform in (%s)",platformSql);
+            sql += String.format(" and g.platform in (%s)",platformSql);
             params.addAll(selectedPlatforms);
         }
         if(selectedYears.size() != 0){
             String yearsSql = String.join(",", Collections.nCopies(selectedYears.size(), "?"));
-            sql += String.format(" and release_date in (%s)",yearsSql);
+            sql += String.format(" and g.release_date in (%s)",yearsSql);
             params.addAll(selectedYears);
         }
         if(selectedGenres.size() != 0){
             String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
-            sql += String.format(" and id in (select game_id from library.game_data_genre where genre_code in (%s))",genresSql);
+            sql += String.format(" and g.id in (select game_id from library.game_data_genre where genre_code in (%s))",genresSql);
             params.addAll(selectedGenres);
         }
+        sql += " group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo";
         if(!sortField.isEmpty()){
             if(sortField.equals("year")) {
-                sortField = "release_date";
+                sortField = "g.release_date";
             }
             else if(sortField.equals("create")) {
-                sortField = "create_ts";
+                sortField = "g.create_ts";
             }
             else{
-                sortField = "name";
+                sortField = "g.name";
             }
 
             if(sortType == null || sortType.isEmpty() || (!sortType.equals("asc") && !sortType.equals("desc"))){
@@ -94,7 +106,7 @@ public class GameDataService implements GameService {
 
         }
         else{
-            sql += " order by name";
+            sql += " order by g.name";
         }
         return sqlDao.executeShortGame(sql,params.toArray());
     }
@@ -102,32 +114,35 @@ public class GameDataService implements GameService {
     @Override
     public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType,int startIndex, int endIndex) {
         List<Object> params = new ArrayList<>();
-        String sql = "select id, create_ts, name, directory_path, platform, release_date, logo from game_data where LOWER(name) like LOWER(?)";
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+                "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
+                "from game_data g left join library.game_data_genre dg on dg.game_id = g.id where lower(g.name) like lower(?)";
         params.add('%' + searchText + '%');
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
-            sql += String.format(" and platform in (%s)",platformSql);
+            sql += String.format(" and g.platform in (%s)",platformSql);
             params.addAll(selectedPlatforms);
         }
         if(selectedYears.size() != 0){
             String yearsSql = String.join(",", Collections.nCopies(selectedYears.size(), "?"));
-            sql += String.format(" and release_date in (%s)",yearsSql);
+            sql += String.format(" and g.release_date in (%s)",yearsSql);
             params.addAll(selectedYears);
         }
         if(selectedGenres.size() != 0){
             String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
-            sql += String.format(" and id in (select game_id from library.game_data_genre where genre_code in (%s))",genresSql);
+            sql += String.format(" and g.id in (select game_id from library.game_data_genre where genre_code in (%s) group by game_id having count(distinct genre_code) = %d)",genresSql, selectedGenres.size());
             params.addAll(selectedGenres);
         }
+        sql += " group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo";
         if(!sortField.isEmpty()){
             if(sortField.equals("year")) {
-                sortField = "release_date";
+                sortField = "g.release_date";
             }
             else if(sortField.equals("create")) {
-                sortField = "create_ts";
+                sortField = "g.create_ts";
             }
             else{
-                sortField = "name";
+                sortField = "g.name";
             }
 
             if(sortType == null || sortType.isEmpty() || (!sortType.equals("asc") && !sortType.equals("desc"))){
@@ -137,10 +152,10 @@ public class GameDataService implements GameService {
 
         }
         else{
-            sql += " order by name";
+            sql += " order by g.name";
         }
         if (endIndex != 0){
-            sql += " OFFSET " + startIndex + " LIMIT " + (endIndex - startIndex);
+            sql += " offset " + startIndex + " limit " + (endIndex - startIndex);
         }
         return sqlDao.executeShortGame(sql,params.toArray());
     }
@@ -148,32 +163,32 @@ public class GameDataService implements GameService {
     @Override
     public List<Long> getGameShortIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         List<Object> params = new ArrayList<>();
-        String sql = "select id from game_data where LOWER(name) like LOWER(?)";
+        String sql = "select g.id from game_data g where lower(g.name) like lower(?)";
         params.add('%' + searchText + '%');
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
-            sql += String.format(" and platform in (%s)",platformSql);
+            sql += String.format(" and g.platform in (%s)",platformSql);
             params.addAll(selectedPlatforms);
         }
         if(selectedYears.size() != 0){
             String yearsSql = String.join(",", Collections.nCopies(selectedYears.size(), "?"));
-            sql += String.format(" and release_date in (%s)",yearsSql);
+            sql += String.format(" and g.release_date in (%s)",yearsSql);
             params.addAll(selectedYears);
         }
         if(selectedGenres.size() != 0){
             String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
-            sql += String.format(" and id in (select game_id from library.game_data_genre where genre_code in (%s))",genresSql);
+            sql += String.format(" and g.id in (select game_id from library.game_data_genre where genre_code in (%s) group by game_id having count(distinct genre_code) = %d)",genresSql, selectedGenres.size());
             params.addAll(selectedGenres);
         }
         if(!sortField.isEmpty()){
             if(sortField.equals("year")) {
-                sortField = "release_date";
+                sortField = "g.release_date";
             }
             else if(sortField.equals("create")) {
-                sortField = "create_ts";
+                sortField = "g.create_ts";
             }
             else{
-                sortField = "name";
+                sortField = "g.name";
             }
 
             if(sortType == null || sortType.isEmpty() || (!sortType.equals("asc") && !sortType.equals("desc"))){
@@ -183,7 +198,7 @@ public class GameDataService implements GameService {
 
         }
         else{
-            sql += " order by name";
+            sql += " order by g.name";
         }
         return sqlDao.executeShortGameId(sql,params.toArray());
     }

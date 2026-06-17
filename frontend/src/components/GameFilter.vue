@@ -52,8 +52,10 @@
             optionLabel="name"
             optionValue="code"
             placeholder="Select genres"
+            filter
+            filterPlaceholder="Search genres..."
+            display="chip"
             class="w-full"
-            :maxSelectedLabels="3"
           />
         </div>
 
@@ -169,5 +171,8 @@ function resetFilters() {
   font-size: 0.875rem;
   font-weight: 600;
   margin-bottom: 0.25rem;
+}
+:deep(.p-multiselect-label) {
+  flex-wrap: wrap;
 }
 </style>
