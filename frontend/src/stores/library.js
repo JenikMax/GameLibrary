@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { gamesApi } from '../api/games'
 
 export const useLibraryStore = defineStore('library', () => {
@@ -77,10 +77,18 @@ export const useLibraryStore = defineStore('library', () => {
     sortType.value = ''
   }
 
+  const genreMap = computed(() => {
+    const map = {}
+    for (const g of filterOptions.value.genres || []) {
+      map[g.code] = g.name
+    }
+    return map
+  })
+
   return {
     games, totalItems, totalPages, currentPage, loading,
     searchText, selectedPlatforms, selectedYears, selectedGenres,
-    sortField, sortType, filterOptions, pageSize,
+    sortField, sortType, filterOptions, pageSize, genreMap,
     fetchGames, fetchFilterOptions, setSearch, setFilters, setSort, resetFilters
   }
 })

@@ -45,6 +45,9 @@
                   optionLabel="name"
                   optionValue="code"
                   placeholder="Select genres"
+                  display="chip"
+                  filter
+                  filterPlaceholder="Search genres..."
                   class="w-full"
                 />
               </div>
@@ -397,6 +400,9 @@ async function handleScrape() {
 }
 .screenshot-item:hover .screenshot-delete-btn {
   opacity: 1;
+}
+:deep(.p-multiselect-label) {
+  flex-wrap: wrap;
 }
 .screenshot-add-box {
   width: 120px;

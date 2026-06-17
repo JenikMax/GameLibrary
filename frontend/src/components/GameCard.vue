@@ -23,7 +23,7 @@
         <Tag
           v-for="genre in game.genres"
           :key="genre"
-          :value="genre"
+          :value="genreName(genre)"
           severity="secondary"
           rounded
           class="genre-tag"
@@ -53,8 +53,10 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
+import { useLibraryStore } from '../stores/library'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -66,6 +68,17 @@ const props = defineProps({
 
 const router = useRouter()
 const { t } = useI18n()
+const libraryStore = useLibraryStore()
+
+onMounted(() => {
+  if (!libraryStore.filterOptions.genres?.length) {
+    libraryStore.fetchFilterOptions()
+  }
+})
+
+function genreName(code) {
+  return libraryStore.genreMap[code] || code
+}
 
 function goToGame() {
   router.push(`/game/${props.game.id}`)

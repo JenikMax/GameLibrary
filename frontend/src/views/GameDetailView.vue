@@ -17,7 +17,7 @@
         <div class="flex gap-2 flex-wrap mb-3">
           <Tag :value="game.platform" severity="info" />
           <Tag :value="game.releaseDate" severity="warn" />
-          <Tag v-for="g in game.genres" :key="g" :value="g" severity="secondary" />
+          <Tag v-for="g in game.genres" :key="g" :value="genreName(g)" severity="secondary" />
         </div>
         <div class="flex gap-2 mb-3 flex-wrap">
           <Button label="Download" icon="pi pi-download" severity="success" @click="downloadGame" />
@@ -90,6 +90,7 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useLibraryStore } from '../stores/library'
 import { gamesApi } from '../api/games'
 import ProgressSpinner from 'primevue/progressspinner'
 import Image from 'primevue/image'
@@ -103,6 +104,7 @@ import { downloadsApi } from '../api/downloads'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const libraryStore = useLibraryStore()
 
 const game = ref(null)
 const loading = ref(true)
@@ -111,6 +113,10 @@ const toast = useToast()
 const viewerVisible = ref(false)
 const viewerIndex = ref(0)
 const viewerRef = ref(null)
+
+function genreName(code) {
+  return libraryStore.genreMap[code] || code
+}
 
 watch(viewerVisible, (val) => {
   if (val) nextTick(() => viewerRef.value?.focus())
@@ -125,8 +131,11 @@ const trailerEmbedUrl = computed(() => {
 
 onMounted(async () => {
   try {
-    const response = await gamesApi.getGame(route.params.id)
-    game.value = response.data.data
+    const [gameRes] = await Promise.all([
+      gamesApi.getGame(route.params.id),
+      libraryStore.filterOptions.genres?.length ? Promise.resolve() : libraryStore.fetchFilterOptions()
+    ])
+    game.value = gameRes.data.data
   } finally {
     loading.value = false
   }
