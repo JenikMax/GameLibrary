@@ -215,11 +215,11 @@ public class GameDataService implements GameService {
 
     @Override
     public List<Genre> getGenres() {
-        return sqlDao.getGenreList("select code from library.game_genre group by code order by description","code");
+        return sqlDao.getGenreList("select code from library.game_genre group by code order by description_ru","code");
     }
 
     public List<Genre> getGenres(Locale locale){
-        if(locale.toString().equals("ru")){
+        if(locale.getLanguage().equals("ru")){
             return sqlDao.getGenreList("select code from library.game_genre group by code order by description_ru","code");
         }
         else{
