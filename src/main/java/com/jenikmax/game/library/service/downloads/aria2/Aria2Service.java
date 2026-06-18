@@ -1,6 +1,8 @@
 package com.jenikmax.game.library.service.downloads.aria2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,19 +19,25 @@ import java.util.concurrent.TimeUnit;
 public class Aria2Service {
 
     private static final Logger logger = LoggerFactory.getLogger(Aria2Service.class);
-    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    private static final MediaType JSON = MediaType.parse("application/json");
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private final OkHttpClient client;
     private final String rpcUrl;
     private final String rpcSecret;
+    private final String gamesDir;
+    private final String aria2DownloadDir;
     private int requestId = 0;
 
     public Aria2Service(
             @Value("${game-library.aria2.rpc-url:http://aria2:6800/jsonrpc}") String rpcUrl,
-            @Value("${game-library.aria2.rpc-secret:}") String rpcSecret) {
+            @Value("${game-library.aria2.rpc-secret:}") String rpcSecret,
+            @Value("${game-library.games.directory:/gameLibrary}") String gamesDir,
+            @Value("${game-library.aria2.download-dir:/downloads}") String aria2DownloadDir) {
         this.rpcUrl = rpcUrl;
         this.rpcSecret = rpcSecret;
+        this.gamesDir = gamesDir;
+        this.aria2DownloadDir = aria2DownloadDir;
         this.client = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
@@ -47,17 +55,88 @@ public class Aria2Service {
         try {
             byte[] torrentBytes = Files.readAllBytes(new File(torrentPath).toPath());
             String base64 = Base64.getEncoder().encodeToString(torrentBytes);
-            List<Object> params = buildParams(base64, dir);
-            Map<String, Object> response = callRpc("aria2.addTorrent", params);
-            if (response != null && response.containsKey("result")) {
-                String gid = (String) response.get("result");
-                logger.info("aria2 addTorrent success, GID: {}", gid);
-                return gid;
+            String mappedDir = dir != null ? dir.replace(gamesDir, aria2DownloadDir) : null;
+            logger.info("addTorrent: dir={}, mappedDir={}, base64Len={}",
+                    dir, mappedDir, base64.length());
+
+            ArrayNode params = mapper.createArrayNode();
+            params.add("token:" + rpcSecret);
+            params.add(base64);
+            params.add(mapper.createArrayNode());
+            ObjectNode options = mapper.createObjectNode();
+            options.put("dir", mappedDir);
+            params.add(options);
+
+            ObjectNode request = mapper.createObjectNode();
+            request.put("jsonrpc", "2.0");
+            request.put("id", ++requestId);
+            request.put("method", "aria2.addTorrent");
+            request.set("params", params);
+
+            String json = mapper.writeValueAsString(request);
+            logger.info("addTorrent JSON: {}", json);
+
+            RequestBody body = RequestBody.create(JSON, json);
+            Request httpRequest = new Request.Builder()
+                    .url(rpcUrl)
+                    .post(body)
+                    .build();
+
+            try (Response httpResponse = client.newCall(httpRequest).execute()) {
+                String responseBody = httpResponse.body() != null ? httpResponse.body().string() : null;
+                logger.info("addTorrent RESPONSE ({}): {}", httpResponse.code(), responseBody);
+                if (!httpResponse.isSuccessful()) return null;
+                Map<String, Object> response = mapper.readValue(responseBody, Map.class);
+                if (response != null && response.containsKey("result")) {
+                    String gid = (String) response.get("result");
+                    logger.info("aria2 addTorrent success, GID: {}", gid);
+                    return gid;
+                }
+                if (response != null && response.containsKey("error")) {
+                    logger.warn("aria2 addTorrent RPC error: {}", response.get("error"));
+                }
             }
         } catch (Exception e) {
             logger.error("aria2 addTorrent failed", e);
         }
         return null;
+    }
+
+    private boolean changeDownloadOption(String gid, String key, String value) {
+        try {
+            ArrayNode params = mapper.createArrayNode();
+            params.add("token:" + rpcSecret);
+            params.add(gid);
+            ObjectNode options = mapper.createObjectNode();
+            options.put(key, value);
+            params.add(options);
+
+            ObjectNode request = mapper.createObjectNode();
+            request.put("jsonrpc", "2.0");
+            request.put("id", ++requestId);
+            request.put("method", "aria2.changeOption");
+            request.set("params", params);
+
+            String json = mapper.writeValueAsString(request);
+            RequestBody body = RequestBody.create(JSON, json);
+            Request httpRequest = new Request.Builder()
+                    .url(rpcUrl)
+                    .post(body)
+                    .build();
+
+            try (Response httpResponse = client.newCall(httpRequest).execute()) {
+                String responseBody = httpResponse.body() != null ? httpResponse.body().string() : null;
+                if (!httpResponse.isSuccessful()) {
+                    logger.warn("aria2.changeOption failed for {}={}: {}", key, value, responseBody);
+                    return false;
+                }
+                Map<String, Object> resp = mapper.readValue(responseBody, Map.class);
+                return resp != null && resp.containsKey("result");
+            }
+        } catch (Exception e) {
+            logger.warn("aria2.changeOption failed for {}={}: {}", key, value, e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -229,6 +308,7 @@ public class Aria2Service {
 
             String json = mapper.writeValueAsString(request);
             RequestBody body = RequestBody.create(JSON, json);
+            logger.info("RPC request {}: len={}, body={}", method, json.length(), json.length() > 300 ? json.substring(0, 300) + "..." : json);
 
             Request httpRequest = new Request.Builder()
                     .url(rpcUrl)
@@ -236,11 +316,11 @@ public class Aria2Service {
                     .build();
 
             try (Response httpResponse = client.newCall(httpRequest).execute()) {
+                String responseBody = httpResponse.body() != null ? httpResponse.body().string() : null;
                 if (!httpResponse.isSuccessful()) {
-                    logger.warn("aria2 RPC call {} returned {}", method, httpResponse.code());
+                    logger.warn("aria2 RPC call {} returned {}: body={}", method, httpResponse.code(), responseBody);
                     return null;
                 }
-                String responseBody = httpResponse.body() != null ? httpResponse.body().string() : null;
                 if (responseBody == null) return null;
                 return mapper.readValue(responseBody, Map.class);
             }

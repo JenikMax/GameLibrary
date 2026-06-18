@@ -141,7 +141,7 @@ const stoppedDownloads = ref([])
 const globalStat = ref(null)
 const aria2Connected = ref(null)
 const loading = ref(false)
-const ariaNgUrl = window.location.origin.replace(/:\d+$/, '') + ':6880'
+const ariaNgUrl = window.location.origin.replace(/:\d+$/, '') + ':6880/#!/settings/rpc'
 
 let pollInterval = null
 

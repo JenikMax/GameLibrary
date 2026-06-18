@@ -21,6 +21,7 @@ game-library:
   aria2:
     rpc-url: ${ARIA2_RPC_URL:http://aria2:6800/jsonrpc}
     rpc-secret: ${ARIA2_RPC_SECRET:}
+    download-dir: ${ARIA2_DOWNLOAD_DIR:/downloads}
 
 spring:
   mvc:

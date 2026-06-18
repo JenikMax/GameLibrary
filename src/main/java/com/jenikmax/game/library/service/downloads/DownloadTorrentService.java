@@ -43,8 +43,8 @@ public class DownloadTorrentService {
 
         // DHT-only: use a placeholder announce URI (some clients require one)
         // aria2 supports DHT + PEX without a tracker
-        URI announceURI = URI.create("dht:://GameLibrary");
-        Torrent torrent = Torrent.create(directory.getParentFile(), files, announceURI, "GameLibrary");
+        URI announceURI = URI.create("dht://GameLibrary");
+        Torrent torrent = Torrent.create(directory, files, announceURI, "GameLibrary");
 
         String torrentFileName = torrent.getName() + new Date().getTime() + ".torrent";
         File result = new File(torrentDir + File.separator + torrentFileName);
@@ -57,7 +57,7 @@ public class DownloadTorrentService {
         String gid = null;
 
         if (seedViaAria2) {
-            gid = aria2Service.addTorrent(torrentPath, directoryPath);
+            gid = aria2Service.addTorrent(torrentPath, directory.getParent());
         }
 
         return new TorrentResult(torrentPath, gid);

@@ -8,6 +8,7 @@ services:
       - "5432:5432"
     volumes:
       - /host_mnt/d/Work/MyProjects/gametest/db/data:/var/lib/postgresql/data
+      #- /host_mnt/f/Work/Git/my_project/db/data:/var/lib/postgresql/data  рабочий пример
     env_file:
       - ./postgresdb/env.list
     healthcheck:
@@ -35,7 +36,9 @@ services:
       - JWT_SECRET=5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437
     volumes:
       - /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
+      #- /host_mnt/f/Work/Git/my_project/data:/gameLibrary  рабочий пример
       - /host_mnt/d/Work/MyProjects/gametest/tracker/torrents:/torrentDirTmp
+      #- /host_mnt/f/Work/Git/my_project/data/tDir:/torrentDirTmp  рабочий пример
     depends_on:
       postgresdb:
         condition: service_healthy
@@ -63,6 +66,7 @@ services:
     volumes:
       - ./aria2-config:/config
       - /host_mnt/d/Work/MyProjects/gametest/games:/downloads
+     # - /host_mnt/f/Work/Git/my_project/data:/downloads рабочий пример
     environment:
       - PUID=197609
       - PGID=197609

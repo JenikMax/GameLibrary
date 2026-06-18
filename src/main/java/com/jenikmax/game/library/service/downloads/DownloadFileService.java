@@ -30,7 +30,8 @@ public class DownloadFileService implements DownloadService {
     public void downloadTorrent(String path, OutputStream outputStream, CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture) {
         try {
             Path directoryPath = Paths.get(path);
-            String torrentFilePath = torrentService.createTorrent(path);
+            DownloadTorrentService.TorrentResult torrentResult = torrentService.createTorrent(path, true);
+            String torrentFilePath = torrentResult.getTorrentPath();
             File torrentFile = new File(torrentFilePath);
             if (!torrentFile.exists()) return;
             try(FileInputStream fis = new FileInputStream(torrentFile)) {
