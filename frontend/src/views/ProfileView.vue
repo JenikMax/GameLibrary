@@ -171,4 +171,7 @@ async function migrateImages() {
   font-weight: 600;
   margin-bottom: 0.25rem;
 }
+.p-fileupload input[type="file"] {
+  display: none;
+}
 </style>

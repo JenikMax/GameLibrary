@@ -7,13 +7,7 @@
     </template>
     <template #end>
       <div class="flex align-items-center gap-2">
-        <SelectButton
-          v-model="lang"
-          :options="langOptions"
-          optionLabel="label"
-          optionValue="value"
-          class="lang-switcher"
-        />
+        <LocaleSwitcher />
         <Button
           :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
           severity="secondary"
@@ -45,36 +39,23 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import { useLocaleStore } from '../stores/locale'
 import { useDarkMode } from '../composables/useDarkMode'
 import { useI18n } from '../composables/useI18n'
 import { adminApi } from '../api/admin'
+import LocaleSwitcher from './LocaleSwitcher.vue'
 import Menubar from 'primevue/menubar'
 import Button from 'primevue/button'
 import Avatar from 'primevue/avatar'
-import SelectButton from 'primevue/selectbutton'
 import { useToast } from 'primevue/usetoast'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const localeStore = useLocaleStore()
 const { isDarkMode, toggleDarkMode } = useDarkMode()
 const { t } = useI18n()
 const toast = useToast()
-
-const langOptions = [
-  { label: 'RU', value: 'ru' },
-  { label: 'EN', value: 'en' }
-]
-
-const lang = ref(localeStore.locale)
-watch(lang, (val) => {
-  localeStore.setLocale(val)
-  window.location.reload()
-})
 
 const items = computed(() => {
   const menu = [
@@ -141,8 +122,5 @@ function handleLogout() {
   right: 0;
   z-index: 1000;
   border-radius: 0;
-}
-.lang-switcher {
-  height: 2rem;
 }
 </style>
