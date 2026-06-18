@@ -65,7 +65,7 @@ services:
       - "6888:6888/udp"
     volumes:
       - ./aria2-config:/config
-      - /host_mnt/d/Work/MyProjects/gametest/games:/downloads
+      - /host_mnt/d/Work/MyProjects/gametest:/downloads:ro
      # - /host_mnt/f/Work/Git/my_project/data:/downloads рабочий пример
     environment:
       - PUID=197609
