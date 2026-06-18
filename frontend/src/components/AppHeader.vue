@@ -17,8 +17,7 @@
           v-tooltip.left="isDarkMode ? t('nav.dark') : t('nav.light')"
         />
         <Avatar
-          v-if="authStore.avatarUrl"
-          :image="authStore.avatarUrl"
+          :image="authStore.avatarUrl || '/game-library/img/user.png'"
           shape="circle"
           size="small"
           v-tooltip.left="authStore.username"
