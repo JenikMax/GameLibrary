@@ -1,6 +1,6 @@
 package com.jenikmax.game.library.service.downloads;
 
-import com.jenikmax.game.library.service.downloads.aria2.Aria2Service;
+import com.jenikmax.game.library.service.downloads.transmission.TransmissionService;
 import com.turn.ttorrent.common.Torrent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,32 +18,34 @@ import java.util.List;
 public class DownloadTorrentService {
 
     private final String torrentDir;
-    private final Aria2Service aria2Service;
+    private final String announceUrl;
+    private final TransmissionService transmissionService;
 
     public DownloadTorrentService(
             @Value("${game-library.games.torrent.directory-tmp:/torrentDirTmp}") String torrentDir,
-            Aria2Service aria2Service) {
+            @Value("${game-library.tracker.announce-base-url:http://localhost:8080/game-library/api/tracker/announce}") String announceUrl,
+            TransmissionService transmissionService) {
         this.torrentDir = torrentDir;
-        this.aria2Service = aria2Service;
+        this.announceUrl = announceUrl;
+        this.transmissionService = transmissionService;
     }
 
     /**
-     * Create a .torrent file (DHT-only, no external tracker) and optionally
-     * start seeding via aria2.
+     * Create a .torrent file with embedded tracker announce URL and optionally
+     * start seeding via Transmission.
      *
      * @param directoryPath path to game directory
-     * @param seedViaAria2  if true, sends the torrent to aria2 for seeding
-     * @return result with torrent file path and optional aria2 GID
+     * @param seedViaTransmission if true, sends the torrent to Transmission for seeding
+     * @return result with torrent file path and optional seed ID
      */
-    public TorrentResult createTorrent(String directoryPath, boolean seedViaAria2)
+    public TorrentResult createTorrent(String directoryPath, boolean seedViaTransmission)
             throws IOException, InterruptedException, NoSuchAlgorithmException {
         File directory = new File(directoryPath);
         List<File> files = new ArrayList<>();
         searchFiles(directory, files);
 
-        // DHT-only: use a placeholder announce URI (some clients require one)
-        // aria2 supports DHT + PEX without a tracker
-        URI announceURI = URI.create("dht://GameLibrary");
+        // Use embedded HTTP tracker as primary announce, DHT as fallback
+        URI announceURI = URI.create(announceUrl);
         Torrent torrent = Torrent.create(directory, files, announceURI, "GameLibrary");
 
         String torrentFileName = torrent.getName() + new Date().getTime() + ".torrent";
@@ -54,17 +56,17 @@ public class DownloadTorrentService {
         }
 
         String torrentPath = result.getAbsolutePath();
-        String gid = null;
+        String seedId = null;
 
-        if (seedViaAria2) {
-            gid = aria2Service.addTorrent(torrentPath, directory.getParent());
+        if (seedViaTransmission) {
+            seedId = transmissionService.addTorrent(torrentPath, directoryPath);
         }
 
-        return new TorrentResult(torrentPath, gid);
+        return new TorrentResult(torrentPath, seedId);
     }
 
     /**
-     * Legacy method: create torrent without aria2 seeding.
+     * Legacy method: create torrent without seeding.
      */
     public String createTorrent(String directoryPath)
             throws IOException, InterruptedException, NoSuchAlgorithmException {
@@ -88,14 +90,15 @@ public class DownloadTorrentService {
 
     public static class TorrentResult {
         private final String torrentPath;
-        private final String aria2Gid;
+        private final String seedId;
 
-        public TorrentResult(String torrentPath, String aria2Gid) {
+        public TorrentResult(String torrentPath, String seedId) {
             this.torrentPath = torrentPath;
-            this.aria2Gid = aria2Gid;
+            this.seedId = seedId;
         }
 
         public String getTorrentPath() { return torrentPath; }
-        public String getAria2Gid() { return aria2Gid; }
+        public String getSeedId() { return seedId; }
     }
+
 }

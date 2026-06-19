@@ -159,7 +159,7 @@ async function seedGame() {
     toast.add({
       severity: 'success',
       summary: t('game.seeding_started'),
-      detail: `GID: ${res.data.data.aria2Gid}`,
+      detail: `ID: ${res.data.data.seedId}`,
       life: 5000
     })
   } catch {
