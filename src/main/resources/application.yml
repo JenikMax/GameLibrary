@@ -18,10 +18,11 @@ game-library:
   jwt:
     secret: ${JWT_SECRET:5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
-  aria2:
-    rpc-url: ${ARIA2_RPC_URL:http://aria2:6800/jsonrpc}
-    rpc-secret: ${ARIA2_RPC_SECRET:}
-    download-dir: ${ARIA2_DOWNLOAD_DIR:/downloads}
+  tracker:
+    announce-base-url: ${TRACKER_ANNOUNCE_URL:http://localhost:8080/game-library/api/tracker/announce}
+  transmission:
+    rpc-url: ${TRANSMISSION_RPC_URL:http://transmission:9091/transmission/rpc}
+    download-dir: ${TRANSMISSION_DOWNLOAD_DIR:/downloads}
 
 spring:
   mvc:

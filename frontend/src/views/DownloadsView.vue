@@ -12,15 +12,15 @@
       </div>
     </div>
 
-    <Message v-if="aria2Connected === false" severity="warn" :closable="false" class="mb-3">
-      {{ t('downloads.aria2_disconnected') }}
-      <a :href="ariaNgUrl" target="_blank" class="ml-2">{{ t('downloads.open_ariang') }}</a>
+    <Message v-if="transmissionConnected === false" severity="warn" :closable="false" class="mb-3">
+      {{ t('downloads.transmission_disconnected') }}
+      <a :href="transmissionUrl" target="_blank" class="ml-2">{{ t('downloads.open_transmission') }}</a>
     </Message>
     <Message v-else severity="info" :closable="false" class="mb-3">
       <span class="flex align-items-center gap-2">
-        <i class="pi pi-check-circle text-green-500"></i> {{ t('downloads.aria2_connected') }}
-        <a :href="ariaNgUrl" target="_blank" class="ml-2">
-          <i class="pi pi-external-link"></i> {{ t('downloads.ariang_web_ui') }}
+        <i class="pi pi-check-circle text-green-500"></i> {{ t('downloads.transmission_connected') }}
+        <a :href="transmissionUrl" target="_blank" class="ml-2">
+          <i class="pi pi-external-link"></i> {{ t('downloads.transmission_web_ui') }}
         </a>
       </span>
     </Message>
@@ -139,15 +139,15 @@ const activeDownloads = ref([])
 const waitingDownloads = ref([])
 const stoppedDownloads = ref([])
 const globalStat = ref(null)
-const aria2Connected = ref(null)
+const transmissionConnected = ref(null)
 const loading = ref(false)
-const ariaNgUrl = window.location.origin.replace(/:\d+$/, '') + ':6880/#!/settings/rpc'
+const transmissionUrl = window.location.origin.replace(/:\d+$/, '') + ':9091'
 
 let pollInterval = null
 
 onMounted(async () => {
-  await checkAria2()
-  if (aria2Connected.value) {
+  await checkTransmission()
+  if (transmissionConnected.value) {
     await fetchAll()
     pollInterval = setInterval(fetchAll, 5000)
   }
@@ -157,12 +157,12 @@ onUnmounted(() => {
   if (pollInterval) clearInterval(pollInterval)
 })
 
-async function checkAria2() {
+async function checkTransmission() {
   try {
     await downloadsApi.getAria2Version()
-    aria2Connected.value = true
+    transmissionConnected.value = true
   } catch {
-    aria2Connected.value = false
+    transmissionConnected.value = false
   }
 }
 
@@ -180,7 +180,7 @@ async function fetchAll() {
     stoppedDownloads.value = stoppedRes.data.data || []
     globalStat.value = statRes.data.data || null
   } catch {
-    // aria2 might be down
+    // Transmission might be down
   } finally {
     loading.value = false
   }

@@ -12,7 +12,7 @@
 | ORM / JDBC | Hibernate 5.6, Spring Data JPA, Commons DBCP 1.4 |
 | REST API | Spring MVC `@RestController`, JWT auth |
 | Документация API | OpenAPI / Swagger UI |
-| Скачивание | aria2 (JSON-RPC) + AriaNg Web UI |
+| Скачивание | Transmission (JSON-RPC) + встроенный HTTP-трекер |
 | Сеть | OkHttp 3, Jsoup, HtmlUnit (скрапинг) |
 | Сборка backend | Maven, JAR packaging |
 | Сборка frontend | npm / Vite |
@@ -21,23 +21,25 @@
 ## Архитектура
 
 ```
-┌─────────┐   :80   ┌──────────┐   :8080  ┌──────────────┐
-│ Browser │ ──────▶ │  Nginx   │ ──────▶  │   Backend    │
-└─────────┘         │ (Vue SPA)│          │  (REST API)  │
-                    └──────────┘          └──────┬───────┘
-                                                  │
-                                          ┌───────▼───────┐
-                                          │    aria2      │ :6800 RPC
-                                          │   (JSON-RPC)  │ :6888 DHT
-                                          └───────┬───────┘
-                                                  │
-                                          ┌───────▼───────┐
-                                          │    AriaNg     │ :6880 Web UI
-                                          └───────────────┘
-                           :5432
-                    ┌──────────────┐
-                    │  PostgreSQL  │
-                    └──────────────┘
+┌─────────┐   :80   ┌──────────┐   :8080  ┌────────────────┐
+│ Browser │ ──────▶ │  Nginx   │ ──────▶  │   Backend      │
+└─────────┘         │ (Vue SPA)│          │  (REST API)    │
+                    └──────────┘          │  + Tracker     │
+                                          └───┬────────┬───┘
+                                              │        ▲
+                                              │        │ announce
+                                              │  ┌─────┴────────┐
+                                              │  │  Transmission│ :9091 RPC
+                                              │  │  (seeder)    │ :51413 P2P
+                                              │  └──────┬───────┘
+                                              │         │
+                     ┌──────────────┐         │
+                     │  PostgreSQL  │  :5432  │
+                     └──────────────┘         │
+                     Пользовательские торрент-клиенты
+                     (qBittorrent, Transmission, и др.)
+                         │              ▲
+                         └───── P2P ────┘
 ```
 
 ### Frontend (Vue 3 + PrimeVue)
@@ -53,7 +55,7 @@
 | `/game/:id/edit` | ADMIN | Редактирование + scraping |
 | `/profile` | USER | Профиль, аватар, смена пароля |
 | `/admin/users` | ADMIN | Управление пользователями |
-| `/downloads` | USER, ADMIN | Статус загрузок aria2 |
+| `/downloads` | USER, ADMIN | Статус раздач Transmission |
 
 ### Backend (Spring Boot REST API)
 
@@ -69,8 +71,9 @@
 | `POST /api/games/{id}/edit` | ADMIN | Редактирование игры |
 | `POST /api/games/{id}/grab` | ADMIN | Скраппинг метаданных |
 | `GET /api/games/{id}/download` | USER, ADMIN | Скачивание (ZIP/.torrent) |
-| `POST /api/games/{id}/seed` | USER, ADMIN | Запуск раздачи через aria2 |
-| `GET /api/downloads/active` | USER, ADMIN | Активные загрузки aria2 |
+| `POST /api/games/{id}/seed` | USER, ADMIN | Запуск раздачи через Transmission |
+| `GET /api/downloads/active` | USER, ADMIN | Активные раздачи Transmission |
+| `GET /api/tracker/announce` | все | HTTP-трекер BitTorrent |
 | `GET /api/profile` | USER, ADMIN | Профиль |
 | `POST /api/scan` | ADMIN | Сканирование библиотеки |
 | `GET /api/admin/users` | ADMIN | Список пользователей |
@@ -112,8 +115,8 @@ Swagger UI: `/game-library/swagger-ui.html`
 
 ### Скачивание игр
 - **Малые игры (<1 ГБ)**: потоковая упаковка в ZIP
-- **Крупные игры (≥1 ГБ)**: создание .torrent (DHT/PEX) + раздача через aria2
-- **Seed via aria2**: кнопка на странице игры — создаёт торрент и запускает сидирование на NAS
+- **Крупные игры (≥1 ГБ)**: создание .torrent с announce URL встроенного HTTP-трекера (`/api/tracker/announce`) + раздача через Transmission
+- **Seed via Transmission**: кнопка на странице игры — создаёт торрент и запускает сидирование на NAS
 
 ### Пользователи и роли
 - **ADMIN**: сканирование, редактирование, scraper, управление пользователями
@@ -140,15 +143,15 @@ make up               # docker-compose up --build -d
 | Порт | Сервис | Назначение |
 |------|--------|-----------|
 | `:80` | frontend (Nginx) | Vue SPA + прокси на API |
-| `:8080` | backend | Spring Boot REST API |
-| `:6880` | AriaNg | Web UI для aria2 |
-| `:6888` | aria2 | DHT (торренты) |
+| `:8080` | backend | Spring Boot REST API + встроенный HTTP-трекер |
+| `:9091` | transmission | RPC-управление |
+| `:51413` | transmission | P2P-трафик (TCP/UDP) |
 | `:5432` | postgresdb | PostgreSQL |
 
 ### Локальная разработка
 
 ```bash
-# Backend (нужен PostgreSQL + aria2 локально)
+# Backend (нужен PostgreSQL + Transmission локально)
 mvn spring-boot:run
 
 # Frontend (Vite dev server с прокси на localhost:8080)
@@ -197,8 +200,9 @@ DDL: `postgresdb/ddl/1_init.sql`, `2_library.sql`, `3_user.sql`.
 | `DB_PORT` | `5432` | Порт PostgreSQL |
 | `GAMES_DIRECTORY` | `/gameLibrary` | Корень с играми |
 | `IMAGES_DIRECTORY` | `/gameLibrary/images` | Изображения на ФС |
-| `ARIA2_RPC_URL` | `http://aria2:6800/jsonrpc` | JSON-RPC aria2 |
-| `ARIA2_RPC_SECRET` | (пусто) | Секрет aria2 |
+| `TRACKER_ANNOUNCE_URL` | `http://localhost:8080/game-library/api/tracker/announce` | URL announce для .torrent (должен быть доступен клиентам) |
+| `TRANSMISSION_RPC_URL` | `http://transmission:9091/transmission/rpc` | RPC Transmission |
+| `TRANSMISSION_DOWNLOAD_DIR` | `/downloads` | Директория с играми (в контейнере Transmission) |
 | `JWT_SECRET` | (ключ по умолчанию) | Секрет JWT |
 | `JWT_EXPIRATION_MS` | `86400000` | Время жизни токена (24ч) |
 
@@ -226,9 +230,8 @@ game-library:
     directory: /mnt/nas/gameLibrary     # путь к вашей библиотеке игр
   images:
     directory: /mnt/nas/gameLibrary/images
-  aria2:
-    rpc-url: http://localhost:6800/jsonrpc   # для локального запуска
-    rpc-secret: mysecret                      # если задан секрет aria2
+  tracker:
+    announce-base-url: http://192.168.1.100:8080/game-library/api/tracker/announce  # IP вашего NAS
 
 spring:
   datasource:
@@ -254,19 +257,16 @@ npm run build
 cd ..
 
 # 4. Настроить volume paths в docker-compose.yml
-#    Отредактируйте раздел volumes для сервисов backend и aria2:
+#    Отредактируйте раздел volumes для сервисов backend и transmission:
 #
 #    backend:
 #      volumes:
 #        - /mnt/nas/gameLibrary:/gameLibrary      # ваши игры
 #        - /mnt/nas/torrents:/torrentDirTmp        # временные .torrent файлы
 #
-#    aria2:
+#    transmission:
 #      volumes:
-#        - /mnt/nas/gameLibrary:/gameLibrary      # для доступа к файлам игр
-#        - /mnt/nas/torrents:/torrentDirTmp        # .torrent файлы
-#        - /mnt/nas/aria2-config:/config           # конфиг aria2
-#        - /mnt/nas/aria2-downloads:/downloads     # загрузки aria2
+#        - /mnt/nas/gameLibrary/games:/downloads  # подпапка games, чтобы пути совпадали
 
 # 5. Запустить все сервисы
 docker compose up --build -d
@@ -274,7 +274,7 @@ docker compose up --build -d
 # 6. Проверить:
 #    - Frontend: http://localhost
 #    - Swagger UI: http://localhost/game-library/swagger-ui.html
-#    - AriaNg: http://localhost:6880
+#    - Transmission Web UI: http://localhost:9091
 #    - API: http://localhost:8080/game-library/api/games
 ```
 
@@ -286,13 +286,12 @@ sudo -u postgres psql -f postgresdb/ddl/1_init.sql
 sudo -u postgres psql -f postgresdb/ddl/2_library.sql
 sudo -u postgres psql -f postgresdb/ddl/3_user.sql
 
-# 2. aria2 (в отдельном терминале)
-docker run -d --name aria2 \
-  -p 6800:6800 -p 6888:6888 \
-  -v /mnt/nas/gameLibrary:/gameLibrary \
-  -v /mnt/nas/torrents:/torrentDirTmp \
-  -e SECRET=mysecret \
-  p3terx/aria2-pro
+# 2. Transmission (в отдельном терминале)
+docker run -d --name transmission \
+  -p 9091:9091 -p 51413:51413 -p 51413:51413/udp \
+  -v /mnt/nas/gameLibrary/games:/downloads \
+  -e PUID=$(id -u) -e PGID=$(id -g) \
+  lscr.io/linuxserver/transmission
 
 # 3. Backend
 mvn spring-boot:run
@@ -302,25 +301,10 @@ cd frontend && npm run dev
 # Frontend будет на http://localhost:5173, API проксируется на :8080
 ```
 
-### Настройка aria2 для Linux
+### Настройка Transmission (без Docker)
 
-Создайте `/mnt/nas/aria2-config/aria2.conf`:
-
-```ini
-enable-rpc=true
-rpc-listen-all=true
-rpc-secret=mysecret
-dir=/downloads
-max-concurrent-downloads=5
-max-connection-per-server=16
-seed-ratio=0.0
-seed-time=0
-bt-enable-lpd=true
-enable-dht=true
-dht-listen-port=6888
-peer-id-prefix=-TR2940-
-user-agent=Transmission/2.94
-```
+Дополнительная конфигурация задаётся через файл `/mnt/nas/transmission-config/settings.json`.
+Основные параметры уже настроены в docker-compose.yml через переменные окружения.
 
 ## Развёртывание на Windows
 
@@ -354,9 +338,8 @@ game-library:
     directory: D:/GameLibrary              # ваша библиотека игр
   images:
     directory: D:/GameLibrary/images
-  aria2:
-    rpc-url: http://localhost:6800/jsonrpc
-    rpc-secret: mysecret
+  tracker:
+    announce-base-url: http://192.168.1.100:8080/game-library/api/tracker/announce
 
 spring:
   datasource:
@@ -389,12 +372,9 @@ cd ..
 #        - D:/GameLibrary:/gameLibrary
 #        - D:/torrents:/torrentDirTmp
 #
-#    aria2:
+#    transmission:
 #      volumes:
-#        - D:/GameLibrary:/gameLibrary
-#        - D:/torrents:/torrentDirTmp
-#        - D:/aria2-config:/config
-#        - D:/aria2-downloads:/downloads
+#        - D:/GameLibrary/games:/downloads
 
 # 5. Запустить все сервисы
 docker compose up --build -d
@@ -415,30 +395,15 @@ psql -U postgres -f postgresdb\ddl\2_library.sql
 psql -U postgres -f postgresdb\ddl\3_user.sql
 ```
 
-#### 2. aria2
+#### 2. Transmission
 
-Скачайте [aria2 для Windows](https://github.com/aria2/aria2/releases), распакуйте в `C:\aria2`.
-
-Создайте `C:\aria2\aria2.conf`:
-
-```ini
-enable-rpc=true
-rpc-listen-all=true
-rpc-secret=mysecret
-dir=C:\aria2-downloads
-max-concurrent-downloads=5
-max-connection-per-server=16
-seed-ratio=0.0
-seed-time=0
-bt-enable-lpd=true
-enable-dht=true
-dht-listen-port=6888
-```
-
-Запустите aria2:
+Установите [Transmission для Windows](https://transmissionbt.com/download/) или запустите через Docker Desktop:
 
 ```powershell
-C:\aria2\aria2c.exe --conf-path=C:\aria2\aria2.conf
+docker run -d --name transmission \
+  -p 9091:9091 -p 51413:51413 -p 51413:51413/udp \
+  -v D:\GameLibrary\games:/downloads \
+  lscr.io/linuxserver/transmission
 ```
 
 #### 3. Backend
@@ -481,10 +446,11 @@ Frontend откроется на `http://localhost:5173`, API проксируе
 - Проверьте `DB_HOST` и `DB_PORT`: при запуске в Docker имя сервиса `postgresdb`, при локальном — `localhost`.
 - Проверьте пароль: `2wq345tgfiNcbBBwee3` для пользователя `library-manager-user`.
 
-### aria2 не отвечает
-- При запуске в Docker: `docker compose logs aria2` — проверьте, что RPC включён.
-- Проверьте `ARIA2_RPC_URL`: в Docker `http://aria2:6800/jsonrpc`, локально `http://localhost:6800/jsonrpc`.
-- Если задан `rpc-secret`, он должен совпадать в `aria2.conf` и `application.yml`.
+### Transmission не отвечает
+- При запуске в Docker: `docker compose logs transmission` — проверьте логи.
+- Проверьте `TRANSMISSION_RPC_URL`: в Docker `http://transmission:9091/transmission/rpc`, локально `http://localhost:9091/transmission/rpc`.
+- Проверьте, что Transmission запущен: `curl -X GET http://localhost:9091/transmission/rpc` — должен вернуть заголовок `X-Transmission-Session-Id`.
+- Убедитесь, что `PUID`/`PGID` в docker-compose.yml соответствуют владельцу файлов игр.
 
 ### Изображения не отображаются
 - После миграции изображения хранятся на диске, путь должен совпадать с `IMAGES_DIRECTORY`.

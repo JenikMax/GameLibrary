@@ -14,8 +14,7 @@ No Maven wrapper — `mvn` must be on PATH. Java 1.8 target. No tests, no lint/f
 
 ## Docker
 
-`docker-compose.yml` starts four services: `frontend` (Nginx + Vue SPA, `:80`), `backend` (Spring Boot REST, `:8080`), `aria2` (torrent client, `:6800` RPC, `:6888` DHT), `postgresdb` (`:5432`).  
-Optionally `ariang` web UI on `:6880`.  
+`docker-compose.yml` starts four services: `frontend` (Nginx + Vue SPA, `:80`), `backend` (Spring Boot REST, `:8080`), `transmission` (torrent seeder, `:9091` RPC, `:51413`), `postgresdb` (`:5432`).  
 DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/docker-entrypoint-initdb.d/`.
 
 ## Architecture
@@ -27,7 +26,7 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - Legacy Thymeleaf views still work alongside REST (dual auth: form login + JWT).
 - PostgreSQL schema `library`, managed via Commons DBCP + JPA (Hibernate 5.6).
 - Auth: Spring Security, form login + JWT, BCrypt, `ROLE_ADMIN`/`ROLE_USER`.
-- Torrent: aria2 via JSON-RPC (no embedded tracker, DHT/PEX only).
+- Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission RPC for seeding.
 - Images: filesystem (`/gameLibrary/images/`) with DB bytea fallback.
 - Scrapers: Steam, MobyGames, IGDB, Igromania, TheGameDB, Playground, WorldArt.
 - Package root: `com.jenikmax.game.library`.
@@ -38,6 +37,7 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - `Game.java` is a decompiled `.class` → `@Entity` uses annotated getters, not fields. Keep this pattern.
 - **Frontend must be built separately** before Docker (`npm run build` or `make build-frontend`). Dev server (`npm run dev`) proxies `/game-library/*` to `:8080`.
 - **OkHttp 3.x API order**: `RequestBody.create(MediaType, String)` — MediaType first.
-- **aria2 must be running** for torrent seeding / download management. In Docker it starts automatically; for local dev run `docker run p3terx/aria2-pro`.
+- **Transmission must be running** for torrent seeding. In Docker it starts automatically; for local dev run `docker run lscr.io/linuxserver/transmission`.
 - **Multi-stage Docker build** requires Docker 19.03+ and BuildKit.
+- **Tracker announce URL** must be reachable from user torrent clients. Set `TRACKER_ANNOUNCE_URL` to your NAS IP/hostname in `docker-compose.yml`.
 - **Images on filesystem**: after DB→FS migration (`POST /api/admin/migrate-images` or `scripts/migrate-images.sh`), images are served from disk. If the file is missing, falls back to DB bytea.
