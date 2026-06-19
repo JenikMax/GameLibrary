@@ -534,6 +534,24 @@ Frontend откроется на `http://localhost:5173`, API проксируе
 - Если файл отсутствует — будет fallback на БД (работает медленнее).
 - Запустите миграцию: `POST /api/admin/migrate-images` или `scripts/migrate-images.sh`.
 
+### Transmission сидирует, но торрент-клиенты не могут скачать (uTorrent и др.)
+
+Трекер работает (логи backend показывают `returning complete=1`), uTorrent видит сида, но данные не передаются.
+
+**Решение:** включите uTP в настройках Transmission. Отредактируйте `tracker/config/settings.json` на хосте:
+
+```json
+"utp-enabled": true
+```
+
+и перезапустите контейнер:
+
+```bash
+docker-compose restart transmission
+```
+
+По умолчанию `utp-enabled` не задан (или `false`). Некоторые клиенты (uTorrent) на Windows не могут установить peer-to-peer соединение с Transmission по TCP, если uTP выключен. uTP должен быть включён с обеих сторон.
+
 ### Ошибка "no suitable method found for create"
 - OkHttp 3.x: `RequestBody.create(MediaType, String)` — сначала MediaType, потом String.
 - Если вы обновили OkHttp до 4.x, API изменился. Держите OkHttp 3.12.x для совместимости с Java 8.

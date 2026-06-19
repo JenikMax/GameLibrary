@@ -40,4 +40,5 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - **Transmission must be running** for torrent seeding. In Docker it starts automatically; for local dev run `docker run lscr.io/linuxserver/transmission`.
 - **Multi-stage Docker build** requires Docker 19.03+ and BuildKit.
 - **Tracker announce URL** must be reachable from user torrent clients. Set `TRACKER_ANNOUNCE_URL` to your NAS IP/hostname in `docker-compose.yml`.
+- **uTP must be enabled** in Transmission (`"utp-enabled": true` in `tracker/config/settings.json`) for P2P connections with uTorrent on Windows. Without it, even though the tracker correctly returns the seeder, data transfer fails because uTorrent cannot connect over pure TCP. Enable uTP in Transmission, then `docker-compose restart transmission`.
 - **Images on filesystem**: after DB→FS migration (`POST /api/admin/migrate-images` or `scripts/migrate-images.sh`), images are served from disk. If the file is missing, falls back to DB bytea.

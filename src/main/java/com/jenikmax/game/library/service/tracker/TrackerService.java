@@ -71,6 +71,9 @@ public class TrackerService {
             }
         }
 
+        logger.info("Swarm {}: {} peer(s), returning complete={}, incomplete={} to {}",
+                infoHash, peers.size(), complete, incomplete, peerId);
+
         return new TrackerResponse(complete, incomplete, ANNOUNCE_INTERVAL_SEC, activePeers);
     }
 
@@ -99,10 +102,10 @@ public class TrackerService {
         sb.append("l");
         for (PeerInfo p : response.peers) {
             sb.append("d");
-            appendBencoded(sb, "peer id");
-            appendBencoded(sb, p.getPeerId());
             appendBencoded(sb, "ip");
             appendBencoded(sb, p.getIp());
+            appendBencoded(sb, "peer id");
+            appendBencoded(sb, p.getPeerId());
             appendBencoded(sb, "port");
             sb.append("i").append(p.getPort()).append("e");
             sb.append("e");
@@ -116,6 +119,34 @@ public class TrackerService {
         byte[] bytes = value.getBytes(StandardCharsets.ISO_8859_1);
         sb.append(bytes.length).append(":");
         sb.append(value);
+    }
+
+    public String bencodeScrape(String infoHash) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("d5:filesd");
+        if (infoHash != null) {
+            List<PeerInfo> peers = peersByInfoHash.get(infoHash);
+            int complete = 0;
+            int incomplete = 0;
+            if (peers != null) {
+                for (PeerInfo p : peers) {
+                    if (p.isExpired(PEER_TIMEOUT_SEC)) continue;
+                    if (p.isSeeder()) complete++;
+                    else incomplete++;
+                }
+            }
+            appendBencoded(sb, infoHash);
+            sb.append("d");
+            appendBencoded(sb, "complete");
+            sb.append("i").append(complete).append("e");
+            appendBencoded(sb, "incomplete");
+            sb.append("i").append(incomplete).append("e");
+            appendBencoded(sb, "downloaded");
+            sb.append("i0e");
+            sb.append("e");
+        }
+        sb.append("ee");
+        return sb.toString();
     }
 
     public static class TrackerResponse {
