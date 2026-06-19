@@ -37,7 +37,19 @@ public class TrackerController {
             @RequestParam(value = "compact", defaultValue = "0") int compact,
             HttpServletRequest request) {
 
-        String ip = ipParam != null && !ipParam.isEmpty() ? ipParam : request.getRemoteAddr();
+        String ip = ipParam;
+        if (ip == null || ip.isEmpty()) {
+            ip = request.getRemoteAddr();
+            // Docker internal IP → use the actual IP the peer connected to (from Host header)
+            if (ip.startsWith("172.") || ip.startsWith("10.") || ip.startsWith("100.")) {
+                String host = request.getHeader("Host");
+                if (host != null) {
+                    int colon = host.indexOf(':');
+                    if (colon > 0) host = host.substring(0, colon);
+                    if (!host.isEmpty()) ip = host;
+                }
+            }
+        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("Tracker announce: info_hash={}, peer_id={}, port={}, event={}, ip={}",

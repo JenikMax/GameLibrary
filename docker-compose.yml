@@ -29,9 +29,11 @@ services:
       - SERVER_PORT=8080
       - DB_HOST=postgresdb
       - DB_PORT=5432
-      # ⚠️ TRACKER_ANNOUNCE_URL must be reachable from user torrent clients.
-      # Replace "localhost" with your NAS IP/hostname, e.g. http://192.168.1.100:8080/game-library/api/tracker/announce
-      - TRACKER_ANNOUNCE_URL=http://localhost:8080/game-library/api/tracker/announce
+      # ⚠️ TRACKER_ANNOUNCE_URL — IP машины, на которой запущен backend (трекер).
+      # Должен быть доступен из ваших торрент-клиентов. Замените на актуальный IP:
+      #   docker-compose:  http://<IP_ХОСТА>:8080/game-library/api/tracker/announce
+      #   без Docker:      http://localhost:8080/game-library/api/tracker/announce
+      - TRACKER_ANNOUNCE_URL=http://192.168.0.109:8080/game-library/api/tracker/announce
       - TRANSMISSION_RPC_URL=http://transmission:9091/transmission/rpc
       - TRANSMISSION_DOWNLOAD_DIR=/downloads
       - GAMES_DIRECTORY=/gameLibrary
@@ -60,19 +62,27 @@ services:
     restart: unless-stopped
 
   transmission:
-    image: lscr.io/linuxserver/transmission:latest
+    image: lscr.io/linuxserver/transmission:4.1.2
     container_name: transmission
     ports:
       - "9091:9091"
       - "51413:51413"
       - "51413:51413/udp"
     volumes:
-      - /host_mnt/d/Work/MyProjects/gametest:/downloads
-      #- /host_mnt/f/Work/Git/my_project/data:/downloads рабочий пример
+      - /host_mnt/d/Work/MyProjects/gametest/games:/downloads/games
+      - /host_mnt/d/Work/MyProjects/gametest/tracker/config:/config
+      - /host_mnt/d/Work/MyProjects/gametest/tracker/watch:/watch
+      - /host_mnt/d/Work/MyProjects/gametest/tracker/complete:/downloads/complete
+      - /host_mnt/d/Work/MyProjects/gametest/tracker/incomplete:/downloads/incomplete
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=Etc/UTC
+      - TRANSMISSION_DOWNLOAD_DIR=/downloads/complete
+      - TRANSMISSION_INCOMPLETE_DIR=/downloads/incomplete
+      - TRANSMISSION_INCOMPLETE_DIR_ENABLED=true
+      - TRANSMISSION_WATCH_DIR=/watch
+      - TRANSMISSION_WATCH_DIR_ENABLED=true
       - DHT=true
       - LPD=true
       - PEX=true

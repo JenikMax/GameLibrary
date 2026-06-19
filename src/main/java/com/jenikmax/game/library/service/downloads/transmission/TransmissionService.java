@@ -261,12 +261,14 @@ public class TransmissionService {
 
     private String mapDownloadDir(String dir) {
         if (dir == null) return transmissionDownloadDir;
+        if (dir.endsWith("/")) dir = dir.substring(0, dir.length() - 1);
+        String parent = dir.contains("/") ? dir.substring(0, dir.lastIndexOf("/")) : dir;
         String prefix = gamesDir + "/games";
         String relative;
-        if (dir.startsWith(prefix)) {
-            relative = dir.substring(prefix.length());
-        } else if (dir.startsWith(gamesDir)) {
-            relative = dir.substring(gamesDir.length());
+        if (parent.startsWith(prefix)) {
+            relative = parent.substring(gamesDir.length());
+        } else if (parent.startsWith(gamesDir)) {
+            relative = parent.substring(gamesDir.length());
         } else {
             relative = "/" + dir;
         }

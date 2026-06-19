@@ -240,6 +240,53 @@ spring:
     password: 2wq345tgfiNcbBBwee3
 ```
 
+### Структура директорий для Transmission
+
+При запуске через Docker контейнер Transmission использует bind mounts для доступа к файлам игр, настройкам и служебным каталогам. Перед запуском создайте на хосте следующую структуру:
+
+```
+nas/gameLibrary/                  # корень библиотеки
+├── games/                        # игровые файлы (PC, PS3, ...)
+├── images/                       # скриншоты и обложки
+├── db/                           # данные PostgreSQL (Docker volume)
+└── tracker/                      # всё, что связано с Transmission
+    ├── config/                   # settings.json, queue.json (создаётся автоматически)
+    ├── watch/                    # автодобавление .torrent файлов
+    ├── complete/                 # завершённые загрузки
+    ├── incomplete/               # незавершённые загрузки
+    └── torrents/                 # .torrent файлы, созданные backend
+```
+
+**Создание директорий (Linux):**
+```bash
+mkdir -p /mnt/nas/gameLibrary/games
+mkdir -p /mnt/nas/gameLibrary/tracker/{config,watch,complete,incomplete,torrents}
+```
+
+**Создание директорий (Windows):**
+```cmd
+mkdir D:\GameLibrary\tracker\config
+mkdir D:\GameLibrary\tracker\watch
+mkdir D:\GameLibrary\tracker\complete
+mkdir D:\GameLibrary\tracker\incomplete
+```
+
+Обратите внимание: `PUID` / `PGID` в `docker-compose.yml` должны совпадать с UID/GID владельца файлов игр. На WSL/Windows файлы будут доступны, даже если `chown` в контейнере выдаёт предупреждение.
+
+### Настройка Transmission
+
+Файл `tracker/config/settings.json` создаётся автоматически при первом запуске контейнера. Важные параметры задаются через переменные окружения в `docker-compose.yml` (секция `environment` сервиса `transmission`):
+
+| Переменная | Значение | Параметр settings.json |
+|---|---|---|
+| `TRANSMISSION_DOWNLOAD_DIR` | `/downloads/complete` | `download-dir` |
+| `TRANSMISSION_INCOMPLETE_DIR` | `/downloads/incomplete` | `incomplete-dir` |
+| `TRANSMISSION_INCOMPLETE_DIR_ENABLED` | `true` | `incomplete-dir-enabled` |
+| `TRANSMISSION_WATCH_DIR` | `/watch` | `watch-dir` |
+| `TRANSMISSION_WATCH_DIR_ENABLED` | `true` | `watch-dir-enabled` |
+
+Если нужно изменить другие параметры Transmission (RPC-порт, лимиты скорости и т.д.) — отредактируйте `settings.json` на хосте и перезапустите контейнер.
+
 ### Сборка и запуск (Docker)
 
 ```bash
@@ -256,22 +303,32 @@ npm install
 npm run build
 cd ..
 
-# 4. Настроить volume paths в docker-compose.yml
+# 4. Создать на хосте структуру директорий для Transmission:
+#    mkdir -p /mnt/nas/gameLibrary/games
+#    mkdir -p /mnt/nas/gameLibrary/tracker/{config,watch,complete,incomplete,torrents}
+#
+#    Подробнее — в разделе «Структура директорий для Transmission» ниже.
+
+# 5. Настроить volume paths в docker-compose.yml
 #    Отредактируйте раздел volumes для сервисов backend и transmission:
 #
 #    backend:
 #      volumes:
-#        - /mnt/nas/gameLibrary:/gameLibrary      # ваши игры
-#        - /mnt/nas/torrents:/torrentDirTmp        # временные .torrent файлы
+#        - /mnt/nas/gameLibrary:/gameLibrary            # корень с games/, images/ и т.д.
+#        - /mnt/nas/gameLibrary/tracker/torrents:/torrentDirTmp
 #
 #    transmission:
 #      volumes:
-#        - /mnt/nas/gameLibrary/games:/downloads  # подпапка games, чтобы пути совпадали
+#        - /mnt/nas/gameLibrary/games:/downloads/games         # игровые файлы для сидирования
+#        - /mnt/nas/gameLibrary/tracker/config:/config         # настройки Transmission
+#        - /mnt/nas/gameLibrary/tracker/watch:/watch           # автодобавление торрентов
+#        - /mnt/nas/gameLibrary/tracker/complete:/downloads/complete
+#        - /mnt/nas/gameLibrary/tracker/incomplete:/downloads/incomplete
 
-# 5. Запустить все сервисы
+# 6. Запустить все сервисы
 docker compose up --build -d
 
-# 6. Проверить:
+# 7. Проверить:
 #    - Frontend: http://localhost
 #    - Swagger UI: http://localhost/game-library/swagger-ui.html
 #    - Transmission Web UI: http://localhost:9091
@@ -289,7 +346,11 @@ sudo -u postgres psql -f postgresdb/ddl/3_user.sql
 # 2. Transmission (в отдельном терминале)
 docker run -d --name transmission \
   -p 9091:9091 -p 51413:51413 -p 51413:51413/udp \
-  -v /mnt/nas/gameLibrary/games:/downloads \
+  -v /mnt/nas/gameLibrary/games:/downloads/games \
+  -v /mnt/nas/gameLibrary/tracker/config:/config \
+  -v /mnt/nas/gameLibrary/tracker/watch:/watch \
+  -v /mnt/nas/gameLibrary/tracker/complete:/downloads/complete \
+  -v /mnt/nas/gameLibrary/tracker/incomplete:/downloads/incomplete \
   -e PUID=$(id -u) -e PGID=$(id -g) \
   lscr.io/linuxserver/transmission
 
@@ -364,19 +425,30 @@ npm install
 npm run build
 cd ..
 
-# 4. Настроить volume paths в docker-compose.yml
+# 4. Создать на хосте структуру директорий:
+#    mkdir D:\GameLibrary\tracker\config
+#    mkdir D:\GameLibrary\tracker\watch
+#    mkdir D:\GameLibrary\tracker\complete
+#    mkdir D:\GameLibrary\tracker\incomplete
+#    # games/ и tracker/torrents/ уже должны быть
+
+# 5. Настроить volume paths в docker-compose.yml
 #    Замените Linux-пути на Windows:
 #
 #    backend:
 #      volumes:
 #        - D:/GameLibrary:/gameLibrary
-#        - D:/torrents:/torrentDirTmp
+#        - D:/GameLibrary/tracker/torrents:/torrentDirTmp
 #
 #    transmission:
 #      volumes:
-#        - D:/GameLibrary/games:/downloads
+#        - D:/GameLibrary/games:/downloads/games
+#        - D:/GameLibrary/tracker/config:/config
+#        - D:/GameLibrary/tracker/watch:/watch
+#        - D:/GameLibrary/tracker/complete:/downloads/complete
+#        - D:/GameLibrary/tracker/incomplete:/downloads/incomplete
 
-# 5. Запустить все сервисы
+# 6. Запустить все сервисы
 docker compose up --build -d
 ```
 
@@ -402,7 +474,11 @@ psql -U postgres -f postgresdb\ddl\3_user.sql
 ```powershell
 docker run -d --name transmission \
   -p 9091:9091 -p 51413:51413 -p 51413:51413/udp \
-  -v D:\GameLibrary\games:/downloads \
+  -v D:\GameLibrary\games:/downloads/games \
+  -v D:\GameLibrary\tracker\config:/config \
+  -v D:\GameLibrary\tracker\watch:/watch \
+  -v D:\GameLibrary\tracker\complete:/downloads/complete \
+  -v D:\GameLibrary\tracker\incomplete:/downloads/incomplete \
   lscr.io/linuxserver/transmission
 ```
 
@@ -451,6 +527,7 @@ Frontend откроется на `http://localhost:5173`, API проксируе
 - Проверьте `TRANSMISSION_RPC_URL`: в Docker `http://transmission:9091/transmission/rpc`, локально `http://localhost:9091/transmission/rpc`.
 - Проверьте, что Transmission запущен: `curl -X GET http://localhost:9091/transmission/rpc` — должен вернуть заголовок `X-Transmission-Session-Id`.
 - Убедитесь, что `PUID`/`PGID` в docker-compose.yml соответствуют владельцу файлов игр.
+- Если в логах ошибка `Couldn't bind to [::]:9091` — Transmission пытается слушать IPv6, но Docker Desktop на Windows/WSL не поддерживает его. Отредактируйте `tracker/config/settings.json` на хосте, замените `"rpc-bind-address": "[::]"` на `"rpc-bind-address": "0.0.0.0"` и перезапустите контейнер.
 
 ### Изображения не отображаются
 - После миграции изображения хранятся на диске, путь должен совпадать с `IMAGES_DIRECTORY`.
