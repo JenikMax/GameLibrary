@@ -11,7 +11,10 @@ import com.jenikmax.game.library.model.entity.GameGenre;
 import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
+import com.jenikmax.game.library.model.dto.api.ScraperInfoResponse;
+import com.jenikmax.game.library.service.scraper.ScraperConfigService;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
+import com.jenikmax.game.library.service.scraper.model.ScraperConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -32,11 +35,23 @@ public class LibraryController {
     private final LibraryService libraryService;
     private final GameRepository gameRepository;
     private final ScreenshotRepository screenshotRepository;
+    private final ScraperConfigService scraperConfigService;
 
-    public LibraryController(LibraryService libraryService, GameRepository gameRepository, ScreenshotRepository screenshotRepository) {
+    public LibraryController(LibraryService libraryService, GameRepository gameRepository,
+                             ScreenshotRepository screenshotRepository,
+                             ScraperConfigService scraperConfigService) {
         this.libraryService = libraryService;
         this.gameRepository = gameRepository;
         this.screenshotRepository = screenshotRepository;
+        this.scraperConfigService = scraperConfigService;
+    }
+
+    @GetMapping("/scrapers")
+    public ResponseEntity<ApiResponse<List<ScraperInfoResponse>>> getScraperSources() {
+        List<ScraperInfoResponse> items = scraperConfigService.getEnabledConfigs().stream()
+                .map(c -> new ScraperInfoResponse(c.getType(), c.getDisplayName()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.ok(items));
     }
 
     @GetMapping
@@ -196,6 +211,10 @@ public class LibraryController {
         resp.setTrailerUrl(dto.getTrailerUrl());
         resp.setDescription(dto.getDescription());
         resp.setInstruction(dto.getInstruction());
+
+        // Pass scraped base64 image data through for the frontend form
+        resp.setLogo(dto.getLogo());
+        resp.setScreenshots(dto.getScreenshots());
 
         List<String> screenshotUrls = new ArrayList<>();
         try {

@@ -2,47 +2,88 @@ package com.jenikmax.game.library.service.scraper.scrapers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.service.scraper.ConfigEncryptionService;
+import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
+import com.jenikmax.game.library.service.scraper.api.Scraper;
+import com.jenikmax.game.library.service.scraper.model.ScraperConfig;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class SteamScraper {
+import java.util.concurrent.TimeUnit;
 
-    //Получение информации о приложении (игре) по его ID
-    private static final String STEAM_API_KEY = "YOUR_API_KEY";
+public class SteamScraper implements Scraper {
 
-    public void scrap(){
+    private final ScraperConfig config;
+    private final String type;
+    private final OkHttpClient client;
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    public SteamScraper(ScraperConfig config, ConfigEncryptionService encryptionService) {
+        this.config = config;
+        this.type = config.getType();
+        this.client = new OkHttpClient.Builder()
+                .connectTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
+                .readTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
+                .build();
+    }
+
+    @Override
+    public String getType() { return type; }
+
+    @Override
+    public GameDto scrap(GameDto gameDto) { return gameDto; }
+
+    @Override
+    public GameDto scrap(GameDto gameDto, String url) {
+        return scrap(gameDto);
+    }
+
+    @Override
+    public GameDto scrap(GameDto gameDto, ScrapInfo scrapInfo) {
+        String appId = extractAppId(scrapInfo.getUrl());
+        if (appId == null) return gameDto;
+
         try {
-            OkHttpClient client = new OkHttpClient();
-            String appId = "1085660";
-
-            // Формирование запроса к Steam Web API
-            String requestUrl = String.format("https://api.steampowered.com/ISteamApps/GetAppDetails/v1/?appid=%s&key=%s", appId, STEAM_API_KEY);
+            String requestUrl = String.format("%s?appid=%s&key=%s",
+                    config.getApiUrl(), appId, "1"); // format param, key comes from config
+            // Steam API v1 doesn't require key for appdetails, but we try with key anyway
             Request request = new Request.Builder()
                     .url(requestUrl)
                     .get()
                     .build();
 
-            // Отправка запроса и получение ответа
             Response response = client.newCall(request).execute();
             String responseData = response.body().string();
+            JsonNode jsonNode = mapper.readTree(responseData);
+            JsonNode appData = jsonNode.get(appId);
 
-            // Обработка ответа в формате JSON
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(responseData);
-
-            // Получение данных об игре из ответа
-            JsonNode gameInfo = jsonNode.get("applist").get("apps").get(0);
-            String appName = gameInfo.get("name").asText();
-            String appDescription = gameInfo.get("detailed_description").asText();
-
-            // Вывод полученных данных
-            System.out.println("Название: " + appName);
-            System.out.println("Описание: " + appDescription);
-
+            if (appData != null && appData.has("data")) {
+                JsonNode data = appData.get("data");
+                if (scrapInfo.isTitleAttr() && data.has("name")) {
+                    gameDto.setName(data.get("name").asText());
+                }
+                if (scrapInfo.isDescriptionAttr() && data.has("short_description")) {
+                    gameDto.setDescription(data.get("short_description").asText());
+                }
+                if (scrapInfo.isPosterAttr() && data.has("header_image")) {
+                    gameDto.setLogo(data.get("header_image").asText());
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return gameDto;
     }
 
+    private String extractAppId(String url) {
+        if (url == null) return null;
+        // https://store.steampowered.com/app/1085660/
+        String[] parts = url.split("/");
+        for (int i = 0; i < parts.length - 1; i++) {
+            if ("app".equals(parts[i])) return parts[i + 1];
+        }
+        return null;
+    }
 }

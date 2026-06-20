@@ -111,6 +111,8 @@
                 id="scrapeSource"
                 v-model="scrape.source"
                 :options="scrapeSources"
+                optionLabel="label"
+                optionValue="value"
                 class="w-full"
               />
             </div>
@@ -183,7 +185,7 @@ const existingScreenshots = ref([])
 const newScreenshotPreviews = ref([])
 const logoPreview = ref('')
 const allGenres = ref([])
-const scrapeSources = ['Playground', 'Igromania']
+const scrapeSources = ref([])
 const scrapeFields = [
   { key: 'title', labelKey: 'game.scraper.field.title' },
   { key: 'poster', labelKey: 'game.scraper.field.poster' },
@@ -193,7 +195,7 @@ const scrapeFields = [
   { key: 'screens', labelKey: 'game.scraper.field.screenshots' }
 ]
 const scrape = ref({
-  source: 'Playground',
+  source: '',
   url: '',
   title: false,
   poster: false,
@@ -218,9 +220,10 @@ const editorOptions = {
 
 onMounted(async () => {
   try {
-    const [gameRes, filterRes] = await Promise.all([
+    const [gameRes, filterRes, scraperRes] = await Promise.all([
       gamesApi.getGame(route.params.id),
-      gamesApi.getFilterOptions()
+      gamesApi.getFilterOptions(),
+      gamesApi.getScrapers()
     ])
     const g = gameRes.data.data
     game.value = g
@@ -244,6 +247,11 @@ onMounted(async () => {
     })
     newScreenshotPreviews.value = []
     allGenres.value = filterRes.data.data.genres || []
+    const sources = (scraperRes.data.data || []).map(s => ({ label: s.displayName || s.type, value: s.type }))
+    scrapeSources.value = sources
+    if (sources.length > 0 && !scrape.value.source) {
+      scrape.value.source = sources[0].value
+    }
   } finally {
     loading.value = false
   }
@@ -326,7 +334,16 @@ async function handleScrape() {
       trailerUrl: g.trailerUrl || form.value.trailerUrl,
       genres: g.genres || form.value.genres,
       description: g.description || form.value.description,
-      instruction: g.instruction || form.value.instruction
+      instruction: g.instruction || form.value.instruction,
+      logo: g.logo || form.value.logo || '',
+      screenshots: [...(g.screenshots || []), ...(form.value.screenshots || [])],
+      deleteScreenshotIds: form.value.deleteScreenshotIds || []
+    }
+    if (g.logo) {
+      logoPreview.value = g.logo
+    }
+    if (g.screenshots && g.screenshots.length > 0) {
+      newScreenshotPreviews.value.push(...g.screenshots)
     }
     success.value = t('game.scrape_success')
   } catch (e) {

@@ -2,51 +2,85 @@ package com.jenikmax.game.library.service.scraper.scrapers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.service.scraper.ConfigEncryptionService;
+import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
+import com.jenikmax.game.library.service.scraper.api.Scraper;
+import com.jenikmax.game.library.service.scraper.model.ScraperConfig;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MobyGamesScraper {
+import java.util.concurrent.TimeUnit;
 
-    //YOUR_API_KEY на ваше реальное значение ключа доступа к API MobyGames.
-    private static final String API_KEY = "YOUR_API_KEY";
+public class MobyGamesScraper implements Scraper {
 
-   public void scrap(){
-       try {
-           OkHttpClient client = new OkHttpClient();
-           String gameId = "dune"; // Замените на идентификатор игры
+    private final ScraperConfig config;
+    private final ConfigEncryptionService encryptionService;
+    private final String type;
+    private final OkHttpClient client;
+    private final ObjectMapper mapper = new ObjectMapper();
 
-           // Формирование запроса к API MobyGames
-           String requestUrl = String.format("https://api.mobygames.com/v1/games/%s?api_key=%s", gameId, API_KEY);
-           Request request = new Request.Builder()
-                   .url(requestUrl)
-                   .get()
-                   .build();
+    public MobyGamesScraper(ScraperConfig config, ConfigEncryptionService encryptionService) {
+        this.config = config;
+        this.encryptionService = encryptionService;
+        this.type = config.getType();
+        this.client = new OkHttpClient.Builder()
+                .connectTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
+                .readTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
+                .build();
+    }
 
-           // Отправка запроса и получение ответа
-           Response response = client.newCall(request).execute();
-           String responseData = response.body().string();
+    @Override
+    public String getType() { return type; }
 
-           // Обработка ответа в формате JSON
-           ObjectMapper objectMapper = new ObjectMapper();
-           JsonNode jsonNode = objectMapper.readTree(responseData);
+    @Override
+    public GameDto scrap(GameDto gameDto) { return gameDto; }
 
-           // Получение данных об игре из ответа
-           String title = jsonNode.get("title").asText();
-           String releaseDate = jsonNode.get("release_date").asText();
-           String genre = jsonNode.get("genre").asText();
-           String platform = jsonNode.get("platform").asText();
+    @Override
+    public GameDto scrap(GameDto gameDto, String url) {
+        return scrap(gameDto);
+    }
 
-           // Вывод полученных данных
-           System.out.println("Название: " + title);
-           System.out.println("Дата выпуска: " + releaseDate);
-           System.out.println("Жанр: " + genre);
-           System.out.println("Платформа: " + platform);
+    @Override
+    public GameDto scrap(GameDto gameDto, ScrapInfo scrapInfo) {
+        String gameId = extractGameId(scrapInfo.getUrl());
+        if (gameId == null) return gameDto;
 
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
-   }
+        try {
+            String apiKey = encryptionService.decrypt(
+                    config.getEncryptedApiKey() != null ? config.getEncryptedApiKey() : "");
+            String requestUrl = String.format("%s/%s?api_key=%s", config.getApiUrl(), gameId, apiKey);
+            Request request = new Request.Builder()
+                    .url(requestUrl)
+                    .get()
+                    .build();
 
+            Response response = client.newCall(request).execute();
+            String responseData = response.body().string();
+            JsonNode jsonNode = mapper.readTree(responseData);
 
+            if (scrapInfo.isTitleAttr() && jsonNode.has("title")) {
+                gameDto.setName(jsonNode.get("title").asText());
+            }
+            if (scrapInfo.isDescriptionAttr() && jsonNode.has("description")) {
+                gameDto.setDescription(jsonNode.get("description").asText());
+            }
+            if (scrapInfo.isYearAttrAttr() && jsonNode.has("release_date")) {
+                gameDto.setReleaseDate(jsonNode.get("release_date").asText());
+            }
+            if (scrapInfo.isGenresAttr() && jsonNode.has("genre")) {
+                gameDto.setGenres(java.util.Collections.singletonList(jsonNode.get("genre").asText()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return gameDto;
+    }
+
+    private String extractGameId(String url) {
+        if (url == null) return null;
+        String[] parts = url.split("/");
+        return parts[parts.length - 1];
+    }
 }

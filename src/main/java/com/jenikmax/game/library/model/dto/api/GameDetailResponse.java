@@ -15,6 +15,8 @@ public class GameDetailResponse {
     private String description;
     private String instruction;
     private List<String> screenshotUrls;
+    private String logo;
+    private List<String> screenshots;
 
     public GameDetailResponse() {}
 
@@ -40,4 +42,8 @@ public class GameDetailResponse {
     public void setInstruction(String instruction) { this.instruction = instruction; }
     public List<String> getScreenshotUrls() { return screenshotUrls; }
     public void setScreenshotUrls(List<String> screenshotUrls) { this.screenshotUrls = screenshotUrls; }
+    public String getLogo() { return logo; }
+    public void setLogo(String logo) { this.logo = logo; }
+    public List<String> getScreenshots() { return screenshots; }
+    public void setScreenshots(List<String> screenshots) { this.screenshots = screenshots; }
 }

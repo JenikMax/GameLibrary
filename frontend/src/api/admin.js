@@ -18,5 +18,17 @@ export const adminApi = {
   },
   migrateImages() {
     return api.post('/admin/migrate-images')
+  },
+  getScraperConfigs() {
+    return api.get('/admin/scraper-config')
+  },
+  getScraperConfig(type) {
+    return api.get(`/admin/scraper-config/${type}`)
+  },
+  updateScraperConfig(type, config) {
+    return api.put(`/admin/scraper-config/${type}`, config)
+  },
+  reloadScraperConfig() {
+    return api.post('/admin/scraper-config/reload')
   }
 }

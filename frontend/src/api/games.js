@@ -21,5 +21,8 @@ export const gamesApi = {
   },
   getDownloadUrl(id) {
     return `/game-library/api/games/${id}/download`
+  },
+  getScrapers() {
+    return api.get('/games/scrapers')
   }
 }

@@ -7,6 +7,7 @@ import GameDetailView from '../views/GameDetailView.vue'
 import GameEditView from '../views/GameEditView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import AdminUsersView from '../views/AdminUsersView.vue'
+import AdminScrapersView from '../views/AdminScrapersView.vue'
 import DownloadsView from '../views/DownloadsView.vue'
 
 const routes = [
@@ -50,6 +51,12 @@ const routes = [
     path: '/admin/users',
     name: 'AdminUsers',
     component: AdminUsersView,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/scrapers',
+    name: 'AdminScrapers',
+    component: AdminScrapersView,
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {

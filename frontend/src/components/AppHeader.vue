@@ -80,6 +80,11 @@ const items = computed(() => {
           command: () => router.push('/admin/users')
         },
         {
+          label: t('nav.scrapers'),
+          icon: 'pi pi-cloud-download',
+          command: () => router.push('/admin/scrapers')
+        },
+        {
           label: t('nav.settings'),
           icon: 'pi pi-sliders-h',
           items: [

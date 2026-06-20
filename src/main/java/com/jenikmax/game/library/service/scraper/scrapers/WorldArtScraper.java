@@ -4,60 +4,88 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
+import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
+import com.jenikmax.game.library.service.scraper.api.Scraper;
+import com.jenikmax.game.library.service.scraper.model.ScraperConfig;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.Scanner;
+import java.util.Map;
 
-public class WorldArtScraper {
+public class WorldArtScraper implements Scraper {
 
-    public void scrap(){
+    private final ScraperConfig config;
+    private final String type;
+
+    public WorldArtScraper(ScraperConfig config) {
+        this.config = config;
+        this.type = config.getType();
+    }
+
+    @Override
+    public String getType() { return type; }
+
+    @Override
+    public GameDto scrap(GameDto gameDto) { return gameDto; }
+
+    @Override
+    public GameDto scrap(GameDto gameDto, String url) {
+        return scrap(gameDto);
+    }
+
+    @Override
+    public GameDto scrap(GameDto gameDto, ScrapInfo scrapInfo) {
+        String searchQuery = extractSearchQuery(scrapInfo, gameDto);
+        if (searchQuery == null) return gameDto;
+
         try (WebClient webClient = new WebClient()) {
-            // Включение поддержки JavaScript для HtmlUnit
             webClient.getOptions().setJavaScriptEnabled(true);
+            webClient.getOptions().setTimeout(config.getTimeoutMs());
 
-            // Получение страницы с использованием HtmlUnit
-            HtmlPage searchPage = webClient.getPage("http://www.world-art.ru");
+            Map<String, String> sel = config.getCssSelectors();
+            if (sel == null) sel = java.util.Collections.emptyMap();
 
-            // Получение формы поиска по названию игры
-            HtmlForm searchForm = searchPage.getFirstByXPath("//form[@id='searchform']");
-            if (searchForm == null) {
-                System.out.println("Форма поиска не найдена.");
-                return;
-            }
+            String baseUrl = config.getBaseUrl() != null ? config.getBaseUrl() : "http://www.world-art.ru";
+            HtmlPage searchPage = webClient.getPage(baseUrl);
 
-            // Ввод названия игры в строку поиска
-            Scanner scanner = new Scanner(System.in);
-            System.out.print("Введите название игры: ");
-            String gameName = scanner.nextLine();
+            String searchFormId = sel.getOrDefault("searchForm", "searchform");
+            HtmlForm searchForm = searchPage.getFirstByXPath("//form[@id='" + searchFormId + "']");
+            if (searchForm == null) return gameDto;
 
-            // Заполнение строки поиска
-            searchForm.getInputByName("searchtext").setValueAttribute(gameName);
-            HtmlSubmitInput submitBtn = searchForm.getInputByName("dosearch");
+            String searchInputName = sel.getOrDefault("searchInput", "searchtext");
+            searchForm.getInputByName(searchInputName).setValueAttribute(searchQuery);
 
-            // Отправка запроса на поиск
+            String submitInputName = sel.getOrDefault("searchSubmit", "dosearch");
+            HtmlSubmitInput submitBtn = searchForm.getInputByName(submitInputName);
             HtmlPage searchResultsPage = submitBtn.click();
 
-            // Получение HTML-кода страницы
             String html = searchResultsPage.asXml();
-
-            // Создание объекта Document с использованием Jsoup
             Document doc = Jsoup.parse(html);
 
-            // Парсинг и обработка данных с помощью Jsoup
-            Elements newsElements = doc.select(".foundresult");
+            String resultSel = sel.getOrDefault("resultItem", ".foundresult");
+            String titleSel = sel.getOrDefault("resultTitle", ".RUbreaking");
 
-            for (Element element : newsElements) {
-                String title = element.selectFirst(".RUbreaking").text();
-                System.out.println("Заголовок: " + title);
-                System.out.println("----------------------------");
+            Elements newsElements = doc.select(resultSel);
+            if (!newsElements.isEmpty()) {
+                Element first = newsElements.first();
+                Element titleElement = first.selectFirst(titleSel);
+                if (titleElement != null && scrapInfo.isTitleAttr()) {
+                    gameDto.setName(titleElement.text());
+                }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return gameDto;
     }
 
+    private String extractSearchQuery(ScrapInfo scrapInfo, GameDto gameDto) {
+        if (scrapInfo.getUrl() != null && !scrapInfo.getUrl().isEmpty()) {
+            return scrapInfo.getUrl().trim();
+        }
+        return gameDto.getName();
+    }
 }
