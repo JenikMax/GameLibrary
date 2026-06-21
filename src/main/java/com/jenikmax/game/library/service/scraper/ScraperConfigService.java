@@ -241,12 +241,13 @@ public class ScraperConfigService {
 
         ScraperConfig igdb = new ScraperConfig();
         igdb.setType("igdb");
-        igdb.setEnabled(false);
+        igdb.setEnabled(true);
         igdb.setDisplayName("IGDB");
         igdb.setApiUrl("https://api.igdb.com/v4/games");
         igdb.setAuthScheme("Bearer");
         igdb.setHeaders(new LinkedHashMap<>());
         igdb.getHeaders().put("Client-ID", "");
+        igdb.setGenreMappings(buildIgdbGenreMappings());
         list.add(igdb);
 
         ScraperConfig thegamesdb = new ScraperConfig();
@@ -775,6 +776,44 @@ public class ScraperConfigService {
         map.put("World War II", Arrays.asList("istoriia"));
         map.put("Wrestling", Arrays.asList("fighting", "sport"));
         map.put("Zombies", Arrays.asList("zombie", "horror"));
+        return map;
+    }
+
+    private Map<String, List<String>> buildIgdbGenreMappings() {
+        Map<String, List<String>> map = new LinkedHashMap<>();
+        map.put("Action", Arrays.asList("action"));
+        map.put("Adventure", Arrays.asList("adventure"));
+        map.put("Arcade", Arrays.asList("arcade"));
+        map.put("Battle Royale", Arrays.asList("battle_royale"));
+        map.put("Card & Board Game", Arrays.asList("card", "board_game"));
+        map.put("Fighting", Arrays.asList("fighting"));
+        map.put("Hack and slash/Beat 'em up", Arrays.asList("hack_and_slash", "beat_em_up"));
+        map.put("Hack and Slash", Arrays.asList("hack_and_slash"));
+        map.put("Beat 'em up", Arrays.asList("beat_em_up"));
+        map.put("Horror", Arrays.asList("horror"));
+        map.put("Indie", Arrays.asList("indie"));
+        map.put("MOBA", Arrays.asList("moba"));
+        map.put("Music", Arrays.asList("music"));
+        map.put("Open World", Arrays.asList("open_world"));
+        map.put("Pinball", Arrays.asList("arcade"));
+        map.put("Platform", Arrays.asList("platform"));
+        map.put("Point-and-click", Arrays.asList("point_click", "quest"));
+        map.put("Puzzle", Arrays.asList("pazzl"));
+        map.put("Quiz/Trivia", Arrays.asList("logic"));
+        map.put("Racing", Arrays.asList("racing"));
+        map.put("Real Time Strategy (RTS)", Arrays.asList("rts"));
+        map.put("Role-playing (RPG)", Arrays.asList("rpg"));
+        map.put("Science Fiction", Arrays.asList("sci_fi"));
+        map.put("Shooter", Arrays.asList("shooter"));
+        map.put("Simulator", Arrays.asList("simulators"));
+        map.put("Sport", Arrays.asList("sport"));
+        map.put("Stealth", Arrays.asList("stealth"));
+        map.put("Strategy", Arrays.asList("strategy"));
+        map.put("Survival", Arrays.asList("survival"));
+        map.put("Tactical", Arrays.asList("tactics"));
+        map.put("Tower Defense", Arrays.asList("tower_defence"));
+        map.put("Turn-based strategy (TBS)", Arrays.asList("turn_based", "strategy"));
+        map.put("Visual Novel", Arrays.asList("vizualnaia_novella"));
         return map;
     }
 }
