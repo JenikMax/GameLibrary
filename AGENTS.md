@@ -28,7 +28,7 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - Auth: Spring Security, form login + JWT, BCrypt, `ROLE_ADMIN`/`ROLE_USER`.
 - Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission 4.1.2 RPC for seeding.
 - Images: filesystem (`/gameLibrary/images/`) with DB bytea fallback.
-- Scrapers (2 active, 5 disabled): Playground (CSS selectors), Igromania (JSON paths), Steam, MobyGames, IGDB, TheGameDB, WorldArt.
+- Scrapers (3 active, 3 disabled): Playground (CSS selectors), Igromania (JSON paths), WorldArt (CSS selectors), Steam, IGDB, TheGameDB.
 - State: Pinia stores for auth, library, locale.
 - Rich text: VueQuill + Quill 2 for game description editing.
 - Package root: `com.jenikmax.game.library`.
@@ -42,6 +42,13 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - **Transmission must be running** for torrent seeding. In Docker it starts automatically; for local dev run `docker run lscr.io/linuxserver/transmission`.
 - **Multi-stage Docker build** requires Docker 19.03+ and BuildKit.
 - **Tracker announce URL** must be reachable from user torrent clients. Set `TRACKER_ANNOUNCE_URL` to your NAS IP/hostname in `docker-compose.yml`.
-- **uTP must be enabled** in Transmission (`"utp-enabled": true` in `tracker/config/settings.json`) for P2P connections with uTorrent on Windows. Without it, even though the tracker correctly returns the seeder, data transfer fails because uTorrent cannot connect over pure TCP. Enable uTP in Transmission, then `docker-compose restart transmission`.
+- **uTP must be enabled** in Transmission for P2P connections with uTorrent on Windows. Without it, even though the tracker correctly returns the seeder, data transfer fails because uTorrent cannot connect over pure TCP.
+  - The modern key is `preferred_transports`, set **both** in `gameLibraryConfigs/tracker/config/settings.json`:
+    ```json
+    "preferred_transports": ["utp", "tcp"],
+    "utp-enabled": true
+    ```
+  - The container init script (`init-transmission-config/run`) does NOT process `TRANSMISSION_*` env vars (only `USER`, `PASS`, `WHITELIST`, etc.), so `TRANSMISSION_UTP_ENABLED=true` in docker-compose.yml has **no effect**. The fix must be done directly in the host `settings.json` — it survives restarts because the init script doesn't touch these keys.
+  - After editing, `docker-compose restart transmission`.
 - **Images on filesystem**: after DB→FS migration (`POST /api/admin/migrate-images` or `scripts/migrate-images.sh`), images are served from disk. If the file is missing, falls back to DB bytea.
-- **Local dev profile** in `application-alone.yml` overrides games/image/tracker paths for local development. Activate with `--spring.profiles.active=alone`.
+- **Local dev profile** in `application-alone.yml` overrides games/images/gameLibraryConfigs paths for local development. Activate with `--spring.profiles.active=alone`.

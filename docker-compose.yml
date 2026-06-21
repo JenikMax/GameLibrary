@@ -7,7 +7,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /host_mnt/d/Work/MyProjects/gametest/db/data:/var/lib/postgresql/data
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/db/data:/var/lib/postgresql/data
       #- /host_mnt/f/Work/Git/my_project/db/data:/var/lib/postgresql/data  рабочий пример
     env_file:
       - ./postgresdb/env.list
@@ -42,7 +42,7 @@ services:
     volumes:
       - /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
       #- /host_mnt/f/Work/Git/my_project/data:/gameLibrary  рабочий пример
-      - /host_mnt/d/Work/MyProjects/gametest/tracker/torrents:/torrentDirTmp
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents:/torrentDirTmp
       #- /host_mnt/f/Work/Git/my_project/data/tDir:/torrentDirTmp  рабочий пример
     depends_on:
       postgresdb:
@@ -70,10 +70,10 @@ services:
       - "51413:51413/udp"
     volumes:
       - /host_mnt/d/Work/MyProjects/gametest/games:/downloads/games
-      - /host_mnt/d/Work/MyProjects/gametest/tracker/config:/config
-      - /host_mnt/d/Work/MyProjects/gametest/tracker/watch:/watch
-      - /host_mnt/d/Work/MyProjects/gametest/tracker/complete:/downloads/complete
-      - /host_mnt/d/Work/MyProjects/gametest/tracker/incomplete:/downloads/incomplete
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/config:/config
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/watch:/watch
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/complete:/downloads/complete
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
@@ -86,4 +86,5 @@ services:
       - DHT=true
       - LPD=true
       - PEX=true
+
     restart: unless-stopped

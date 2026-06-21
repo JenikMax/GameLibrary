@@ -43,8 +43,6 @@ public class ScraperFactory {
                 return new IgromaniaScraper(config, encryptionService);
             case "steam":
                 return new SteamScraper(config, encryptionService);
-            case "mobygames":
-                return new MobyGamesScraper(config, encryptionService);
             case "igdb":
                 return new IGDBScraper(config, encryptionService);
             case "thegamesdb":

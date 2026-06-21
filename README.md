@@ -13,7 +13,7 @@
 | REST API | Spring MVC `@RestController`, JWT auth |
 | Документация API | OpenAPI / Swagger UI |
 | Скачивание | Transmission (JSON-RPC) + встроенный HTTP-трекер |
-| Сеть | OkHttp 3, Jsoup, HtmlUnit (скрапинг) |
+| Сеть | OkHttp 3, Jsoup (скрапинг) |
 | Сборка backend | Maven, JAR packaging |
 | Сборка frontend | npm / Vite |
 | Контейнеризация | Docker, docker-compose |
@@ -225,7 +225,7 @@ DDL выполняются в порядке сортировки: `postgresdb/d
 | `TRANSMISSION_DOWNLOAD_DIR` | `/downloads` | Директория с играми (в контейнере Transmission) |
 | `JWT_SECRET` | (ключ по умолчанию) | Секрет JWT |
 | `JWT_EXPIRATION_MS` | `86400000` | Время жизни токена (24ч) |
-| `SCRAPER_CONFIG_DIR` | `/gameLibrary/scrapers` | Директория с `scrapers-config.json` |
+| `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Директория с `scrapers-config.json` |
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная директория для .torrent файлов |
 
 ## Scraper-ы
@@ -237,10 +237,9 @@ DDL выполняются в порядке сортировки: `postgresdb/d
 | Playground (playground.ru) | ✅ Активен | CSS-селекторы | Сбор названия, описания, жанров, скриншотов |
 | Igromania (igromania.ru) | ✅ Активен | JSON Path | Сбор через props initialStoreState |
 | Steam (api.steampowered.com) | ❌ Отключён | REST API | Требуется API-ключ |
-| MobyGames (api.mobygames.com) | ❌ Отключён | REST API | Требуется API-ключ |
 | IGDB (api.igdb.com) | ❌ Отключён | REST API + Bearer | Требуется Client-ID |
 | TheGamesDB (api.thegamesdb.net) | ❌ Отключён | REST API | Требуется API-ключ |
-| World-Art (world-art.ru) | ❌ Отключён | CSS-селекторы | Форма поиска |
+| World-Art (world-art.ru) | ✅ Активен | CSS-селекторы | Прямой парсинг карточки + поиск |
 
 Подробнее о подводных камнях — см. `AGENTS.md`.
 
@@ -284,34 +283,35 @@ spring:
 nas/gameLibrary/                  # корень библиотеки
 ├── games/                        # игровые файлы (PC, PS3, ...)
 ├── images/                       # скриншоты и обложки
-├── db/                           # данные PostgreSQL (Docker volume)
-└── tracker/                      # всё, что связано с Transmission
-    ├── config/                   # settings.json, queue.json (создаётся автоматически)
-    ├── watch/                    # автодобавление .torrent файлов
-    ├── complete/                 # завершённые загрузки
-    ├── incomplete/               # незавершённые загрузки
-    └── torrents/                 # .torrent файлы, созданные backend
+└── gameLibraryConfigs/           # конфигурационные данные
+    ├── db/                       # данные PostgreSQL (Docker volume)
+    └── tracker/                  # всё, что связано с Transmission
+        ├── config/               # settings.json, queue.json (создаётся автоматически)
+        ├── watch/                # автодобавление .torrent файлов
+        ├── complete/             # завершённые загрузки
+        ├── incomplete/           # незавершённые загрузки
+        └── torrents/             # .torrent файлы, созданные backend
 ```
 
 **Создание директорий (Linux):**
 ```bash
 mkdir -p /mnt/nas/gameLibrary/games
-mkdir -p /mnt/nas/gameLibrary/tracker/{config,watch,complete,incomplete,torrents}
+mkdir -p /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/{config,watch,complete,incomplete,torrents}
 ```
 
 **Создание директорий (Windows):**
 ```cmd
-mkdir D:\GameLibrary\tracker\config
-mkdir D:\GameLibrary\tracker\watch
-mkdir D:\GameLibrary\tracker\complete
-mkdir D:\GameLibrary\tracker\incomplete
+mkdir D:\GameLibrary\gameLibraryConfigs\tracker\config
+mkdir D:\GameLibrary\gameLibraryConfigs\tracker\watch
+mkdir D:\GameLibrary\gameLibraryConfigs\tracker\complete
+mkdir D:\GameLibrary\gameLibraryConfigs\tracker\incomplete
 ```
 
 Обратите внимание: `PUID` / `PGID` в `docker-compose.yml` должны совпадать с UID/GID владельца файлов игр. На WSL/Windows файлы будут доступны, даже если `chown` в контейнере выдаёт предупреждение.
 
 ### Настройка Transmission
 
-Файл `tracker/config/settings.json` создаётся автоматически при первом запуске контейнера. Важные параметры задаются через переменные окружения в `docker-compose.yml` (секция `environment` сервиса `transmission`):
+Файл `gameLibraryConfigs/tracker/config/settings.json` создаётся автоматически при первом запуске контейнера. Важные параметры задаются через переменные окружения в `docker-compose.yml` (секция `environment` сервиса `transmission`):
 
 | Переменная | Значение | Параметр settings.json |
 |---|---|---|
@@ -341,7 +341,7 @@ cd ..
 
 # 4. Создать на хосте структуру директорий для Transmission:
 #    mkdir -p /mnt/nas/gameLibrary/games
-#    mkdir -p /mnt/nas/gameLibrary/tracker/{config,watch,complete,incomplete,torrents}
+#    mkdir -p /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/{config,watch,complete,incomplete,torrents}
 #
 #    Подробнее — в разделе «Структура директорий для Transmission» ниже.
 
@@ -351,15 +351,15 @@ cd ..
 #    backend:
 #      volumes:
 #        - /mnt/nas/gameLibrary:/gameLibrary            # корень с games/, images/ и т.д.
-#        - /mnt/nas/gameLibrary/tracker/torrents:/torrentDirTmp
+#        - /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/torrents:/torrentDirTmp
 #
 #    transmission:
 #      volumes:
 #        - /mnt/nas/gameLibrary/games:/downloads/games         # игровые файлы для сидирования
-#        - /mnt/nas/gameLibrary/tracker/config:/config         # настройки Transmission
-#        - /mnt/nas/gameLibrary/tracker/watch:/watch           # автодобавление торрентов
-#        - /mnt/nas/gameLibrary/tracker/complete:/downloads/complete
-#        - /mnt/nas/gameLibrary/tracker/incomplete:/downloads/incomplete
+#        - /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/config:/config         # настройки Transmission
+#        - /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/watch:/watch           # автодобавление торрентов
+#        - /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/complete:/downloads/complete
+#        - /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
 
 # 6. Запустить все сервисы
 docker compose up --build -d
@@ -383,10 +383,10 @@ sudo -u postgres psql -f postgresdb/ddl/3_user.sql
 docker run -d --name transmission \
   -p 9091:9091 -p 51413:51413 -p 51413:51413/udp \
   -v /mnt/nas/gameLibrary/games:/downloads/games \
-  -v /mnt/nas/gameLibrary/tracker/config:/config \
-  -v /mnt/nas/gameLibrary/tracker/watch:/watch \
-  -v /mnt/nas/gameLibrary/tracker/complete:/downloads/complete \
-  -v /mnt/nas/gameLibrary/tracker/incomplete:/downloads/incomplete \
+  -v /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/config:/config \
+  -v /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/watch:/watch \
+  -v /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/complete:/downloads/complete \
+  -v /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete \
   -e PUID=$(id -u) -e PGID=$(id -g) \
   lscr.io/linuxserver/transmission
 
@@ -462,11 +462,11 @@ npm run build
 cd ..
 
 # 4. Создать на хосте структуру директорий:
-#    mkdir D:\GameLibrary\tracker\config
-#    mkdir D:\GameLibrary\tracker\watch
-#    mkdir D:\GameLibrary\tracker\complete
-#    mkdir D:\GameLibrary\tracker\incomplete
-#    # games/ и tracker/torrents/ уже должны быть
+#    mkdir D:\GameLibrary\gameLibraryConfigs\tracker\config
+#    mkdir D:\GameLibrary\gameLibraryConfigs\tracker\watch
+#    mkdir D:\GameLibrary\gameLibraryConfigs\tracker\complete
+#    mkdir D:\GameLibrary\gameLibraryConfigs\tracker\incomplete
+#    # games/ и gameLibraryConfigs/tracker/torrents/ уже должны быть
 
 # 5. Настроить volume paths в docker-compose.yml
 #    Замените Linux-пути на Windows:
@@ -474,15 +474,15 @@ cd ..
 #    backend:
 #      volumes:
 #        - D:/GameLibrary:/gameLibrary
-#        - D:/GameLibrary/tracker/torrents:/torrentDirTmp
+#        - D:/GameLibrary/gameLibraryConfigs/tracker/torrents:/torrentDirTmp
 #
 #    transmission:
 #      volumes:
 #        - D:/GameLibrary/games:/downloads/games
-#        - D:/GameLibrary/tracker/config:/config
-#        - D:/GameLibrary/tracker/watch:/watch
-#        - D:/GameLibrary/tracker/complete:/downloads/complete
-#        - D:/GameLibrary/tracker/incomplete:/downloads/incomplete
+#        - D:/GameLibrary/gameLibraryConfigs/tracker/config:/config
+#        - D:/GameLibrary/gameLibraryConfigs/tracker/watch:/watch
+#        - D:/GameLibrary/gameLibraryConfigs/tracker/complete:/downloads/complete
+#        - D:/GameLibrary/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
 
 # 6. Запустить все сервисы
 docker compose up --build -d
@@ -511,10 +511,10 @@ psql -U postgres -f postgresdb\ddl\3_user.sql
 docker run -d --name transmission \
   -p 9091:9091 -p 51413:51413 -p 51413:51413/udp \
   -v D:\GameLibrary\games:/downloads/games \
-  -v D:\GameLibrary\tracker\config:/config \
-  -v D:\GameLibrary\tracker\watch:/watch \
-  -v D:\GameLibrary\tracker\complete:/downloads/complete \
-  -v D:\GameLibrary\tracker\incomplete:/downloads/incomplete \
+  -v D:\GameLibrary\gameLibraryConfigs\tracker\config:/config \
+  -v D:\GameLibrary\gameLibraryConfigs\tracker\watch:/watch \
+  -v D:\GameLibrary\gameLibraryConfigs\tracker\complete:/downloads/complete \
+  -v D:\GameLibrary\gameLibraryConfigs\tracker\incomplete:/downloads/incomplete \
   lscr.io/linuxserver/transmission
 ```
 
@@ -563,7 +563,7 @@ Frontend откроется на `http://localhost:5173`, API проксируе
 - Проверьте `TRANSMISSION_RPC_URL`: в Docker `http://transmission:9091/transmission/rpc`, локально `http://localhost:9091/transmission/rpc`.
 - Проверьте, что Transmission запущен: `curl -X GET http://localhost:9091/transmission/rpc` — должен вернуть заголовок `X-Transmission-Session-Id`.
 - Убедитесь, что `PUID`/`PGID` в docker-compose.yml соответствуют владельцу файлов игр.
-- Если в логах ошибка `Couldn't bind to [::]:9091` — Transmission пытается слушать IPv6, но Docker Desktop на Windows/WSL не поддерживает его. Отредактируйте `tracker/config/settings.json` на хосте, замените `"rpc-bind-address": "[::]"` на `"rpc-bind-address": "0.0.0.0"` и перезапустите контейнер.
+- Если в логах ошибка `Couldn't bind to [::]:9091` — Transmission пытается слушать IPv6, но Docker Desktop на Windows/WSL не поддерживает его. Отредактируйте `gameLibraryConfigs/tracker/config/settings.json` на хосте, замените `"rpc-bind-address": "[::]"` на `"rpc-bind-address": "0.0.0.0"` и перезапустите контейнер.
 
 ### Изображения не отображаются
 - После миграции изображения хранятся на диске, путь должен совпадать с `IMAGES_DIRECTORY`.
@@ -574,19 +574,24 @@ Frontend откроется на `http://localhost:5173`, API проксируе
 
 Трекер работает (логи backend показывают `returning complete=1`), uTorrent видит сида, но данные не передаются.
 
-**Решение:** включите uTP в настройках Transmission. Отредактируйте `tracker/config/settings.json` на хосте:
+**Решение:** включите uTP в настройках Transmission. Отредактируйте `gameLibraryConfigs/tracker/config/settings.json` на хосте:
 
 ```json
-"utp-enabled": true
+{
+    "preferred_transports": ["utp", "tcp"],
+    "utp-enabled": true
+}
 ```
 
-и перезапустите контейнер:
+Затем перезапустите контейнер:
 
 ```bash
 docker-compose restart transmission
 ```
 
-По умолчанию `utp-enabled` не задан (или `false`). Некоторые клиенты (uTorrent) на Windows не могут установить peer-to-peer соединение с Transmission по TCP, если uTP выключен. uTP должен быть включён с обеих сторон.
+**Важно:** в Transmission 4.x ключ `utp-enabled` считается устаревшим. Основной способ управления — `preferred_transports`. Если в нём нет `"utp"`, то uTP будет выключен, даже если `utp-enabled: true`. Убедитесь, что указаны оба ключа.
+
+Переменная окружения `TRANSMISSION_UTP_ENABLED=true` в `docker-compose.yml` **не работает** — init-скрипт контейнера linuxserver/transmission не обрабатывает `TRANSMISSION_*` переменные (поддерживаются только `USER`, `PASS`, `WHITELIST`, `HOST_WHITELIST`, `PEERPORT`, `UMASK`). Настройки необходимо менять напрямую в `settings.json` на хосте — они сохранятся после перезапусков.
 
 ### Ошибка "no suitable method found for create"
 - OkHttp 3.x: `RequestBody.create(MediaType, String)` — сначала MediaType, потом String.

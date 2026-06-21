@@ -3,8 +3,8 @@ DB_PORT: 5432
 DB_HOST: localhost
 SERVER_PORT: 8080
 TORRENT_TTL: 180000
-TORRENT_DIR: D:/Work/MyProjects/gametest/tracker/watch
-TORRENT_DIR_TMP: D:/Work/MyProjects/gametest/tracker/torrents
+TORRENT_DIR: D:/Work/MyProjects/gametest/gameLibraryConfigs/tracker/watch
+TORRENT_DIR_TMP: D:/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents
 TORRENT_TRACKER_HOST: 192.168.0.109
 TORRENT_TRACKER_PORT: 9020
 

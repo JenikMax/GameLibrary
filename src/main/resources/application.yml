@@ -24,7 +24,7 @@ game-library:
     rpc-url: ${TRANSMISSION_RPC_URL:http://transmission:9091/transmission/rpc}
     download-dir: ${TRANSMISSION_DOWNLOAD_DIR:/downloads}
   scraper:
-    config-dir: ${SCRAPER_CONFIG_DIR:/gameLibrary/scrapers}
+    config-dir: ${SCRAPER_CONFIG_DIR:/gameLibrary/gameLibraryConfigs/scrapers}
 
 spring:
   mvc:
