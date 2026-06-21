@@ -125,10 +125,15 @@ public class ScraperConfigService {
 
     public synchronized void updateConfig(String type, ScraperConfig newConfig) {
         newConfig.setType(type);
-        if (newConfig.getEncryptedApiKey() != null && !newConfig.getEncryptedApiKey().isEmpty()) {
-            if (!encryptionService.isEncrypted(newConfig.getEncryptedApiKey())) {
-                newConfig.setEncryptedApiKey(encryptionService.encrypt(newConfig.getEncryptedApiKey()));
+        ScraperConfig existing = configs.get(type);
+
+        String incomingKey = newConfig.getEncryptedApiKey();
+        if (incomingKey == null || incomingKey.isEmpty() || incomingKey.contains("****")) {
+            if (existing != null) {
+                newConfig.setEncryptedApiKey(existing.getEncryptedApiKey());
             }
+        } else if (!encryptionService.isEncrypted(incomingKey)) {
+            newConfig.setEncryptedApiKey(encryptionService.encrypt(incomingKey));
         }
         configs.put(type, newConfig);
         save();
@@ -140,7 +145,7 @@ public class ScraperConfigService {
         String stored = cfg.getEncryptedApiKey();
         if (stored != null && !stored.isEmpty()) {
             String decrypted = encryptionService.decrypt(stored);
-            if (!decrypted.equals(stored)) return decrypted;
+            if (decrypted != null && !decrypted.equals(stored)) return decrypted;
         }
         String envKey = System.getenv("SCRAPER_" + type.toUpperCase() + "_API_KEY");
         if (envKey != null && !envKey.isEmpty()) return envKey;
@@ -252,9 +257,10 @@ public class ScraperConfigService {
 
         ScraperConfig thegamesdb = new ScraperConfig();
         thegamesdb.setType("thegamesdb");
-        thegamesdb.setEnabled(false);
+        thegamesdb.setEnabled(true);
         thegamesdb.setDisplayName("TheGamesDB");
         thegamesdb.setApiUrl("https://api.thegamesdb.net/v1/Games/ByGameName");
+        thegamesdb.setGenreMappings(buildTheGameDBGenreMappings());
         list.add(thegamesdb);
 
         ScraperConfig worldart = new ScraperConfig();
@@ -813,6 +819,37 @@ public class ScraperConfigService {
         map.put("Tactical", Arrays.asList("tactics"));
         map.put("Tower Defense", Arrays.asList("tower_defence"));
         map.put("Turn-based strategy (TBS)", Arrays.asList("turn_based", "strategy"));
+        map.put("Visual Novel", Arrays.asList("vizualnaia_novella"));
+        return map;
+    }
+
+    private Map<String, List<String>> buildTheGameDBGenreMappings() {
+        Map<String, List<String>> map = new LinkedHashMap<>();
+        map.put("Action", Arrays.asList("action"));
+        map.put("Adventure", Arrays.asList("adventure"));
+        map.put("Arcade", Arrays.asList("arcade"));
+        map.put("Board Game", Arrays.asList("board_game", "card"));
+        map.put("Card Game", Arrays.asList("card"));
+        map.put("Educational", Arrays.asList("other"));
+        map.put("Family", Arrays.asList("other"));
+        map.put("Fighting", Arrays.asList("fighting"));
+        map.put("Hack and Slash", Arrays.asList("hack_and_slash", "beat_em_up"));
+        map.put("Indie", Arrays.asList("indie"));
+        map.put("MOBA", Arrays.asList("moba"));
+        map.put("Misc", Arrays.asList("other"));
+        map.put("Music", Arrays.asList("music"));
+        map.put("Party", Arrays.asList("other"));
+        map.put("Pinball", Arrays.asList("arcade"));
+        map.put("Platform", Arrays.asList("platform"));
+        map.put("Puzzle", Arrays.asList("pazzl"));
+        map.put("Racing", Arrays.asList("racing"));
+        map.put("Rhythm", Arrays.asList("music"));
+        map.put("Role-Playing", Arrays.asList("rpg"));
+        map.put("Shooter", Arrays.asList("shooter"));
+        map.put("Simulation", Arrays.asList("simulators"));
+        map.put("Sports", Arrays.asList("sport"));
+        map.put("Strategy", Arrays.asList("strategy"));
+        map.put("Trivia", Arrays.asList("logic"));
         map.put("Visual Novel", Arrays.asList("vizualnaia_novella"));
         return map;
     }

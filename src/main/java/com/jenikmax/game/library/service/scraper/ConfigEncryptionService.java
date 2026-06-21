@@ -72,8 +72,8 @@ public class ConfigEncryptionService {
             byte[] plaintext = cipher.doFinal(combined, GCM_IV_LENGTH, combined.length - GCM_IV_LENGTH);
             return new String(plaintext, "UTF-8");
         } catch (Exception e) {
-            log.warn("Decryption failed for value, returning as-is", e);
-            return ciphertext;
+            log.error("Decryption failed for value", e);
+            return null;
         }
     }
 

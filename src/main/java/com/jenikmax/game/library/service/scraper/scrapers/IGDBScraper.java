@@ -53,8 +53,9 @@ public class IGDBScraper implements Scraper {
         if (gameName == null) return gameDto;
 
         try {
-            String accessToken = encryptionService.decrypt(
-                    config.getEncryptedApiKey() != null ? config.getEncryptedApiKey() : "");
+            String encKey = config.getEncryptedApiKey();
+            String accessToken = encKey != null ? encryptionService.decrypt(encKey) : "";
+            if (accessToken == null) accessToken = "";
             String clientId = config.getHeaders() != null ? config.getHeaders().get("Client-ID") : "";
 
             String query = String.format(
@@ -85,7 +86,11 @@ public class IGDBScraper implements Scraper {
 
                 if (scrapInfo.isPosterAttr() && game.has("cover") && game.get("cover").has("url")) {
                     String coverUrl = game.get("cover").get("url").asText();
-                    gameDto.setLogo("https:" + coverUrl.replace("t_thumb", "t_cover_big"));
+                    String fullUrl = "https:" + coverUrl.replace("t_thumb", "t_cover_big");
+                    String b64 = imageToBase64(fullUrl);
+                    if (b64 != null) {
+                        gameDto.setLogo(b64);
+                    }
                 }
 
                 if (scrapInfo.isYearAttrAttr() && game.has("first_release_date")) {

@@ -1,5 +1,6 @@
 package com.jenikmax.game.library.service.scraper.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,9 @@ public class ScraperConfig {
     public void setGenreMappings(Map<String, List<String>> genreMappings) { this.genreMappings = genreMappings; }
     public String getApiUrl() { return apiUrl; }
     public void setApiUrl(String apiUrl) { this.apiUrl = apiUrl; }
+    @JsonProperty("apiKey")
     public String getEncryptedApiKey() { return encryptedApiKey; }
+    @JsonProperty("apiKey")
     public void setEncryptedApiKey(String encryptedApiKey) { this.encryptedApiKey = encryptedApiKey; }
     public String getAuthScheme() { return authScheme; }
     public void setAuthScheme(String authScheme) { this.authScheme = authScheme; }

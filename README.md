@@ -117,7 +117,7 @@ Swagger UI: `/game-library/swagger-ui.html`
 ### Редактирование игр (ADMIN)
 - Название, год, платформа, описание (Quill-редактор), инструкция, трейлер
 - Жанры из общего справочника
-- Сбор метаданных со scraper-ов (4 активных: Playground.ru / Igromania.ru / World-Art / Steam, 2 отключённых)
+- Сбор метаданных со scraper-ов (6 активных: Playground.ru / Igromania.ru / World-Art / Steam / IGDB / TheGamesDB)
 
 ### Скачивание игр
 - **Малые игры (<1 ГБ)**: потоковая упаковка в ZIP
@@ -226,6 +226,7 @@ DDL выполняются в порядке сортировки: `postgresdb/d
 | `JWT_SECRET` | (ключ по умолчанию) | Секрет JWT |
 | `JWT_EXPIRATION_MS` | `86400000` | Время жизни токена (24ч) |
 | `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Директория с `scrapers-config.json` |
+| `SCRAPER_ENCRYPTION_KEY` | (не задан) | Ключ AES-256 (base64) для шифрования API-ключей скраперов. **Обязателен для сохранения ключей после перезапуска**. Сгенерировать: `openssl rand -base64 32` |
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная директория для .torrent файлов |
 
 ## Scraper-ы
@@ -237,9 +238,43 @@ DDL выполняются в порядке сортировки: `postgresdb/d
 | Playground (playground.ru) | ✅ Активен | CSS-селекторы | Сбор названия, описания, жанров, скриншотов |
 | Igromania (igromania.ru) | ✅ Активен | JSON Path | Сбор через props initialStoreState |
 | Steam (store.steampowered.com) | ✅ Активен | Storefront API | Steam Storefront, без API-ключа |
-| IGDB (api.igdb.com) | ❌ Отключён | REST API + Bearer | Требуется Client-ID |
-| TheGamesDB (api.thegamesdb.net) | ❌ Отключён | REST API | Требуется API-ключ |
+| IGDB (api.igdb.com) | ✅ Активен | REST API + Bearer | Требуется Client-ID + Bearer-токен (Twitch OAuth) |
+| TheGamesDB (api.thegamesdb.net) | ✅ Активен | REST API | Требуется API-ключ (регистрация на thegamesdb.net) |
 | World-Art (world-art.ru) | ✅ Активен | CSS-селекторы | Прямой парсинг карточки + поиск |
+
+### Настройка IGDB scraper
+
+IGDB использует авторизацию Twitch. Для работы потребуются **Client-ID** и **Access Token**:
+
+1. Зайди на https://dev.twitch.tv/console/apps/create
+2. Создай приложение (Name — любое, OAuth Redirect URLs — `http://localhost`, Category — любой)
+3. После создания скопируй **Client-ID** из списка приложений
+4. Там же нажми **New Secret** → скопируй **Client Secret**
+5. Получи access token:
+
+   ```bash
+   curl -X POST "https://id.twitch.tv/oauth2/token?client_id=ВАШ_CLIENT_ID&client_secret=ВАШ_SECRET&grant_type=client_credentials"
+   ```
+
+6. Из JSON-ответа скопируй значение поля `access_token`.
+
+Куда прописать:
+- **Client-ID** → в админке (`/admin/scrapers`) → IGDB → поле `headers.Client-ID`
+- **access_token** → там же → поле `encryptedApiKey` (админка зашифрует сама)
+
+### Настройка TheGamesDB scraper
+
+TheGamesDB требует API-ключ. Получить его:
+
+1. Зарегистрируйся на https://thegamesdb.net/register.php
+2. Подтверди email, войди на сайт
+3. Перейди на https://api.thegamesdb.net/key.php — ключ будет отображён
+4. Скопируй ключ
+
+Куда прописать:
+- **API-ключ** → в админке (`/admin/scrapers`) → TheGamesDB → поле `encryptedApiKey` (админка зашифрует сама)
+
+**Лимит:** 1000 запросов в месяц. Один поиск игры может использовать 2-3 запроса (поиск + жанры + скриншоты).
 
 Подробнее о подводных камнях — см. `AGENTS.md`.
 
