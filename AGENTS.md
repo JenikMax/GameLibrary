@@ -10,7 +10,7 @@ mvn spring-boot:run                          # run backend locally (needs Postgr
 cd frontend && npm run dev                   # run frontend dev server (:5173, proxies to :8080)
 ```
 
-No Maven wrapper — `mvn` must be on PATH. Java 1.8 target. No tests, no lint/format/typecheck config.
+No Maven wrapper — `mvn` must be on PATH. Java 11 target, `eclipse-temurin:11-jre-alpine` runtime. No tests, no lint/format/typecheck config.
 
 ## Docker
 
@@ -24,11 +24,13 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - Frontend: separate Vue 3 + Vite + PrimeVue 4 project in `frontend/`, served via Nginx.
 - API: JSON REST (`/game-library/api/**`) with JWT auth; Swagger UI at `/game-library/swagger-ui.html`.
 - Legacy Thymeleaf views still work alongside REST (dual auth: form login + JWT).
-- PostgreSQL schema `library`, managed via Commons DBCP + JPA (Hibernate 5.6).
+- PostgreSQL 16 schema `library`, managed via Commons DBCP 1.4 + JPA (Hibernate 5.6.15).
 - Auth: Spring Security, form login + JWT, BCrypt, `ROLE_ADMIN`/`ROLE_USER`.
-- Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission RPC for seeding.
+- Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission 4.1.2 RPC for seeding.
 - Images: filesystem (`/gameLibrary/images/`) with DB bytea fallback.
-- Scrapers: Steam, MobyGames, IGDB, Igromania, TheGameDB, Playground, WorldArt.
+- Scrapers (2 active, 5 disabled): Playground (CSS selectors), Igromania (JSON paths), Steam, MobyGames, IGDB, TheGameDB, WorldArt.
+- State: Pinia stores for auth, library, locale.
+- Rich text: VueQuill + Quill 2 for game description editing.
 - Package root: `com.jenikmax.game.library`.
 
 ## Gotchas
@@ -42,3 +44,4 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - **Tracker announce URL** must be reachable from user torrent clients. Set `TRACKER_ANNOUNCE_URL` to your NAS IP/hostname in `docker-compose.yml`.
 - **uTP must be enabled** in Transmission (`"utp-enabled": true` in `tracker/config/settings.json`) for P2P connections with uTorrent on Windows. Without it, even though the tracker correctly returns the seeder, data transfer fails because uTorrent cannot connect over pure TCP. Enable uTP in Transmission, then `docker-compose restart transmission`.
 - **Images on filesystem**: after DB→FS migration (`POST /api/admin/migrate-images` or `scripts/migrate-images.sh`), images are served from disk. If the file is missing, falls back to DB bytea.
+- **Local dev profile** in `application-alone.yml` overrides games/image/tracker paths for local development. Activate with `--spring.profiles.active=alone`.

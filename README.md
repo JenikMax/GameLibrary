@@ -6,10 +6,10 @@
 
 | Компонент | Технология |
 |-----------|-----------|
-| Backend | Spring Boot 2.7.1, Java 1.8 |
-| Frontend | Vue 3 + Vite, PrimeVue 4 |
-| База данных | PostgreSQL (схема `library`) |
-| ORM / JDBC | Hibernate 5.6, Spring Data JPA, Commons DBCP 1.4 |
+| Backend | Spring Boot 2.7.1, Java 11 |
+| Frontend | Vue 3 + Vite 5, PrimeVue 4, Pinia, VueQuill (Quill 2) |
+| База данных | PostgreSQL 16 (схема `library`) |
+| ORM / JDBC | Hibernate 5.6.15, Spring Data JPA, Commons DBCP 1.4 |
 | REST API | Spring MVC `@RestController`, JWT auth |
 | Документация API | OpenAPI / Swagger UI |
 | Скачивание | Transmission (JSON-RPC) + встроенный HTTP-трекер |
@@ -55,6 +55,7 @@
 | `/game/:id/edit` | ADMIN | Редактирование + scraping |
 | `/profile` | USER | Профиль, аватар, смена пароля |
 | `/admin/users` | ADMIN | Управление пользователями |
+| `/admin/scrapers` | ADMIN | Настройка scraper-ов (вкл/выкл, API-ключи) |
 | `/downloads` | USER, ADMIN | Статус раздач Transmission |
 
 ### Backend (Spring Boot REST API)
@@ -78,6 +79,11 @@
 | `POST /api/scan` | ADMIN | Сканирование библиотеки |
 | `GET /api/admin/users` | ADMIN | Список пользователей |
 | `POST /api/admin/users/{id}/toggle-admin` | ADMIN | Смена роли |
+| `POST /api/admin/users/{id}/toggle-active` | ADMIN | Блокировка/разблокировка пользователя |
+| `POST /api/admin/users/{id}/reset-password` | ADMIN | Сброс пароля |
+| `GET /api/admin/scraper-config` | ADMIN | Конфигурации scraper-ов |
+| `POST /api/admin/scraper-config` | ADMIN | Сохранение конфигураций scraper-ов |
+| `POST /api/admin/scraper-config/reload` | ADMIN | Перезагрузка scraper-ов из файла |
 | `POST /api/admin/migrate-images` | ADMIN | Миграция изображений из БД в ФС |
 
 Swagger UI: `/game-library/swagger-ui.html`
@@ -109,9 +115,9 @@ Swagger UI: `/game-library/swagger-ui.html`
 - Пагинация (12 игр на страницу)
 
 ### Редактирование игр (ADMIN)
-- Название, год, платформа, описание, инструкция, трейлер
+- Название, год, платформа, описание (Quill-редактор), инструкция, трейлер
 - Жанры из общего справочника
-- Сбор метаданных с Playground.ru / Igromania.ru
+- Сбор метаданных со scraper-ов (2 активных: Playground.ru / Igromania.ru, 5 отключённых)
 
 ### Скачивание игр
 - **Малые игры (<1 ГБ)**: потоковая упаковка в ZIP
@@ -152,10 +158,20 @@ make up               # docker-compose up --build -d
 
 ```bash
 # Backend (нужен PostgreSQL + Transmission локально)
-mvn spring-boot:run
+mvn spring-boot:run -Dspring.profiles.active=alone
 
 # Frontend (Vite dev server с прокси на localhost:8080)
 cd frontend && npm run dev
+```
+
+Профиль `alone` (`application-alone.yml`) переопределяет пути к играм, трекеру и изображениям для локальной разработки.
+
+Makefile также содержит вспомогательные цели:
+```bash
+make dev-backend    # mvn spring-boot:run
+make dev-frontend   # cd frontend && npm run dev
+make logs           # docker-compose logs -f
+make clean          # docker-compose down -v && mvn clean && rm -rf frontend/dist
 ```
 
 ## Миграция изображений из БД в ФС
@@ -187,7 +203,11 @@ curl -X POST http://localhost:8080/game-library/api/admin/migrate-images \
 | `game_screenshot` | Скриншоты (source bytea) |
 | `library_user` | Пользователи (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/1_init.sql`, `2_library.sql`, `3_user.sql`.
+Сборка PostgreSQL-контейнера: `postgresdb/Dockerfile` (база `postgres:16.14`).
+
+DDL выполняются в порядке сортировки: `postgresdb/ddl/1_init.sql` (пользователь + БД + схема), `2_library.sql` (таблицы игр + ~70 жанров), `3_user.sql` (таблица пользователей + admin/guest seed).
+
+Управление БД через скрипты в `postgresdb/`: `01_build.sh`, `02_up.sh`, `03_build-and-up.sh`, `04_kill.sh`, `05_stop.sh`, `06_recreate.sh`.
 
 ## Окружение
 
@@ -205,6 +225,22 @@ DDL: `postgresdb/ddl/1_init.sql`, `2_library.sql`, `3_user.sql`.
 | `TRANSMISSION_DOWNLOAD_DIR` | `/downloads` | Директория с играми (в контейнере Transmission) |
 | `JWT_SECRET` | (ключ по умолчанию) | Секрет JWT |
 | `JWT_EXPIRATION_MS` | `86400000` | Время жизни токена (24ч) |
+| `SCRAPER_CONFIG_DIR` | `/gameLibrary/scrapers` | Директория с `scrapers-config.json` |
+| `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная директория для .torrent файлов |
+
+## Scraper-ы
+
+Конфигурация scraper-ов хранится в `scrapers/scrapers-config.json` и управляется через `/api/admin/scraper-config`.
+
+| Scraper | Статус | Метод | Описание |
+|---------|--------|-------|----------|
+| Playground (playground.ru) | ✅ Активен | CSS-селекторы | Сбор названия, описания, жанров, скриншотов |
+| Igromania (igromania.ru) | ✅ Активен | JSON Path | Сбор через props initialStoreState |
+| Steam (api.steampowered.com) | ❌ Отключён | REST API | Требуется API-ключ |
+| MobyGames (api.mobygames.com) | ❌ Отключён | REST API | Требуется API-ключ |
+| IGDB (api.igdb.com) | ❌ Отключён | REST API + Bearer | Требуется Client-ID |
+| TheGamesDB (api.thegamesdb.net) | ❌ Отключён | REST API | Требуется API-ключ |
+| World-Art (world-art.ru) | ❌ Отключён | CSS-селекторы | Форма поиска |
 
 Подробнее о подводных камнях — см. `AGENTS.md`.
 
@@ -214,7 +250,7 @@ DDL: `postgresdb/ddl/1_init.sql`, `2_library.sql`, `3_user.sql`.
 
 | Компонент | Версия | Установка |
 |-----------|--------|-----------|
-| Java | 8 (JDK) | `apt install openjdk-8-jdk` / `sdk install java 8.0.402-tem` |
+| Java | 11 (JDK) | `apt install openjdk-11-jdk` / `sdk install java 11.0.26-tem` |
 | Maven | 3.6+ | `apt install maven` |
 | Node.js | 18+ | `apt install nodejs npm` / `nvm install 18` |
 | Docker | 19.03+ | `apt install docker.io docker-compose-v2` |
@@ -373,7 +409,7 @@ cd frontend && npm run dev
 
 | Компонент | Версия | Ссылка |
 |-----------|--------|--------|
-| Java | 8 (JDK) | [Adoptium Temurin 8](https://adoptium.net/temurin/releases/?version=8) |
+| Java | 11 (JDK) | [Adoptium Temurin 11](https://adoptium.net/temurin/releases/?version=11) |
 | Maven | 3.6+ | [Maven Download](https://maven.apache.org/download.cgi) |
 | Node.js | 18+ | [Node.js 18 LTS](https://nodejs.org/) |
 | Docker Desktop | последняя | [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/) |
@@ -554,4 +590,4 @@ docker-compose restart transmission
 
 ### Ошибка "no suitable method found for create"
 - OkHttp 3.x: `RequestBody.create(MediaType, String)` — сначала MediaType, потом String.
-- Если вы обновили OkHttp до 4.x, API изменился. Держите OkHttp 3.12.x для совместимости с Java 8.
+- Если вы обновили OkHttp до 4.x, API изменился. Проект использует OkHttp 3.14.9.
