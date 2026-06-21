@@ -217,7 +217,7 @@ public class WorldArtScraper implements Scraper {
             Document doc = fetchDocument(baseUrl + "/games/games_img.php?id=" + gameId);
             if (doc == null) return Collections.emptyList();
 
-            int bucket = ((Integer.parseInt(gameId) + 999) / 1000) * 1000;
+            int bucket = ((Integer.parseInt(gameId) + 9999) / 10000) * 10000;
             List<String> result = new ArrayList<>();
             int max = config.getMaxScreenshots();
             int count = 0;
