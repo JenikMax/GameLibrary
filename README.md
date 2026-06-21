@@ -117,7 +117,7 @@ Swagger UI: `/game-library/swagger-ui.html`
 ### Редактирование игр (ADMIN)
 - Название, год, платформа, описание (Quill-редактор), инструкция, трейлер
 - Жанры из общего справочника
-- Сбор метаданных со scraper-ов (2 активных: Playground.ru / Igromania.ru, 5 отключённых)
+- Сбор метаданных со scraper-ов (4 активных: Playground.ru / Igromania.ru / World-Art / Steam, 2 отключённых)
 
 ### Скачивание игр
 - **Малые игры (<1 ГБ)**: потоковая упаковка в ZIP
@@ -236,7 +236,7 @@ DDL выполняются в порядке сортировки: `postgresdb/d
 |---------|--------|-------|----------|
 | Playground (playground.ru) | ✅ Активен | CSS-селекторы | Сбор названия, описания, жанров, скриншотов |
 | Igromania (igromania.ru) | ✅ Активен | JSON Path | Сбор через props initialStoreState |
-| Steam (api.steampowered.com) | ❌ Отключён | REST API | Требуется API-ключ |
+| Steam (store.steampowered.com) | ✅ Активен | Storefront API | Steam Storefront, без API-ключа |
 | IGDB (api.igdb.com) | ❌ Отключён | REST API + Bearer | Требуется Client-ID |
 | TheGamesDB (api.thegamesdb.net) | ❌ Отключён | REST API | Требуется API-ключ |
 | World-Art (world-art.ru) | ✅ Активен | CSS-селекторы | Прямой парсинг карточки + поиск |

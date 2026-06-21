@@ -28,7 +28,7 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - Auth: Spring Security, form login + JWT, BCrypt, `ROLE_ADMIN`/`ROLE_USER`.
 - Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission 4.1.2 RPC for seeding.
 - Images: filesystem (`/gameLibrary/images/`) with DB bytea fallback.
-- Scrapers (3 active, 3 disabled): Playground (CSS selectors), Igromania (JSON paths), WorldArt (CSS selectors), Steam, IGDB, TheGameDB.
+- Scrapers (4 active, 2 disabled): Playground (CSS selectors), Igromania (JSON paths), WorldArt (CSS selectors), Steam (Storefront API, no key required), IGDB, TheGameDB.
 - State: Pinia stores for auth, library, locale.
 - Rich text: VueQuill + Quill 2 for game description editing.
 - Package root: `com.jenikmax.game.library`.
