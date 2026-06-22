@@ -6,6 +6,6 @@ TORRENT_TTL: 180000
 TORRENT_DIR: D:/Work/MyProjects/gametest/gameLibraryConfigs/tracker/watch
 TORRENT_DIR_TMP: D:/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents
 TORRENT_TRACKER_HOST: 192.168.0.109
-TORRENT_TRACKER_PORT: 9010
+TORRENT_TRACKER_PORT: 9020
 
 

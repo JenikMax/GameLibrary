@@ -1,7 +1,6 @@
 package com.jenikmax.game.library.controller.view;
 
 import com.jenikmax.game.library.model.dto.GameDto;
-import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.enums.Genre;
@@ -11,9 +10,6 @@ import com.jenikmax.game.library.service.utils.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.MessageSource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,32 +36,44 @@ public class LibraryViewController {
     static final Logger logger = LogManager.getLogger(LibraryViewController.class.getName());
 
     private final LibraryService libraryService;
+    //private final GenreLoc genreLoc;
     private final MessageSource messageSource;
     private final StringUtils stringUtils;
 
     public LibraryViewController(LibraryService libraryService, MessageSource messageSource, StringUtils stringUtils) {
         this.libraryService = libraryService;
+        //this.genreLoc = genreLoc;
         this.messageSource = messageSource;
         this.stringUtils = stringUtils;
     }
 
     @GetMapping("/library")
     public String main(Model model, Locale locale, @RequestParam(value = "page", defaultValue = "1") int page,
-                        @RequestParam(value = "searchText", required = false) String searchText,
-                        @RequestParam(value = "message", required = false) String message) {
+                       @RequestParam(value = "searchText", required = false) String searchText,
+                       @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
+                       @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
+                       @RequestParam(value = "message", required = false) String message,
+                       @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                       @RequestParam(value = "sortField", required = false) String sortField,
+                       @RequestParam(value = "sortType", required = false) String sortType) {
         logger.info("Open library");
+
         searchText = searchText != null ? searchText : "";
-        message = message != null ? message : "";
-        ArrayList<String> selectedPlatforms = new ArrayList<>();
-        ArrayList<String> selectedYears = new ArrayList<>();
-        ArrayList<String> selectedGenres = new ArrayList<>();
-        String sortField = "";
-        String sortType = "";
+        selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
+        selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
+        selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
+        sortField = sortField != null ? sortField : "";
+        sortType = sortType != null ? sortType : "";
+
+        List<Long> gameIdList = libraryService.getGameIdList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
 
         int pageSize = 12;
-        int totalPages = 1;
+        int totalPages = (gameIdList.size() + pageSize - 1) / pageSize;
+        totalPages = totalPages == 0 ? 1 : totalPages;
+        int startIndex = (page - 1) * pageSize;
+        int endIndex = Math.min((startIndex + pageSize), gameIdList.size());
 
-        List<GameShortDto> paginatedGames = new ArrayList<>();
+        List<GameShortDto> paginatedGames = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType, startIndex, endIndex);
 
         List<String> years = libraryService.getReleaseDates();
         List<String> platforms = libraryService.getGamesPlatforms();
@@ -105,6 +113,44 @@ public class LibraryViewController {
     }
 
 
+    @PostMapping("/filter")
+    public String applyFilters(Model model, RedirectAttributes redirectAttributes,
+                               @RequestParam(value = "page", defaultValue = "1") int page,
+                               @RequestParam(value = "searchText", required = false) String searchText,
+                               @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
+                               @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
+                               @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                               @RequestParam(value = "sortField", required = false) String sortField,
+                               @RequestParam(value = "sortType", required = false) String sortType) {
+        redirectAttributes.addAttribute("page",page);
+        redirectAttributes.addAttribute("searchText",searchText);
+        redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
+        redirectAttributes.addAttribute("sortField",sortField != null ? sortField : "");
+        redirectAttributes.addAttribute("sortType",sortType != null ? sortType : "");
+        return "redirect:/library";
+    }
+
+    @GetMapping("/filter")
+    public String applyFiltersGet(Model model, RedirectAttributes redirectAttributes,
+                               @RequestParam(value = "page", defaultValue = "1") int page,
+                               @RequestParam(value = "searchText", required = false) String searchText,
+                               @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
+                               @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
+                               @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                               @RequestParam(value = "sortField", required = false) String sortField,
+                               @RequestParam(value = "sortType", required = false) String sortType) {
+        redirectAttributes.addAttribute("page",page);
+        redirectAttributes.addAttribute("searchText",searchText);
+        redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
+        redirectAttributes.addAttribute("sortField",sortField != null ? sortField : "");
+        redirectAttributes.addAttribute("sortType",sortType != null ? sortType : "");
+        return "redirect:/library";
+    }
+
     @PostMapping("/search")
     public String search(Model model, RedirectAttributes redirectAttributes,
                                @RequestParam(value = "searchText", required = false) String searchText) {
@@ -113,9 +159,27 @@ public class LibraryViewController {
     }
 
 
+    @PostMapping("/sort")
+    public String applySort(Model model, RedirectAttributes redirectAttributes,
+                               @RequestParam(value = "page", defaultValue = "1") int page,
+                               @RequestParam(value = "searchText", required = false) String searchText,
+                               @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
+                               @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
+                               @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                               @RequestParam(value = "sortField", required = false) String sortField,
+                               @RequestParam(value = "sortType", required = false) String sortType) {
+        redirectAttributes.addAttribute("page",page);
+        redirectAttributes.addAttribute("searchText",searchText);
+        redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
+        redirectAttributes.addAttribute("sortField",sortField != null ? sortField : "");
+        redirectAttributes.addAttribute("sortType",sortType != null ? sortType : "");
+        return "redirect:/library";
+    }
 
-    @GetMapping("/library-games")
-    public String applySortGet(Model model,
+    @GetMapping("/sort")
+    public String applySortGet(Model model, RedirectAttributes redirectAttributes,
                             @RequestParam(value = "page", defaultValue = "1") int page,
                             @RequestParam(value = "searchText", required = false) String searchText,
                             @RequestParam(value = "selectedPlatforms", required = false) List<String> selectedPlatforms,
@@ -123,42 +187,23 @@ public class LibraryViewController {
                             @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
                             @RequestParam(value = "sortField", required = false) String sortField,
                             @RequestParam(value = "sortType", required = false) String sortType) {
-
-        searchText = searchText != null ? searchText : "";
-        selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
-        selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
-        selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
-        sortField = sortField != null ? sortField : "";
-        sortType = sortType != null ? sortType : "";
-
-        List<Long> gameIdList = libraryService.getGameIdList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
-
-        int pageSize = 20;
-        int totalPages = (gameIdList.size() + pageSize - 1) / pageSize;
-        totalPages = totalPages == 0 ? 1 : totalPages;
-        int startIndex = (page - 1) * pageSize;
-        int endIndex = Math.min((startIndex + pageSize), gameIdList.size());
-
-        List<GameReadDto> paginatedGames = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType, startIndex, endIndex);
-
-        model.addAttribute("gameList",paginatedGames);
-        model.addAttribute("page", page);
-        model.addAttribute("pages", initPages(page,totalPages));
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortType", sortType);
-
-
-        return "libraryList";
+        redirectAttributes.addAttribute("page",page);
+        redirectAttributes.addAttribute("searchText",searchText);
+        redirectAttributes.addAttribute("selectedPlatforms",selectedPlatforms != null ? selectedPlatforms : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedYears",selectedYears != null ? selectedYears : new ArrayList<>());
+        redirectAttributes.addAttribute("selectedGenres",selectedGenres != null ? selectedGenres : new ArrayList<>());
+        redirectAttributes.addAttribute("sortField",sortField != null ? sortField : "");
+        redirectAttributes.addAttribute("sortType",sortType != null ? sortType : "");
+        return "redirect:/library";
     }
-    
 
 
 
     @GetMapping("library/game/{id}")
     public String viewGame(@PathVariable("id") Long id, Model model,Locale locale) {
         logger.info("Open game - {}",id);
-        GameReadDto gameDto = libraryService.getGameReadInfo(id);
+        GameDto gameDto = libraryService.getGameInfo(id);
+        //gameDto.setDescription(stringUtils.replaceSpacesWithHtmlEntities(gameDto.getDescription()));
         List<Genre> currentGenres = libraryService.getGenres(gameDto);
         ShortUser user = libraryService.getUserInfo();
         model.addAttribute("game", gameDto);
@@ -245,21 +290,9 @@ public class LibraryViewController {
         return Arrays.asList(NumberUtils.sequence(Math.max(1, page - 3),Math.min(totalPage, page + 3)));
     }
 
-    @GetMapping("library/image/{id}")
-    public ResponseEntity<byte[]> getImage(@PathVariable("id") Long id) {
-        byte[] imageBytes = libraryService.getImageBytesById(id);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
-    }
 
-    @GetMapping("library/poster/{id}")
-    public ResponseEntity<byte[]> getPoster(@PathVariable("id") Long id) {
-        byte[] imageBytes = libraryService.getPosterBytesById(id);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+    private Locale getSessionLocale(){
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getLocale();
     }
-
 
 }

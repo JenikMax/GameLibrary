@@ -1,6 +1,5 @@
 package com.jenikmax.game.library.service.data.api;
 
-import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.Screenshot;
@@ -11,15 +10,15 @@ import java.util.Locale;
 
 public interface GameService {
 
-    List<GameReadDto> getGameShortList();
+    List<GameShortDto> getGameShortList();
 
-    List<GameReadDto> getGameShortList(int startIndex, int endIndex);
+    List<GameShortDto> getGameShortList(int startIndex, int endIndex);
 
     List<Long> getGameShortIdList();
 
-    List<GameReadDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
+    List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
 
-    List<GameReadDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex);
+    List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex);
 
     List<Long> getGameShortIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
 
@@ -52,7 +51,4 @@ public interface GameService {
 
     List<String> getGameGenres();
 
-    byte[] getImageBytesById(Long id);
-
-    byte[] getPosterBytesById(Long id);
 }

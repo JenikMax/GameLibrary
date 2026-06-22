@@ -1,7 +1,6 @@
 package com.jenikmax.game.library.service.api;
 
 import com.jenikmax.game.library.model.dto.GameDto;
-import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.enums.Genre;
@@ -20,21 +19,19 @@ public interface LibraryService {
 
     void scanLibrary();
 
-    List<GameReadDto> getGameList();
+    List<GameShortDto> getGameList();
 
-    List<GameReadDto> getGameList(int startIndex, int endIndex);
+    List<GameShortDto> getGameList(int startIndex, int endIndex);
 
     List<Long> getGameListId();
 
-    List<GameReadDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
+    List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
 
-    List<GameReadDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex);
+    List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex);
 
     List<Long> getGameIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
 
     GameDto getGameInfo(Long gameId);
-
-    GameReadDto getGameReadInfo(Long gameId);
 
     GameDto updateGameInfo(GameDto gameDto);
 
@@ -54,19 +51,12 @@ public interface LibraryService {
 
     List<Genre> getGenres(GameDto gameDto);
 
-    List<Genre> getGenres(GameReadDto gameDto);
-
     List<String> getGameGenres();
 
     ResponseEntity<Resource> downloadGame(GameDto game);
 
     CompletableFuture<ResponseEntity<StreamingResponseBody>> downloadGameInStream(GameDto game, HttpServletResponse response);
 
-    byte[] getImageBytesById(Long id);
-
-    byte[] getPosterBytesById(Long id);
-
     ShortUser getUserInfo();
-
 
 }

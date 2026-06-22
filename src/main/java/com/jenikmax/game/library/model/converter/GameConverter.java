@@ -1,11 +1,9 @@
 package com.jenikmax.game.library.model.converter;
 
 import com.jenikmax.game.library.model.dto.GameDto;
-import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
-import com.jenikmax.game.library.model.entity.Poster;
 import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 
@@ -33,7 +31,7 @@ public class GameConverter {
         dto.setDirectoryPath(entity.getDirectoryPath());
         dto.setReleaseDate(entity.getReleaseDate());
         dto.setPlatform(entity.getPlatform());
-        dto.setLogo(BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(entity.getPoster().getSource()));
+        dto.setLogo(BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(entity.getLogo()));
         dto.setGenres(new ArrayList<>());
         for (GameGenre gameGenre : entity.getGenres()){
             dto.getGenres().add(gameGenreToDtoConverter(gameGenre));
@@ -49,7 +47,7 @@ public class GameConverter {
         entity.setDirectoryPath(dto.getDirectoryPath());
         entity.setReleaseDate(dto.getReleaseDate());
         entity.setPlatform(dto.getPlatform());
-        entity.setPoster(dtoToPosterEntityConverter(dto.getLogo(),entity));
+        entity.setLogo(Base64.getDecoder().decode(dto.getLogo()));
         entity.setGenres(new ArrayList<>());
         for(String genre: dto.getGenres()){
             entity.getGenres().add(dtoToGameGenreEntityConverter(genre,entity));
@@ -68,32 +66,10 @@ public class GameConverter {
         dto.setPlatform(entity.getPlatform());
         dto.setDescription(entity.getDescription());
         dto.setInstruction(entity.getInstruction());
-        dto.setLogo(BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(entity.getPoster().getSource()));
+        dto.setLogo(BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(entity.getLogo()));
         dto.setScreenshots(new ArrayList<>());
         for (Screenshot screenshot : entity.getScreenshots()){
             dto.getScreenshots().add(screenshotToDtoConverter(screenshot));
-        }
-        dto.setGenres(new ArrayList<>());
-        for (GameGenre gameGenre : entity.getGenres()){
-            dto.getGenres().add(gameGenreToDtoConverter(gameGenre));
-        }
-        return dto;
-    }
-    public static GameReadDto gameToReadDtoConverter(Game entity){
-        GameReadDto dto = new GameReadDto();
-        dto.setId(entity.getId());
-        dto.setCreateTs(entity.getCreateTs());
-        dto.setName(entity.getName());
-        dto.setDirectoryPath(entity.getDirectoryPath());
-        dto.setReleaseDate(entity.getReleaseDate());
-        dto.setTrailerUrl(entity.getTrailerUrl());
-        dto.setPlatform(entity.getPlatform());
-        dto.setDescription(entity.getDescription());
-        dto.setInstruction(entity.getInstruction());
-        dto.setLogo(entity.getPoster().getId());
-        dto.setScreenshots(new ArrayList<>());
-        for (Screenshot screenshot : entity.getScreenshots()){
-            dto.getScreenshots().add(screenshot.getId());
         }
         dto.setGenres(new ArrayList<>());
         for (GameGenre gameGenre : entity.getGenres()){
@@ -113,7 +89,8 @@ public class GameConverter {
         entity.setPlatform(dto.getPlatform());
         entity.setDescription(dto.getDescription());
         entity.setInstruction(dto.getInstruction());
-        entity.setPoster(dtoToPosterEntityConverter(dto.getLogo(),entity));
+        entity.setLogo(Base64.getDecoder().decode(dto.getLogo().replaceAll(BASE_64_JPG_PREFIX,"").replaceAll(BASE_64_JPEG_PREFIX,"").replaceAll(BASE_64_PNG_PREFIX,"")));
+        //entity.setLogo(Base64.getDecoder().decode(dto.getLogo().replaceFirst(BASE_64_JPEG_PREFIX + "|"+ BASE_64_JPG_PREFIX + "|" + BASE_64_PNG_PREFIX, "")));
         entity.setScreenshots(new ArrayList<>());
         if(dto.getScreenshots() != null){
             for (String screenshot : dto.getScreenshots()){
@@ -130,6 +107,11 @@ public class GameConverter {
     }
 
     public static String gameGenreToDtoConverter(GameGenre entity){
+        //GameGenreDto dto = new GameGenreDto();
+        //dto.setId(entity.getId());
+        //dto.setGameId(entity.getGame().getId());
+        //dto.setGenreCode(entity.getGenre().toString());
+        //dto.setGenreDescription(entity.getGenre().getName());
         return entity.getGenre().toString();
     }
 
@@ -141,22 +123,21 @@ public class GameConverter {
     }
 
     public static String screenshotToDtoConverter(Screenshot entity){
+        //ScreenshotDto dto = new ScreenshotDto();
+        //dto.setId(entity.getId());
+        //dto.setGameId(entity.getGame().getId());
+        //dto.setName(entity.getName());
+        //dto.setSource("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(entity.getSource()));
         return BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(entity.getSource());
     }
 
     public static Screenshot dtoToScreenshotEntityConverter(String screenshot, Game game){
         Screenshot entity = new Screenshot();
+        //entity.setId(dto.getId());
         entity.setGame(game);
         entity.setName("screenshot" + game.getScreenshots().size() + ".jpg");
         entity.setSource(Base64.getDecoder().decode(screenshot.replaceAll(BASE_64_JPEG_PREFIX,"").replaceAll(BASE_64_JPG_PREFIX,"").replaceAll(BASE_64_PNG_PREFIX,"")));
-        return entity;
-    }
-
-    public static Poster dtoToPosterEntityConverter(String screenshot, Game game){
-        Poster entity = new Poster();
-        entity.setGame(game);
-        entity.setName("poster.jpg");
-        entity.setSource(Base64.getDecoder().decode(screenshot.replaceAll(BASE_64_JPEG_PREFIX,"").replaceAll(BASE_64_JPG_PREFIX,"").replaceAll(BASE_64_PNG_PREFIX,"")));
+        //entity.setSource(Base64.getDecoder().decode(screenshot.replaceFirst(BASE_64_JPEG_PREFIX + "|"+ BASE_64_JPG_PREFIX + "|" + BASE_64_PNG_PREFIX, "")));
         return entity;
     }
 

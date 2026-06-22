@@ -79,10 +79,6 @@ public enum Genre {
     metroidvaniia("Метроидвания"),
     pazzl("Паззл"),
     meha("Меха"),
-
-    slesher("Слешер"),
-    mistika("Мистика"),
-
     other("Другое");
 
 

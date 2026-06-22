@@ -24,7 +24,7 @@ public class Game implements Serializable {
     protected String platform;
     protected String directoryPath;
     protected String releaseDate;
-    protected Poster poster;
+    protected byte[] logo;
     protected List<GameGenre> genres;
 
     private String trailerUrl;
@@ -89,13 +89,13 @@ public class Game implements Serializable {
         this.directoryPath = directoryPath;
     }
 
-    @OneToOne(mappedBy="game", cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE,CascadeType.REFRESH}, orphanRemoval = true)
-    public Poster getPoster() {
-        return poster;
+    @Column(name = "logo")
+    public byte[] getLogo() {
+        return logo;
     }
 
-    public void setPoster(Poster poster) {
-        this.poster = poster;
+    public void setLogo(byte[] logo) {
+        this.logo = logo;
     }
 
     @OneToMany(mappedBy="game", cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE,CascadeType.REFRESH}, orphanRemoval = true)

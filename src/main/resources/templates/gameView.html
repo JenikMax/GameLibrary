@@ -1,53 +1,37 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-
     <link rel="stylesheet" type="text/css" th:href="@{/css/game.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery.fancybox.min.css}"/>
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
-    <script type="text/javascript" th:src="@{/js/jquery.fancybox.min.js}"></script>
     <link rel="icon" type="image/png" th:href="@{/img/app_ico.png}" />
     <title>Game Library App - Game View</title>
     <script>
         $(document).ready(function () {
-            replaceNbsp();
             document.getElementById("h_searchText").addEventListener("keyup", function(event) {
                 if (event.keyCode === 13) {
                     event.preventDefault();
                     document.getElementById("h_searchButton").click();
                 }
             });
-            $(".game_screenshots a").fancybox({
-                buttons: [
-                    "close",
-                    "slideShow",
-                    "zoom",
-                    "fullScreen",
-                    "thumbs",
-                    "share",
-                ],
-            });
-            $(".poster a").fancybox({
-                buttons: [
-                    "close",
-                    "zoom",
-                ],
-            });
         });
+
+        function openModal(img) {
+            var modal = document.getElementById("modal");
+            var modalImg = document.getElementById("modalImg");
+
+            modal.style.display = "block";
+            modalImg.src = img.src;
+            modalImg.style.width = "90%";
+            modalImg.style.height = "90%";
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("modal");
+            modal.style.display = "none";
+        }
 
         function goBack() {
             window.history.back();
-        }
-
-        function replaceNbsp() {
-            var descriptionDiv = document.querySelector('.description');
-            if (descriptionDiv) {
-                var pElements = descriptionDiv.getElementsByTagName('p');
-                for (var i = 0; i < pElements.length; i++) {
-                    var p = pElements[i];
-                    p.innerHTML = p.innerHTML.replace(/&nbsp;/g, ' ');
-                }
-            }
         }
 
     </script>
@@ -61,9 +45,13 @@
                 <h1 th:text="${game.name} + ' (' + ${game.releaseDate} + ')'"></h1>
             </div>
             <div class="poster">
-                <a th:href="@{'/library/poster/' + ${game.logo}}" data-fancybox="poster">
-                    <img th:src="@{'/library/poster/' + ${game.logo}}" th:alt="${game.name}">
-                </a>
+                <img th:src="${game.logo}" th:alt="${game.name}" onclick="openModal(this)">
+            </div>
+            <div id="modal" class="modal">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <div class="modal-content">
+                    <img id="modalImg" onclick="closeModal()">
+                </div>
             </div>
             <div class="description">
                 <span th:text="${game.platform}"></span>
@@ -79,9 +67,7 @@
         </div>
         <div class="game_screenshots">
             <li th:each="screenshot, stat : ${game.screenshots}">
-                <a th:href="@{'/library/image/' + ${screenshot}}" data-fancybox="gallery">
-                    <img th:src="@{'/library/image/' + ${screenshot}}" th:alt="'img' + ${stat.index} + '.jpg'" data-index="${stat.index}"/>
-                </a>
+                <img th:src="${screenshot}" th:alt="'img' + ${stat.index} + '.jpg'" onclick="openModal(this)" data-index="${stat.index}">
             </li>
         </div>
         <div class="game_trailer" th:if="${game.trailerUrl != null and game.trailerUrl != '' and game.trailerUrl != 'N/A'}">

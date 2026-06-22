@@ -2,7 +2,6 @@ package com.jenikmax.game.library.service;
 
 import com.jenikmax.game.library.model.converter.GameConverter;
 import com.jenikmax.game.library.model.dto.GameDto;
-import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.Game;
@@ -110,12 +109,12 @@ public class LibraryOperationService implements LibraryService {
     }
 
     @Override
-    public List<GameReadDto> getGameList() {
+    public List<GameShortDto> getGameList() {
         return gameService.getGameShortList();
     }
 
     @Override
-    public List<GameReadDto> getGameList(int startIndex, int endIndex) {
+    public List<GameShortDto> getGameList(int startIndex, int endIndex) {
         return gameService.getGameShortList(startIndex, endIndex);
     }
 
@@ -125,13 +124,13 @@ public class LibraryOperationService implements LibraryService {
     }
 
     @Override
-    public List<GameReadDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
+    public List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         if(searchText.isEmpty() && selectedPlatforms.size() == 0 && selectedYears.size() == 0 && selectedGenres.size() == 0 && sortField.isEmpty()) return getGameList();
         return gameService.getGameShortList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
     }
 
     @Override
-    public List<GameReadDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex) {
+    public List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex) {
         if(searchText.isEmpty() && selectedPlatforms.size() == 0 && selectedYears.size() == 0 && selectedGenres.size() == 0 && sortField.isEmpty()) return getGameList(startIndex,endIndex);
         return gameService.getGameShortList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType,startIndex,endIndex);
     }
@@ -146,12 +145,6 @@ public class LibraryOperationService implements LibraryService {
     public GameDto getGameInfo(Long gameId) {
         return GameConverter.gameToDtoConverter(gameService.getGameById(gameId));
     }
-
-    @Override
-    public GameReadDto getGameReadInfo(Long gameId){
-        return GameConverter.gameToReadDtoConverter(gameService.getGameById(gameId));
-    }
-
 
     @Override
     public GameDto updateGameInfo(GameDto gameDto) {
@@ -204,14 +197,6 @@ public class LibraryOperationService implements LibraryService {
         for(String genre : gameDto.getGenres()) genres.add(Genre.valueOf(genre));
         return genres;
     }
-
-    @Override
-    public List<Genre> getGenres(GameReadDto gameDto) {
-        List<Genre> genres = new ArrayList<>();
-        for(String genre : gameDto.getGenres()) genres.add(Genre.valueOf(genre));
-        return genres;
-    }
-
     @Override
     public List<String> getGameGenres() {
         return gameService.getGameGenres();
@@ -258,16 +243,6 @@ public class LibraryOperationService implements LibraryService {
         });
 
         return completableFuture;
-    }
-
-    @Override
-    public byte[] getImageBytesById(Long id) {
-        return gameService.getImageBytesById(id);
-    }
-
-    @Override
-    public byte[] getPosterBytesById(Long id){
-        return gameService.getPosterBytesById(id);
     }
 
     @Override
