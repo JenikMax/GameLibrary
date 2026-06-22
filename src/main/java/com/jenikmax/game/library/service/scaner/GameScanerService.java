@@ -57,13 +57,19 @@ public class GameScanerService implements ScanerService {
     }
 
     public Game getAdditinalGameInfo(Game game){
+        game = getBasicGameInfo(game);
+        game.setLogo(getLogo(game));
+        game.setScreenshots(getScreenshots(game));
+        return game;
+    }
+
+    @Override
+    public Game getBasicGameInfo(Game game){
         File gameinfoDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX);
         if(!gameinfoDir.exists()){
             createDefaultGameInfo(game);
         }
         if(gameinfoDir.exists()){
-            File logo = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_LOGO_FILE_NAME);
-            if(logo.exists()) game.setLogo(readImage(logo));
             File information = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME);
             if(information.exists()){
                 GameInfo gameInfo = getAdditinalGameInfo(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME);
@@ -82,30 +88,40 @@ public class GameScanerService implements ScanerService {
                     }
                 }
             }
-            File screenDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_SCREEN_PREFIX);
-            if(screenDir.exists()){
-                List<File> screenImgFiles = Arrays.asList(screenDir.listFiles());
-                game.setScreenshots(new ArrayList<>());
-                int count = 1;
-                for(File img : screenImgFiles){
-                    Screenshot screenshot = new Screenshot();
-                    screenshot.setGame(game);
-                    screenshot.setName("image" + count + ".jpg");
-                    screenshot.setSource(readImage(img));
-                    game.getScreenshots().add(screenshot);
-                    count++;
-                }
-            }
-
         }
         if(game.getGenres() == null) game.setGenres(new ArrayList<>());
         if(game.getScreenshots() == null) game.setScreenshots(new ArrayList<>());
-        if(game.getLogo() == null) game.setLogo(getDefaultLogo());
         if(game.getReleaseDate() == null) game.setReleaseDate("N/A");
         if(game.getTrailerUrl() == null) game.setTrailerUrl("N/A");
         if(game.getDescription() == null) game.setDescription("N/A");
         if(game.getInstruction() == null) game.setInstruction("N/A");
         return game;
+    }
+
+    @Override
+    public byte[] getLogo(Game game){
+        File logo = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_LOGO_FILE_NAME);
+        if(logo.exists()) return readImage(logo);
+        return getDefaultLogo();
+    }
+
+    @Override
+    public List<Screenshot> getScreenshots(Game game){
+        List<Screenshot> screenshots = new ArrayList<>();
+        File screenDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_SCREEN_PREFIX);
+        if(screenDir.exists()){
+            List<File> screenImgFiles = Arrays.asList(screenDir.listFiles());
+            int count = 1;
+            for(File img : screenImgFiles){
+                Screenshot screenshot = new Screenshot();
+                screenshot.setGame(game);
+                screenshot.setName("image" + count + ".jpg");
+                screenshot.setSource(readImage(img));
+                screenshots.add(screenshot);
+                count++;
+            }
+        }
+        return screenshots;
     }
 
     public void storeGame(Game game){

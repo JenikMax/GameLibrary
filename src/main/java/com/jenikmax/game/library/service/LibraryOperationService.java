@@ -5,6 +5,7 @@ import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.entity.Game;
+import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.GameService;
@@ -23,11 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,9 @@ public class LibraryOperationService implements LibraryService {
     private final ScraperFactory scraperFactory;
     private final DownloadService downloadService;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public LibraryOperationService(@Value("${game-library.games.directory}") String rootDirectory,
                                    GameService gameService, UserService userService, ScanerService scanerService, ScraperFactory scraperFactory, DownloadService downloadService) {
         this.rootDirectory = rootDirectory;
@@ -56,23 +60,49 @@ public class LibraryOperationService implements LibraryService {
     @Override
     public void scanLibrary() {
         List<Game> findGames = scanerService.scanDirectory(rootDirectory + LIBRARY_PREFIX);
-        List<Game> storedGames = gameService.getGameList();
-        List<Game> newGames = storedGames.isEmpty() ?
+
+        // лёгкий запрос — только id + directoryPath, без byte[]
+        List<Object[]> storedPaths = gameService.getGameDirectoryPaths();
+        Map<String, Long> storedMap = new HashMap<>();
+        for (Object[] row : storedPaths) {
+            storedMap.put((String) row[1], (Long) row[0]);
+        }
+
+        List<Game> newGames = storedMap.isEmpty() ?
                 findGames :
                 findGames.stream()
-                        .filter(newGame -> storedGames.stream()
-                                .noneMatch(storedGame ->
-                                        storedGame.getDirectoryPath().equals(newGame.getDirectoryPath())))
+                        .filter(newGame -> !storedMap.containsKey(newGame.getDirectoryPath()))
                         .collect(Collectors.toList());
-        List<Game> gamesToDelete = storedGames.stream()
-                .filter(storedGame -> findGames.stream()
-                                .noneMatch(findGame -> findGame.getDirectoryPath().equals(storedGame.getDirectoryPath())))
-                .collect(Collectors.toList());
-        for(Game gameShort : newGames){
-            Game game = scanerService.getAdditinalGameInfo(gameShort);
-            gameService.storeGame(game);
+
+        List<Game> gamesToDelete = storedMap.isEmpty() ?
+                new ArrayList<>() :
+                storedMap.entrySet().stream()
+                        .filter(entry -> findGames.stream()
+                                .noneMatch(findGame -> findGame.getDirectoryPath().equals(entry.getKey())))
+                        .map(entry -> { Game g = new Game(); g.setId(entry.getValue()); return g; })
+                        .collect(Collectors.toList());
+
+        // Проход 1: метаданные (без byte[])
+        List<Long> newGameIds = new ArrayList<>();
+        for (Game gameShort : newGames) {
+            Game game = scanerService.getBasicGameInfo(gameShort);
+            game = gameService.storeGameMetadata(game);
+            newGameIds.add(game.getId());
         }
-        for(Game gameShort : gamesToDelete){
+
+        // Проход 2: изображения (с очисткой persistence context после каждого сохранения)
+        for (Long gameId : newGameIds) {
+            Game game = entityManager.find(Game.class, gameId);
+            byte[] logo = scanerService.getLogo(game);
+            game.setLogo(logo);
+            List<Screenshot> screenshots = scanerService.getScreenshots(game);
+            game.getScreenshots().clear();
+            game.getScreenshots().addAll(screenshots);
+            gameService.updateGameImages(game);
+            entityManager.clear();
+        }
+
+        for (Game gameShort : gamesToDelete) {
             gameService.deleteGameInfo(gameShort.getId());
         }
 

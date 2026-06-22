@@ -38,6 +38,7 @@ services:
       - TRANSMISSION_DOWNLOAD_DIR=/downloads
       - GAMES_DIRECTORY=/gameLibrary
       - IMAGES_DIRECTORY=/gameLibrary/images
+      - SCRAPER_CONFIG_DIR=/scraper-config
       - JWT_SECRET=5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437
       # ⚠️ SCRAPER_ENCRYPTION_KEY — ключ шифрования API-ключей скраперов.
       # Если измените — пересохраните API-ключи в админке (/admin/scrapers).
@@ -48,6 +49,7 @@ services:
       #- /host_mnt/f/Work/Git/my_project/data:/gameLibrary  рабочий пример
       - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents:/torrentDirTmp
       #- /host_mnt/f/Work/Git/my_project/data/tDir:/torrentDirTmp  рабочий пример
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/scrapers:/scraper-config
     depends_on:
       postgresdb:
         condition: service_healthy

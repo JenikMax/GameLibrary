@@ -11,7 +11,7 @@ FROM eclipse-temurin:11-jre-alpine
 WORKDIR /app
 COPY --from=build /build/target/game-library.jar app.jar
 
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Xmx1024m"
 
 VOLUME /gameLibrary
 VOLUME /torrentDirTmp

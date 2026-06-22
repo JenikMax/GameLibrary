@@ -18,6 +18,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Timestamp;
@@ -33,6 +35,9 @@ public class GameDataService implements GameService {
     private final GameRepository gameRepository;
     private final GameGenreRepository gameGenreRepository;
     private final ScreenshotRepository screenshotRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, ScreenshotRepository screenshotRepository) {
         this.sqlDao = sqlDao;
@@ -278,6 +283,12 @@ public class GameDataService implements GameService {
     }
 
     @Override
+    public List<Object[]> getGameDirectoryPaths() {
+        return entityManager.createQuery("select g.id, g.directoryPath from Game g")
+                .getResultList();
+    }
+
+    @Override
     public Game getGameById(Long gameId) {
         return gameRepository.getReferenceById(gameId);
     }
@@ -286,6 +297,21 @@ public class GameDataService implements GameService {
     @Override
     public void storeGame(Game game) {
         game.setCreateTs(new Timestamp(new Date().getTime()));
+        gameRepository.save(game);
+    }
+
+    @Transactional
+    @Override
+    public Game storeGameMetadata(Game game) {
+        game.setCreateTs(new Timestamp(new Date().getTime()));
+        game.setLogo(null);
+        game.setScreenshots(new ArrayList<>());
+        return gameRepository.save(game);
+    }
+
+    @Transactional
+    @Override
+    public void updateGameImages(Game game) {
         gameRepository.save(game);
     }
 
