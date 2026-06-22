@@ -6,6 +6,8 @@ import com.jenikmax.game.library.model.dto.api.DownloadInfoResponse;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.downloads.DownloadTorrentService;
 import com.jenikmax.game.library.service.downloads.transmission.TransmissionService;
+import com.jenikmax.game.library.service.torrent.TorrentTask;
+import com.jenikmax.game.library.service.torrent.TorrentTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +29,16 @@ public class DownloadController {
     private final LibraryService libraryService;
     private final TransmissionService transmissionService;
     private final DownloadTorrentService torrentService;
+    private final TorrentTaskService torrentTaskService;
 
-    public DownloadController(LibraryService libraryService, TransmissionService transmissionService, DownloadTorrentService torrentService) {
+    public DownloadController(LibraryService libraryService,
+                               TransmissionService transmissionService,
+                               DownloadTorrentService torrentService,
+                               TorrentTaskService torrentTaskService) {
         this.libraryService = libraryService;
         this.transmissionService = transmissionService;
         this.torrentService = torrentService;
+        this.torrentTaskService = torrentTaskService;
     }
 
     @GetMapping("/games/{id}/download")
@@ -58,23 +65,40 @@ public class DownloadController {
         logger.info("Seed game via Transmission - {}", id);
         try {
             GameDto gameDto = libraryService.getGameInfo(id);
-            DownloadTorrentService.TorrentResult result =
-                    torrentService.createTorrent(gameDto.getDirectoryPath(), true);
+            String taskId = torrentTaskService.submitSeedTask(id, gameDto.getDirectoryPath());
 
             Map<String, Object> data = new HashMap<>();
             data.put("gameId", id);
-            data.put("gameName", gameDto.getName());
-            data.put("torrentPath", result.getTorrentPath());
-            data.put("seedId", result.getSeedId());
-            data.put("torrentDownloadUrl",
-                    "/game-library/api/games/" + id + "/download");
+            data.put("taskId", taskId);
+            data.put("statusUrl", "/game-library/api/seed/status/" + taskId);
 
-            return ResponseEntity.ok(ApiResponse.ok("Torrent created and seeding started", data));
+            return ResponseEntity.accepted()
+                    .body(ApiResponse.ok("Torrent creation started", data));
         } catch (Exception e) {
             logger.error("Seed game error", e);
             return ResponseEntity.internalServerError()
-                    .body(ApiResponse.error("Failed to seed game: " + e.getMessage()));
+                    .body(ApiResponse.error("Failed to start seeding: " + e.getMessage()));
         }
+    }
+
+    @GetMapping("/seed/status/{taskId}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getSeedStatus(@PathVariable String taskId) {
+        TorrentTask task = torrentTaskService.getTask(taskId);
+        if (task == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("taskId", task.getTaskId());
+        data.put("gameId", task.getGameId());
+        data.put("status", task.getStatus().name());
+        data.put("progress", task.getProgress());
+        data.put("currentFile", task.getCurrentFile());
+        data.put("torrentPath", task.getTorrentPath());
+        data.put("seedId", task.getSeedId());
+        data.put("errorMessage", task.getErrorMessage());
+
+        return ResponseEntity.ok(ApiResponse.ok(data));
     }
 
     @GetMapping("/downloads/active")

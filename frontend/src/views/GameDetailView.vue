@@ -37,6 +37,11 @@
             @click="$router.push(`/game/${game.id}/edit`)"
           />
         </div>
+        <div v-if="seedTaskId || seeding" class="seed-progress-section mb-3">
+          <ProgressBar :value="seedProgress" class="mb-1" />
+          <small class="text-muted" v-if="seedCurrentFile">{{ seedCurrentFile }}</small>
+          <small class="text-muted" v-else>{{ t('game.seeding_started') }}</small>
+        </div>
         <Divider />
         <h3>{{ t('game.description') }}</h3>
         <p v-html="game.description" class="description-text"></p>
@@ -87,13 +92,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useLibraryStore } from '../stores/library'
 import { useI18n } from '../composables/useI18n'
 import { gamesApi } from '../api/games'
 import ProgressSpinner from 'primevue/progressspinner'
+import ProgressBar from 'primevue/progressbar'
 import Image from 'primevue/image'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
@@ -111,6 +117,10 @@ const { t } = useI18n()
 const game = ref(null)
 const loading = ref(true)
 const seeding = ref(false)
+const seedTaskId = ref(null)
+const seedProgress = ref(0)
+const seedCurrentFile = ref('')
+let seedPollTimer = null
 const toast = useToast()
 const viewerVisible = ref(false)
 const viewerIndex = ref(0)
@@ -152,27 +162,72 @@ function downloadGame() {
   window.open(gamesApi.getDownloadUrl(game.value.id), '_blank')
 }
 
+function pollSeedStatus() {
+  if (!seedTaskId.value) return
+  seedPollTimer = setInterval(async () => {
+    try {
+      const res = await downloadsApi.getSeedStatus(seedTaskId.value)
+      const task = res.data.data
+      if (task.status === 'COMPLETED') {
+        clearInterval(seedPollTimer)
+        seedPollTimer = null
+        seeding.value = false
+        seedTaskId.value = null
+        toast.add({
+          severity: 'success',
+          summary: t('game.seeding_started'),
+          detail: `ID: ${task.seedId}`,
+          life: 5000
+        })
+      } else if (task.status === 'FAILED') {
+        clearInterval(seedPollTimer)
+        seedPollTimer = null
+        seeding.value = false
+        seedTaskId.value = null
+        toast.add({
+          severity: 'error',
+          summary: t('game.seeding_failed'),
+          detail: task.errorMessage || t('game.seeding_failed_detail'),
+          life: 5000
+        })
+      } else {
+        seedProgress.value = task.progress || 0
+        seedCurrentFile.value = task.currentFile || ''
+      }
+    } catch {
+      clearInterval(seedPollTimer)
+      seedPollTimer = null
+      seeding.value = false
+      seedTaskId.value = null
+    }
+  }, 1000)
+}
+
 async function seedGame() {
   seeding.value = true
+  seedProgress.value = 0
+  seedCurrentFile.value = ''
   try {
     const res = await downloadsApi.seedGame(game.value.id)
-    toast.add({
-      severity: 'success',
-      summary: t('game.seeding_started'),
-      detail: `ID: ${res.data.data.seedId}`,
-      life: 5000
-    })
+    seedTaskId.value = res.data.data.taskId
+    pollSeedStatus()
   } catch {
+    seeding.value = false
     toast.add({
       severity: 'error',
       summary: t('game.seeding_failed'),
       detail: t('game.seeding_failed_detail'),
       life: 5000
     })
-  } finally {
-    seeding.value = false
   }
 }
+
+onUnmounted(() => {
+  if (seedPollTimer) {
+    clearInterval(seedPollTimer)
+    seedPollTimer = null
+  }
+})
 
 function openGallery(index) {
   viewerIndex.value = index
@@ -263,6 +318,9 @@ function onViewerKeydown(e) {
 }
 .nav-btn {
   flex-shrink: 0;
+}
+.seed-progress-section {
+  max-width: 400px;
 }
 .video-wrapper {
   position: relative;

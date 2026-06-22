@@ -4,6 +4,9 @@ export const downloadsApi = {
   seedGame(id) {
     return api.post(`/games/${id}/seed`)
   },
+  getSeedStatus(taskId) {
+    return api.get(`/seed/status/${taskId}`)
+  },
   getActive() {
     return api.get('/downloads/active')
   },
