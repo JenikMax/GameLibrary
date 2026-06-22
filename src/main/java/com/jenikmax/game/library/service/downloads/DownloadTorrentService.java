@@ -46,7 +46,13 @@ public class DownloadTorrentService {
 
         // Use embedded HTTP tracker as primary announce, DHT as fallback
         URI announceURI = URI.create(announceUrl);
-        Torrent torrent = Torrent.create(directory, files, announceURI, "GameLibrary");
+        long totalSize = files.stream().mapToLong(File::length).sum();
+        int pieceLength = selectPieceLength(totalSize);
+        List<List<URI>> announceList = new ArrayList<>();
+        List<URI> tier = new ArrayList<>();
+        tier.add(announceURI);
+        announceList.add(tier);
+        Torrent torrent = Torrent.create(directory, files, pieceLength, announceList, "GameLibrary");
 
         String torrentFileName = torrent.getName() + new Date().getTime() + ".torrent";
         File result = new File(torrentDir + File.separator + torrentFileName);
@@ -86,6 +92,18 @@ public class DownloadTorrentService {
                 }
             }
         }
+    }
+
+    /**
+     * Auto-select piece length based on total content size.
+     * Larger pieces mean fewer SHA-1 hashes, reducing torrent creation time
+     * on low-power hardware (especially HDD-bound NAS).
+     */
+    private static int selectPieceLength(long totalSize) {
+        if (totalSize > 50L * 1024 * 1024 * 1024) return 4 * 1024 * 1024;
+        if (totalSize > 10L * 1024 * 1024 * 1024) return 2 * 1024 * 1024;
+        if (totalSize > 3L * 1024 * 1024 * 1024)  return 1 * 1024 * 1024;
+        return 512 * 1024;
     }
 
     public static class TorrentResult {

@@ -44,6 +44,7 @@ services:
       # Если измените — пересохраните API-ключи в админке (/admin/scrapers).
       # Сгенерировать новый: openssl rand -base64 32
       - SCRAPER_ENCRYPTION_KEY=9TBYQ1SL5z791jiCHB1aEADQG1kbl0Aive+pMA7F1DU=
+      - TTORRENT_HASHING_THREADS=2
     volumes:
       - /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
       #- /host_mnt/f/Work/Git/my_project/data:/gameLibrary  рабочий пример
