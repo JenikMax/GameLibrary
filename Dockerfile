@@ -1,18 +1,20 @@
-# Используем в качестве базового образа сервер приложений Tomcat 8
-FROM tomcat:8-jre8-alpine
+# Stage 1: Build with Maven
+FROM maven:3.8.8-eclipse-temurin-11 AS build
+WORKDIR /build
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+COPY src ./src
+RUN mvn package -DskipTests -B
 
-# Установка переменной окружения для рабочей директории и копирование WAR-файла
-WORKDIR /usr/local/tomcat/webapps/
-COPY target/game-library.war game-library.war
-COPY tomcat/server.xml /usr/local/tomcat/conf/
-# Установка переменной окружения для временного каталога веб-приложения Tomcat
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
+# Stage 2: Runtime with JRE
+FROM eclipse-temurin:11-jre-alpine
+WORKDIR /app
+COPY --from=build /build/target/game-library.jar app.jar
 
-# Монтирование каталога gameLibrary в контейнере
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Xmx1024m"
+
 VOLUME /gameLibrary
+VOLUME /torrentDirTmp
 
-# Монтирование каталога torrentDir в контейнере
-VOLUME /torrentDir
-
-# Запуск Tomcat
-CMD ["catalina.sh", "run"]
+EXPOSE 8080
+CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

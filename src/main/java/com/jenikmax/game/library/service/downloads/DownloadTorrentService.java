@@ -1,16 +1,14 @@
 package com.jenikmax.game.library.service.downloads;
 
-import com.jenikmax.game.library.service.downloads.api.TorrentTracker;
+import com.jenikmax.game.library.service.downloads.transmission.TransmissionService;
 import com.turn.ttorrent.common.Torrent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.channels.FileChannel;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,88 +17,106 @@ import java.util.List;
 @Component
 public class DownloadTorrentService {
 
-    private final Long torrentTtl;
     private final String torrentDir;
-    private final String torrentWatch;
-    private final String trackerHost;
-    private final int trackerPort;
-    private final TorrentTracker tracker;
+    private final String announceUrl;
+    private final TransmissionService transmissionService;
 
-    public DownloadTorrentService(@Value("${game-library.games.torrent.ttl}") Long torrentTtl,
-                                  @Value("${game-library.games.torrent.directory-tmp}") String torrentDir,
-                                  @Value("${game-library.games.torrent.directory}") String torrentWatch,
-                                  @Value("${game-library.games.torrent.tracker-host}") String trackerHost,
-                                  @Value("${game-library.games.torrent.tracker-port}") int trackerPort, TorrentTracker tracker) {
-        this.torrentTtl = torrentTtl;
+    public DownloadTorrentService(
+            @Value("${game-library.games.torrent.directory-tmp:/torrentDirTmp}") String torrentDir,
+            @Value("${game-library.tracker.announce-base-url:http://localhost:8080/game-library/api/tracker/announce}") String announceUrl,
+            TransmissionService transmissionService) {
         this.torrentDir = torrentDir;
-        this.torrentWatch = torrentWatch;
-
-        this.trackerHost = trackerHost;
-        this.trackerPort = trackerPort;
-        this.tracker = tracker;
+        this.announceUrl = announceUrl;
+        this.transmissionService = transmissionService;
     }
 
-    public String createTorrent(String directoryPath) throws IOException, InterruptedException, NoSuchAlgorithmException {
+    /**
+     * Create a .torrent file with embedded tracker announce URL and optionally
+     * start seeding via Transmission.
+     *
+     * @param directoryPath path to game directory
+     * @param seedViaTransmission if true, sends the torrent to Transmission for seeding
+     * @return result with torrent file path and optional seed ID
+     */
+    public TorrentResult createTorrent(String directoryPath, boolean seedViaTransmission)
+            throws IOException, InterruptedException, NoSuchAlgorithmException {
         File directory = new File(directoryPath);
         List<File> files = new ArrayList<>();
         searchFiles(directory, files);
-        // Указываем IP-адрес хоста, где раздача будет доступна
-        URI announceURI = URI.create("http://" + trackerHost + ":" + trackerPort + "/announce");
-        Torrent torrent = Torrent.create(directory.getParentFile(), files, announceURI, "GameLibrary");
-        tracker.annonceTorrent(torrent);
-        //tracker.unAnnonceTorrent(torrent,torrentTtl);
 
-        File result = new File(torrentDir + File.separator + torrent.getName() + new Date().getTime() + ".torrent");
+        // Use embedded HTTP tracker as primary announce, DHT as fallback
+        URI announceURI = URI.create(announceUrl);
+        long totalSize = files.stream().mapToLong(File::length).sum();
+        int pieceLength = selectPieceLength(totalSize);
+        List<List<URI>> announceList = new ArrayList<>();
+        List<URI> tier = new ArrayList<>();
+        tier.add(announceURI);
+        announceList.add(tier);
+        Torrent torrent = Torrent.create(directory, files, pieceLength, announceList, "GameLibrary");
+
+        String torrentFileName = torrent.getName() + new Date().getTime() + ".torrent";
+        File result = new File(torrentDir + File.separator + torrentFileName);
         result.createNewFile();
-        try(FileOutputStream fileOutputStream = new FileOutputStream(result);){
-            torrent.save(fileOutputStream);
+        try (FileOutputStream fos = new FileOutputStream(result)) {
+            torrent.save(fos);
         }
-        copyFile(result.getAbsolutePath(),torrentWatch);
-        return result.getAbsolutePath();
+
+        String torrentPath = result.getAbsolutePath();
+        String seedId = null;
+
+        if (seedViaTransmission) {
+            seedId = transmissionService.addTorrent(torrentPath, directoryPath);
+        }
+
+        return new TorrentResult(torrentPath, seedId);
     }
 
-    private void copyFile(String sourceFilePath, String destinationDirectory) throws IOException {
-        File sourceFile = new File(sourceFilePath);
-        File destinationDir = new File(destinationDirectory);
-
-        // Создание директории, если она не существует
-        if (!destinationDir.exists()) {
-            destinationDir.mkdirs();
-        }
-
-        // Путь назначения для скопированного файла
-        String destinationFilePath = destinationDirectory + File.separator + sourceFile.getName();
-
-        FileChannel sourceChannel = null;
-        FileChannel destinationChannel = null;
-
-        try {
-            sourceChannel = new FileInputStream(sourceFile).getChannel();
-            destinationChannel = new FileOutputStream(destinationFilePath).getChannel();
-            // Копирование файла из исходного канала в канал назначения
-            destinationChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
-
-            System.out.println("Файл успешно скопирован в " + destinationFilePath);
-        } finally {
-            if (sourceChannel != null) {
-                sourceChannel.close();
-            }
-            if (destinationChannel != null) {
-                destinationChannel.close();
-            }
-        }
+    /**
+     * Legacy method: create torrent without seeding.
+     */
+    public String createTorrent(String directoryPath)
+            throws IOException, InterruptedException, NoSuchAlgorithmException {
+        return createTorrent(directoryPath, false).getTorrentPath();
     }
 
     private void searchFiles(File directory, List<File> files) {
         if (directory.isDirectory()) {
-            for (File file : directory.listFiles()) {
-                if (file.isDirectory()) {
-                    searchFiles(file, files);
-                } else {
-                    files.add(file);
+            File[] listed = directory.listFiles();
+            if (listed != null) {
+                for (File file : listed) {
+                    if (file.isDirectory()) {
+                        searchFiles(file, files);
+                    } else {
+                        files.add(file);
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * Auto-select piece length based on total content size.
+     * Larger pieces mean fewer SHA-1 hashes, reducing torrent creation time
+     * on low-power hardware (especially HDD-bound NAS).
+     */
+    private static int selectPieceLength(long totalSize) {
+        if (totalSize > 50L * 1024 * 1024 * 1024) return 4 * 1024 * 1024;
+        if (totalSize > 10L * 1024 * 1024 * 1024) return 2 * 1024 * 1024;
+        if (totalSize > 3L * 1024 * 1024 * 1024)  return 1 * 1024 * 1024;
+        return 512 * 1024;
+    }
+
+    public static class TorrentResult {
+        private final String torrentPath;
+        private final String seedId;
+
+        public TorrentResult(String torrentPath, String seedId) {
+            this.torrentPath = torrentPath;
+            this.seedId = seedId;
+        }
+
+        public String getTorrentPath() { return torrentPath; }
+        public String getSeedId() { return seedId; }
     }
 
 }

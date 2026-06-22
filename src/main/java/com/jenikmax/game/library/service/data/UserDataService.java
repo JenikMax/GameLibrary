@@ -11,9 +11,11 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.FileCopyUtils;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -135,6 +137,7 @@ public class UserDataService implements UserService {
         if (user == null) return userDto;
         userDto.setId(user.getId());
         userDto.setName(user.getUsername());
+        userDto.setActive(user.isActive());
         userDto.setAdmin(user.isAdmin());
         userDto.setAvatar(user.getAvatar() != null ? BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(user.getAvatar()) : null);
         return userDto;
@@ -157,10 +160,22 @@ public class UserDataService implements UserService {
     }
 
 
+    @PostConstruct
+    @Transactional
+    public void initDefaultAvatars() {
+        byte[] defaultAvatar = getDefaultAvatar();
+        if (defaultAvatar == null) return;
+        List<User> usersWithoutAvatar = userRepository.findByAvatarIsNull();
+        for (User user : usersWithoutAvatar) {
+            user.setAvatar(defaultAvatar);
+            userRepository.save(user);
+        }
+    }
+
     private byte[] getDefaultAvatar(){
         ClassPathResource resource = new ClassPathResource("static/img/user.png");
-        try {
-            return Files.readAllBytes(resource.getFile().toPath());
+        try (InputStream is = resource.getInputStream()) {
+            return FileCopyUtils.copyToByteArray(is);
         } catch (IOException e) {
             return null;
         }

@@ -1,0 +1,8 @@
+.git/
+.gitignore
+node_modules/
+frontend/
+*.md
+AGENTS.md
+aria2-config/
+scripts/

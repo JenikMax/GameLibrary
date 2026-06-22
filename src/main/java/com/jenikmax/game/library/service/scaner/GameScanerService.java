@@ -3,7 +3,6 @@ package com.jenikmax.game.library.service.scaner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
-import com.jenikmax.game.library.model.entity.Poster;
 import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
@@ -11,10 +10,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,10 +57,19 @@ public class GameScanerService implements ScanerService {
     }
 
     public Game getAdditinalGameInfo(Game game){
+        game = getBasicGameInfo(game);
+        game.setLogo(getLogo(game));
+        game.setScreenshots(getScreenshots(game));
+        return game;
+    }
+
+    @Override
+    public Game getBasicGameInfo(Game game){
         File gameinfoDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX);
+        if(!gameinfoDir.exists()){
+            createDefaultGameInfo(game);
+        }
         if(gameinfoDir.exists()){
-            File logo = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_LOGO_FILE_NAME);
-            if(logo.exists()) game.setPoster(getPoster(game,readImage(logo)));
             File information = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME);
             if(information.exists()){
                 GameInfo gameInfo = getAdditinalGameInfo(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_INFO_FILE_NAME);
@@ -69,31 +79,18 @@ public class GameScanerService implements ScanerService {
                 game.setDescription(gameInfo.getDescription());
                 game.setInstruction(gameInfo.getInstruction());
                 game.setGenres(new ArrayList<>());
-                for(String genre : gameInfo.getGenres()){
-                    GameGenre gameGenre = new GameGenre();
-                    gameGenre.setGame(game);
-                    gameGenre.setGenre(Genre.valueOf(genre));
-                    game.getGenres().add(gameGenre);
+                if(gameInfo.getGenres() != null) {
+                    for(String genre : gameInfo.getGenres()){
+                        GameGenre gameGenre = new GameGenre();
+                        gameGenre.setGame(game);
+                        gameGenre.setGenre(Genre.valueOf(genre));
+                        game.getGenres().add(gameGenre);
+                    }
                 }
             }
-            File screenDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_SCREEN_PREFIX);
-            if(screenDir.exists()){
-                List<File> screenImgFiles = Arrays.asList(screenDir.listFiles());
-                game.setScreenshots(new ArrayList<>());
-                int count = 1;
-                for(File img : screenImgFiles){
-                    Screenshot screenshot = new Screenshot();
-                    screenshot.setGame(game);
-                    screenshot.setName("image" + count + "jpg");
-                    screenshot.setSource(readImage(img));
-                    game.getScreenshots().add(screenshot);
-                }
-            }
-
         }
         if(game.getGenres() == null) game.setGenres(new ArrayList<>());
         if(game.getScreenshots() == null) game.setScreenshots(new ArrayList<>());
-        if(game.getPoster() == null) game.setPoster(getPoster(game,getDefaultLogo()));
         if(game.getReleaseDate() == null) game.setReleaseDate("N/A");
         if(game.getTrailerUrl() == null) game.setTrailerUrl("N/A");
         if(game.getDescription() == null) game.setDescription("N/A");
@@ -101,12 +98,30 @@ public class GameScanerService implements ScanerService {
         return game;
     }
 
-    private Poster getPoster(Game game, byte[] source){
-        Poster poster = new Poster();
-        poster.setGame(game);
-        poster.setName("poster.jpg");
-        poster.setSource(source);
-        return poster;
+    @Override
+    public byte[] getLogo(Game game){
+        File logo = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_LOGO_FILE_NAME);
+        if(logo.exists()) return readImage(logo);
+        return getDefaultLogo();
+    }
+
+    @Override
+    public List<Screenshot> getScreenshots(Game game){
+        List<Screenshot> screenshots = new ArrayList<>();
+        File screenDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_SCREEN_PREFIX);
+        if(screenDir.exists()){
+            List<File> screenImgFiles = Arrays.asList(screenDir.listFiles());
+            int count = 1;
+            for(File img : screenImgFiles){
+                Screenshot screenshot = new Screenshot();
+                screenshot.setGame(game);
+                screenshot.setName("image" + count + ".jpg");
+                screenshot.setSource(readImage(img));
+                screenshots.add(screenshot);
+                count++;
+            }
+        }
+        return screenshots;
     }
 
     public void storeGame(Game game){
@@ -128,21 +143,19 @@ public class GameScanerService implements ScanerService {
         gameInfo.setTrailerUrl(game.getTrailerUrl());
         gameInfo.setDescription(game.getDescription());
         gameInfo.setInstruction(game.getInstruction());
-        // Создание объекта ObjectMapper с использованием YAMLFactory
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             File gameInfiFile = getGameInfoFile(game.getDirectoryPath());
-            // Запись объекта в YAML файл
             objectMapper.writeValue(gameInfiFile, gameInfo);
-            System.out.println("Объект успешно записан в YAML файл.");
+            logger.info("Game info saved for {}", game.getName());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error writing game info for {} - ", game.getName(), e);
         }
     }
 
     private void storeLogoGameInfo(Game game){
         try {
-            this.saveImage(game.getDirectoryPath() + GAME_INFO_PREFIX, "logo.jpg", game.getPoster().getSource());
+            this.saveImage(game.getDirectoryPath() + GAME_INFO_PREFIX, "logo.jpg", game.getLogo());
         }
         catch (Exception e){
             logger.error("Error storeLogoGameInfo logo - ",e);
@@ -185,32 +198,51 @@ public class GameScanerService implements ScanerService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             // Чтение объекта из файла JSON
-            GameInfo gameInfo = objectMapper.readValue(new File(path), GameInfo.class);
-            return gameInfo;
+            return objectMapper.readValue(new File(path), GameInfo.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error reading game info from {} - ", path, e);
         }
         return null;
     }
 
 
 
-    private byte[] getDefaultLogo(){
-        ClassPathResource resource = new ClassPathResource("static/img/default.jpg");
+    private void createDefaultGameInfo(Game game){
         try {
-            return Files.readAllBytes(resource.getFile().toPath());
+            new File(game.getDirectoryPath() + GAME_INFO_PREFIX).mkdirs();
+            byte[] defaultLogo = getDefaultLogo();
+            if (defaultLogo != null) {
+                saveImage(game.getDirectoryPath() + GAME_INFO_PREFIX, "logo.jpg", defaultLogo);
+            }
+            GameInfo gameInfo = new GameInfo();
+            gameInfo.setName(game.getName());
+            gameInfo.setPlatform(game.getPlatform());
+            gameInfo.setReleaseDate("N/A");
+            gameInfo.setTrailerUrl("N/A");
+            gameInfo.setDescription("N/A");
+            gameInfo.setInstruction("N/A");
+            gameInfo.setGenres(new ArrayList<>());
+            new ObjectMapper().writeValue(getGameInfoFile(game.getDirectoryPath()), gameInfo);
         } catch (IOException e) {
-            logger.error("GetDefaultImg Error - ",e);
+            logger.error("Error creating default game info - ", e);
+        }
+    }
+
+    private byte[] getDefaultLogo(){
+        ClassPathResource resource = new ClassPathResource("static/img/logo.jpg");
+        try (InputStream is = resource.getInputStream()) {
+            return StreamUtils.copyToByteArray(is);
+        } catch (IOException e) {
+            logger.error("GetDefaultImg Error - ", e);
             return null;
         }
     }
 
     private byte[] readImage(File image){
         try {
-            byte[] bytes = Files.readAllBytes(image.toPath());
-            return bytes;
+            return Files.readAllBytes(image.toPath());
         } catch (IOException e) {
-            logger.error("GetDefaultImg Error - ", e);
+            logger.error("GetDefaultImg Error - ",e);
             return null;
         }
     }

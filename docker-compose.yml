@@ -1,23 +1,5 @@
 version: '3'
 services:
-  deluge:
-    image: lscr.io/linuxserver/deluge:latest
-    container_name: deluge
-    environment:
-      - PUID=197609
-      - PGID=197609
-      - TZ=Etc/UTC
-      - DELUGE_LOGLEVEL=error
-    volumes:
-      - /host_mnt/d/Work/MyProjects/gametest/tracker/config:/config
-      - /host_mnt/d/Work/MyProjects/gametest/games:/downloads
-      - /host_mnt/d/Work/MyProjects/gametest/tracker/watch:/watch
-    ports:
-      - 8112:8112
-      - 6881:6881
-      - 6881:6881/udp
-      - 58846:58846
-    restart: unless-stopped
   postgresdb:
     build:
       context: .
@@ -25,46 +7,91 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /host_mnt/d/Work/MyProjects/gametest/db/data:/var/lib/postgresql/data
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/db/data:/var/lib/postgresql/data
+      #- /host_mnt/f/Work/Git/my_project/db/data:/var/lib/postgresql/data  рабочий пример
     env_file:
       - ./postgresdb/env.list
-  application:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-      - "9010:9010"
     environment:
-      - JAVA_OPTS=-Xmx2048m -Xms512m
-      - SERVER_PORT=8080 # порт на котором будет запущено приложение в образе
-      - DB_HOST=postgresdb #хост для подключения к бд (совпадает с службой бд в докер компоус)
-      - DB_PORT=5432 #порт для подключения к бд
-      - TORRENT_TRACKER_HOST=192.168.0.109
-      - TORRENT_TRACKER_PORT=9010
+      - SERVER_PORT=8080
+      - DB_HOST=postgresdb
+      - DB_PORT=5432
+      # ⚠️ TRACKER_ANNOUNCE_URL — IP машины, на которой запущен backend (трекер).
+      # Должен быть доступен из ваших торрент-клиентов. Замените на актуальный IP:
+      #   docker-compose:  http://<IP_ХОСТА>:8080/game-library/api/tracker/announce
+      #   без Docker:      http://localhost:8080/game-library/api/tracker/announce
+      - TRACKER_ANNOUNCE_URL=http://192.168.0.109:8080/game-library/api/tracker/announce
+      - TRANSMISSION_RPC_URL=http://transmission:9091/transmission/rpc
+      - TRANSMISSION_DOWNLOAD_DIR=/downloads
+      - GAMES_DIRECTORY=/gameLibrary
+      - IMAGES_DIRECTORY=/gameLibrary/images
+      - SCRAPER_CONFIG_DIR=/scraper-config
+      - JWT_SECRET=5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437
+      # ⚠️ SCRAPER_ENCRYPTION_KEY — ключ шифрования API-ключей скраперов.
+      # Если измените — пересохраните API-ключи в админке (/admin/scrapers).
+      # Сгенерировать новый: openssl rand -base64 32
+      - SCRAPER_ENCRYPTION_KEY=9TBYQ1SL5z791jiCHB1aEADQG1kbl0Aive+pMA7F1DU=
+      - TTORRENT_HASHING_THREADS=2
     volumes:
       - /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
-      - /host_mnt/d/Work/MyProjects/gametest/tracker/torrents:/torrentDir
-      - /host_mnt/d/Work/MyProjects/gametest/tracker/watch:/torrentDirTmp
+      #- /host_mnt/f/Work/Git/my_project/data:/gameLibrary  рабочий пример
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents:/torrentDirTmp
+      #- /host_mnt/f/Work/Git/my_project/data/tDir:/torrentDirTmp  рабочий пример
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/scrapers:/scraper-config
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+      transmission:
+        condition: service_started
+    restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
 
-  ##transmission:
-  ##  image: lscr.io/linuxserver/transmission:latest
-  ##  container_name: transmission
-  ##  environment:
-  ##    - PUID=197609
-  ##    - PGID=197121
-  ##    - TZ=Etc/UTC
-  ##    - USER=admin
-  ##    - PASS=admin1234
-  ##    - PEERPORT=31375
-  ##  volumes:
-  ##    - /host_mnt/d/Work/MyProjects/gametest/tracker/data:/config
-  ##    - /host_mnt/d/Work/MyProjects/gametest/games:/downloads
-  ##    - /host_mnt/d/Work/MyProjects/gametest/tracker/torrents:/watch
-  ##  ports:
-  ##    - 9091:9091
-  ##    - 31375:31375
-  ##    - 51413:51413
-  ##    - 51413:51413/udp
-  ##  restart: unless-stopped
+  transmission:
+    image: lscr.io/linuxserver/transmission:4.1.2
+    container_name: transmission
+    ports:
+      - "9091:9091"
+      - "51413:51413"
+      - "51413:51413/udp"
+    volumes:
+      - /host_mnt/d/Work/MyProjects/gametest/games:/downloads/games
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/config:/config
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/watch:/watch
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/complete:/downloads/complete
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=Etc/UTC
+      - TRANSMISSION_DOWNLOAD_DIR=/downloads/complete
+      - TRANSMISSION_INCOMPLETE_DIR=/downloads/incomplete
+      - TRANSMISSION_INCOMPLETE_DIR_ENABLED=true
+      - TRANSMISSION_WATCH_DIR=/watch
+      - TRANSMISSION_WATCH_DIR_ENABLED=true
+      - DHT=true
+      - LPD=true
+      - PEX=true
+
+    restart: unless-stopped

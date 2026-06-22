@@ -1,7 +1,6 @@
 package com.jenikmax.game.library.dao;
 
 import com.jenikmax.game.library.dao.api.SqlDao;
-import com.jenikmax.game.library.model.dto.GameReadDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +12,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +28,29 @@ public class SqlDaoImpl implements SqlDao {
 
 
     @Override
-    public List<GameReadDto> executeShortGame(String query) {
-        List<GameReadDto> gameShortDtoList = jdbcTemplate.query(query, (rs, rowNum) -> {
-            GameReadDto dto = new GameReadDto();
+    public List<GameShortDto> executeShortGame(String query) {
+        List<GameShortDto> gameShortDtoList = jdbcTemplate.query(query, (rs, rowNum) -> {
+            GameShortDto dto = new GameShortDto();
             dto.setId(rs.getLong("id"));
             dto.setCreateTs(rs.getTimestamp("create_ts"));
             dto.setName(rs.getString("name"));
             dto.setDirectoryPath(rs.getString("directory_path"));
             dto.setPlatform(rs.getString("platform"));
             dto.setReleaseDate(rs.getString("release_date"));
-            dto.setGenres(new ArrayList<>());
-            dto.setLogo(rs.getLong("poster_id"));
+            try {
+                String genreCodes = rs.getString("genre_codes");
+                if (genreCodes != null && !genreCodes.isEmpty()) {
+                    dto.setGenres(Arrays.asList(genreCodes.split(",")));
+                } else {
+                    dto.setGenres(new ArrayList<>());
+                }
+            } catch (java.sql.SQLException e) {
+                dto.setGenres(new ArrayList<>());
+            }
+            byte[] logoBytes = rs.getBytes("logo");
+            if (logoBytes != null) {
+                dto.setLogo("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(logoBytes));
+            }
             return dto;
         });
         return gameShortDtoList;
@@ -69,17 +81,29 @@ public class SqlDaoImpl implements SqlDao {
     }
 
     @Override
-    public List<GameReadDto> executeShortGame(String query, Object[] params) {
-        List<GameReadDto> gameShortDtoList = jdbcTemplate.query(query, (rs, rowNum) -> {
-            GameReadDto dto = new GameReadDto();
+    public List<GameShortDto> executeShortGame(String query, Object[] params) {
+        List<GameShortDto> gameShortDtoList = jdbcTemplate.query(query, (rs, rowNum) -> {
+            GameShortDto dto = new GameShortDto();
             dto.setId(rs.getLong("id"));
             dto.setCreateTs(rs.getTimestamp("create_ts"));
             dto.setName(rs.getString("name"));
             dto.setDirectoryPath(rs.getString("directory_path"));
             dto.setPlatform(rs.getString("platform"));
             dto.setReleaseDate(rs.getString("release_date"));
-            dto.setGenres(new ArrayList<>());
-            dto.setLogo(rs.getLong("poster_id"));
+            try {
+                String genreCodes = rs.getString("genre_codes");
+                if (genreCodes != null && !genreCodes.isEmpty()) {
+                    dto.setGenres(Arrays.asList(genreCodes.split(",")));
+                } else {
+                    dto.setGenres(new ArrayList<>());
+                }
+            } catch (java.sql.SQLException e) {
+                dto.setGenres(new ArrayList<>());
+            }
+            byte[] logoBytes = rs.getBytes("logo");
+            if (logoBytes != null) {
+                dto.setLogo("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(logoBytes));
+            }
             return dto;
         }, params);
         return gameShortDtoList;
