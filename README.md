@@ -120,8 +120,8 @@ Swagger UI: `/game-library/swagger-ui.html`
 - Сбор метаданных со scraper-ов (6 активных: Playground.ru / Igromania.ru / World-Art / Steam / IGDB / TheGamesDB)
 
 ### Скачивание игр
-- **Малые игры (<1 ГБ)**: потоковая упаковка в ZIP
-- **Крупные игры (≥1 ГБ)**: создание .torrent с announce URL встроенного HTTP-трекера (`/api/tracker/announce`) + раздача через Transmission
+- **Малые игры (<5 ГБ)**: потоковая упаковка в ZIP
+- **Крупные игры (≥5 ГБ)**: создание .torrent с announce URL встроенного HTTP-трекера (`/api/tracker/announce`) + раздача через Transmission
 - **Seed via Transmission**: кнопка на странице игры — создаёт торрент и запускает сидирование на NAS
 
 ### Пользователи и роли
@@ -228,6 +228,7 @@ DDL выполняются в порядке сортировки: `postgresdb/d
 | `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Директория с `scrapers-config.json` |
 | `SCRAPER_ENCRYPTION_KEY` | (не задан) | Ключ AES-256 (base64) для шифрования API-ключей скраперов. **Обязателен для сохранения ключей после перезапуска**. Сгенерировать: `openssl rand -base64 32` |
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная директория для .torrent файлов |
+| `TTORRENT_HASHING_THREADS` | `2` | Количество потоков для хеширования торрент-файлов (ускорение создания .torrent) |
 
 ## Scraper-ы
 

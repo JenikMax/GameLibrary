@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +18,10 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @Component
 public class DownloadTorrentService {
@@ -81,6 +87,44 @@ public class DownloadTorrentService {
     public String createTorrent(String directoryPath)
             throws IOException, InterruptedException, NoSuchAlgorithmException {
         return createTorrent(directoryPath, false, null).getTorrentPath();
+    }
+
+    public List<File> listGameFiles(String directoryPath) {
+        File directory = new File(directoryPath);
+        List<File> files = new ArrayList<>();
+        searchFiles(directory, files);
+        return files;
+    }
+
+    public boolean isTorrentCached(String directoryPath) {
+        File directory = new File(directoryPath);
+        if (!directory.isDirectory()) return false;
+        List<File> files = new ArrayList<>();
+        searchFiles(directory, files);
+        return cacheManager.getCachedTorrent(directory, files).isPresent();
+    }
+
+    public void serveTorrentFile(String directoryPath, OutputStream outputStream,
+                                  CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture) {
+        try {
+            File directory = new File(directoryPath);
+            List<File> files = new ArrayList<>();
+            searchFiles(directory, files);
+            Path cachedTorrent = cacheManager.getCachedTorrent(directory, files)
+                    .orElseThrow(() -> new IOException("Torrent not cached for " + directoryPath));
+
+            try (FileInputStream fis = new FileInputStream(cachedTorrent.toFile())) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = fis.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+            completableFuture.complete(ResponseEntity.ok().build());
+        } catch (Exception e) {
+            logger.error("Failed to serve torrent for {}", directoryPath, e);
+            completableFuture.completeExceptionally(e);
+        }
     }
 
     private void searchFiles(File directory, List<File> files) {

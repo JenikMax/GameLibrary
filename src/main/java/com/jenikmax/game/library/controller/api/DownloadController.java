@@ -4,6 +4,7 @@ import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.api.ApiResponse;
 import com.jenikmax.game.library.model.dto.api.DownloadInfoResponse;
 import com.jenikmax.game.library.service.api.LibraryService;
+import com.jenikmax.game.library.service.downloads.DownloadFileService;
 import com.jenikmax.game.library.service.downloads.DownloadTorrentService;
 import com.jenikmax.game.library.service.downloads.transmission.TransmissionService;
 import com.jenikmax.game.library.service.torrent.TorrentTask;
@@ -28,15 +29,18 @@ public class DownloadController {
 
     private final LibraryService libraryService;
     private final TransmissionService transmissionService;
+    private final DownloadFileService downloadFileService;
     private final DownloadTorrentService torrentService;
     private final TorrentTaskService torrentTaskService;
 
     public DownloadController(LibraryService libraryService,
                                TransmissionService transmissionService,
+                               DownloadFileService downloadFileService,
                                DownloadTorrentService torrentService,
                                TorrentTaskService torrentTaskService) {
         this.libraryService = libraryService;
         this.transmissionService = transmissionService;
+        this.downloadFileService = downloadFileService;
         this.torrentService = torrentService;
         this.torrentTaskService = torrentTaskService;
     }
@@ -52,10 +56,14 @@ public class DownloadController {
     @GetMapping("/games/{id}/download-info")
     public ResponseEntity<ApiResponse<DownloadInfoResponse>> getDownloadInfo(@PathVariable Long id) {
         GameDto gameDto = libraryService.getGameInfo(id);
+        long gameSize = downloadFileService.getDirectorySizeRecursively(gameDto.getDirectoryPath());
+        boolean torrentCached = torrentService.isTorrentCached(gameDto.getDirectoryPath());
         DownloadInfoResponse info = new DownloadInfoResponse();
         info.setGameId(gameDto.getId());
         info.setGameName(gameDto.getName());
         info.setReleaseDate(gameDto.getReleaseDate());
+        info.setGameSize(gameSize);
+        info.setTorrentCached(torrentCached);
         info.setDownloadUrl("/game-library/api/games/" + id + "/download");
         return ResponseEntity.ok(ApiResponse.ok(info));
     }
@@ -79,6 +87,45 @@ public class DownloadController {
             return ResponseEntity.internalServerError()
                     .body(ApiResponse.error("Failed to start seeding: " + e.getMessage()));
         }
+    }
+
+    @PostMapping("/games/{id}/prepare-download")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> prepareDownload(@PathVariable Long id) {
+        logger.info("Prepare torrent download for game - {}", id);
+        try {
+            GameDto gameDto = libraryService.getGameInfo(id);
+            String taskId = torrentTaskService.submitDownloadTask(id, gameDto.getDirectoryPath());
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("gameId", id);
+            data.put("taskId", taskId);
+            data.put("statusUrl", "/game-library/api/download/prepare-status/" + taskId);
+
+            return ResponseEntity.accepted()
+                    .body(ApiResponse.ok("Torrent preparation started", data));
+        } catch (Exception e) {
+            logger.error("Prepare download error", e);
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.error("Failed to start torrent preparation: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/download/prepare-status/{taskId}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getPrepareStatus(@PathVariable String taskId) {
+        TorrentTask task = torrentTaskService.getTask(taskId);
+        if (task == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("taskId", task.getTaskId());
+        data.put("gameId", task.getGameId());
+        data.put("status", task.getStatus().name());
+        data.put("progress", task.getProgress());
+        data.put("currentFile", task.getCurrentFile());
+        data.put("errorMessage", task.getErrorMessage());
+
+        return ResponseEntity.ok(ApiResponse.ok(data));
     }
 
     @GetMapping("/seed/status/{taskId}")

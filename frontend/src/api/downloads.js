@@ -7,6 +7,12 @@ export const downloadsApi = {
   getSeedStatus(taskId) {
     return api.get(`/seed/status/${taskId}`)
   },
+  prepareDownload(id) {
+    return api.post(`/games/${id}/prepare-download`)
+  },
+  getPrepareStatus(taskId) {
+    return api.get(`/download/prepare-status/${taskId}`)
+  },
   getActive() {
     return api.get('/downloads/active')
   },

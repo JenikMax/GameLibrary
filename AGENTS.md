@@ -71,6 +71,8 @@ TheGamesDB требует API-ключ. Чтобы получить его:
 ## Gotchas
 
 - **Plaintext DB passwords** in `application.yml` and `postgresdb/ddl/1_init.sql`.
+- **Torrent download limit is 5 GB** (not 1 GB). Code at `LibraryOperationService.java:225` uses `5L * 1024 * 1024 * 1024` as the boundary for ZIP vs .torrent download.
+- **TTORRENT_HASHING_THREADS** env var controls hashing parallelism for torrent creation. Default `2`. Set lower on low-CPU NAS to avoid I/O saturation.
 - `Game.java` is a decompiled `.class` → `@Entity` uses annotated getters, not fields. Keep this pattern.
 - **Frontend must be built separately** before Docker (`npm run build` or `make build-frontend`). Dev server (`npm run dev`) proxies `/game-library/*` to `:8080`.
 - **OkHttp 3.x API order**: `RequestBody.create(MediaType, String)` — MediaType first.

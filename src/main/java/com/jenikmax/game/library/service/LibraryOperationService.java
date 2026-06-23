@@ -223,7 +223,7 @@ public class LibraryOperationService implements LibraryService {
         // Создайте StreamingResponseBody для передачи данных
         StreamingResponseBody streamingResponseBody = outputStream -> {
             if(size > 5L * 1024 * 1024 * 1024){
-                downloadService.downloadTorrent(game.getDirectoryPath(),outputStream,completableFuture);
+                downloadService.serveCachedTorrent(game.getDirectoryPath(),outputStream,completableFuture);
             }
             else{
                 downloadService.downloadZipInStream(game.getDirectoryPath(),outputStream,completableFuture);

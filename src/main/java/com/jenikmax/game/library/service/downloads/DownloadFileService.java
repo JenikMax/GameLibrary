@@ -112,6 +112,11 @@ public class DownloadFileService implements DownloadService {
         }
     }
 
+    public void serveCachedTorrent(String path, OutputStream outputStream,
+                                    CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture) {
+        torrentService.serveTorrentFile(path, outputStream, completableFuture);
+    }
+
     public long getDirectorySizeRecursively(String path) {
         File file = new File(path);
         long size = 0;

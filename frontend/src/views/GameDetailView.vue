@@ -20,7 +20,8 @@
           <Tag v-for="g in game.genres" :key="g" :value="genreName(g)" severity="secondary" />
         </div>
         <div class="flex gap-2 mb-3 flex-wrap">
-          <Button :label="t('game.download')" icon="pi pi-download" severity="success" @click="downloadGame" />
+          <Button :label="t('game.download')" icon="pi pi-download" severity="success"
+            @click="downloadGame" :loading="preparing" />
           <Button
             :label="t('game.seed')"
             icon="pi pi-seed-inverse"
@@ -41,6 +42,11 @@
           <ProgressBar :value="seedProgress" class="mb-1" />
           <small class="text-muted" v-if="seedCurrentFile">{{ seedCurrentFile }}</small>
           <small class="text-muted" v-else>{{ t('game.seeding_started') }}</small>
+        </div>
+        <div v-if="preparing" class="seed-progress-section mb-3">
+          <ProgressBar :value="prepareProgress" class="mb-1" />
+          <small class="text-muted" v-if="prepareCurrentFile">{{ prepareCurrentFile }}</small>
+          <small class="text-muted" v-else>{{ t('game.download_preparing') }}</small>
         </div>
         <Divider />
         <h3>{{ t('game.description') }}</h3>
@@ -121,6 +127,11 @@ const seedTaskId = ref(null)
 const seedProgress = ref(0)
 const seedCurrentFile = ref('')
 let seedPollTimer = null
+const preparing = ref(false)
+const prepareTaskId = ref(null)
+const prepareProgress = ref(0)
+const prepareCurrentFile = ref('')
+let preparePollTimer = null
 const toast = useToast()
 const viewerVisible = ref(false)
 const viewerIndex = ref(0)
@@ -158,8 +169,90 @@ onMounted(async () => {
   }
 })
 
-function downloadGame() {
-  window.open(gamesApi.getDownloadUrl(game.value.id), '_blank')
+async function downloadGame() {
+  if (!game.value || preparing.value) return
+
+  const infoRes = await gamesApi.getDownloadInfo(game.value.id)
+  const info = infoRes.data.data
+
+  const TORRENT_THRESHOLD = 5 * 1024 * 1024 * 1024
+
+  if (info.gameSize < TORRENT_THRESHOLD) {
+    window.open(gamesApi.getDownloadUrl(game.value.id), '_blank')
+    return
+  }
+
+  if (info.torrentCached) {
+    window.open(gamesApi.getDownloadUrl(game.value.id), '_blank')
+    return
+  }
+
+  preparing.value = true
+  prepareProgress.value = 0
+  prepareCurrentFile.value = ''
+  try {
+    const res = await downloadsApi.prepareDownload(game.value.id)
+    prepareTaskId.value = res.data.data.taskId
+    pollPrepareStatus()
+  } catch {
+    preparing.value = false
+    toast.add({
+      severity: 'error',
+      summary: t('game.download_failed'),
+      life: 5000
+    })
+  }
+}
+
+function downloadFile(url) {
+  const a = document.createElement('a')
+  a.href = url
+  a.download = ''
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
+function pollPrepareStatus() {
+  if (!prepareTaskId.value) return
+  preparePollTimer = setInterval(async () => {
+    try {
+      const res = await downloadsApi.getPrepareStatus(prepareTaskId.value)
+      const task = res.data.data
+      if (task.status === 'COMPLETED') {
+        clearInterval(preparePollTimer)
+        preparePollTimer = null
+        preparing.value = false
+        prepareTaskId.value = null
+        toast.add({
+          severity: 'success',
+          summary: t('game.seeding_started'),
+          detail: task.seedId ? `ID: ${task.seedId}` : '',
+          life: 5000
+        })
+        downloadFile(gamesApi.getDownloadUrl(game.value.id))
+      } else if (task.status === 'FAILED') {
+        clearInterval(preparePollTimer)
+        preparePollTimer = null
+        preparing.value = false
+        prepareTaskId.value = null
+        toast.add({
+          severity: 'error',
+          summary: t('game.download_failed'),
+          detail: task.errorMessage || '',
+          life: 5000
+        })
+      } else {
+        prepareProgress.value = task.progress || 0
+        prepareCurrentFile.value = task.currentFile || ''
+      }
+    } catch {
+      clearInterval(preparePollTimer)
+      preparePollTimer = null
+      preparing.value = false
+      prepareTaskId.value = null
+    }
+  }, 1000)
 }
 
 function pollSeedStatus() {
@@ -226,6 +319,10 @@ onUnmounted(() => {
   if (seedPollTimer) {
     clearInterval(seedPollTimer)
     seedPollTimer = null
+  }
+  if (preparePollTimer) {
+    clearInterval(preparePollTimer)
+    preparePollTimer = null
   }
 })
 

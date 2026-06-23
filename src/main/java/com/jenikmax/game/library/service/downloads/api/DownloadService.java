@@ -15,6 +15,8 @@ public interface DownloadService {
 
     void downloadZipInStream(String path, OutputStream outputStream, CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture);
 
+    void serveCachedTorrent(String path, OutputStream outputStream,
+                            CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture);
 
     long getDirectorySizeRecursively(String path);
 

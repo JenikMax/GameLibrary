@@ -59,6 +59,35 @@ public class TorrentTaskService implements DisposableBean {
         return taskId;
     }
 
+    public String submitDownloadTask(Long gameId, String directoryPath) {
+        String taskId = UUID.randomUUID().toString();
+        TorrentTask task = new TorrentTask(taskId, gameId);
+        tasks.put(taskId, task);
+
+        executor.submit(() -> {
+            try {
+                task.setStatus(TorrentTask.Status.HASHING);
+
+                DownloadTorrentService.TorrentResult result =
+                        downloadTorrentService.createTorrent(directoryPath, true, (done, total, fileName) -> {
+                            task.setProgress(done * 100 / total);
+                            task.setCurrentFile(fileName);
+                        });
+
+                task.setTorrentPath(result.getTorrentPath());
+                task.setSeedId(result.getSeedId());
+                task.setStatus(TorrentTask.Status.COMPLETED);
+
+            } catch (Exception e) {
+                logger.error("Torrent creation failed for {}", directoryPath, e);
+                task.setStatus(TorrentTask.Status.FAILED);
+                task.setErrorMessage(e.getMessage() != null ? e.getMessage() : "Unknown error");
+            }
+        });
+
+        return taskId;
+    }
+
     public TorrentTask getTask(String taskId) {
         return tasks.get(taskId);
     }
