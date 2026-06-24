@@ -55,7 +55,7 @@
 make all   # builds backend + frontend, starts docker-compose
 ```
 
-Opens at `http://localhost` — login as `admin` / `admin`.
+Opens at `http://localhost` — login as `admin` / `password`.
 
 ## 📦 Tech Stack
 
@@ -409,7 +409,7 @@ npm run dev
 make all   # сборка backend + frontend, запуск docker-compose
 ```
 
-Открыть `http://localhost` — войти как `admin` / `admin`.
+Открыть `http://localhost` — войти как `admin` / `password`.
 
 ## 📦 Технологический стек
 
