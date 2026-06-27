@@ -294,21 +294,9 @@ function removeNewScreenshot(index) {
 async function handleSave() {
   saving.value = true
   error.value = ''
-  success.value = ''
   try {
-    const response = await gamesApi.editGame(route.params.id, form.value)
-    game.value = response.data.data
-    if (game.value.logoUrl) game.value.logoUrl += '?t=' + Date.now()
-    existingScreenshots.value = (response.data.data.screenshotUrls || []).map(url => {
-      const parts = url.split('/')
-      return { id: Number(parts[parts.length - 1]), url }
-    })
-    newScreenshotPreviews.value = []
-    form.value.screenshots = []
-    form.value.deleteScreenshotIds = []
-    form.value.logo = ''
-    logoPreview.value = ''
-    success.value = t('game.save_success')
+    await gamesApi.editGame(route.params.id, form.value)
+    await router.replace(`/game/${route.params.id}`)
   } catch (e) {
     if (e.response?.status === 413) {
       error.value = t('game.file_size_error')

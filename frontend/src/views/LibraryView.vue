@@ -2,6 +2,7 @@
   <div class="library-layout">
     <aside class="filter-sidebar">
       <GameFilter
+        ref="filterRef"
         :options="store.filterOptions"
         @apply="handleApplyFilters"
         @reset="handleResetFilters"
@@ -48,7 +49,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLibraryStore } from '../stores/library'
 import { useAuthStore } from '../stores/auth'
@@ -62,17 +63,63 @@ import ProgressBar from 'primevue/progressbar'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
 
+const LIBRARY_STATE_KEY = 'libraryState'
+
+function saveStateToSession() {
+  sessionStorage.setItem(LIBRARY_STATE_KEY, JSON.stringify({
+    currentPage: store.currentPage,
+    searchText: store.searchText,
+    platforms: store.selectedPlatforms,
+    years: store.selectedYears,
+    genres: store.selectedGenres,
+    sortField: store.sortField,
+    sortType: store.sortType
+  }))
+}
+
 const store = useLibraryStore()
 const authStore = useAuthStore()
 const { t } = useI18n()
 const router = useRouter()
 const toast = useToast()
 const scanning = ref(false)
+const filterRef = ref(null)
 
 onMounted(async () => {
   await store.fetchFilterOptions()
-  await store.fetchGames()
+  const saved = sessionStorage.getItem(LIBRARY_STATE_KEY)
+  if (saved) {
+    const state = JSON.parse(saved)
+    store.searchText = state.searchText || ''
+    store.selectedPlatforms = state.platforms || []
+    store.selectedYears = state.years || []
+    store.selectedGenres = state.genres || []
+    store.sortField = state.sortField || ''
+    store.sortType = state.sortType || ''
+    sessionStorage.removeItem(LIBRARY_STATE_KEY)
+    await store.fetchGames(state.currentPage || 1)
+  } else {
+    store.resetFilters()
+    await store.fetchGames()
+  }
 })
+
+onBeforeUnmount(() => {
+  saveStateToSession()
+})
+
+watch(
+  [() => store.searchText, () => store.selectedPlatforms, () => store.selectedYears,
+   () => store.selectedGenres, () => store.sortField, () => store.sortType],
+  () => filterRef.value?.restoreState({
+    searchText: store.searchText,
+    selectedPlatforms: store.selectedPlatforms,
+    selectedYears: store.selectedYears,
+    selectedGenres: store.selectedGenres,
+    sortField: store.sortField,
+    sortType: store.sortType
+  })
+)
 
 function onPageChange(event) {
   store.fetchGames(event.page + 1)
@@ -91,6 +138,7 @@ function handleApplyFilters(filters) {
 
 function handleResetFilters() {
   store.resetFilters()
+  sessionStorage.removeItem(LIBRARY_STATE_KEY)
   store.fetchGames(1)
 }
 

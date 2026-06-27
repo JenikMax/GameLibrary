@@ -13,7 +13,10 @@
         />
       </div>
       <div class="game-info">
-        <h1>{{ game.name }}</h1>
+        <div class="flex align-items-center gap-2 mb-2">
+          <Button icon="pi pi-arrow-left" text @click="$router.push('/')" />
+          <h1 class="m-0">{{ game.name }}</h1>
+        </div>
         <div class="flex gap-2 flex-wrap mb-3">
           <Tag :value="game.platform" severity="info" />
           <Tag :value="game.releaseDate" severity="warn" />

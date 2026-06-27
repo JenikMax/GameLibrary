@@ -1,9 +1,9 @@
 <template>
   <Menubar :model="items" class="app-header">
     <template #start>
-      <router-link to="/" style="display:flex;align-items:center;gap:0.5rem">
+      <a style="display:flex;align-items:center;gap:0.5rem;cursor:pointer" @click="goToLibrary">
         <img :src="'/game-library/img/logo_w.jpg'" height="32" alt="logo" />
-      </router-link>
+      </a>
     </template>
     <template #end>
       <div class="flex align-items-center gap-2">
@@ -41,6 +41,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useLibraryStore } from '../stores/library'
 import { useDarkMode } from '../composables/useDarkMode'
 import { useI18n } from '../composables/useI18n'
 import { adminApi } from '../api/admin'
@@ -52,6 +53,7 @@ import { useToast } from 'primevue/usetoast'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const libraryStore = useLibraryStore()
 const { isDarkMode, toggleDarkMode } = useDarkMode()
 const { t } = useI18n()
 const toast = useToast()
@@ -61,7 +63,7 @@ const items = computed(() => {
     {
       label: t('nav.library'),
       icon: 'pi pi-th-large',
-      command: () => router.push('/')
+      command: goToLibrary
     },
     {
       label: t('nav.downloads'),
@@ -107,6 +109,16 @@ const items = computed(() => {
   }
   return menu
 })
+
+function goToLibrary() {
+  sessionStorage.removeItem('libraryState')
+  libraryStore.resetFilters()
+  if (router.currentRoute.value.path === '/') {
+    libraryStore.fetchGames(1)
+  } else {
+    router.push('/')
+  }
+}
 
 function goToProfile() {
   router.push('/profile')

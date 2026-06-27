@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
@@ -104,18 +104,28 @@ import Button from 'primevue/button'
 const { t } = useI18n()
 
 const props = defineProps({
-  options: { type: Object, required: true },
-  modelValue: { type: Object, default: () => ({}) }
+  options: { type: Object, required: true }
 })
 
 const emit = defineEmits(['apply', 'reset'])
 
-const searchText = ref(props.modelValue.searchText || '')
-const selectedPlatforms = ref(props.modelValue.selectedPlatforms || [])
-const selectedYears = ref(props.modelValue.selectedYears || [])
-const selectedGenres = ref(props.modelValue.selectedGenres || [])
-const sortField = ref(props.modelValue.sortField || '')
-const sortType = ref(props.modelValue.sortType || '')
+const searchText = ref('')
+const selectedPlatforms = ref([])
+const selectedYears = ref([])
+const selectedGenres = ref([])
+const sortField = ref('')
+const sortType = ref('')
+
+function restoreState(state) {
+  searchText.value = state.searchText || ''
+  selectedPlatforms.value = state.selectedPlatforms || []
+  selectedYears.value = state.selectedYears || []
+  selectedGenres.value = state.selectedGenres || []
+  sortField.value = state.sortField || ''
+  sortType.value = state.sortType || ''
+}
+
+defineExpose({ restoreState })
 
 const sortOptions = [
   { label: t('filter.sort_name'), value: 'name' },
