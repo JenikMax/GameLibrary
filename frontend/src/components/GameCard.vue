@@ -102,11 +102,12 @@ function downloadGame() {
   overflow: hidden;
   cursor: pointer;
   border-radius: 6px 6px 0 0;
+  aspect-ratio: 2 / 3;
 }
 .game-card-img {
   display: block;
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
   transition: transform 0.3s;
 }
