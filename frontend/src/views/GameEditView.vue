@@ -123,8 +123,8 @@
             <div class="field flex flex-column gap-2">
               <label>{{ t('game.scraper.fields') }}</label>
               <div v-for="opt in scrapeFields" :key="opt.key" class="flex align-items-center gap-2">
-                <Checkbox v-model="scrape[opt.key]" :binary="true" :inputId="opt.key" />
-                <label :for="opt.key">{{ t(opt.labelKey) }}</label>
+                <Checkbox v-model="scrape[opt.key]" :binary="true" :inputId="'scrape-' + opt.key" />
+                <label :for="'scrape-' + opt.key">{{ t(opt.labelKey) }}</label>
               </div>
             </div>
             <Button :label="t('game.scraper.scrape')" icon="pi pi-cloud-download" @click="handleScrape" :loading="scraping" class="w-full" />
@@ -336,14 +336,14 @@ async function handleScrape() {
       description: g.description || form.value.description,
       instruction: g.instruction || form.value.instruction,
       logo: g.logo || form.value.logo || '',
-      screenshots: [...(g.screenshots || []), ...(form.value.screenshots || [])],
+      screenshots: [...(new Set([...(form.value.screenshots || []), ...(g.screenshots || [])]))],
       deleteScreenshotIds: form.value.deleteScreenshotIds || []
     }
     if (g.logo) {
       logoPreview.value = g.logo
     }
     if (g.screenshots && g.screenshots.length > 0) {
-      newScreenshotPreviews.value.push(...g.screenshots)
+      newScreenshotPreviews.value = [...g.screenshots]
     }
     success.value = t('game.scrape_success')
   } catch (e) {
@@ -374,7 +374,7 @@ async function handleScrape() {
 }
 .quill-editor :deep(.ql-toolbar) {
   border: none;
-  border-radius: 6px 6px 0 0;
+  border-radius: 6px 0 0 0;
 }
 .quill-editor :deep(.ql-container) {
   border: none;
@@ -422,6 +422,12 @@ async function handleScrape() {
 }
 :deep(.p-multiselect-label) {
   flex-wrap: wrap;
+}
+:deep(.p-multiselect-option) {
+  cursor: pointer;
+}
+:deep(.p-multiselect-option *) {
+  pointer-events: auto !important;
 }
 .screenshot-add-box {
   width: 120px;

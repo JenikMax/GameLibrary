@@ -50,7 +50,8 @@ public class GameConverter {
         entity.setLogo(Base64.getDecoder().decode(dto.getLogo()));
         entity.setGenres(new ArrayList<>());
         for(String genre: dto.getGenres()){
-            entity.getGenres().add(dtoToGameGenreEntityConverter(genre,entity));
+            GameGenre gg = dtoToGameGenreEntityConverter(genre,entity);
+            if (gg != null) entity.getGenres().add(gg);
         }
         return entity;
     }
@@ -100,7 +101,8 @@ public class GameConverter {
         entity.setGenres(new ArrayList<>());
         if(dto.getGenres() != null){
             for(String genre : dto.getGenres()){
-                entity.getGenres().add(dtoToGameGenreEntityConverter(genre,entity));
+                GameGenre gg = dtoToGameGenreEntityConverter(genre,entity);
+                if (gg != null) entity.getGenres().add(gg);
             }
         }
         return entity;
@@ -118,7 +120,11 @@ public class GameConverter {
     public static GameGenre dtoToGameGenreEntityConverter(String genre, Game game){
         GameGenre entity = new GameGenre();
         entity.setGame(game);
-        entity.setGenre(Genre.valueOf(genre));
+        try {
+            entity.setGenre(Genre.valueOf(genre));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
         return entity;
     }
 

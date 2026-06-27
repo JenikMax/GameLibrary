@@ -216,6 +216,9 @@ public class ScraperConfigService {
         playground.getGenreMappings().put("third-person", Arrays.asList("third_person"));
         playground.getGenreMappings().put("open-world", Arrays.asList("open_world"));
         playground.getGenreMappings().put("post-apocalyptic", Arrays.asList("post_apocalyptic"));
+        playground.getGenreMappings().putAll(buildWorldArtGenreMappings());
+        playground.getGenreMappings().put("рогалик", Arrays.asList("roguelike"));
+        playground.getGenreMappings().put("глобальная_стратегия", Arrays.asList("_4X"));
         list.add(playground);
 
         ScraperConfig igromania = new ScraperConfig();
@@ -287,6 +290,7 @@ public class ScraperConfigService {
         map.put("moba", Arrays.asList("moba"));
         map.put("point-click", Arrays.asList("point_click"));
         map.put("roguelike", Arrays.asList("roguelike"));
+        map.put("rouglike", Arrays.asList("roguelike"));
         map.put("td", Arrays.asList("tower_defence"));
         map.put("tps", Arrays.asList("third_person", "shooter"));
         map.put("arkada", Arrays.asList("arcade"));

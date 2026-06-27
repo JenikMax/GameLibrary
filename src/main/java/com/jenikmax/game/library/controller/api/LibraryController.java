@@ -147,15 +147,12 @@ public class LibraryController {
                 gameDto.setLogo(existing.getLogo());
             }
 
-            // Preserve remaining screenshots + add new ones
-            List<String> finalScreenshots = new ArrayList<>();
-            if (existing.getScreenshots() != null) {
-                finalScreenshots.addAll(existing.getScreenshots());
-            }
+            // Use form screenshots as complete set, or keep existing if none provided
             if (gameEdit.getScreenshots() != null) {
-                finalScreenshots.addAll(gameEdit.getScreenshots());
+                gameDto.setScreenshots(gameEdit.getScreenshots());
+            } else {
+                gameDto.setScreenshots(existing.getScreenshots());
             }
-            gameDto.setScreenshots(finalScreenshots);
 
             GameDto updated = libraryService.updateGameInfo(gameDto);
             return ResponseEntity.ok(ApiResponse.ok(toGameDetailResponse(updated)));

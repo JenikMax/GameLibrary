@@ -3,6 +3,7 @@ package com.jenikmax.game.library.service.scraper.scrapers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.scraper.ConfigEncryptionService;
 import com.jenikmax.game.library.service.scraper.JsoupHelper;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
@@ -127,8 +128,21 @@ public class PlaygroundScraper implements Scraper {
             gameData.put("genres", genres);
         } else if (ldJson != null && ldJson.has("genre")) {
             List<String> ldGenres = new ArrayList<>();
+            Map<String, List<String>> mappings = config.getGenreMappings();
+            if (mappings == null) mappings = Collections.emptyMap();
             for (JsonNode g : ldJson.get("genre")) {
-                ldGenres.add(g.asText().toLowerCase().replace(" ", "_"));
+                String key = g.asText().toLowerCase().replace(" ", "_");
+                List<String> mapped = mappings.get(key);
+                if (mapped != null) {
+                    ldGenres.addAll(mapped);
+                } else {
+                    try {
+                        Genre.valueOf(key);
+                        ldGenres.add(key);
+                    } catch (IllegalArgumentException e) {
+                        // unknown genre, skip
+                    }
+                }
             }
             gameData.put("genres", ldGenres);
         }
@@ -172,24 +186,19 @@ public class PlaygroundScraper implements Scraper {
         Set<String> urls = new LinkedHashSet<>();
         Elements links = doc.select("a[href*=\"/i/screenshot/\"]");
         for (Element link : links) {
-            String href = link.attr("href");
-            if (!href.isEmpty() && !href.startsWith("data:")) urls.add(href);
+            String url = link.attr("href");
+            if (!url.isEmpty() && !url.startsWith("data:")) urls.add(normalizeScreenshotUrl(url));
         }
         Elements imgs = doc.select("img[src*=\"/i/screenshot/\"]");
         for (Element img : imgs) {
-            String src = img.attr("src");
-            if (!src.isEmpty() && !src.startsWith("data:")) urls.add(src);
+            String url = img.attr("src");
+            if (!url.isEmpty() && !url.startsWith("data:")) urls.add(normalizeScreenshotUrl(url));
         }
         List<String> result = new ArrayList<>();
         int max = config.getMaxScreenshots();
         int count = 0;
         for (String url : urls) {
             if (count >= max) break;
-            url = url.replace("https://i.playground.ru//i/", "https://i.playground.ru/i/");
-            url = url.replace("http://i.playground.ru//i/", "https://i.playground.ru/i/");
-            if (url.contains(".webp?")) {
-                url = url.substring(0, url.indexOf(".webp?")) + url.substring(url.indexOf(".webp?") + 5);
-            }
             try {
                 result.add(imageToBase64(url, referer));
                 count++;
@@ -198,6 +207,17 @@ public class PlaygroundScraper implements Scraper {
             }
         }
         return result;
+    }
+
+    private String normalizeScreenshotUrl(String url) {
+        url = url.replace("https://i.playground.ru//i/", "https://i.playground.ru/i/");
+        url = url.replace("http://i.playground.ru//i/", "https://i.playground.ru/i/");
+        if (url.contains(".webp?")) {
+            url = url.substring(0, url.indexOf(".webp?")) + url.substring(url.indexOf(".webp?") + 5);
+        }
+        int qIdx = url.indexOf('?');
+        if (qIdx >= 0) url = url.substring(0, qIdx);
+        return url;
     }
 
     private JsonNode parseJsonLd(Document document) {
