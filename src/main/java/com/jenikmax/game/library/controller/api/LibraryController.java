@@ -148,7 +148,7 @@ public class LibraryController {
             }
 
             // Use form screenshots as complete set, or keep existing if none provided
-            if (gameEdit.getScreenshots() != null) {
+            if (gameEdit.getScreenshots() != null && !gameEdit.getScreenshots().isEmpty()) {
                 gameDto.setScreenshots(gameEdit.getScreenshots());
             } else {
                 gameDto.setScreenshots(existing.getScreenshots());
