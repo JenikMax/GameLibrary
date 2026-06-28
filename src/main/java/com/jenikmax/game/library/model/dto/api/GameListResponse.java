@@ -11,16 +11,18 @@ public class GameListResponse {
     private String releaseDate;
     private List<String> genres;
     private String logoUrl;
+    private String logo;
 
     public GameListResponse() {}
 
-    public GameListResponse(Long id, String name, String platform, String releaseDate, List<String> genres, String logoUrl) {
+    public GameListResponse(Long id, String name, String platform, String releaseDate, List<String> genres, String logoUrl, String logo) {
         this.id = id;
         this.name = name;
         this.platform = platform;
         this.releaseDate = releaseDate;
         this.genres = genres;
         this.logoUrl = logoUrl;
+        this.logo = logo;
     }
 
     public Long getId() { return id; }
@@ -35,4 +37,6 @@ public class GameListResponse {
     public void setGenres(List<String> genres) { this.genres = genres; }
     public String getLogoUrl() { return logoUrl; }
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
+    public String getLogo() { return logo; }
+    public void setLogo(String logo) { this.logo = logo; }
 }

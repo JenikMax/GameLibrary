@@ -10,9 +10,14 @@ import com.jenikmax.game.library.service.scraper.ScraperConfigService;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -27,13 +32,16 @@ public class LibraryController {
     private final LibraryService libraryService;
     private final ScreenshotRepository screenshotRepository;
     private final ScraperConfigService scraperConfigService;
+    private final String imagesDirectory;
 
     public LibraryController(LibraryService libraryService,
                              ScreenshotRepository screenshotRepository,
-                             ScraperConfigService scraperConfigService) {
+                             ScraperConfigService scraperConfigService,
+                             @Value("${game-library.images.directory:/gameLibrary/images}") String imagesDirectory) {
         this.libraryService = libraryService;
         this.screenshotRepository = screenshotRepository;
         this.scraperConfigService = scraperConfigService;
+        this.imagesDirectory = imagesDirectory;
     }
 
     @GetMapping("/scrapers")
@@ -182,7 +190,8 @@ public class LibraryController {
         resp.setPlatform(dto.getPlatform());
         resp.setReleaseDate(dto.getReleaseDate());
         resp.setGenres(dto.getGenres());
-        resp.setLogoUrl("/game-library/api/images/games/" + dto.getId() + "/logo");
+        resp.setLogoUrl(buildLogoUrl(dto.getId()));
+        resp.setLogo(dto.getLogo());
         return resp;
     }
 
@@ -194,7 +203,7 @@ public class LibraryController {
         resp.setReleaseDate(dto.getReleaseDate());
         resp.setDirectoryPath(dto.getDirectoryPath());
         resp.setGenres(dto.getGenres());
-        resp.setLogoUrl("/game-library/api/images/games/" + dto.getId() + "/logo");
+        resp.setLogoUrl(buildLogoUrl(dto.getId()));
         resp.setTrailerUrl(dto.getTrailerUrl());
         resp.setDescription(dto.getDescription());
         resp.setInstruction(dto.getInstruction());
@@ -215,5 +224,19 @@ public class LibraryController {
         resp.setScreenshotUrls(screenshotUrls);
 
         return resp;
+    }
+
+    private String buildLogoUrl(Long gameId) {
+        String baseUrl = "/game-library/api/images/games/" + gameId + "/logo";
+        try {
+            Path logoPath = Paths.get(imagesDirectory, "games", String.valueOf(gameId), "logo.jpg");
+            if (Files.exists(logoPath)) {
+                long modified = Files.getLastModifiedTime(logoPath).toMillis();
+                return baseUrl + "?v=" + modified;
+            }
+        } catch (IOException e) {
+            // ignore, return base URL
+        }
+        return baseUrl;
     }
 }

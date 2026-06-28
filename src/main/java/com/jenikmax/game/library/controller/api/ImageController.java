@@ -97,6 +97,7 @@ public class ImageController {
         InputStream inputStream = Files.newInputStream(filePath);
         try {
             return ResponseEntity.ok()
+                    .header("Cache-Control", "no-cache, no-store, must-revalidate")
                     .contentType(MediaType.parseMediaType(contentType))
                     .body(new InputStreamResource(inputStream));
         } catch (Exception e) {

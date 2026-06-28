@@ -3,7 +3,7 @@
     <template #header>
       <div class="game-card-img-wrapper" @click="goToGame">
         <img
-          :src="game.logoUrl || '/game-library/img/default.jpg'"
+          :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
           :alt="game.name"
           class="game-card-img"
         />

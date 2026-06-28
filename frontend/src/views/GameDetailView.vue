@@ -6,7 +6,7 @@
     <div class="game-main">
       <div class="game-poster">
         <Image
-          :src="game.logoUrl || '/game-library/img/default.jpg'"
+          :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
           :alt="game.name"
           width="300"
           preview
