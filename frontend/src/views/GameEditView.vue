@@ -95,7 +95,10 @@
           <template #content>
             <div class="flex flex-column align-items-center gap-2">
               <img v-if="logoPreview" :src="logoPreview" class="logo-preview" alt="logo preview" />
-              <img v-else :src="game.logoUrl || '/game-library/img/default.jpg'" class="logo-preview" alt="current logo" />
+  <img v-else
+       :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
+       class="logo-preview"
+       alt="current logo" />
               <Button :label="t('game.change_logo')" icon="pi pi-image" severity="secondary" size="small"
                 @click="$refs.logoInput.click()" />
               <input ref="logoInput" type="file" accept="image/*" class="hidden-input" @change="handleLogoUpload" />
