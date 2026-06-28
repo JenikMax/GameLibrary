@@ -16,9 +16,12 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TheGameDBScraper implements Scraper {
+
+    private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;
+    private static final int GENRE_CACHE_MAX = 200;
 
     private final ScraperConfig config;
     private final ConfigEncryptionService encryptionService;
@@ -26,18 +29,17 @@ public class TheGameDBScraper implements Scraper {
     private final OkHttpClient client;
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<Integer, String> genreCache = new ConcurrentHashMap<>();
+    private final AtomicInteger genreCacheSize = new AtomicInteger(0);
 
     private static final String FIELDS = "genres,overview,players,publishers,rating,coop,youtube";
     private static final String INCLUDE = "boxart";
 
-    public TheGameDBScraper(ScraperConfig config, ConfigEncryptionService encryptionService) {
+    public TheGameDBScraper(ScraperConfig config, ConfigEncryptionService encryptionService,
+                            OkHttpClient client) {
         this.config = config;
         this.encryptionService = encryptionService;
+        this.client = client;
         this.type = config.getType();
-        this.client = new OkHttpClient.Builder()
-                .connectTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                .readTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                .build();
     }
 
     @Override
@@ -255,7 +257,10 @@ public class TheGameDBScraper implements Scraper {
                     JsonNode genreNode = genres.get(key);
                     int id = genreNode.get("id").asInt();
                     String name = genreNode.get("name").asText();
-                    genreCache.put(id, name);
+                    if (genreCacheSize.get() < GENRE_CACHE_MAX) {
+                        genreCache.put(id, name);
+                        genreCacheSize.incrementAndGet();
+                    }
                     resolved.put(id, name);
                 }
             }
@@ -302,19 +307,17 @@ public class TheGameDBScraper implements Scraper {
 
     private String imageToBase64(String imageUrl) {
         try {
-            OkHttpClient imgClient = new OkHttpClient.Builder()
-                    .connectTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                    .readTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                    .followRedirects(true)
-                    .build();
             Request request = new Request.Builder()
                     .url(imageUrl)
                     .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                     .header("Accept", "image/avif,image/webp,image/apng,image/*,*/*;q=0.8")
                     .build();
-            try (Response response = imgClient.newCall(request).execute()) {
+            try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) return null;
+                long contentLength = response.body().contentLength();
+                if (contentLength > MAX_IMAGE_BYTES) return null;
                 byte[] bytes = response.body().bytes();
+                if (bytes.length > MAX_IMAGE_BYTES) return null;
                 String mime = response.header("Content-Type", "image/jpeg");
                 if (mime == null) mime = "image/jpeg";
                 int semi = mime.indexOf(';');

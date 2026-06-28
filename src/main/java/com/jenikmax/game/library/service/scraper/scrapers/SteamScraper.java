@@ -13,12 +13,13 @@ import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 public class SteamScraper implements Scraper {
+
+    private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;
 
     private final ScraperConfig config;
     private final String type;
@@ -26,13 +27,11 @@ public class SteamScraper implements Scraper {
     private final ObjectMapper mapper = new ObjectMapper();
     private static final Pattern YEAR_PATTERN = Pattern.compile("(\\d{4})");
 
-    public SteamScraper(ScraperConfig config, ConfigEncryptionService encryptionService) {
+    public SteamScraper(ScraperConfig config, ConfigEncryptionService encryptionService,
+                        OkHttpClient client) {
         this.config = config;
+        this.client = client;
         this.type = config.getType();
-        this.client = new OkHttpClient.Builder()
-                .connectTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                .readTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                .build();
     }
 
     @Override
@@ -231,19 +230,17 @@ public class SteamScraper implements Scraper {
 
     private String imageToBase64(String imageUrl) {
         try {
-            OkHttpClient imgClient = new OkHttpClient.Builder()
-                    .connectTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                    .readTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                    .followRedirects(true)
-                    .build();
             Request request = new Request.Builder()
                     .url(imageUrl)
                     .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                     .header("Accept", "image/avif,image/webp,image/apng,image/*,*/*;q=0.8")
                     .build();
-            try (Response response = imgClient.newCall(request).execute()) {
+            try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) return null;
+                long contentLength = response.body().contentLength();
+                if (contentLength > MAX_IMAGE_BYTES) return null;
                 byte[] bytes = response.body().bytes();
+                if (bytes.length > MAX_IMAGE_BYTES) return null;
                 String mime = response.header("Content-Type", "image/jpeg");
                 if (mime == null) mime = "image/jpeg";
                 int semi = mime.indexOf(';');

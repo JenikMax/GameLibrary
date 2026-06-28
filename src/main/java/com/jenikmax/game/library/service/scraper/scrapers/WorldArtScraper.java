@@ -14,17 +14,20 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WorldArtScraper implements Scraper {
 
+    private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;
+
     private final ScraperConfig config;
     private final String type;
+    private final OkHttpClient client;
 
-    public WorldArtScraper(ScraperConfig config) {
+    public WorldArtScraper(ScraperConfig config, OkHttpClient client) {
         this.config = config;
+        this.client = client;
         this.type = config.getType();
     }
 
@@ -267,11 +270,6 @@ public class WorldArtScraper implements Scraper {
     }
 
     private String imageToBase64(String imageUrl) throws IOException {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                .readTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                .followRedirects(true)
-                .build();
         Request request = new Request.Builder()
                 .url(imageUrl)
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
@@ -279,7 +277,14 @@ public class WorldArtScraper implements Scraper {
                 .build();
         try (okhttp3.Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) throw new IOException("HTTP " + response.code());
+            long contentLength = response.body().contentLength();
+            if (contentLength > MAX_IMAGE_BYTES) {
+                throw new IOException("Image too large: " + contentLength + " bytes");
+            }
             byte[] bytes = response.body().bytes();
+            if (bytes.length > MAX_IMAGE_BYTES) {
+                throw new IOException("Image too large: " + bytes.length + " bytes");
+            }
             String mime = response.header("Content-Type", "image/jpeg");
             int semi = mime.indexOf(';');
             if (semi > 0) mime = mime.substring(0, semi).trim();

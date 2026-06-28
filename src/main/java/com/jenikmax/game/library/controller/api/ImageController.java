@@ -95,8 +95,13 @@ public class ImageController {
         String contentType = Files.probeContentType(filePath);
         if (contentType == null) contentType = "application/octet-stream";
         InputStream inputStream = Files.newInputStream(filePath);
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(new InputStreamResource(inputStream));
+        try {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(new InputStreamResource(inputStream));
+        } catch (Exception e) {
+            inputStream.close();
+            throw e;
+        }
     }
 }

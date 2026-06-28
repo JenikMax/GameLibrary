@@ -3,6 +3,7 @@ package com.jenikmax.game.library.service.scraper;
 import com.jenikmax.game.library.service.scraper.api.Scraper;
 import com.jenikmax.game.library.service.scraper.model.ScraperConfig;
 import com.jenikmax.game.library.service.scraper.scrapers.*;
+import okhttp3.OkHttpClient;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -13,11 +14,16 @@ public class ScraperFactory {
 
     private final ScraperConfigService configService;
     private final ConfigEncryptionService encryptionService;
+    private final OkHttpClient okHttpClient;
+    private final JsoupHelper jsoupHelper;
     private final Map<String, Scraper> instanceCache = new ConcurrentHashMap<>();
 
-    public ScraperFactory(ScraperConfigService configService, ConfigEncryptionService encryptionService) {
+    public ScraperFactory(ScraperConfigService configService, ConfigEncryptionService encryptionService,
+                          OkHttpClient okHttpClient, JsoupHelper jsoupHelper) {
         this.configService = configService;
         this.encryptionService = encryptionService;
+        this.okHttpClient = okHttpClient;
+        this.jsoupHelper = jsoupHelper;
     }
 
     public Scraper getScraper(String type) {
@@ -38,17 +44,17 @@ public class ScraperFactory {
         }
         switch (type) {
             case "playground":
-                return new PlaygroundScraper(config, encryptionService);
+                return new PlaygroundScraper(config, encryptionService, okHttpClient, jsoupHelper);
             case "igromania":
-                return new IgromaniaScraper(config, encryptionService);
+                return new IgromaniaScraper(config, encryptionService, jsoupHelper);
             case "steam":
-                return new SteamScraper(config, encryptionService);
+                return new SteamScraper(config, encryptionService, okHttpClient);
             case "igdb":
-                return new IGDBScraper(config, encryptionService);
+                return new IGDBScraper(config, encryptionService, okHttpClient);
             case "thegamesdb":
-                return new TheGameDBScraper(config, encryptionService);
+                return new TheGameDBScraper(config, encryptionService, okHttpClient);
             case "worldart":
-                return new WorldArtScraper(config);
+                return new WorldArtScraper(config, okHttpClient);
             default:
                 throw new IllegalArgumentException("Unsupported scraper type: " + type);
         }

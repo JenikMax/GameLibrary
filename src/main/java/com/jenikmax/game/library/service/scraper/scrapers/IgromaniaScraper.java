@@ -17,10 +17,13 @@ public class IgromaniaScraper implements Scraper {
 
     private final ScraperConfig config;
     private final String type;
+    private final JsoupHelper jsoupHelper;
     private static final String BASE_64_PREFIX = "data:image/jpeg;base64,";
 
-    public IgromaniaScraper(ScraperConfig config, ConfigEncryptionService encryptionService) {
+    public IgromaniaScraper(ScraperConfig config, ConfigEncryptionService encryptionService,
+                            JsoupHelper jsoupHelper) {
         this.config = config;
+        this.jsoupHelper = jsoupHelper;
         this.type = config.getType();
     }
 
@@ -80,7 +83,7 @@ public class IgromaniaScraper implements Scraper {
 
     public Map<String, Object> scrapeGameInfoJson(String gameUrl) throws IOException {
         Map<String, Object> gameData = new HashMap<>();
-        Document document = JsoupHelper.fetchDocument(gameUrl, config);
+        Document document = jsoupHelper.fetchDocument(gameUrl, config);
         String json = document.toString();
         String scriptBegin = "<script id=\"__NEXT_DATA__\" type=\"application/json\" crossorigin=\"anonymous\">";
         json = json.substring(json.indexOf(scriptBegin) + scriptBegin.length());
@@ -148,7 +151,7 @@ public class IgromaniaScraper implements Scraper {
     }
 
     public String imageToBase64(String imageUrl) throws IOException {
-        byte[] imageBytes = JsoupHelper.fetchBytes(imageUrl, config);
+        byte[] imageBytes = jsoupHelper.fetchBytes(imageUrl, config);
         return Base64.getEncoder().encodeToString(imageBytes);
     }
 }

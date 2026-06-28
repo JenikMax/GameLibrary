@@ -17,17 +17,23 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class PlaygroundScraper implements Scraper {
 
+    private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;
+
     private final ScraperConfig config;
     private final String type;
+    private final OkHttpClient client;
+    private final JsoupHelper jsoupHelper;
     private final ObjectMapper mapper = new ObjectMapper();
     private String currentReferer = "https://www.playground.ru/";
 
-    public PlaygroundScraper(ScraperConfig config, ConfigEncryptionService encryptionService) {
+    public PlaygroundScraper(ScraperConfig config, ConfigEncryptionService encryptionService,
+                             OkHttpClient client, JsoupHelper jsoupHelper) {
         this.config = config;
+        this.client = client;
+        this.jsoupHelper = jsoupHelper;
         this.type = config.getType();
     }
 
@@ -103,7 +109,7 @@ public class PlaygroundScraper implements Scraper {
     public Map<String, Object> scrapeGameInfo(String gameUrl) throws IOException {
         Map<String, Object> gameData = new HashMap<>();
         this.currentReferer = gameUrl;
-        Document document = JsoupHelper.fetchDocument(gameUrl, config);
+        Document document = jsoupHelper.fetchDocument(gameUrl, config);
 
         JsonNode ldJson = parseJsonLd(document);
         if (ldJson != null) {
@@ -252,16 +258,11 @@ public class PlaygroundScraper implements Scraper {
 
     private List<String> getScreenshots(String gameUrl) throws IOException {
         String screenUrl = gameUrl.substring(0, gameUrl.lastIndexOf('/')) + "/gallery" + gameUrl.substring(gameUrl.lastIndexOf('/'));
-        Document document = JsoupHelper.fetchDocument(screenUrl, config);
+        Document document = jsoupHelper.fetchDocument(screenUrl, config);
         return extractScreenshotsFromDocument(document, gameUrl);
     }
 
     public String imageToBase64(String imageUrl, String referer) throws IOException {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                .readTimeout(config.getTimeoutMs(), TimeUnit.MILLISECONDS)
-                .followRedirects(true)
-                .build();
         Request request = new Request.Builder()
                 .url(imageUrl)
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
@@ -270,7 +271,14 @@ public class PlaygroundScraper implements Scraper {
                 .build();
         try (okhttp3.Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) throw new IOException("HTTP " + response.code());
+            long contentLength = response.body().contentLength();
+            if (contentLength > MAX_IMAGE_BYTES) {
+                throw new IOException("Image too large: " + contentLength + " bytes");
+            }
             byte[] bytes = response.body().bytes();
+            if (bytes.length > MAX_IMAGE_BYTES) {
+                throw new IOException("Image too large: " + bytes.length + " bytes");
+            }
             String mime = response.header("Content-Type", "image/jpeg");
             int semi = mime.indexOf(';');
             if (semi > 0) mime = mime.substring(0, semi).trim();

@@ -156,15 +156,19 @@ public class LibraryOperationService implements LibraryService {
 
     @Override
     public GameDto grabGameInfo(Long id, String source, String url) {
-        if(url != null) return scraperFactory.getScraper(source).scrap(getGameInfo(id),url);
-        return scraperFactory.getScraper(source).scrap(getGameInfo(id));
+        GameDto gameDto = new GameDto();
+        gameDto.setId(id);
+        if(url != null) return scraperFactory.getScraper(source).scrap(gameDto, url);
+        return scraperFactory.getScraper(source).scrap(gameDto);
     }
 
     @Override
     public GameDto grabGameInfo(Long id, ScrapInfo scrapInfo) {
+        GameDto gameDto = new GameDto();
+        gameDto.setId(id);
         if(scrapInfo != null && scrapInfo.getUrl() != null)
-            return scraperFactory.getScraper(scrapInfo.getSource()).scrap(getGameInfo(id),scrapInfo);
-        return scraperFactory.getScraper(scrapInfo.getSource()).scrap(getGameInfo(id));
+            return scraperFactory.getScraper(scrapInfo.getSource()).scrap(gameDto, scrapInfo);
+        return scraperFactory.getScraper(scrapInfo.getSource()).scrap(gameDto);
     }
 
     @Override
