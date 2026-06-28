@@ -144,16 +144,19 @@ const loading = ref(false)
 const transmissionUrl = window.location.origin.replace(/:\d+$/, '') + ':9091'
 
 let pollInterval = null
+let downloadsUnmounted = false
 
 onMounted(async () => {
   await checkTransmission()
+  if (downloadsUnmounted) return
   if (transmissionConnected.value) {
     await fetchAll()
-    pollInterval = setInterval(fetchAll, 5000)
+    if (!downloadsUnmounted) pollInterval = setInterval(fetchAll, 5000)
   }
 })
 
 onUnmounted(() => {
+  downloadsUnmounted = true
   if (pollInterval) clearInterval(pollInterval)
 })
 

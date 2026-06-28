@@ -135,6 +135,7 @@ const prepareTaskId = ref(null)
 const prepareProgress = ref(0)
 const prepareCurrentFile = ref('')
 let preparePollTimer = null
+let isUnmounted = false
 const toast = useToast()
 const viewerVisible = ref(false)
 const viewerIndex = ref(0)
@@ -195,8 +196,9 @@ async function downloadGame() {
   prepareCurrentFile.value = ''
   try {
     const res = await downloadsApi.prepareDownload(game.value.id)
+    if (isUnmounted) return
     prepareTaskId.value = res.data.data.taskId
-    pollPrepareStatus()
+    if (!isUnmounted) pollPrepareStatus()
   } catch {
     preparing.value = false
     toast.add({
@@ -219,8 +221,18 @@ function downloadFile(url) {
 function pollPrepareStatus() {
   if (!prepareTaskId.value) return
   preparePollTimer = setInterval(async () => {
+    if (isUnmounted) {
+      clearInterval(preparePollTimer)
+      preparePollTimer = null
+      return
+    }
     try {
       const res = await downloadsApi.getPrepareStatus(prepareTaskId.value)
+      if (isUnmounted) {
+        clearInterval(preparePollTimer)
+        preparePollTimer = null
+        return
+      }
       const task = res.data.data
       if (task.status === 'COMPLETED') {
         clearInterval(preparePollTimer)
@@ -261,8 +273,18 @@ function pollPrepareStatus() {
 function pollSeedStatus() {
   if (!seedTaskId.value) return
   seedPollTimer = setInterval(async () => {
+    if (isUnmounted) {
+      clearInterval(seedPollTimer)
+      seedPollTimer = null
+      return
+    }
     try {
       const res = await downloadsApi.getSeedStatus(seedTaskId.value)
+      if (isUnmounted) {
+        clearInterval(seedPollTimer)
+        seedPollTimer = null
+        return
+      }
       const task = res.data.data
       if (task.status === 'COMPLETED') {
         clearInterval(seedPollTimer)
@@ -305,8 +327,9 @@ async function seedGame() {
   seedCurrentFile.value = ''
   try {
     const res = await downloadsApi.seedGame(game.value.id)
+    if (isUnmounted) return
     seedTaskId.value = res.data.data.taskId
-    pollSeedStatus()
+    if (!isUnmounted) pollSeedStatus()
   } catch {
     seeding.value = false
     toast.add({
@@ -319,6 +342,7 @@ async function seedGame() {
 }
 
 onUnmounted(() => {
+  isUnmounted = true
   if (seedPollTimer) {
     clearInterval(seedPollTimer)
     seedPollTimer = null

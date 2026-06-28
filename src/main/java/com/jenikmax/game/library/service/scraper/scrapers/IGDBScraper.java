@@ -69,49 +69,50 @@ public class IGDBScraper implements Scraper {
                     .post(RequestBody.create(MediaType.parse("text/plain"), query))
                     .build();
 
-            Response response = client.newCall(request).execute();
-            String responseData = response.body().string();
-            JsonNode jsonNode = mapper.readTree(responseData);
+            try (Response response = client.newCall(request).execute()) {
+                String responseData = response.body().string();
+                JsonNode jsonNode = mapper.readTree(responseData);
 
-            if (jsonNode.isArray() && jsonNode.size() > 0) {
-                JsonNode game = jsonNode.get(0);
+                if (jsonNode.isArray() && jsonNode.size() > 0) {
+                    JsonNode game = jsonNode.get(0);
 
-                if (scrapInfo.isTitleAttr() && game.has("name")) {
-                    gameDto.setName(game.get("name").asText());
-                }
-
-                if (scrapInfo.isDescriptionAttr() && game.has("summary")) {
-                    gameDto.setDescription(game.get("summary").asText());
-                }
-
-                if (scrapInfo.isPosterAttr() && game.has("cover") && game.get("cover").has("url")) {
-                    String coverUrl = game.get("cover").get("url").asText();
-                    String fullUrl = "https:" + coverUrl.replace("t_thumb", "t_cover_big");
-                    String b64 = imageToBase64(fullUrl);
-                    if (b64 != null) {
-                        gameDto.setLogo(b64);
+                    if (scrapInfo.isTitleAttr() && game.has("name")) {
+                        gameDto.setName(game.get("name").asText());
                     }
-                }
 
-                if (scrapInfo.isYearAttrAttr() && game.has("first_release_date")) {
-                    long unix = game.get("first_release_date").asLong();
-                    String year = Instant.ofEpochSecond(unix)
-                            .atZone(ZoneId.of("UTC"))
-                            .format(DateTimeFormatter.ofPattern("yyyy"));
-                    gameDto.setReleaseDate(year);
-                }
-
-                if (scrapInfo.isGenresAttr() && game.has("genres")) {
-                    List<String> genres = extractGenres(game.get("genres"));
-                    if (!genres.isEmpty()) {
-                        gameDto.setGenres(genres);
+                    if (scrapInfo.isDescriptionAttr() && game.has("summary")) {
+                        gameDto.setDescription(game.get("summary").asText());
                     }
-                }
 
-                if (scrapInfo.isScreensAttr() && game.has("screenshots")) {
-                    List<String> screenshots = extractScreenshots(game.get("screenshots"));
-                    if (!screenshots.isEmpty()) {
-                        gameDto.setScreenshots(screenshots);
+                    if (scrapInfo.isPosterAttr() && game.has("cover") && game.get("cover").has("url")) {
+                        String coverUrl = game.get("cover").get("url").asText();
+                        String fullUrl = "https:" + coverUrl.replace("t_thumb", "t_cover_big");
+                        String b64 = imageToBase64(fullUrl);
+                        if (b64 != null) {
+                            gameDto.setLogo(b64);
+                        }
+                    }
+
+                    if (scrapInfo.isYearAttrAttr() && game.has("first_release_date")) {
+                        long unix = game.get("first_release_date").asLong();
+                        String year = Instant.ofEpochSecond(unix)
+                                .atZone(ZoneId.of("UTC"))
+                                .format(DateTimeFormatter.ofPattern("yyyy"));
+                        gameDto.setReleaseDate(year);
+                    }
+
+                    if (scrapInfo.isGenresAttr() && game.has("genres")) {
+                        List<String> genres = extractGenres(game.get("genres"));
+                        if (!genres.isEmpty()) {
+                            gameDto.setGenres(genres);
+                        }
+                    }
+
+                    if (scrapInfo.isScreensAttr() && game.has("screenshots")) {
+                        List<String> screenshots = extractScreenshots(game.get("screenshots"));
+                        if (!screenshots.isEmpty()) {
+                            gameDto.setScreenshots(screenshots);
+                        }
                     }
                 }
             }

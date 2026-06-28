@@ -158,9 +158,10 @@ public class TheGameDBScraper implements Scraper {
                 baseUrl, apiKey, encodedName, FIELDS, INCLUDE);
 
         Request request = new Request.Builder().url(url).get().build();
-        Response response = client.newCall(request).execute();
-        String responseData = response.body().string();
-        return mapper.readTree(responseData);
+        try (Response response = client.newCall(request).execute()) {
+            String responseData = response.body().string();
+            return mapper.readTree(responseData);
+        }
     }
 
     private JsonNode findFirstGame(JsonNode root) {
@@ -242,20 +243,21 @@ public class TheGameDBScraper implements Scraper {
         String url = String.format("https://api.thegamesdb.net/v1/Genres/ByGenreID?apikey=%s&id=%s",
                 apiKey, idParam);
         Request request = new Request.Builder().url(url).get().build();
-        Response response = client.newCall(request).execute();
-        String responseData = response.body().string();
-        JsonNode root = mapper.readTree(responseData);
+        try (Response response = client.newCall(request).execute()) {
+            String responseData = response.body().string();
+            JsonNode root = mapper.readTree(responseData);
 
-        if (root.has("data") && root.get("data").has("genres")) {
-            JsonNode genres = root.get("data").get("genres");
-            Iterator<String> fieldNames = genres.fieldNames();
-            while (fieldNames.hasNext()) {
-                String key = fieldNames.next();
-                JsonNode genreNode = genres.get(key);
-                int id = genreNode.get("id").asInt();
-                String name = genreNode.get("name").asText();
-                genreCache.put(id, name);
-                resolved.put(id, name);
+            if (root.has("data") && root.get("data").has("genres")) {
+                JsonNode genres = root.get("data").get("genres");
+                Iterator<String> fieldNames = genres.fieldNames();
+                while (fieldNames.hasNext()) {
+                    String key = fieldNames.next();
+                    JsonNode genreNode = genres.get(key);
+                    int id = genreNode.get("id").asInt();
+                    String name = genreNode.get("name").asText();
+                    genreCache.put(id, name);
+                    resolved.put(id, name);
+                }
             }
         }
     }
@@ -269,26 +271,27 @@ public class TheGameDBScraper implements Scraper {
                     "https://api.thegamesdb.net/v1/Games/Images?apikey=%s&games_id=%d&filter[type]=screenshot",
                     apiKey, gameId);
             Request request = new Request.Builder().url(url).get().build();
-            Response response = client.newCall(request).execute();
-            String responseData = response.body().string();
-            JsonNode root = mapper.readTree(responseData);
+            try (Response response = client.newCall(request).execute()) {
+                String responseData = response.body().string();
+                JsonNode root = mapper.readTree(responseData);
 
-            if (!root.has("data") || !root.get("data").has("images")) return result;
+                if (!root.has("data") || !root.get("data").has("images")) return result;
 
-            String baseUrl = root.get("data").get("base_url").get("original").asText();
-            JsonNode images = root.get("data").get("images").get(String.valueOf(gameId));
-            if (images == null || !images.isArray()) return result;
+                String baseUrl = root.get("data").get("base_url").get("original").asText();
+                JsonNode images = root.get("data").get("images").get(String.valueOf(gameId));
+                if (images == null || !images.isArray()) return result;
 
-            int count = 0;
-            for (JsonNode img : images) {
-                if (count >= max) break;
-                String filename = img.get("filename").asText();
-                if (filename == null || filename.isEmpty()) continue;
-                String fullUrl = baseUrl + filename;
-                String b64 = imageToBase64(fullUrl);
-                if (b64 != null) {
-                    result.add(b64);
-                    count++;
+                int count = 0;
+                for (JsonNode img : images) {
+                    if (count >= max) break;
+                    String filename = img.get("filename").asText();
+                    if (filename == null || filename.isEmpty()) continue;
+                    String fullUrl = baseUrl + filename;
+                    String b64 = imageToBase64(fullUrl);
+                    if (b64 != null) {
+                        result.add(b64);
+                        count++;
+                    }
                 }
             }
         } catch (Exception e) {

@@ -1,27 +1,19 @@
 package com.jenikmax.game.library.controller.api;
 
-import com.jenikmax.game.library.dao.api.GameRepository;
 import com.jenikmax.game.library.dao.api.ScreenshotRepository;
-import com.jenikmax.game.library.model.converter.GameConverter;
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.api.*;
-import com.jenikmax.game.library.model.entity.Game;
-import com.jenikmax.game.library.model.entity.GameGenre;
-import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
-import com.jenikmax.game.library.model.dto.api.ScraperInfoResponse;
 import com.jenikmax.game.library.service.scraper.ScraperConfigService;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
-import com.jenikmax.game.library.service.scraper.model.ScraperConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -33,15 +25,13 @@ public class LibraryController {
     private static final Logger logger = LoggerFactory.getLogger(LibraryController.class);
 
     private final LibraryService libraryService;
-    private final GameRepository gameRepository;
     private final ScreenshotRepository screenshotRepository;
     private final ScraperConfigService scraperConfigService;
 
-    public LibraryController(LibraryService libraryService, GameRepository gameRepository,
+    public LibraryController(LibraryService libraryService,
                              ScreenshotRepository screenshotRepository,
                              ScraperConfigService scraperConfigService) {
         this.libraryService = libraryService;
-        this.gameRepository = gameRepository;
         this.screenshotRepository = screenshotRepository;
         this.scraperConfigService = scraperConfigService;
     }
@@ -209,17 +199,15 @@ public class LibraryController {
         resp.setDescription(dto.getDescription());
         resp.setInstruction(dto.getInstruction());
 
-        // Pass scraped base64 image data through for the frontend form
+        // Передаём base64 данные — нужны фронтенду для формы редактирования и grab-ответа
         resp.setLogo(dto.getLogo());
         resp.setScreenshots(dto.getScreenshots());
 
         List<String> screenshotUrls = new ArrayList<>();
         try {
-            Game gameEntity = gameRepository.getReferenceById(dto.getId());
-            if (gameEntity.getScreenshots() != null) {
-                for (Screenshot ss : gameEntity.getScreenshots()) {
-                    screenshotUrls.add("/game-library/api/images/games/" + dto.getId() + "/screenshots/" + ss.getId());
-                }
+            List<Long> screenshotIds = screenshotRepository.findIdsByGameId(dto.getId());
+            for (Long screenshotId : screenshotIds) {
+                screenshotUrls.add("/game-library/api/images/games/" + dto.getId() + "/screenshots/" + screenshotId);
             }
         } catch (Exception e) {
             logger.warn("Could not load screenshots for game {}", dto.getId());

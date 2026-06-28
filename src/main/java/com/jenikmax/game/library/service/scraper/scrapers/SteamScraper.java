@@ -182,14 +182,15 @@ public class SteamScraper implements Scraper {
                 .get()
                 .build();
 
-        Response response = client.newCall(request).execute();
-        String responseData = response.body().string();
-        JsonNode root = mapper.readTree(responseData);
-        JsonNode appNode = root.get(appId);
-        if (appNode == null || !appNode.has("success") || !appNode.get("success").asBoolean()) {
-            return null;
+        try (Response response = client.newCall(request).execute()) {
+            String responseData = response.body().string();
+            JsonNode root = mapper.readTree(responseData);
+            JsonNode appNode = root.get(appId);
+            if (appNode == null || !appNode.has("success") || !appNode.get("success").asBoolean()) {
+                return null;
+            }
+            return appNode.get("data");
         }
-        return appNode.get("data");
     }
 
     private List<String> extractGenres(JsonNode genres) {

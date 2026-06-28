@@ -4,8 +4,10 @@ import com.jenikmax.game.library.service.downloads.DownloadTorrentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +33,7 @@ public class TorrentTaskService implements DisposableBean {
     }
 
     public String submitSeedTask(Long gameId, String directoryPath) {
+        pruneOldTasks();
         String taskId = UUID.randomUUID().toString();
         TorrentTask task = new TorrentTask(taskId, gameId);
         tasks.put(taskId, task);
@@ -60,6 +63,7 @@ public class TorrentTaskService implements DisposableBean {
     }
 
     public String submitDownloadTask(Long gameId, String directoryPath) {
+        pruneOldTasks();
         String taskId = UUID.randomUUID().toString();
         TorrentTask task = new TorrentTask(taskId, gameId);
         tasks.put(taskId, task);
@@ -90,6 +94,23 @@ public class TorrentTaskService implements DisposableBean {
 
     public TorrentTask getTask(String taskId) {
         return tasks.get(taskId);
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void pruneOldTasks() {
+        long now = System.currentTimeMillis();
+        long keepMillis = 300000;
+        Iterator<Map.Entry<String, TorrentTask>> it = tasks.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, TorrentTask> entry = it.next();
+            TorrentTask task = entry.getValue();
+            if (task.getStatus() == TorrentTask.Status.COMPLETED
+                    || task.getStatus() == TorrentTask.Status.FAILED) {
+                if (now - task.getCreatedAt() > keepMillis) {
+                    it.remove();
+                }
+            }
+        }
     }
 
     @Override

@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
@@ -51,6 +51,11 @@ const password = ref('')
 const error = ref('')
 const success = ref('')
 const loading = ref(false)
+let redirectTimer = null
+
+onBeforeUnmount(() => {
+  if (redirectTimer) clearTimeout(redirectTimer)
+})
 
 async function handleRegister() {
   if (!username.value || !password.value) {
@@ -63,7 +68,7 @@ async function handleRegister() {
   try {
     await authStore.register(username.value, password.value)
     success.value = t('register.success')
-    setTimeout(() => router.push('/login'), 1500)
+    redirectTimer = setTimeout(() => router.push('/login'), 1500)
   } catch (e) {
     error.value = e.response?.data?.message || t('register.failed')
   } finally {

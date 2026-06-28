@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -46,10 +45,6 @@ public class SqlDaoImpl implements SqlDao {
                 }
             } catch (java.sql.SQLException e) {
                 dto.setGenres(new ArrayList<>());
-            }
-            byte[] logoBytes = rs.getBytes("logo");
-            if (logoBytes != null) {
-                dto.setLogo("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(logoBytes));
             }
             return dto;
         });
@@ -99,10 +94,6 @@ public class SqlDaoImpl implements SqlDao {
                 }
             } catch (java.sql.SQLException e) {
                 dto.setGenres(new ArrayList<>());
-            }
-            byte[] logoBytes = rs.getBytes("logo");
-            if (logoBytes != null) {
-                dto.setLogo("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(logoBytes));
             }
             return dto;
         }, params);

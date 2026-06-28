@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
@@ -58,6 +58,11 @@ const username = ref('')
 const password = ref('')
 const error = ref('')
 const loading = ref(false)
+let errorTimer = null
+
+onBeforeUnmount(() => {
+  if (errorTimer) clearTimeout(errorTimer)
+})
 
 async function handleLogin() {
   if (!username.value || !password.value) {
@@ -71,7 +76,7 @@ async function handleLogin() {
     router.push('/')
   } catch (e) {
     error.value = e.response?.data?.message || t('login.invalid')
-    setTimeout(() => { error.value = '' }, 7000)
+    errorTimer = setTimeout(() => { error.value = '' }, 7000)
   } finally {
     loading.value = false
   }

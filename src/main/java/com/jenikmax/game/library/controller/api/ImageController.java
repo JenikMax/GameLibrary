@@ -9,6 +9,7 @@ import com.jenikmax.game.library.model.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,62 +46,57 @@ public class ImageController {
     }
 
     @GetMapping("/games/{gameId}/logo")
-    public ResponseEntity<byte[]> getGameLogo(@PathVariable Long gameId) {
+    public ResponseEntity<InputStreamResource> getGameLogo(@PathVariable Long gameId) throws IOException {
         Path filePath = Paths.get(imagesDirectory, "games", String.valueOf(gameId), "logo.jpg");
         if (Files.exists(filePath)) {
-            return serveFile(filePath);
+            return serveFileStream(filePath);
         }
         Game game = gameRepository.getReferenceById(gameId);
         if (game != null && game.getLogo() != null) {
-                    return ResponseEntity.ok()
-                            .header("Cache-Control", "no-cache, no-store, must-revalidate")
-                            .contentType(MediaType.IMAGE_JPEG)
-                            .body(game.getLogo());
+            return ResponseEntity.ok()
+                    .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(new InputStreamResource(new java.io.ByteArrayInputStream(game.getLogo())));
         }
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/games/{gameId}/screenshots/{screenshotId}")
-    public ResponseEntity<byte[]> getScreenshot(@PathVariable Long gameId, @PathVariable Long screenshotId) {
+    public ResponseEntity<InputStreamResource> getScreenshot(@PathVariable Long gameId, @PathVariable Long screenshotId) throws IOException {
         Path filePath = Paths.get(imagesDirectory, "games", String.valueOf(gameId), "screenshots", screenshotId + ".jpg");
         if (Files.exists(filePath)) {
-            return serveFile(filePath);
+            return serveFileStream(filePath);
         }
         Optional<Screenshot> screenshot = screenshotRepository.findById(screenshotId);
         if (screenshot.isPresent() && screenshot.get().getSource() != null) {
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_JPEG)
-                    .body(screenshot.get().getSource());
+                    .body(new InputStreamResource(new java.io.ByteArrayInputStream(screenshot.get().getSource())));
         }
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/avatars/{userId}")
-    public ResponseEntity<byte[]> getAvatar(@PathVariable Long userId) {
+    public ResponseEntity<InputStreamResource> getAvatar(@PathVariable Long userId) throws IOException {
         Path filePath = Paths.get(imagesDirectory, "avatars", userId + ".jpg");
         if (Files.exists(filePath)) {
-            return serveFile(filePath);
+            return serveFileStream(filePath);
         }
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent() && user.get().getAvatar() != null) {
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_JPEG)
-                    .body(user.get().getAvatar());
+                    .body(new InputStreamResource(new java.io.ByteArrayInputStream(user.get().getAvatar())));
         }
         return ResponseEntity.notFound().build();
     }
 
-    private ResponseEntity<byte[]> serveFile(Path filePath) {
-        try {
-            byte[] bytes = Files.readAllBytes(filePath);
-            String contentType = Files.probeContentType(filePath);
-            if (contentType == null) contentType = "application/octet-stream";
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .body(bytes);
-        } catch (IOException e) {
-            logger.error("Error serving file: {}", filePath, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    private ResponseEntity<InputStreamResource> serveFileStream(Path filePath) throws IOException {
+        String contentType = Files.probeContentType(filePath);
+        if (contentType == null) contentType = "application/octet-stream";
+        InputStream inputStream = Files.newInputStream(filePath);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(new InputStreamResource(inputStream));
     }
 }
