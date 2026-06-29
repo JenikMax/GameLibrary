@@ -7,8 +7,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/db/data:/var/lib/postgresql/data
-      - /host_mnt/f/Work/Git/my_project/db/data:/var/lib/postgresql/data  #рабочий пример
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/db/data:/var/lib/postgresql/data
+      #- /host_mnt/f/Work/Git/my_project/db/data:/var/lib/postgresql/data  рабочий пример
     env_file:
       - ./postgresdb/env.list
     healthcheck:
@@ -34,7 +34,7 @@ services:
       # Должен быть доступен из ваших торрент-клиентов. Замените на актуальный IP:
       #   docker-compose:  http://<IP_ХОСТА>:8080/game-library/api/tracker/announce
       #   без Docker:      http://localhost:8080/game-library/api/tracker/announce
-      - TRACKER_ANNOUNCE_URL=http://localhost:8080/game-library/api/tracker/announce
+      - TRACKER_ANNOUNCE_URL=http://192.168.0.109:8080/game-library/api/tracker/announce
       - TRANSMISSION_RPC_URL=http://transmission:9091/transmission/rpc
       - TRANSMISSION_DOWNLOAD_DIR=/downloads
       - GAMES_DIRECTORY=/gameLibrary
@@ -47,12 +47,11 @@ services:
       - SCRAPER_ENCRYPTION_KEY=9TBYQ1SL5z791jiCHB1aEADQG1kbl0Aive+pMA7F1DU=
       - TTORRENT_HASHING_THREADS=2
     volumes:
-      #- /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
-      - /host_mnt/f/Work/Git/my_project/data:/gameLibrary  #рабочий пример
-      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents:/torrentDirTmp
-      - /host_mnt/f/Work/Git/my_project/data/tDir:/torrentDirTmp  #рабочий пример
-      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/scrapers:/scraper-config
-      - //host_mnt/f/Work/Git/my_project/data/tDir/scrapers:/scraper-config
+      - /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
+      #- /host_mnt/f/Work/Git/my_project/data:/gameLibrary  рабочий пример
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents:/torrentDirTmp
+      #- /host_mnt/f/Work/Git/my_project/data/tDir:/torrentDirTmp  рабочий пример
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/scrapers:/scraper-config
     depends_on:
       postgresdb:
         condition: service_healthy
@@ -80,16 +79,11 @@ services:
       - "51413:51413"
       - "51413:51413/udp"
     volumes:
-      - /host_mnt/f/Work/Git/my_project/data/games:/downloads/games
-      #- /host_mnt/d/Work/MyProjects/gametest/games:/downloads/games
-      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/config:/config
-      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/config:/config
-      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/watch:/watch
-      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/watch:/watch
-      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/complete:/downloads/complete
-      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/complete:/downloads/complete
-      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
-      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
+      - /host_mnt/d/Work/MyProjects/gametest/games:/downloads/games
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/config:/config
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/watch:/watch
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/complete:/downloads/complete
+      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
