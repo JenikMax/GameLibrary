@@ -16,6 +16,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class PlaygroundScraper implements Scraper {
@@ -39,7 +41,19 @@ public class PlaygroundScraper implements Scraper {
     @Override
     public GameDto scrap(GameDto gameDto, ScrapInfo scrapInfo) {
         try {
-            Map<String, Object> gameData = scrapeGameInfo(scrapInfo.getUrl());
+            String url = scrapInfo.getUrl();
+            if (url == null || url.isEmpty() || !url.startsWith("http://") && !url.startsWith("https://")) {
+                String name = (url != null && !url.isEmpty()) ? url : gameDto.getName();
+                if (name == null || name.isEmpty()) {
+                    throw new RuntimeException("Game name is required for search-based scraping");
+                }
+                String slug = searchByGameName(name);
+                if (slug == null) {
+                    throw new RuntimeException("Game not found on Playground: " + name);
+                }
+                url = "https://www.playground.ru/" + slug;
+            }
+            Map<String, Object> gameData = scrapeGameInfo(url);
             if (scrapInfo.isTitleAttr() && gameData.get("title") != null) {
                 gameDto.setName(gameData.get("title").toString());
             }
@@ -63,11 +77,13 @@ public class PlaygroundScraper implements Scraper {
                 if (screens != null && !screens.isEmpty()) {
                     gameDto.setScreenshots(screens);
                 } else {
-                    gameDto.setScreenshots(getScreenshots(scrapInfo.getUrl()));
+                    gameDto.setScreenshots(getScreenshots(url));
                 }
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Playground scrape failed for URL: " + scrapInfo.getUrl(), e);
+            throw new RuntimeException("Playground scrape failed", e);
         }
         return gameDto;
     }
@@ -75,6 +91,17 @@ public class PlaygroundScraper implements Scraper {
     @Override
     public GameDto scrap(GameDto gameDto, String url) {
         try {
+            if (url == null || url.isEmpty() || !url.startsWith("http://") && !url.startsWith("https://")) {
+                String name = (url != null && !url.isEmpty()) ? url : gameDto.getName();
+                if (name == null || name.isEmpty()) {
+                    throw new RuntimeException("Game name is required for search-based scraping");
+                }
+                String slug = searchByGameName(name);
+                if (slug == null) {
+                    throw new RuntimeException("Game not found on Playground: " + name);
+                }
+                url = "https://www.playground.ru/" + slug;
+            }
             Map<String, Object> gameData = scrapeGameInfo(url);
             gameDto.setName(gameData.get("title").toString());
             if (gameData.get("posterBase64") != null) {
@@ -94,14 +121,27 @@ public class PlaygroundScraper implements Scraper {
             } else {
                 gameDto.setScreenshots(getScreenshots(url));
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Playground scrape failed for URL: " + url, e);
+            throw new RuntimeException("Playground scrape failed", e);
         }
         return gameDto;
     }
 
     @Override
     public GameDto scrap(GameDto gameDto) {
+        if (gameDto.getName() == null || gameDto.getName().isEmpty()) {
+            return gameDto;
+        }
+        try {
+            String slug = searchByGameName(gameDto.getName());
+            if (slug != null) {
+                return scrap(gameDto, "https://www.playground.ru/" + slug);
+            }
+        } catch (Exception e) {
+            // search failed, return unchanged
+        }
         return gameDto;
     }
 
@@ -258,6 +298,30 @@ public class PlaygroundScraper implements Scraper {
         String screenUrl = gameUrl.substring(0, gameUrl.lastIndexOf('/')) + "/gallery" + gameUrl.substring(gameUrl.lastIndexOf('/'));
         Document document = jsoupHelper.fetchDocument(screenUrl, config);
         return extractScreenshotsFromDocument(document, gameUrl);
+    }
+
+    private String searchByGameName(String gameName) throws IOException {
+        String encodedName = URLEncoder.encode(gameName, StandardCharsets.UTF_8.toString());
+        String apiUrl = "https://www.playground.ru/api/game.search?query=" + encodedName + "&include_addons=1";
+
+        Request request = new Request.Builder()
+                .url(apiUrl)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .header("Accept", "application/json")
+                .build();
+
+        try (okhttp3.Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) return null;
+            String json = response.body().string();
+            JsonNode array = mapper.readTree(json);
+            if (array.isArray() && array.size() > 0) {
+                JsonNode first = array.get(0);
+                if (first.has("slug")) {
+                    return first.get("slug").asText();
+                }
+            }
+        }
+        return null;
     }
 
     public String imageToBase64(String imageUrl, String referer) throws IOException {

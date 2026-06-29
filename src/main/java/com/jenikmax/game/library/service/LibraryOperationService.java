@@ -158,7 +158,9 @@ public class LibraryOperationService implements LibraryService {
     public GameDto grabGameInfo(Long id, String source, String url) {
         GameDto gameDto = new GameDto();
         gameDto.setId(id);
-        if(url != null) return scraperFactory.getScraper(source).scrap(gameDto, url);
+        if(url != null && !url.isEmpty()) return scraperFactory.getScraper(source).scrap(gameDto, url);
+        Game game = gameService.getGameById(id);
+        if (game != null) gameDto.setName(game.getName());
         return scraperFactory.getScraper(source).scrap(gameDto);
     }
 
@@ -166,8 +168,10 @@ public class LibraryOperationService implements LibraryService {
     public GameDto grabGameInfo(Long id, ScrapInfo scrapInfo) {
         GameDto gameDto = new GameDto();
         gameDto.setId(id);
-        if(scrapInfo != null && scrapInfo.getUrl() != null)
+        if(scrapInfo != null && scrapInfo.getUrl() != null && !scrapInfo.getUrl().isEmpty())
             return scraperFactory.getScraper(scrapInfo.getSource()).scrap(gameDto, scrapInfo);
+        Game game = gameService.getGameById(id);
+        if (game != null) gameDto.setName(game.getName());
         return scraperFactory.getScraper(scrapInfo.getSource()).scrap(gameDto);
     }
 
