@@ -11,7 +11,7 @@ FROM eclipse-temurin:11-jre-alpine
 WORKDIR /app
 COPY --from=build /build/target/game-library.jar app.jar
 
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Xmx1024m"
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Xmx512m -Xms256m -Xss512k -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m -XX:+ExitOnOutOfMemoryError"
 
 VOLUME /gameLibrary
 VOLUME /torrentDirTmp

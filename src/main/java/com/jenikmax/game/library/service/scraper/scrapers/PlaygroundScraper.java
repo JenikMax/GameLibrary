@@ -27,7 +27,6 @@ public class PlaygroundScraper implements Scraper {
     private final OkHttpClient client;
     private final JsoupHelper jsoupHelper;
     private final ObjectMapper mapper = new ObjectMapper();
-    private String currentReferer = "https://www.playground.ru/";
 
     public PlaygroundScraper(ScraperConfig config, ConfigEncryptionService encryptionService,
                              OkHttpClient client, JsoupHelper jsoupHelper) {
@@ -108,7 +107,6 @@ public class PlaygroundScraper implements Scraper {
 
     public Map<String, Object> scrapeGameInfo(String gameUrl) throws IOException {
         Map<String, Object> gameData = new HashMap<>();
-        this.currentReferer = gameUrl;
         Document document = jsoupHelper.fetchDocument(gameUrl, config);
 
         JsonNode ldJson = parseJsonLd(document);
@@ -266,7 +264,7 @@ public class PlaygroundScraper implements Scraper {
         Request request = new Request.Builder()
                 .url(imageUrl)
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                .header("Referer", referer != null ? referer : currentReferer)
+                .header("Referer", referer)
                 .header("Accept", "image/avif,image/webp,image/apng,image/*,*/*;q=0.8")
                 .build();
         try (okhttp3.Response response = client.newCall(request).execute()) {

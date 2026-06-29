@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
+import org.springframework.context.annotation.Lazy;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,13 +36,16 @@ public class ScraperConfigService {
     private final AtomicBoolean dirty = new AtomicBoolean(false);
     private Thread watchThread;
     private volatile boolean running = true;
+    private final ScraperFactory scraperFactory;
 
     public ScraperConfigService(
             ObjectMapper mapper,
             ConfigEncryptionService encryptionService,
+            @Lazy ScraperFactory scraperFactory,
             @Value("${game-library.scraper.config-dir:#{systemProperties['user.dir'] + '/config'}}") String configDir) {
         this.mapper = mapper.copy().enable(SerializationFeature.INDENT_OUTPUT);
         this.encryptionService = encryptionService;
+        this.scraperFactory = scraperFactory;
         this.configDir = configDir;
     }
 
@@ -137,6 +141,7 @@ public class ScraperConfigService {
         }
         configs.put(type, newConfig);
         save();
+        scraperFactory.invalidateCache();
     }
 
     public String resolveApiKey(String type) {

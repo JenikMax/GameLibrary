@@ -54,7 +54,7 @@ public class ScraperFactory {
             case "thegamesdb":
                 return new TheGameDBScraper(config, encryptionService, okHttpClient);
             case "worldart":
-                return new WorldArtScraper(config, okHttpClient);
+                return new WorldArtScraper(config, okHttpClient, jsoupHelper);
             default:
                 throw new IllegalArgumentException("Unsupported scraper type: " + type);
         }

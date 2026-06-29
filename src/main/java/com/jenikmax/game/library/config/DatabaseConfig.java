@@ -26,9 +26,13 @@ public class DatabaseConfig {
         dataSource.setUrl(url);
         dataSource.setUsername(user);
         dataSource.setPassword(pass);
+        dataSource.setMaxActive(4);
+        dataSource.setMaxIdle(2);
+        dataSource.setMinIdle(1);
+        dataSource.setMaxWait(10000);
+        dataSource.setTestOnBorrow(true);
+        dataSource.setValidationQuery("SELECT 1");
         return dataSource;
     }
-
-
 
 }

@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class TransmissionService {
@@ -26,17 +25,14 @@ public class TransmissionService {
     private final String transmissionDownloadDir;
 
     public TransmissionService(
+            OkHttpClient okHttpClient,
             @Value("${game-library.transmission.rpc-url:http://transmission:9091/transmission/rpc}") String rpcUrl,
             @Value("${game-library.games.directory:/gameLibrary}") String gamesDir,
             @Value("${game-library.transmission.download-dir:/downloads}") String transmissionDownloadDir) {
+        this.client = okHttpClient;
         this.rpcUrl = rpcUrl;
         this.gamesDir = gamesDir;
         this.transmissionDownloadDir = transmissionDownloadDir;
-        this.client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .build();
     }
 
     private String getSessionId() {

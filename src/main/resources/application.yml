@@ -4,6 +4,11 @@ server:
     max-http-form-post-size: 100000KB
     max-file-size: 100000KB
     max-request-size: 100000KB
+    threads:
+      max: 10
+      min-spare: 2
+    accept-count: 5
+    connection-timeout: 30000
   port: ${SERVER_PORT:8080}
   servlet:
     context-path: /game-library
@@ -29,7 +34,7 @@ game-library:
 spring:
   mvc:
     async:
-      request-timeout: 7680000
+      request-timeout: 600000
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/game-library?currentSchema=library
     username: library-manager-user
@@ -37,6 +42,11 @@ spring:
   jpa:
     properties:
       hibernate.default_schema: library
+      hibernate.default_batch_fetch_size: 10
+      hibernate.jdbc.fetch_size: 100
+      hibernate.jdbc.batch_size: 20
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
     hibernate:
       default_schema: library
 

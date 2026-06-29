@@ -1,12 +1,12 @@
 package com.jenikmax.game.library.service.scraper.scrapers;
 
 import com.jenikmax.game.library.model.dto.GameDto;
+import com.jenikmax.game.library.service.scraper.JsoupHelper;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import com.jenikmax.game.library.service.scraper.api.Scraper;
 import com.jenikmax.game.library.service.scraper.model.ScraperConfig;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -24,10 +24,12 @@ public class WorldArtScraper implements Scraper {
     private final ScraperConfig config;
     private final String type;
     private final OkHttpClient client;
+    private final JsoupHelper jsoupHelper;
 
-    public WorldArtScraper(ScraperConfig config, OkHttpClient client) {
+    public WorldArtScraper(ScraperConfig config, OkHttpClient client, JsoupHelper jsoupHelper) {
         this.config = config;
         this.client = client;
+        this.jsoupHelper = jsoupHelper;
         this.type = config.getType();
     }
 
@@ -263,10 +265,7 @@ public class WorldArtScraper implements Scraper {
     }
 
     private Document fetchDocument(String url) throws IOException {
-        return Jsoup.connect(url)
-                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                .timeout(config.getTimeoutMs())
-                .get();
+        return jsoupHelper.fetchDocument(url, config);
     }
 
     private String imageToBase64(String imageUrl) throws IOException {
