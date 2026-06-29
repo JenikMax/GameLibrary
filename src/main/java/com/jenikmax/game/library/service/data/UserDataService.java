@@ -100,23 +100,32 @@ public class UserDataService implements UserService {
     }
 
     @Transactional
-    public UserDto changeUserActivity(Long userId, boolean isActive){
+    public UserDto changeUserActivity(Long userId, boolean isActive, String currentUsername){
         Optional<User> findResult = userRepository.findById(userId);
         if(!findResult.isPresent()) throw new IllegalArgumentException("UserNotFound");
-        User currentUser = findResult.get();
-        currentUser.setActive(isActive);
-        userRepository.save(currentUser);
-        return getUserInfoByName(currentUser.getUsername());
+        User user = findResult.get();
+        if (user.getUsername().equals(currentUsername) && !isActive) {
+            throw new IllegalArgumentException("Cannot deactivate yourself");
+        }
+        user.setActive(isActive);
+        userRepository.save(user);
+        return getUserInfoByName(user.getUsername());
     }
 
     @Transactional
     public UserDto changeUserPrivilegy(Long userId, boolean isAdmin){
         Optional<User> findResult = userRepository.findById(userId);
         if(!findResult.isPresent()) throw new IllegalArgumentException("UserNotFound");
-        User currentUser = findResult.get();
-        currentUser.setAdmin(isAdmin);
-        userRepository.save(currentUser);
-        return getUserInfoByName(currentUser.getUsername());
+        User user = findResult.get();
+        if (!isAdmin && user.isAdmin()) {
+            long adminCount = userRepository.countByAdmin(true);
+            if (adminCount <= 1) {
+                throw new IllegalArgumentException("Cannot remove the last admin");
+            }
+        }
+        user.setAdmin(isAdmin);
+        userRepository.save(user);
+        return getUserInfoByName(user.getUsername());
     }
 
     @Transactional

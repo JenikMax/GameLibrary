@@ -8,6 +8,8 @@ import com.jenikmax.game.library.service.data.UserDataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,14 +38,14 @@ public class AdminController {
 
     @PostMapping("/users/{id}/toggle-admin")
     public ResponseEntity<ApiResponse<Void>> toggleAdmin(@PathVariable Long id,
-                                                          @RequestParam boolean isAdmin) {
+                                                           @RequestParam boolean isAdmin) {
         logger.info("REST toggle admin for user {}: {}", id, isAdmin);
         try {
             userService.changeUserPrivilegy(id, isAdmin);
             return ResponseEntity.ok(ApiResponse.ok("User privileges updated", null));
         } catch (Exception e) {
             logger.error("Toggle admin error", e);
-            return ResponseEntity.badRequest().body(ApiResponse.error("Failed to update user privileges"));
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
 
@@ -52,11 +54,12 @@ public class AdminController {
                                                            @RequestParam boolean isActive) {
         logger.info("REST toggle active for user {}: {}", id, isActive);
         try {
-            userService.changeUserActivity(id, isActive);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            userService.changeUserActivity(id, isActive, auth.getName());
             return ResponseEntity.ok(ApiResponse.ok("User status updated", null));
         } catch (Exception e) {
             logger.error("Toggle active error", e);
-            return ResponseEntity.badRequest().body(ApiResponse.error("Failed to update user status"));
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
 
