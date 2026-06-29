@@ -133,7 +133,7 @@ function restoreState(state) {
   selectedGenres.value = state.selectedGenres || []
   sortField.value = state.sortField || ''
   sortType.value = state.sortType || ''
-  resetting.value = false
+  setTimeout(() => { resetting.value = false }, 300)
 }
 
 defineExpose({ restoreState })
