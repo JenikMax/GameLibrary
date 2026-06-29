@@ -56,6 +56,7 @@
             :filterPlaceholder="t('filter.genres_search')"
             display="chip"
             class="w-full"
+            scrollHeight="400px"
           />
         </div>
 

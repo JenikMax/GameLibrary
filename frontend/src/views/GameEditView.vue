@@ -49,6 +49,7 @@
                   filter
                   :filterPlaceholder="t('filter.genres_search')"
                   class="w-full"
+                  scrollHeight="400px"
                 />
               </div>
               <div class="field col-12">
