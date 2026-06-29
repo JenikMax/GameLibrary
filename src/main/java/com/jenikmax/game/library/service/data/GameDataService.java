@@ -228,7 +228,7 @@ public class GameDataService implements GameService {
             return sqlDao.getGenreList("select code from library.game_genre group by code order by description_ru","code");
         }
         else{
-            return getGenres();
+            return sqlDao.getGenreList("select code from library.game_genre group by code order by description","code");
         }
     }
 

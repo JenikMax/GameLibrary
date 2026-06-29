@@ -11,6 +11,7 @@ import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,14 +34,17 @@ public class LibraryController {
     private final ScreenshotRepository screenshotRepository;
     private final ScraperConfigService scraperConfigService;
     private final String imagesDirectory;
+    private final MessageSource messageSource;
 
     public LibraryController(LibraryService libraryService,
                              ScreenshotRepository screenshotRepository,
                              ScraperConfigService scraperConfigService,
+                             MessageSource messageSource,
                              @Value("${game-library.images.directory:/gameLibrary/images}") String imagesDirectory) {
         this.libraryService = libraryService;
         this.screenshotRepository = screenshotRepository;
         this.scraperConfigService = scraperConfigService;
+        this.messageSource = messageSource;
         this.imagesDirectory = imagesDirectory;
     }
 
@@ -100,7 +104,8 @@ public class LibraryController {
         options.setYears(years);
         options.setPlatforms(platforms);
         options.setGenres(genres.stream()
-                .map(g -> new FilterOptionsResponse.GenreItem(g.name(), g.getName()))
+                .map(g -> new FilterOptionsResponse.GenreItem(g.name(),
+                        messageSource.getMessage("enum.genre." + g.name(), null, g.getName(), locale)))
                 .collect(Collectors.toList()));
 
         return ResponseEntity.ok(ApiResponse.ok(options));
