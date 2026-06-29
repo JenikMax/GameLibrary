@@ -339,7 +339,7 @@ public class GameDataService implements GameService {
     }
 
     private byte[] getDefaultLogo(){
-        ClassPathResource resource = new ClassPathResource("static/img/logo.jpg");
+        ClassPathResource resource = new ClassPathResource("static/img/default.jpg");
         try {
             return Files.readAllBytes(resource.getFile().toPath());
         } catch (IOException e) {

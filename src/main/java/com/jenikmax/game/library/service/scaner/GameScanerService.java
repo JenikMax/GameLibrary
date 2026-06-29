@@ -229,7 +229,7 @@ public class GameScanerService implements ScanerService {
     }
 
     private byte[] getDefaultLogo(){
-        ClassPathResource resource = new ClassPathResource("static/img/logo.jpg");
+        ClassPathResource resource = new ClassPathResource("static/img/default.jpg");
         try (InputStream is = resource.getInputStream()) {
             return StreamUtils.copyToByteArray(is);
         } catch (IOException e) {
