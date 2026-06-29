@@ -195,7 +195,7 @@ All config stored in `scrapers/scrapers-config.json`, managed via `/api/admin/sc
 
 | Scraper | Method | Auth | What it scrapes |
 |---------|--------|------|----------------|
-| **Playground** (playground.ru) | CSS selectors | — | Name, description, genres, screenshots |
+| **Playground** (playground.ru) | CSS selectors + search API | — | Name, description, genres, screenshots |
 | **Igromania** (igromania.ru) | JSON Path | — | Game data via `initialStoreState` |
 | **Steam** (store.steampowered.com) | Storefront API | — | Name, description, screenshots, genres |
 | **IGDB** (api.igdb.com) | REST API | Twitch OAuth 2.0 (Client-ID + Bearer) | Full metadata |
@@ -532,7 +532,7 @@ DDL: `postgresdb/ddl/` — `1_init.sql` (схема), `2_library.sql` (табл�
 
 | Скрапер | Метод | Авторизация | Что собирает |
 |---------|-------|-------------|-------------|
-| **Playground** (playground.ru) | CSS-селекторы | — | Название, описание, жанры, скриншоты |
+| **Playground** (playground.ru) | CSS-селекторы + search API | — | Название, описание, жанры, скриншоты |
 | **Igromania** (igromania.ru) | JSON Path | — | Данные через `initialStoreState` |
 | **Steam** (store.steampowered.com) | Storefront API | — | Название, описание, скриншоты, жанры |
 | **IGDB** (api.igdb.com) | REST API | Twitch OAuth 2.0 (Client-ID + Bearer) | Полные метаданные |
