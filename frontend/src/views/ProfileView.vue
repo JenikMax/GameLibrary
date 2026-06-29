@@ -47,7 +47,6 @@
           <AccordionTab v-if="authStore.isAdmin" :header="t('profile.admin_actions')">
             <div class="flex flex-column gap-2">
               <Button :label="t('library.scan')" icon="pi pi-refresh" severity="warning" @click="scanLibrary" :loading="scanning" />
-              <Button :label="t('profile.migrate_images')" icon="pi pi-image" severity="info" @click="migrateImages" :loading="migrating" />
             </div>
           </AccordionTab>
         </Accordion>
@@ -83,7 +82,6 @@ const previewUrl = ref('')
 const saving = ref(false)
 const changingPass = ref(false)
 const scanning = ref(false)
-const migrating = ref(false)
 const message = ref('')
 const messageSeverity = ref('info')
 
@@ -141,18 +139,6 @@ async function scanLibrary() {
     toast.add({ severity: 'error', summary: t('library.scan_failed'), life: 3000 })
   } finally {
     scanning.value = false
-  }
-}
-
-async function migrateImages() {
-  migrating.value = true
-  try {
-    const res = await adminApi.migrateImages()
-    toast.add({ severity: 'success', summary: res.data.message || t('profile.migration_complete'), life: 5000 })
-  } catch {
-    toast.add({ severity: 'error', summary: t('profile.migration_failed'), life: 3000 })
-  } finally {
-    migrating.value = false
   }
 }
 </script>

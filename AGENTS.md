@@ -27,7 +27,7 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - PostgreSQL 16 schema `library`, managed via Commons DBCP 1.4 + JPA (Hibernate 5.6.15).
 - Auth: Spring Security, form login + JWT, BCrypt, `ROLE_ADMIN`/`ROLE_USER`.
 - Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission 4.1.2 RPC for seeding.
-- Images: filesystem (`/gameLibrary/images/`) with DB bytea fallback.
+- Images: DB bytea with optional filesystem override at `images.directory/games/{id}/logo.jpg` (or `screenshots/`, `avatars/`).
 - Scrapers (6 active): Playground (CSS selectors), Igromania (JSON paths), WorldArt (CSS selectors), Steam (Storefront API, no key required), IGDB (Twitch OAuth), TheGamesDB (API key).
 - State: Pinia stores for auth, library, locale.
 - Rich text: VueQuill + Quill 2 for game description editing.
@@ -88,7 +88,7 @@ TheGamesDB требует API-ключ. Чтобы получить его:
   - The container init script (`init-transmission-config/run`) does NOT process `TRANSMISSION_*` env vars (only `USER`, `PASS`, `WHITELIST`, etc.), so `TRANSMISSION_UTP_ENABLED=true` in docker-compose.yml has **no effect**. The fix must be done directly in the host `settings.json` — it survives restarts because the init script doesn't touch these keys.
   - After editing, `docker-compose restart transmission`.
 - **WorldArt screenshot bucket formula**: `((id + 9999) / 10000) * 10000` in `WorldArtScraper.java:220`. World-art.ru stores images in `img/{bucket}/{id}/{num}.jpg` where bucket is a rounded `10000 * ceil(id/10000)`. The optimize_b path format is `img/converted_images_{bucket}/optimize_b/{id}-{num}-optimize_b.jpg`.
-- **Images on filesystem**: after DB→FS migration (`POST /api/admin/migrate-images` or `scripts/migrate-images.sh`), images are served from disk. If the file is missing, falls back to DB bytea.
+- **Images**: served from DB bytea. Optionally, files at `images.directory/games/{id}/logo.jpg` (or `screenshots/`, `avatars/`) override DB — useful for manual replacement.
 - **Local dev profile** in `application-alone.yml` overrides games/images/gameLibraryConfigs paths for local development. Activate with `--spring.profiles.active=alone`.
 - **SCRAPER_ENCRYPTION_KEY** must be set in `docker-compose.yml` (backend → environment). API-ключи скраперов шифруются этим ключом; при его смене нужно **пересохранить все API-ключи** в админке. Сгенерировать новый: `openssl rand -base64 32`.
 - **Playground screenshot URL normalization** (`PlaygroundScraper.java:212-221`). На странице игры Playground каждая скриншота = `<a href="//i/screenshot/{id}/img.jpg">` (фулсайз) + `<img src="/i/screenshot/{id}/img.jpg?1200x675">` (превью с query-параметром). `extractScreenshotsFromDocument` собирает URL из обоих аттрибутов в `LinkedHashSet`, но из-за разницы в `//` и `?query` они не дедуплицируются. Метод `normalizeScreenshotUrl()` убирает `//`, `.webp?`-мусор и всё после `?` **до** добавления в Set, что превращает оба URL в идентичную строку и устраняет дубликаты.

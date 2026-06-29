@@ -46,7 +46,7 @@
 | Sorting & pagination | Game editor with Quill rich text |
 | ZIP download (<5 GB) / .torrent download (≥5 GB) | User management (roles, block, reset password) |
 | P2P seeding via Transmission | Scraper config panel (API keys, enable/disable) |
-| Profile, avatar, password change | Image migration DB→FS |
+| Profile, avatar, password change | |
 | Russian / English UI | |
 
 ## ⚡ Quick Start
@@ -140,7 +140,6 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `GET /admin/scraper-config` | ADMIN | Get scraper configs |
 | `POST /admin/scraper-config` | ADMIN | Save scraper configs |
 | `POST /admin/scraper-config/reload` | ADMIN | Reload from file |
-| `POST /admin/migrate-images` | ADMIN | Migrate images DB → FS |
 
 ## 🔧 Configuration
 
@@ -189,21 +188,6 @@ Schema `library`:
 | `library_user` | Users (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
 DDL: `postgresdb/ddl/` — `1_init.sql` (schema), `2_library.sql` (tables + genres), `3_user.sql` (users + seed).
-
-### Image Migration (DB → Filesystem)
-
-By default images are stored as `bytea` in DB. To migrate to disk:
-
-```bash
-# Script
-./scripts/migrate-images.sh /gameLibrary/images
-
-# Or via API (ADMIN)
-curl -X POST http://localhost:8080/game-library/api/admin/migrate-images \
-  -H "Authorization: Bearer <token>"
-```
-
-After migration images are served from disk with automatic DB fallback if the file is missing.
 
 ## 🕷 Scrapers
 
@@ -381,7 +365,6 @@ npm run dev
 | Blank page | nginx proxy misconfig | Check nginx.conf `/game-library` location |
 | Backend can't connect to DB | Wrong host/port/password | Check `DB_HOST`, `DB_PORT`, verify PostgreSQL is running |
 | Transmission not responding | Wrong RPC URL or IPv6 bind | Set `TRANSMISSION_RPC_URL`; change `rpc-bind-address` to `0.0.0.0` |
-| Images not showing | Missing files after migration | Run migration again: `POST /api/admin/migrate-images` |
 | Tracker works but no data transfer | uTP disabled | Set `preferred_transports: ["utp", "tcp"]` in Transmission `settings.json` |
 | `no suitable method found for create` | OkHttp version mismatch | Use `RequestBody.create(MediaType, String)` (3.x API) |
 
@@ -400,7 +383,7 @@ npm run dev
 | Сортировка и пагинация | Редактор игр с Quill (rich text) |
 | Скачивание ZIP (<5 ГБ) / .torrent (≥5 ГБ) | Управление пользователями |
 | P2P-раздача через Transmission | Панель конфигурации скраперов |
-| Профиль, аватар, смена пароля | Миграция изображений БД→ФС |
+| Профиль, аватар, смена пароля | |
 | Русский / английский интерфейс | |
 
 ## ⚡ Быстрый старт
@@ -494,7 +477,6 @@ make all   # сборка backend + frontend, запуск docker-compose
 | `GET /admin/scraper-config` | ADMIN | Получить конфиги скраперов |
 | `POST /admin/scraper-config` | ADMIN | Сохранить конфиги |
 | `POST /admin/scraper-config/reload` | ADMIN | Перезагрузить из файла |
-| `POST /admin/migrate-images` | ADMIN | Миграция изображений БД→ФС |
 
 ## 🔧 Конфигурация
 
@@ -543,20 +525,6 @@ make all   # сборка backend + frontend, запуск docker-compose
 | `library_user` | Пользователи (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
 DDL: `postgresdb/ddl/` — `1_init.sql` (схема), `2_library.sql` (таблицы + жанры), `3_user.sql` (пользователи + seed).
-
-### Миграция изображений (БД → ФС)
-
-По умолчанию изображения хранятся как `bytea` в БД. Перенос на диск:
-
-```bash
-./scripts/migrate-images.sh /gameLibrary/images
-
-# Или через API (ADMIN)
-curl -X POST http://localhost:8080/game-library/api/admin/migrate-images \
-  -H "Authorization: Bearer <token>"
-```
-
-После миграции изображения отдаются с диска с fallback на БД при отсутствии файла.
 
 ## 🕷 Скраперы
 
@@ -734,6 +702,5 @@ npm run dev
 | Пустая страница | Неправильный прокси nginx | Проверить location `/game-library` в nginx.conf |
 | Backend не видит БД | Неверный хост/порт/пароль | Проверить `DB_HOST`, `DB_PORT`, работает ли PostgreSQL |
 | Transmission не отвечает | Неверный RPC URL или IPv6 | Указать `TRANSMISSION_RPC_URL`; сменить `rpc-bind-address` на `0.0.0.0` |
-| Нет изображений | Отсутствуют файлы после миграции | Запустить миграцию: `POST /api/admin/migrate-images` |
 | Трекер работает, данных нет | Выключен uTP | Установить `preferred_transports: ["utp", "tcp"]` в `settings.json` |
 | `no suitable method found for create` | Не та версия OkHttp | OkHttp 3.x: `RequestBody.create(MediaType, String)` |

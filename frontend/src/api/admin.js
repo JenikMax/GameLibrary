@@ -16,9 +16,6 @@ export const adminApi = {
   scanLibrary() {
     return api.post('/scan')
   },
-  migrateImages() {
-    return api.post('/admin/migrate-images')
-  },
   getScraperConfigs() {
     return api.get('/admin/scraper-config')
   },
