@@ -81,8 +81,7 @@
         </div>
 
         <div class="flex gap-2">
-          <Button :label="t('filter.apply')" icon="pi pi-filter" @click="applyFilters" class="flex-1" />
-          <Button :label="t('filter.reset')" icon="pi pi-times" severity="secondary" @click="resetFilters" />
+          <Button :label="t('filter.reset')" icon="pi pi-times" severity="secondary" @click="resetFilters" class="flex-1" />
         </div>
       </div>
     </AccordionTab>
@@ -90,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
@@ -104,6 +103,14 @@ import Button from 'primevue/button'
 
 const { t } = useI18n()
 
+function debounce(fn, delay) {
+  let timer
+  return function (...args) {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn.apply(this, args), delay)
+  }
+}
+
 const props = defineProps({
   options: { type: Object, required: true }
 })
@@ -116,17 +123,31 @@ const selectedYears = ref([])
 const selectedGenres = ref([])
 const sortField = ref('')
 const sortType = ref('')
+const resetting = ref(false)
 
 function restoreState(state) {
+  resetting.value = true
   searchText.value = state.searchText || ''
   selectedPlatforms.value = state.selectedPlatforms || []
   selectedYears.value = state.selectedYears || []
   selectedGenres.value = state.selectedGenres || []
   sortField.value = state.sortField || ''
   sortType.value = state.sortType || ''
+  resetting.value = false
 }
 
 defineExpose({ restoreState })
+
+const debouncedApply = debounce(() => {
+  if (!resetting.value) applyFilters()
+}, 250)
+
+watch(searchText, debouncedApply)
+watch(selectedPlatforms, debouncedApply, { deep: true })
+watch(selectedYears, debouncedApply, { deep: true })
+watch(selectedGenres, debouncedApply, { deep: true })
+watch(sortField, debouncedApply)
+watch(sortType, debouncedApply)
 
 const sortOptions = [
   { label: t('filter.sort_name'), value: 'name' },
@@ -162,12 +183,14 @@ function applyFilters() {
 }
 
 function resetFilters() {
+  resetting.value = true
   searchText.value = ''
   selectedPlatforms.value = []
   selectedYears.value = []
   selectedGenres.value = []
   sortField.value = ''
   sortType.value = ''
+  resetting.value = false
   emit('reset')
 }
 </script>

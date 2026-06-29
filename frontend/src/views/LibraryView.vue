@@ -32,11 +32,21 @@
         <p class="text-xl mt-3">{{ t('library.no_games') }}</p>
       </div>
 
-      <div v-else class="game-grid">
-        <GameCard v-for="game in store.games" :key="game.id" :game="game" />
+      <div v-else>
+        <div v-if="store.totalItems > store.pageSize" class="flex justify-content-center mb-3">
+          <Paginator
+            :first="(store.currentPage - 1) * store.pageSize"
+            :rows="store.pageSize"
+            :totalRecords="store.totalItems"
+            @page="onPageChange"
+          />
+        </div>
+        <div class="game-grid">
+          <GameCard v-for="game in store.games" :key="game.id" :game="game" />
+        </div>
       </div>
 
-      <div class="flex justify-content-center mt-4">
+      <div v-if="store.totalItems > store.pageSize" class="flex justify-content-center mt-4">
         <Paginator
           :first="(store.currentPage - 1) * store.pageSize"
           :rows="store.pageSize"
@@ -49,7 +59,7 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLibraryStore } from '../stores/library'
 import { useAuthStore } from '../stores/auth'
@@ -96,6 +106,14 @@ onMounted(async () => {
     store.selectedGenres = state.genres || []
     store.sortField = state.sortField || ''
     store.sortType = state.sortType || ''
+    filterRef.value?.restoreState({
+      searchText: state.searchText || '',
+      selectedPlatforms: state.platforms || [],
+      selectedYears: state.years || [],
+      selectedGenres: state.genres || [],
+      sortField: state.sortField || '',
+      sortType: state.sortType || ''
+    })
     sessionStorage.removeItem(LIBRARY_STATE_KEY)
     await store.fetchGames(state.currentPage || 1)
   } else {
@@ -108,21 +126,9 @@ onBeforeUnmount(() => {
   saveStateToSession()
 })
 
-watch(
-  [() => store.searchText, () => store.selectedPlatforms, () => store.selectedYears,
-   () => store.selectedGenres, () => store.sortField, () => store.sortType],
-  () => filterRef.value?.restoreState({
-    searchText: store.searchText,
-    selectedPlatforms: store.selectedPlatforms,
-    selectedYears: store.selectedYears,
-    selectedGenres: store.selectedGenres,
-    sortField: store.sortField,
-    sortType: store.sortType
-  })
-)
-
 function onPageChange(event) {
   store.fetchGames(event.page + 1)
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 function handleApplyFilters(filters) {
