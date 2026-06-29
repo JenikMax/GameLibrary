@@ -1,5 +1,6 @@
 package com.jenikmax.game.library.controller.api;
 
+import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.dto.UserDto;
 import com.jenikmax.game.library.model.dto.api.ApiResponse;
 import com.jenikmax.game.library.model.dto.api.UserAdminResponse;
@@ -77,7 +78,13 @@ public class AdminController {
         resp.setName(dto.getName());
         resp.setAdmin(dto.isAdmin());
         resp.setActive(dto.isActive());
-        resp.setAvatarUrl("/game-library/api/images/avatars/" + dto.getId());
+        resp.setAvatarUrl(avatarUrl(dto));
         return resp;
     }
+
+    private static String avatarUrl(ShortUser u) {
+        int v = u.getAvatar() != null ? u.getAvatar().hashCode() : 0;
+        return "/game-library/api/images/avatars/" + u.getId() + "?v=" + v;
+    }
+
 }

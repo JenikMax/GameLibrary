@@ -88,6 +88,7 @@ public class ImageController {
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent() && user.get().getAvatar() != null) {
             return ResponseEntity.ok()
+                    .header("Cache-Control", "no-cache, no-store, must-revalidate")
                     .contentType(MediaType.IMAGE_JPEG)
                     .body(new InputStreamResource(new java.io.ByteArrayInputStream(user.get().getAvatar())));
         }

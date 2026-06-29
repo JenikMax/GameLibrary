@@ -1,5 +1,6 @@
 package com.jenikmax.game.library.controller.api;
 
+import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.dto.api.*;
 import com.jenikmax.game.library.model.exceptions.IllegalPassException;
 import com.jenikmax.game.library.model.exceptions.IllegalUsernameException;
@@ -49,7 +50,7 @@ public class AuthController {
             profile.setName(shortUser.getName());
             profile.setAdmin(shortUser.isAdmin());
             profile.setActive(shortUser.isActive());
-            profile.setAvatarUrl("/game-library/api/images/avatars/" + shortUser.getId());
+            profile.setAvatarUrl(avatarUrl(shortUser));
 
             LoginResponse loginResponse = new LoginResponse(token, profile);
             return ResponseEntity.ok(ApiResponse.ok(loginResponse));
@@ -90,7 +91,13 @@ public class AuthController {
         profile.setName(shortUser.getName());
         profile.setAdmin(shortUser.isAdmin());
         profile.setActive(shortUser.isActive());
-        profile.setAvatarUrl("/game-library/api/images/avatars/" + shortUser.getId());
+        profile.setAvatarUrl(avatarUrl(shortUser));
         return ResponseEntity.ok(ApiResponse.ok(profile));
     }
+
+    private static String avatarUrl(ShortUser u) {
+        int v = u.getAvatar() != null ? u.getAvatar().hashCode() : 0;
+        return "/game-library/api/images/avatars/" + u.getId() + "?v=" + v;
+    }
+
 }

@@ -79,7 +79,13 @@ public class ProfileController {
         profile.setName(shortUser.getName());
         profile.setAdmin(shortUser.isAdmin());
         profile.setActive(shortUser.isActive());
-        profile.setAvatarUrl("/game-library/api/images/avatars/" + shortUser.getId());
+        profile.setAvatarUrl(avatarUrl(shortUser));
         return profile;
     }
+
+    static String avatarUrl(ShortUser u) {
+        int v = u.getAvatar() != null ? u.getAvatar().hashCode() : 0;
+        return "/game-library/api/images/avatars/" + u.getId() + "?v=" + v;
+    }
+
 }
