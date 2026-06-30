@@ -916,6 +916,29 @@ public class ScraperConfigService {
         map.put("life simulation", Arrays.asList("simulators"));
         map.put("vehicle simulation", Arrays.asList("simulators"));
         map.put("space combat", Arrays.asList("space", "shooter"));
+        map.put("first person shooter", Arrays.asList("shooter"));
+        map.put("first-person shooter", Arrays.asList("shooter"));
+        map.put("first-person", Arrays.asList("shooter"));
+        map.put("driving", Arrays.asList("racing"));
+        map.put("platformer", Arrays.asList("platform"));
+        map.put("shooting", Arrays.asList("shooter"));
+        map.put("baseball", Arrays.asList("sport"));
+        map.put("billiard", Arrays.asList("sport"));
+        map.put("bowling", Arrays.asList("sport"));
+        map.put("dodgeball", Arrays.asList("sport"));
+        map.put("fishing", Arrays.asList("sport"));
+        map.put("hunting", Arrays.asList("sport", "simulators"));
+        map.put("pool", Arrays.asList("sport"));
+        map.put("skateboarding", Arrays.asList("sport"));
+        map.put("skating", Arrays.asList("sport"));
+        map.put("snowboarding", Arrays.asList("sport"));
+        map.put("soccer", Arrays.asList("sport"));
+        map.put("gun", Arrays.asList("shooter"));
+        map.put("survival horror", Arrays.asList("horror"));
+        map.put("tactical rpg", Arrays.asList("tactics", "rpg"));
+        map.put("gambling", Arrays.asList("card"));
+        map.put("compilation", Arrays.asList("other"));
+        map.put("mini games", Arrays.asList("arcade"));
         return map;
     }
 }
