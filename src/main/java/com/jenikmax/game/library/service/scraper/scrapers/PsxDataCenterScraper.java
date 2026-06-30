@@ -131,10 +131,20 @@ public class PsxDataCenterScraper implements Scraper {
         for (Element link : infoLinks) {
             Element titleCell = findTitleCell(link);
             if (titleCell == null) continue;
-            String title = titleCell.text().replace((char)0xA0, ' ').trim();
-            String normalized = title.replaceAll("[^a-zA-Z0-9]", "").toLowerCase(Locale.ROOT);
-            String searchNormalized = query.replaceAll("[^a-zA-Z0-9]", "");
-            if (normalized.contains(searchNormalized)) {
+            String title = titleCell.ownText().replace((char)0xA0, ' ').trim();
+            Set<String> titleWords = new HashSet<>(Arrays.asList(
+                title.toLowerCase(Locale.ROOT).split("[^a-z0-9]+")
+            ));
+            String[] queryWords = query.toLowerCase(Locale.ROOT).split("[^a-z0-9]+");
+            boolean allMatch = true;
+            for (String qw : queryWords) {
+                if (qw.isEmpty()) continue;
+                if (!titleWords.contains(qw)) {
+                    allMatch = false;
+                    break;
+                }
+            }
+            if (allMatch && queryWords.length > 0) {
                 return link.absUrl("href");
             }
         }

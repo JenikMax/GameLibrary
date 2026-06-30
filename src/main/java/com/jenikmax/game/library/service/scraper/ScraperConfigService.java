@@ -939,6 +939,7 @@ public class ScraperConfigService {
         map.put("gambling", Arrays.asList("card"));
         map.put("compilation", Arrays.asList("other"));
         map.put("mini games", Arrays.asList("arcade"));
+        map.put("breeding", Arrays.asList("simulators"));
         return map;
     }
 }
