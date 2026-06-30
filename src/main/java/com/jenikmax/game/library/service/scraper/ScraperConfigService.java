@@ -280,6 +280,15 @@ public class ScraperConfigService {
         worldart.setGenreMappings(buildWorldArtGenreMappings());
         list.add(worldart);
 
+        ScraperConfig psxdc = new ScraperConfig();
+        psxdc.setType("psxdatacenter");
+        psxdc.setEnabled(true);
+        psxdc.setDisplayName("PSX DataCenter");
+        psxdc.setBaseUrl("https://psxdatacenter.com");
+        psxdc.setMaxScreenshots(10);
+        psxdc.setGenreMappings(buildPsxDataCenterGenreMappings());
+        list.add(psxdc);
+
         return list;
     }
 
@@ -860,6 +869,53 @@ public class ScraperConfigService {
         map.put("Strategy", Arrays.asList("strategy"));
         map.put("Trivia", Arrays.asList("logic"));
         map.put("Visual Novel", Arrays.asList("vizualnaia_novella"));
+        return map;
+    }
+
+    private Map<String, List<String>> buildPsxDataCenterGenreMappings() {
+        Map<String, List<String>> map = new LinkedHashMap<>();
+        map.put("action", Arrays.asList("action"));
+        map.put("adventure", Arrays.asList("adventure"));
+        map.put("shooter", Arrays.asList("shooter"));
+        map.put("simulation", Arrays.asList("simulators"));
+        map.put("flight simulator", Arrays.asList("flight", "simulators"));
+        map.put("rpg", Arrays.asList("rpg"));
+        map.put("strategy", Arrays.asList("strategy"));
+        map.put("sports", Arrays.asList("sport"));
+        map.put("fighting", Arrays.asList("fighting"));
+        map.put("puzzle", Arrays.asList("pazzl"));
+        map.put("racing", Arrays.asList("racing"));
+        map.put("platform", Arrays.asList("platform"));
+        map.put("horror", Arrays.asList("horror"));
+        map.put("arcade", Arrays.asList("arcade"));
+        map.put("music", Arrays.asList("music"));
+        map.put("party", Arrays.asList("other"));
+        map.put("trivia", Arrays.asList("logic"));
+        map.put("beat'em up", Arrays.asList("beat_em_up"));
+        map.put("beat em up", Arrays.asList("beat_em_up"));
+        map.put("visual novel", Arrays.asList("vizualnaia_novella"));
+        map.put("adult", Arrays.asList("adult"));
+        map.put("tactics", Arrays.asList("tactics"));
+        map.put("turn based", Arrays.asList("turn_based"));
+        map.put("simulator", Arrays.asList("simulators"));
+        map.put("open world", Arrays.asList("open_world"));
+        map.put("stealth", Arrays.asList("stealth"));
+        map.put("survival", Arrays.asList("survival"));
+        map.put("battle royale", Arrays.asList("battle_royale"));
+        map.put("mmorpg", Arrays.asList("mmo", "rpg"));
+        map.put("moba", Arrays.asList("moba"));
+        map.put("rail shooter", Arrays.asList("shooter", "arcade"));
+        map.put("light gun", Arrays.asList("shooter", "arcade"));
+        map.put("dance", Arrays.asList("music"));
+        map.put("rhythm", Arrays.asList("music"));
+        map.put("board game", Arrays.asList("board_game"));
+        map.put("card game", Arrays.asList("card"));
+        map.put("fighting (2.5d)", Arrays.asList("fighting"));
+        map.put("fighting (3d)", Arrays.asList("fighting"));
+        map.put("sandbox", Arrays.asList("sandbox"));
+        map.put("life simulation", Arrays.asList("simulators"));
+        map.put("vehicle simulation", Arrays.asList("simulators"));
+        map.put("space combat", Arrays.asList("space", "shooter"));
         return map;
     }
 }

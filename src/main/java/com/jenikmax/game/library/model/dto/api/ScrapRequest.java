@@ -10,6 +10,7 @@ public class ScrapRequest {
     private boolean year;
     private boolean genres;
     private boolean screens;
+    private boolean instruction;
 
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }
@@ -27,4 +28,6 @@ public class ScrapRequest {
     public void setGenres(boolean genres) { this.genres = genres; }
     public boolean isScreens() { return screens; }
     public void setScreens(boolean screens) { this.screens = screens; }
+    public boolean isInstruction() { return instruction; }
+    public void setInstruction(boolean instruction) { this.instruction = instruction; }
 }

@@ -258,11 +258,12 @@ public class LibraryViewController {
                                @RequestParam(value = "description", required = false, defaultValue = "false") Boolean descriptionAttr,
                                @RequestParam(value = "year", required = false, defaultValue = "false") Boolean yearAttr,
                                @RequestParam(value = "genres", required = false, defaultValue = "false") Boolean genresAttr,
-                               @RequestParam(value = "screens", required = false, defaultValue = "false") Boolean screensAttr,
-                               Model model, Locale locale) {
+                                @RequestParam(value = "screens", required = false, defaultValue = "false") Boolean screensAttr,
+                                @RequestParam(value = "instruction", required = false, defaultValue = "false") Boolean instructionAttr,
+                                Model model, Locale locale) {
         logger.info("Grab game data game - {}, source - {}, url - {}",id,source,url);
 
-        ScrapInfo scrapInfo = new ScrapInfo(url,source,titleAttr,posterAttr,descriptionAttr,yearAttr,genresAttr,screensAttr);
+        ScrapInfo scrapInfo = new ScrapInfo(url,source,titleAttr,posterAttr,descriptionAttr,yearAttr,genresAttr,screensAttr,instructionAttr);
         GameDto gameDto = libraryService.grabGameInfo(id,scrapInfo);
         List<Genre> genres = libraryService.getGenres(locale);
         List<Genre> currentGenres = libraryService.getGenres(gameDto);

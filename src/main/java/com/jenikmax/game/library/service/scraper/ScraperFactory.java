@@ -55,6 +55,8 @@ public class ScraperFactory {
                 return new TheGameDBScraper(config, encryptionService, okHttpClient);
             case "worldart":
                 return new WorldArtScraper(config, okHttpClient, jsoupHelper);
+            case "psxdatacenter":
+                return new PsxDataCenterScraper(config, okHttpClient, jsoupHelper);
             default:
                 throw new IllegalArgumentException("Unsupported scraper type: " + type);
         }

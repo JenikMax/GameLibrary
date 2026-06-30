@@ -11,11 +11,20 @@ public class ScrapInfo {
     private boolean isYearAttrAttr;
     private boolean isGenresAttr;
     private boolean isScreensAttr;
+    private boolean isInstructionAttr;
 
     public ScrapInfo(String url, String source, boolean isTitleAttr,
                      boolean isPosterAttr, boolean isDescriptionAttr,
                      boolean isYearAttrAttr, boolean isGenresAttr,
                      boolean isScreensAttr) {
+        this(url, source, isTitleAttr, isPosterAttr, isDescriptionAttr,
+                isYearAttrAttr, isGenresAttr, isScreensAttr, false);
+    }
+
+    public ScrapInfo(String url, String source, boolean isTitleAttr,
+                     boolean isPosterAttr, boolean isDescriptionAttr,
+                     boolean isYearAttrAttr, boolean isGenresAttr,
+                     boolean isScreensAttr, boolean isInstructionAttr) {
         this.url = url;
         this.source = source;
         this.isTitleAttr = isTitleAttr;
@@ -24,6 +33,7 @@ public class ScrapInfo {
         this.isYearAttrAttr = isYearAttrAttr;
         this.isGenresAttr = isGenresAttr;
         this.isScreensAttr = isScreensAttr;
+        this.isInstructionAttr = isInstructionAttr;
     }
 
     public String getUrl() {
@@ -56,5 +66,9 @@ public class ScrapInfo {
 
     public boolean isScreensAttr() {
         return isScreensAttr;
+    }
+
+    public boolean isInstructionAttr() {
+        return isInstructionAttr;
     }
 }

@@ -196,17 +196,19 @@ const scrapeFields = [
   { key: 'description', labelKey: 'game.scraper.field.description' },
   { key: 'year', labelKey: 'game.scraper.field.year' },
   { key: 'genres', labelKey: 'game.scraper.field.genres' },
-  { key: 'screens', labelKey: 'game.scraper.field.screenshots' }
+  { key: 'screens', labelKey: 'game.scraper.field.screenshots' },
+  { key: 'instruction', labelKey: 'game.scraper.field.instruction' }
 ]
 const scrape = ref({
   source: '',
   url: '',
-  title: false,
-  poster: false,
-  description: false,
-  year: false,
-  genres: false,
-  screens: false
+  title: true,
+  poster: true,
+  description: true,
+  year: true,
+  genres: true,
+  screens: true,
+  instruction: true
 })
 
 const editorOptions = {

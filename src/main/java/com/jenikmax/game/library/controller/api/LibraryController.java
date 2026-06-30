@@ -179,7 +179,8 @@ public class LibraryController {
                     scrapRequest.isDescription(),
                     scrapRequest.isYear(),
                     scrapRequest.isGenres(),
-                    scrapRequest.isScreens());
+                    scrapRequest.isScreens(),
+                    scrapRequest.isInstruction());
             GameDto gameDto = libraryService.grabGameInfo(id, scrapInfo);
             return ResponseEntity.ok(ApiResponse.ok(toGameDetailResponse(gameDto)));
         } catch (Exception e) {

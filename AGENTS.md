@@ -28,7 +28,7 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - Auth: Spring Security, form login + JWT, BCrypt, `ROLE_ADMIN`/`ROLE_USER`.
 - Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission 4.1.2 RPC for seeding.
 - Images: DB bytea with optional filesystem override at `images.directory/games/{id}/logo.jpg` (or `screenshots/`, `avatars/`).
-- Scrapers (6 active): Playground (CSS selectors + search API), Igromania (JSON paths), WorldArt (CSS selectors), Steam (Storefront API, no key required), IGDB (Twitch OAuth), TheGamesDB (API key).
+- Scrapers (7 active): Playground (CSS selectors + search API), Igromania (JSON paths), WorldArt (CSS selectors), Steam (Storefront API, no key required), IGDB (Twitch OAuth), TheGamesDB (API key), PsxDataCenter (JSoup, PS1/PS2, no key).
 - State: Pinia stores for auth, library, locale.
 - Rich text: VueQuill + Quill 2 for game description editing.
 - Package root: `com.jenikmax.game.library`.
@@ -67,6 +67,24 @@ TheGamesDB требует API-ключ. Чтобы получить его:
 - Либо отредактировать `scrapers/scrapers-config.json` напрямую (будет в plaintext)
 
 Лимит: 1000 запросов в месяц. Один поиск игры может использовать 2-3 запроса (поиск + жанры + скриншоты).
+
+## PsxDataCenter Scraper
+
+PsxDataCenter (psxdatacenter.com) — скрапер для PS1 и PS2 без ключа. Использует JSoup для парсинга фреймовой структуры сайта.
+
+- **Поиск по названию**: скрапит 6 list-страниц (3 региона × 2 платформы PS1/PS2), первое совпадение.
+- **Две версии разметки** карточки игры:
+  - **Version A** (старая): метки в `<b>` — `Game Name:`, `Genre:`, `Release Date:`
+  - **Version B** (н овая): текст метки напрямую в `<td>` — `Common Title`, `Genre / Style`, `Date Released`
+  - Какая версия отдаётся, зависит от User-Agent / Referer. `jsoupHelper` (OkHttp + Mozilla UA) → Version B.
+- **PS2**: метки **ВЕРХНИМ РЕГИСТРОМ** (`GENRE / STYLE`, `COMMON TITLE`, `DATE RELEASED`) — сравнение через `equalsIgnoreCase`.
+- **Кодировка**: windows-1252.
+- **Описание**: `table#table16 td[style*="#333333"]`, fallback на самый длинный `<td>`.
+- **Instruction**: `table#table25 td.bluecell:matchesOwn((?i)emulator)`.
+- **PSP исключён**: на PSP list-страницах все INFO-кнопки пустые.
+- **Genre mappings** (~40 записей) в `ScraperConfigService.buildPsxDataCenterGenreMappings()`.
+- **Screenshots**: URL извлекается из `td[onclick*="Select("]` через regex.
+- **NBSP-очистка**: `cleanText()` заменяет `\u00A0` и типографские кавычки.
 
 ## Gotchas
 
