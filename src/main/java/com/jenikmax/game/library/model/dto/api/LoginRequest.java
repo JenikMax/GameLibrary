@@ -1,6 +1,6 @@
 package com.jenikmax.game.library.model.dto.api;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequest {
 

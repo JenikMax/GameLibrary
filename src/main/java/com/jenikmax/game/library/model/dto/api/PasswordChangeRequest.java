@@ -1,7 +1,7 @@
 package com.jenikmax.game.library.model.dto.api;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class PasswordChangeRequest {
 

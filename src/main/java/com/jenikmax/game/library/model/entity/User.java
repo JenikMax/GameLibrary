@@ -1,6 +1,6 @@
 package com.jenikmax.game.library.model.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 

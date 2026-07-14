@@ -1,5 +1,7 @@
 package com.jenikmax.game.library.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.jenikmax.game.library.service.utils.StringUtils;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
@@ -36,6 +38,11 @@ public class AppConfig {
                 .followRedirects(true)
                 .connectionPool(new ConnectionPool(10, 5, TimeUnit.MINUTES))
                 .build();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     }
 
 }
