@@ -104,6 +104,15 @@ public class DownloadTorrentService {
         return cacheManager.getCachedTorrent(directory, files).isPresent();
     }
 
+    public long getCachedTorrentSize(String directoryPath) throws IOException {
+        File directory = new File(directoryPath);
+        List<File> files = new ArrayList<>();
+        searchFiles(directory, files);
+        Path cachedTorrent = cacheManager.getCachedTorrent(directory, files)
+                .orElseThrow(() -> new IOException("Torrent not cached for " + directoryPath));
+        return Files.size(cachedTorrent);
+    }
+
     public void serveTorrentFile(String directoryPath, OutputStream outputStream,
                                   CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture) {
         try {

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.*;
-import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -128,6 +127,30 @@ public class DownloadFileService implements DownloadService {
             size += file.length();
         }
         return size;
+    }
+
+    @Override
+    public StreamingZipWriter.ZipManifest buildZipManifest(String path) throws IOException {
+        StreamingZipWriter writer = new StreamingZipWriter();
+        return writer.buildManifest(Paths.get(path));
+    }
+
+    @Override
+    public void downloadZipWithManifest(String path, OutputStream outputStream,
+                                         StreamingZipWriter.ZipManifest manifest,
+                                         CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture) {
+        try {
+            StreamingZipWriter writer = new StreamingZipWriter();
+            writer.writeZip(manifest, Paths.get(path), outputStream);
+            completableFuture.complete(ResponseEntity.ok().build());
+        } catch (Exception e) {
+            completableFuture.completeExceptionally(e);
+        }
+    }
+
+    @Override
+    public long getCachedTorrentSize(String path) throws IOException {
+        return torrentService.getCachedTorrentSize(path);
     }
 
 }

@@ -10,6 +10,7 @@ import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.GameService;
 import com.jenikmax.game.library.service.data.api.UserService;
+import com.jenikmax.game.library.service.downloads.StreamingZipWriter;
 import com.jenikmax.game.library.service.downloads.api.DownloadService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
 import com.jenikmax.game.library.service.scraper.ScraperFactory;
@@ -226,29 +227,59 @@ public class LibraryOperationService implements LibraryService {
     @Override
     public CompletableFuture<ResponseEntity<StreamingResponseBody>> downloadGameInStream(GameDto game, HttpServletResponse response) {
         CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture = new CompletableFuture<>();
-        String extension = "";
-        Long size = downloadService.getDirectorySizeRecursively(game.getDirectoryPath());// ?> 5L * 1024 * 1024 * 1024
-        // Создайте StreamingResponseBody для передачи данных
-        StreamingResponseBody streamingResponseBody = outputStream -> {
-            if(size > 5L * 1024 * 1024 * 1024){
-                downloadService.serveCachedTorrent(game.getDirectoryPath(),outputStream,completableFuture);
-            }
-            else{
-                downloadService.downloadZipInStream(game.getDirectoryPath(),outputStream,completableFuture);
-            }
-        };
-        // Установите заголовки ответа
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + game.getName() + "(" + game.getReleaseDate() + ")" +  (size > 5L * 1024 * 1024 * 1024 ? ".torrent\"" : ".zip\""));
+        Long size = downloadService.getDirectorySizeRecursively(game.getDirectoryPath());
 
-        // Запустите операцию формирования архива в отдельном потоке
-        CompletableFuture.runAsync(() -> {
+        if (size > 5L * 1024 * 1024 * 1024) {
+            long torrentSize;
             try {
-                streamingResponseBody.writeTo(response.getOutputStream());
-                response.flushBuffer();
+                torrentSize = downloadService.getCachedTorrentSize(game.getDirectoryPath());
             } catch (IOException e) {
                 completableFuture.completeExceptionally(e);
+                return completableFuture;
             }
-        });
+            response.setHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(torrentSize));
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + game.getName() + "(" + game.getReleaseDate() + ").torrent\"");
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+            StreamingResponseBody streamingResponseBody = outputStream -> {
+                downloadService.serveCachedTorrent(game.getDirectoryPath(), outputStream, completableFuture);
+            };
+
+            CompletableFuture.runAsync(() -> {
+                try {
+                    streamingResponseBody.writeTo(response.getOutputStream());
+                    response.flushBuffer();
+                } catch (IOException e) {
+                    completableFuture.completeExceptionally(e);
+                }
+            });
+        } else {
+            StreamingZipWriter.ZipManifest manifest;
+            try {
+                manifest = downloadService.buildZipManifest(game.getDirectoryPath());
+            } catch (IOException e) {
+                completableFuture.completeExceptionally(e);
+                return completableFuture;
+            }
+            response.setHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(manifest.zipSize));
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + game.getName() + "(" + game.getReleaseDate() + ").zip\"");
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+            StreamingResponseBody streamingResponseBody = outputStream -> {
+                downloadService.downloadZipWithManifest(game.getDirectoryPath(), outputStream, manifest, completableFuture);
+            };
+
+            CompletableFuture.runAsync(() -> {
+                try {
+                    streamingResponseBody.writeTo(response.getOutputStream());
+                    response.flushBuffer();
+                } catch (IOException e) {
+                    completableFuture.completeExceptionally(e);
+                }
+            });
+        }
 
         return completableFuture;
     }
