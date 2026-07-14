@@ -10,7 +10,7 @@ mvn spring-boot:run                          # run backend locally (needs Postgr
 cd frontend && npm run dev                   # run frontend dev server (:5173, proxies to :8080)
 ```
 
-No Maven wrapper — `mvn` must be on PATH. Java 11 target, `eclipse-temurin:11-jre-alpine` runtime. No tests, no lint/format/typecheck config.
+No Maven wrapper — `mvn` must be on PATH. Java 25 target, `eclipse-temurin:25-jre-alpine` runtime. No tests, no lint/format/typecheck config.
 
 ## Docker
 
@@ -19,12 +19,12 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 
 ## Architecture
 
-- Spring Boot 2.7.1 → `jar` packaging, embedded Tomcat.
+- Spring Boot 4.0.7 → `jar` packaging, embedded Tomcat (max 10 threads).
 - Context path `/game-library` (`application.yml:server.servlet.context-path`).
-- Frontend: separate Vue 3 + Vite + PrimeVue 4 project in `frontend/`, served via Nginx.
+- Frontend: separate Vue 3 + Vite 5 + PrimeVue 4 project in `frontend/`, served via Nginx.
 - API: JSON REST (`/game-library/api/**`) with JWT auth; Swagger UI at `/game-library/swagger-ui.html`.
 - Legacy Thymeleaf views still work alongside REST (dual auth: form login + JWT).
-- PostgreSQL 16 schema `library`, managed via Commons DBCP 1.4 + JPA (Hibernate 5.6.15).
+- PostgreSQL 16 schema `library`, JPA (Hibernate managed by Boot 4.x) + HikariCP pool.
 - Auth: Spring Security, form login + JWT, BCrypt, `ROLE_ADMIN`/`ROLE_USER`.
 - Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission 4.1.2 RPC for seeding.
 - Images: DB bytea with optional filesystem override at `images.directory/games/{id}/logo.jpg` (or `screenshots/`, `avatars/`).
@@ -93,7 +93,7 @@ PsxDataCenter (psxdatacenter.com) — скрапер для PS1 и PS2 без к
 - **TTORRENT_HASHING_THREADS** env var controls hashing parallelism for torrent creation. Default `2`. Set lower on low-CPU NAS to avoid I/O saturation.
 - `Game.java` is a decompiled `.class` → `@Entity` uses annotated getters, not fields. Keep this pattern.
 - **Frontend must be built separately** before Docker (`npm run build` or `make build-frontend`). Dev server (`npm run dev`) proxies `/game-library/*` to `:8080`.
-- **OkHttp 3.x API order**: `RequestBody.create(MediaType, String)` — MediaType first.
+- **OkHttp 4.x API order**: `RequestBody.create(MediaType, String)` — MediaType first.
 - **Transmission must be running** for torrent seeding. In Docker it starts automatically; for local dev run `docker run lscr.io/linuxserver/transmission`.
 - **Multi-stage Docker build** requires Docker 19.03+ and BuildKit.
 - **Tracker announce URL** must be reachable from user torrent clients. Set `TRACKER_ANNOUNCE_URL` to your NAS IP/hostname in `docker-compose.yml`.
@@ -103,7 +103,7 @@ PsxDataCenter (psxdatacenter.com) — скрапер для PS1 и PS2 без к
     "preferred_transports": ["utp", "tcp"],
     "utp-enabled": true
     ```
-  - The container init script (`init-transmission-config/run`) does NOT process `TRANSMISSION_*` env vars (only `USER`, `PASS`, `WHITELIST`, etc.), so `TRANSMISSION_UTP_ENABLED=true` in docker-compose.yml has **no effect**. The fix must be done directly in the host `settings.json` — it survives restarts because the init script doesn't touch these keys.
+  - The container does NOT process `TRANSMISSION_*` env vars (only `USER`, `PASS`, `WHITELIST`, etc.), so `TRANSMISSION_UTP_ENABLED=true` in docker-compose.yml has **no effect**. The fix must be done directly in the host `settings.json`.
   - After editing, `docker-compose restart transmission`.
 - **WorldArt screenshot bucket formula**: `((id + 9999) / 10000) * 10000` in `WorldArtScraper.java:220`. World-art.ru stores images in `img/{bucket}/{id}/{num}.jpg` where bucket is a rounded `10000 * ceil(id/10000)`. The optimize_b path format is `img/converted_images_{bucket}/optimize_b/{id}-{num}-optimize_b.jpg`.
 - **Images**: served from DB bytea. Optionally, files at `images.directory/games/{id}/logo.jpg` (or `screenshots/`, `avatars/`) override DB — useful for manual replacement.
@@ -119,3 +119,15 @@ PsxDataCenter (psxdatacenter.com) — скрапер для PS1 и PS2 без к
 - **Save redirects to game card** (`GameEditView.vue:299-301`). `handleSave()` при успехе делает `router.replace(\`/game/\${route.params.id}\`)` — уходит на карточку, а не остаётся на странице редактирования. `replace` вместо `push`, чтобы кнопка «назад» вела в Library, не возвращаясь на редактор.
 - **Back-to-library arrow** (`GameDetailView.vue:19`). На карточке игры есть кнопка `←` (`router.push('/')`).
 - **Library state сохраняется в sessionStorage** (`LibraryView.vue`). Перед уходом со страницы Library (`onBeforeUnmount`) состояние (страница, поиск, платформы, годы, жанры, сортировка) пишется в `sessionStorage.libraryState`. При монтировании Library проверяет наличие сохранённого состояния и восстанавливает его. При сбросе фильтров сохранённое состояние удаляется. Это позволяет вернуться на ту же страницу с теми же фильтрами после просмотра/редактирования игры, даже после F5.
+- **Virtual threads enabled** (`application.yml:spring.threads.virtual.enabled: true`). Все сервлетные запросы и асинхронные задачи используют виртуальные треды Java 25 (Project Loom). Это даёт высокую конкурентность при малом пуле потоков Tomcat (max 10).
+- **Streaming ZIP без сжатия** (`StreamingZipWriter.java`). ZIP-архив пишется методом STORED (без compression), с CRC32 data descriptor. `ZipManifest` предвычисляет размер на лету для заголовка Content-Length. Это позволяет стримить архивы >5 ГБ без буферизации.
+- **Download preview (prepare-download)**. Для игр ≥5 ГБ запускается асинхронная задача `TorrentTaskService`, которая готовит .torrent-файл в фоне. Статус проверяется через `GET /api/download/prepare-status/{taskId}`. После готовности клиенту отдаётся .torrent для скачивания через Transmission.
+- **Admin password reset → `qwerty1234`** (`UserDataService.java:34`). При сбросе пароля админом пользователю устанавливается пароль `qwerty1234` (hardcoded).
+- **`GET /downloads/aria2-version` проверяет Transmission, не Aria2**. Эндпоинт назван legacy, но на самом деле проверяет connectivity с Transmission RPC. Возвращает `"Transmission is connected"` / `"Transmission is not available"`.
+- **Route transition — cross-fade** (`App.vue:9`). Переходы между страницами используют `<Transition name="route-fade">` без `mode="out-in"`. Старый контент затухает одновременно с появлением нового — без белых вспышек. `.main-container` имеет `background-color: var(--p-surface-50)` (light) / `var(--p-surface-950)` (dark).
+- **AppHeader — full-width background + centered content** (`AppHeader.vue`). Меню фиксировано сверху, фон растянут на всю ширину через `app-header-wrapper`. Внутренний `Menubar` центрирован с `max-width: 1400px` — левый край совпадает с фильтром, правый — со списком игр.
+- **primeflex.css — кастомный utility framework** (`frontend/src/assets/styles/primeflex.css`, ~20k строк). Самописный CSS-фреймворк с классами для grid, flex, spacing, colors, surfaces. Не является npm-пакетом.
+- **i18n — кастомный composable без библиотеки** (`useI18n.js`). Встроенный словарь на 179 ключей (RU/EN) без vue-i18n. При смене языка — `window.location.reload()` для перезапуска приложения.
+- **Debounced filter (250ms)** (`GameFilter.vue`). Все поля фильтра (поиск, платформы, годы, жанры, сортировка) имеют `watch` с debounce 250ms и авто-применением. Отдельной кнопки Apply нет.
+- **Сканирование ФС в две фазы** (`GameScanerService.java`). Phase 1: запись метаданных в БД (без bytea). Phase 2: добавление изображений с `entityManager.clear()` после каждой игры — предотвращает OOM при больших библиотеках.
+- **OkHttpClient — единый инстанс** (`AppConfig.java`). Настроен в `@Bean OkHttpClient` с 30s timeout, Mozilla User-Agent. Используется всеми скраперами через `JsoupHelper`.
