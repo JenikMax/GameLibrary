@@ -1,11 +1,7 @@
 <template>
   <div class="app-header-wrapper">
     <Menubar :model="items" class="app-header">
-      <template #start>
-        <a style="display:flex;align-items:center;gap:0.5rem;cursor:pointer" @click="goToLibrary">
-          <img :src="'/game-library/img/logo_w.jpg'" height="32" alt="logo" />
-        </a>
-      </template>
+
       <template #end>
         <div class="flex align-items-center gap-2">
           <LocaleSwitcher />

@@ -6,7 +6,7 @@
     <AppHeader v-if="authStore.isAuthenticated" />
     <div class="main-container" :class="{ 'with-header': authStore.isAuthenticated }">
       <router-view v-slot="{ Component, route }">
-        <Transition name="route-fade">
+        <Transition name="route-fade" mode="out-in">
           <component :is="Component" :key="route.path" />
         </Transition>
       </router-view>
