@@ -1,40 +1,42 @@
 <template>
-  <Menubar :model="items" class="app-header">
-    <template #start>
-      <a style="display:flex;align-items:center;gap:0.5rem;cursor:pointer" @click="goToLibrary">
-        <img :src="'/game-library/img/logo_w.jpg'" height="32" alt="logo" />
-      </a>
-    </template>
-    <template #end>
-      <div class="flex align-items-center gap-2">
-        <LocaleSwitcher />
-        <Button
-          :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
-          severity="secondary"
-          text
-          rounded
-          @click="toggleDarkMode"
-          v-tooltip.left="isDarkMode ? t('nav.dark') : t('nav.light')"
-        />
-        <Avatar
-          :image="authStore.avatarUrl || '/game-library/img/user.png'"
-          shape="circle"
-          size="small"
-          v-tooltip.left="authStore.username"
-          @click="goToProfile"
-          class="cursor-pointer"
-        />
-        <Button
-          icon="pi pi-sign-out"
-          severity="danger"
-          text
-          rounded
-          @click="handleLogout"
-          v-tooltip.left="t('nav.logout')"
-        />
-      </div>
-    </template>
-  </Menubar>
+  <div class="app-header-wrapper">
+    <Menubar :model="items" class="app-header">
+      <template #start>
+        <a style="display:flex;align-items:center;gap:0.5rem;cursor:pointer" @click="goToLibrary">
+          <img :src="'/game-library/img/logo_w.jpg'" height="32" alt="logo" />
+        </a>
+      </template>
+      <template #end>
+        <div class="flex align-items-center gap-2">
+          <LocaleSwitcher />
+          <Button
+            :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
+            severity="secondary"
+            text
+            rounded
+            @click="toggleDarkMode"
+            v-tooltip.left="isDarkMode ? t('nav.dark') : t('nav.light')"
+          />
+          <Avatar
+            :image="authStore.avatarUrl || '/game-library/img/user.png'"
+            shape="circle"
+            size="small"
+            v-tooltip.left="authStore.username"
+            @click="goToProfile"
+            class="cursor-pointer"
+          />
+          <Button
+            icon="pi pi-sign-out"
+            severity="danger"
+            text
+            rounded
+            @click="handleLogout"
+            v-tooltip.left="t('nav.logout')"
+          />
+        </div>
+      </template>
+    </Menubar>
+  </div>
 </template>
 
 <script setup>
@@ -131,12 +133,20 @@ function handleLogout() {
 </script>
 
 <style scoped>
-.app-header {
+.app-header-wrapper {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
+  background: var(--p-menubar-background, var(--p-surface-0, #ffffff));
+  border-bottom: 1px solid var(--p-menubar-border-color, var(--p-surface-200, #e5e7eb));
+}
+.app-header {
+  max-width: 1400px;
+  margin: 0 auto;
   border-radius: 0;
+  width: 100%;
+  border: none;
 }
 </style>

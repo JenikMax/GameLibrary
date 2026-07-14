@@ -6,7 +6,7 @@
     <AppHeader v-if="authStore.isAuthenticated" />
     <div class="main-container" :class="{ 'with-header': authStore.isAuthenticated }">
       <router-view v-slot="{ Component, route }">
-        <Transition name="route-fade" mode="out-in">
+        <Transition name="route-fade">
           <component :is="Component" :key="route.path" />
         </Transition>
       </router-view>
@@ -35,6 +35,10 @@ const { isDarkMode } = useDarkMode()
 }
 .main-container {
   min-height: 100vh;
+  background-color: var(--p-surface-50);
+}
+.app-dark .main-container {
+  background-color: var(--p-surface-950);
 }
 .main-container.with-header {
   min-height: calc(100vh - 60px);
