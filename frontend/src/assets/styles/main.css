@@ -39,3 +39,57 @@ a {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
+
+/* Image fade-in on load */
+.img-fade {
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
+}
+.img-fade.loaded {
+  opacity: 1;
+}
+
+/* Skeleton placeholder for loading images */
+.img-skeleton {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    rgba(128, 128, 128, 0.08) 30%,
+    rgba(128, 128, 128, 0.18) 50%,
+    rgba(128, 128, 128, 0.08) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite linear;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Card list transition (pagination + filters) */
+.card-list-enter-active {
+  transition: all 0.3s ease-out;
+}
+.card-list-leave-active {
+  transition: all 0.25s ease-in;
+  position: absolute;
+}
+.card-list-enter-from {
+  opacity: 0;
+  transform: translateY(15px);
+}
+.card-list-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* Route fade transition (navigation between views) */
+.route-fade-enter-active,
+.route-fade-leave-active {
+  transition: opacity 0.2s ease-out;
+}
+.route-fade-enter-from,
+.route-fade-leave-to {
+  opacity: 0;
+}

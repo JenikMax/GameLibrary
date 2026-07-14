@@ -68,12 +68,16 @@
                 <label>{{ t('game.field.screenshots') }}</label>
                 <div class="screenshots-grid">
                   <div v-for="ss in existingScreenshots" :key="ss.id" class="screenshot-item">
-                    <img :src="ss.url" alt="screenshot" class="screenshot-thumb" />
+                    <img :src="ss.url" alt="screenshot"
+                         class="screenshot-thumb img-fade"
+                         :class="{ loaded: existingSsLoaded[ss.id] }"
+                         @load="existingSsLoaded[ss.id] = true"
+                         @error="existingSsLoaded[ss.id] = true" />
                     <Button icon="pi pi-trash" severity="danger" text rounded size="small"
                       class="screenshot-delete-btn" @click="removeExistingScreenshot(ss.id)" />
                   </div>
                   <div v-for="(preview, i) in newScreenshotPreviews" :key="'new-'+i" class="screenshot-item">
-                    <img :src="preview" alt="new screenshot" class="screenshot-thumb" />
+                    <img :src="preview" alt="new screenshot" class="screenshot-thumb img-fade loaded" />
                     <Button icon="pi pi-trash" severity="danger" text rounded size="small"
                       class="screenshot-delete-btn" @click="removeNewScreenshot(i)" />
                   </div>
@@ -95,11 +99,14 @@
           <template #title>{{ t('game.logo') }}</template>
           <template #content>
             <div class="flex flex-column align-items-center gap-2">
-              <img v-if="logoPreview" :src="logoPreview" class="logo-preview" alt="logo preview" />
-  <img v-else
-       :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
-       class="logo-preview"
-       alt="current logo" />
+              <img v-if="logoPreview" :src="logoPreview" class="logo-preview img-fade loaded" alt="logo preview" />
+              <img v-else
+                   :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
+                   class="logo-preview img-fade"
+                   :class="{ loaded: logoLoaded }"
+                   alt="current logo"
+                   @load="logoLoaded = true"
+                   @error="logoLoaded = true" />
               <Button :label="t('game.change_logo')" icon="pi pi-image" severity="secondary" size="small"
                 @click="$refs.logoInput.click()" />
               <input ref="logoInput" type="file" accept="image/*" class="hidden-input" @change="handleLogoUpload" />
@@ -145,7 +152,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
 import { gamesApi } from '../api/games'
@@ -170,6 +177,8 @@ const saving = ref(false)
 const scraping = ref(false)
 const error = ref('')
 const success = ref('')
+const logoLoaded = ref(false)
+const existingSsLoaded = reactive({})
 
 const form = ref({
   name: '',

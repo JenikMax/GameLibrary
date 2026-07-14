@@ -41,18 +41,17 @@
             @page="onPageChange"
           />
         </div>
-        <div class="game-grid">
+        <TransitionGroup name="card-list" tag="div" class="game-grid">
           <GameCard v-for="game in store.games" :key="game.id" :game="game" />
+        </TransitionGroup>
+        <div v-if="store.totalItems > store.pageSize" class="flex justify-content-center mt-4">
+          <Paginator
+            :first="(store.currentPage - 1) * store.pageSize"
+            :rows="store.pageSize"
+            :totalRecords="store.totalItems"
+            @page="onPageChange"
+          />
         </div>
-      </div>
-
-      <div v-if="store.totalItems > store.pageSize" class="flex justify-content-center mt-4">
-        <Paginator
-          :first="(store.currentPage - 1) * store.pageSize"
-          :rows="store.pageSize"
-          :totalRecords="store.totalItems"
-          @page="onPageChange"
-        />
       </div>
     </main>
   </div>

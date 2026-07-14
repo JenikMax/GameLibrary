@@ -5,7 +5,11 @@
         <img
           :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
           :alt="game.name"
-          class="game-card-img"
+          class="game-card-img img-fade"
+          :class="{ loaded: imgLoaded }"
+          loading="lazy"
+          @load="imgLoaded = true"
+          @error="imgLoaded = true"
         />
       </div>
     </template>
@@ -53,7 +57,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
 import { useLibraryStore } from '../stores/library'
@@ -69,6 +73,7 @@ const props = defineProps({
 const router = useRouter()
 const { t } = useI18n()
 const libraryStore = useLibraryStore()
+const imgLoaded = ref(false)
 
 onMounted(() => {
   if (!libraryStore.filterOptions.genres?.length) {
@@ -109,7 +114,7 @@ function downloadGame() {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s;
+  transition: transform 0.3s, opacity 0.35s ease-out;
 }
 .game-card-img-wrapper:hover .game-card-img {
   transform: scale(1.05);

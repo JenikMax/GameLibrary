@@ -4,7 +4,7 @@
   </div>
   <div v-else-if="game" class="game-detail-container">
     <div class="game-main">
-      <div class="game-poster">
+      <div class="game-poster poster-fade">
         <Image
           :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
           :alt="game.name"
@@ -72,8 +72,11 @@
           :key="i"
           :src="url"
           alt="screenshot"
-          class="screenshot-thumb"
+          class="screenshot-thumb img-fade"
+          :class="{ loaded: screenshotLoaded[i] }"
           @click="openGallery(i)"
+          @load="screenshotLoaded[i] = true"
+          @error="screenshotLoaded[i] = true"
         />
       </div>
     </div>
@@ -86,7 +89,7 @@
         <Button icon="pi pi-chevron-left" text severity="secondary" rounded
           class="nav-btn" @click="prevImage" :disabled="viewerIndex <= 0" />
         <div class="viewer-image-wrap">
-          <img :src="game.screenshotUrls[viewerIndex]" class="viewer-image" alt="screenshot" />
+          <img :src="game.screenshotUrls[viewerIndex]" class="viewer-image viewer-fade" :key="viewerIndex" alt="screenshot" />
         </div>
         <Button icon="pi pi-chevron-right" text severity="secondary" rounded
           class="nav-btn" @click="nextImage" :disabled="viewerIndex >= game.screenshotUrls.length - 1" />
@@ -101,7 +104,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useLibraryStore } from '../stores/library'
@@ -140,6 +143,7 @@ const toast = useToast()
 const viewerVisible = ref(false)
 const viewerIndex = ref(0)
 const viewerRef = ref(null)
+const screenshotLoaded = reactive({})
 
 function genreName(code) {
   return libraryStore.genreMap[code] || code
@@ -412,6 +416,13 @@ function onViewerKeydown(e) {
   gap: 0.5rem;
   margin-top: 1rem;
 }
+.poster-fade {
+  animation: posterEnter 0.4s ease-out;
+}
+@keyframes posterEnter {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
 .screenshot-thumb {
   width: 100%;
   height: 150px;
@@ -439,6 +450,13 @@ function onViewerKeydown(e) {
   max-height: 80vh;
   object-fit: contain;
   border-radius: 4px;
+}
+.viewer-fade {
+  animation: viewerEnter 0.25s ease-out;
+}
+@keyframes viewerEnter {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .nav-btn {
   flex-shrink: 0;
