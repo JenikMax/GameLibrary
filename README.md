@@ -351,23 +351,37 @@ cp .env.example .env
 Create on host before launching:
 
 ```
-/mnt/nas/gameLibrary/              # library root
-├── games/                         # game files (PC, PS3, ...)
-├── images/                        # screenshots and covers
-└── gameLibraryConfigs/
-    ├── db/                        # PostgreSQL data (Docker volume)
-    └── tracker/                   # Transmission-related
-        ├── config/                # settings.json (auto-created)
-        ├── watch/                 # auto-add .torrent
-        ├── complete/              # completed downloads
-        ├── incomplete/            # incomplete downloads
-        └── torrents/              # .torrent files from backend
+/mnt/nas/gameLibrary/                  # Games root (mount → backend:/gameLibrary)
+├── games/                             # Game files (PC, PS3, ...)
+├── images/                            # Screenshots and covers
+└── gameLibraryConfigs/                # Config files
+    ├── db/data/                       # PostgreSQL data (mount → postgresdb:/var/lib/postgresql/data)
+    └── tracker/
+        ├── config/                    # Transmission settings.json (auto-created)
+        ├── watch/                     # Auto-add .torrent files
+        ├── complete/                  # Completed downloads
+        ├── incomplete/                # Incomplete downloads (resume)
+        └── torrents/                  # .torrent files from backend (mount → backend:/torrentDirTmp)
 ```
 
 ```bash
-mkdir -p /mnt/nas/gameLibrary/games
-mkdir -p /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/{config,watch,complete,incomplete,torrents}
+# Create the full directory structure at once:
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,tracker/{config,watch,complete,incomplete,torrents}}}
 ```
+
+> **Volume reference** — each path in `docker-compose.yml` serves a specific purpose:
+>
+> | Host path | Container path | Service | Purpose |
+> |-----------|---------------|---------|---------|
+> | `.../db/data` | `/var/lib/postgresql/data` | postgresdb | PostgreSQL database files |
+> | `...` (games root) | `/gameLibrary` | backend | Game files + images (games/, images/) |
+> | `.../tracker/torrents` | `/torrentDirTmp` | backend | Temporary .torrent files |
+> | `.../scrapers` | `/scraper-config` | backend | Scraper config (scrapers-config.json) |
+> | `.../games` | `/downloads/games` | transmission | Game files for seeding |
+> | `.../tracker/config` | `/config` | transmission | Transmission settings.json |
+> | `.../tracker/watch` | `/watch` | transmission | Auto-add .torrent directory |
+> | `.../tracker/complete` | `/downloads/complete` | transmission | Completed downloads |
+> | `.../tracker/incomplete` | `/downloads/incomplete` | transmission | Incomplete downloads |
 
 #### Quick start
 
@@ -799,23 +813,37 @@ cp .env.example .env
 Создать на хосте перед запуском:
 
 ```
-/mnt/nas/gameLibrary/              # корень библиотеки
-├── games/                         # игровые файлы
-├── images/                        # скриншоты и обложки
-└── gameLibraryConfigs/
-    ├── db/                        # данные PostgreSQL (volume)
-    └── tracker/                   # Transmission
-        ├── config/                # settings.json (авто-создание)
-        ├── watch/                 # авто-добавление .torrent
-        ├── complete/              # завершённые
-        ├── incomplete/            # незавершённые
-        └── torrents/              # .torrent от backend
+/mnt/nas/gameLibrary/                  # Корень библиотеки (mount → backend:/gameLibrary)
+├── games/                             # Файлы игр (PC, PS3, ...)
+├── images/                            # Скриншоты и обложки
+└── gameLibraryConfigs/                # Конфигурационные файлы
+    ├── db/data/                       # Данные PostgreSQL (mount → postgresdb:/var/lib/postgresql/data)
+    └── tracker/
+        ├── config/                    # Transmission settings.json (авто-создание)
+        ├── watch/                     # Авто-добавление .torrent
+        ├── complete/                  # Завершённые загрузки
+        ├── incomplete/                # Незавершённые загрузки (докачка)
+        └── torrents/                  # .torrent от backend (mount → backend:/torrentDirTmp)
 ```
 
 ```bash
-mkdir -p /mnt/nas/gameLibrary/games
-mkdir -p /mnt/nas/gameLibrary/gameLibraryConfigs/tracker/{config,watch,complete,incomplete,torrents}
+# Создать полную структуру каталогов одной командой:
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,tracker/{config,watch,complete,incomplete,torrents}}}
 ```
+
+> **Справочник томов** — для чего каждый путь в `docker-compose.yml`:
+>
+> | Путь на хосте | Путь в контейнере | Сервис | Назначение |
+> |--------------|-------------------|--------|------------|
+> | `.../db/data` | `/var/lib/postgresql/data` | postgresdb | Файлы базы данных PostgreSQL |
+> | `...` (корень) | `/gameLibrary` | backend | Файлы игр + изображения (games/, images/) |
+> | `.../tracker/torrents` | `/torrentDirTmp` | backend | Временные .torrent-файлы |
+> | `.../scrapers` | `/scraper-config` | backend | Конфиги скраперов (scrapers-config.json) |
+> | `.../games` | `/downloads/games` | transmission | Файлы игр для раздачи |
+> | `.../tracker/config` | `/config` | transmission | Настройки Transmission settings.json |
+> | `.../tracker/watch` | `/watch` | transmission | Авто-добавление .torrent |
+> | `.../tracker/complete` | `/downloads/complete` | transmission | Завершённые загрузки |
+> | `.../tracker/incomplete` | `/downloads/incomplete` | transmission | Незавершённые загрузки |
 
 #### Быстрый старт
 

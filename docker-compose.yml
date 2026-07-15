@@ -6,6 +6,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
+      # Данные PostgreSQL (БД). Хранятся между перезапусками контейнера.
       - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/db/data:/var/lib/postgresql/data
       #- /host_mnt/f/Work/Git/my_project/db/data:/var/lib/postgresql/data  #рабочий пример
     environment:
@@ -49,10 +50,13 @@ services:
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
       - TTORRENT_HASHING_THREADS=2
     volumes:
+      # Корень библиотеки игр. Внутри контейнера: games/ (файлы игр), images/ (скриншоты, обложки).
       - /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
       #- /host_mnt/f/Work/Git/my_project/data:/gameLibrary  #рабочий пример
+      # Временная директория для созданных .torrent-файлов (TorrentTaskService).
       - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents:/torrentDirTmp
       #- /host_mnt/f/Work/Git/my_project/data/tDir:/torrentDirTmp  #рабочий пример
+      # Конфигурация скраперов (scrapers-config.json). Редактируется через админку или напрямую.
       - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/scrapers:/scraper-config
       #- /host_mnt/f/Work/Git/my_project/data/tDir/scrapers:/scraper-config
     depends_on:
@@ -82,14 +86,19 @@ services:
       - "51413:51413"
       - "51413:51413/udp"
     volumes:
+      # Файлы игр, которые Transmission будет раздавать (та же директория, что и в GAMES_DIRECTORY).
       #- /host_mnt/f/Work/Git/my_project/data/games:/downloads/games
       - /host_mnt/d/Work/MyProjects/gametest/games:/downloads/games
+      # Настройки Transmission (settings.json). После первого запуска файл создаётся автоматически.
       #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/config:/config
       - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/config:/config
+      # Авто-добавление .torrent-файлов (положите .torrent → Transmission подхватит).
       #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/watch:/watch
       - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/watch:/watch
+      # Завершённые загрузки.
       #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/complete:/downloads/complete
       - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/complete:/downloads/complete
+      # Незавершённые загрузки (докачка).
       #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
       - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
     environment:
