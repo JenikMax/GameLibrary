@@ -230,6 +230,7 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Directory with `scrapers-config.json` |
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Temp directory for .torrent files |
 | `TTORRENT_HASHING_THREADS` | `2` | Threads for torrent hashing (lower on low-CPU NAS) |
+| `CORS_ALLOWED_ORIGINS` | *(empty — same-origin only)* | Allowed CORS origins (comma-separated), e.g. `http://nas.local:8090`. Required if accessing backend directly (not through Nginx reverse proxy on port 80) |
 | `RESET_PASSWORD_DEFAULT` | *(auto-generated)* | Override default password for admin password-reset |
 
 ### Database Schema
@@ -486,6 +487,7 @@ npm run dev
 | Transmission not responding | Wrong RPC URL or IPv6 bind | Set `TRANSMISSION_RPC_URL`; change `rpc-bind-address` to `0.0.0.0` |
 | Tracker works but no data transfer | uTP disabled | Set `preferred_transports: ["utp", "tcp"]` in Transmission `settings.json` |
 | `no suitable method found for create` | OkHttp version mismatch | Use `RequestBody.create(MediaType, String)` (4.x API — MediaType first) |
+| `403 Invalid CORS request` | `CORS_ALLOWED_ORIGINS` not set | Add `CORS_ALLOWED_ORIGINS=http://your-host:port` to `.env` and ensure it's in `docker-compose.yml` → `backend.environment` |
 
 ---
 
@@ -677,6 +679,7 @@ make all                      # сборка backend + frontend, запуск do
 | `SCRAPER_ENCRYPTION_KEY` | не задан | AES-256 ключ (base64) для шифрования API-ключей. **Обязателен.** Сгенерировать: `openssl rand -base64 32` |
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная папка для .torrent файлов |
 | `TTORRENT_HASHING_THREADS` | `2` | Потоков для хеширования торрентов (меньше на слабых NAS) |
+| `CORS_ALLOWED_ORIGINS` | *(пусто — только same-origin)* | Разрешённые CORS-источники (через запятую), например `http://nas.local:8090`. Нужен при прямом доступе к API (не через Nginx reverse-proxy на порту 80) |
 
 ### База данных
 
@@ -932,3 +935,4 @@ npm run dev
 | Transmission не отвечает | Неверный RPC URL или IPv6 | Указать `TRANSMISSION_RPC_URL`; сменить `rpc-bind-address` на `0.0.0.0` |
 | Трекер работает, данных нет | Выключен uTP | Установить `preferred_transports: ["utp", "tcp"]` в `settings.json` |
 | `no suitable method found for create` | Не та версия OkHttp | OkHttp 4.x: `RequestBody.create(MediaType, String)` — MediaType first |
+| `403 Invalid CORS request` | Не задан `CORS_ALLOWED_ORIGINS` | Добавить `CORS_ALLOWED_ORIGINS=http://ваш-хост:порт` в `.env` и убедиться, что переменная есть в `docker-compose.yml` → `backend.environment` |
