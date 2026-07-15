@@ -53,7 +53,7 @@
 | 💬 Comments on game pages | |
 | 🔔 Notifications (torrent ready, scan done, etc.) | |
 | 👁 View history (last 20, stored in localStorage) | |
-| 🔗 Related games (same platform, genre, or similar name) | |
+| 🔗 Related games (same genre or similar name) | |
 
 ## ⚡ Quick Start
 
@@ -129,7 +129,7 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `POST /auth/register` | all | Register new user |
 | `GET /auth/me` | USER, ADMIN | Current user info |
 | **Games** | | |
-| `GET /games` | USER, ADMIN | Game list (filters, sort, page) |
+| `GET /games` | USER, ADMIN | Game list (filters, sort, page, `favoritesOnly`) |
 | `GET /games/filter-options` | USER, ADMIN | Years, platforms, genres for filter UI |
 | `GET /games/scrapers` | USER, ADMIN | List enabled scraper sources |
 | `GET /games/{id}` | USER, ADMIN | Game details |
@@ -146,7 +146,7 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `GET /games/{id}/comments` | USER, ADMIN | Get game comments |
 | `POST /games/{id}/comments` | USER, ADMIN | Add comment |
 | `DELETE /games/{id}/comments/{commentId}` | USER, ADMIN | Delete own comment |
-| `GET /games/{id}/related` | USER, ADMIN | Related games by platform/genre/name |
+| `GET /games/{id}/related` | USER, ADMIN | Related games by genre/name (same platform removed) |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Torrent preparation task status |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Seed task status |
@@ -509,7 +509,7 @@ npm run dev
 | 💬 Комментарии на странице игры | |
 | 🔔 Уведомления (торрент готов, сканирование завершено и т.д.) | |
 | 👁 История просмотров (последние 20, localStorage) | |
-| 🔗 Связанные игры (платформа, жанр, похожее название) | |
+| 🔗 Связанные игры (жанр или похожее название) | |
 
 ## ⚡ Быстрый старт
 
@@ -585,7 +585,7 @@ make all                      # сборка backend + frontend, запуск do
 | `POST /auth/register` | все | Регистрация |
 | `GET /auth/me` | USER, ADMIN | Текущий пользователь |
 | **Games** | | |
-| `GET /games` | USER, ADMIN | Список игр (фильтры, сортировка, стр.) |
+| `GET /games` | USER, ADMIN | Список игр (фильтры, сортировка, стр., `favoritesOnly`) |
 | `GET /games/filter-options` | USER, ADMIN | Годы, платформы, жанры для UI фильтра |
 | `GET /games/scrapers` | USER, ADMIN | Список включённых скраперов |
 | `GET /games/{id}` | USER, ADMIN | Детали игры |
@@ -602,7 +602,7 @@ make all                      # сборка backend + frontend, запуск do
 | `GET /games/{id}/comments` | USER, ADMIN | Получить комментарии |
 | `POST /games/{id}/comments` | USER, ADMIN | Добавить комментарий |
 | `DELETE /games/{id}/comments/{commentId}` | USER, ADMIN | Удалить свой комментарий |
-| `GET /games/{id}/related` | USER, ADMIN | Связанные игры |
+| `GET /games/{id}/related` | USER, ADMIN | Связанные игры (жанр или похожее название) |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Статус подготовки торрента |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Статус раздачи |
