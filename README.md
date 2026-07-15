@@ -23,6 +23,7 @@
 <p align="center">
   <a href="#-features">Features</a> &nbsp;•&nbsp;
   <a href="#-quick-start">Quick Start</a> &nbsp;•&nbsp;
+  <a href="instruction.md">📖 Full Instructions</a> &nbsp;•&nbsp;
   <a href="#-tech-stack">Tech Stack</a> &nbsp;•&nbsp;
   <a href="#-architecture">Architecture</a> &nbsp;•&nbsp;
   <a href="#-configuration">Configuration</a> &nbsp;•&nbsp;
@@ -67,6 +68,8 @@ make all                      # builds backend + frontend, starts docker-compose
 ```
 
 Opens at `http://localhost` — login as `admin` / `password`.
+
+> 📖 **Step-by-step deployment guide for beginners** → [instruction.md](instruction.md) (setup, scrapers, troubleshooting)
 
 ## 📦 Tech Stack
 
@@ -539,6 +542,8 @@ make all                      # сборка backend + frontend, запуск do
 ```
 
 Открыть `http://localhost` — войти как `admin` / `password`.
+
+> 📖 **Пошаговая инструкция для новичков** → [instruction.md](instruction.md) (развёртывание, настройка скраперов, решение проблем)
 
 ## 📦 Технологический стек
 
