@@ -14,6 +14,7 @@ export const useLibraryStore = defineStore('library', () => {
   const selectedGenres = ref([])
   const sortField = ref('')
   const sortType = ref('')
+  const favoritesOnly = ref(false)
   const filterOptions = ref({ years: [], platforms: [], genres: [] })
   const pageSize = 12
 
@@ -28,7 +29,8 @@ export const useLibraryStore = defineStore('library', () => {
         years: selectedYears.value.length ? selectedYears.value : undefined,
         genres: selectedGenres.value.length ? selectedGenres.value : undefined,
         sortField: sortField.value || undefined,
-        sortType: sortType.value || undefined
+        sortType: sortType.value || undefined,
+        favoritesOnly: favoritesOnly.value || undefined
       })
       const data = response.data
       if (data.success) {
@@ -75,6 +77,7 @@ export const useLibraryStore = defineStore('library', () => {
     selectedGenres.value = []
     sortField.value = ''
     sortType.value = ''
+    favoritesOnly.value = false
   }
 
   const genreMap = computed(() => {
@@ -88,7 +91,7 @@ export const useLibraryStore = defineStore('library', () => {
   return {
     games, totalItems, totalPages, currentPage, loading,
     searchText, selectedPlatforms, selectedYears, selectedGenres,
-    sortField, sortType, filterOptions, pageSize, genreMap,
+    sortField, sortType, favoritesOnly, filterOptions, pageSize, genreMap,
     fetchGames, fetchFilterOptions, setSearch, setFilters, setSort, resetFilters
   }
 })

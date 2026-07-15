@@ -27,6 +27,14 @@
         <div class="flex align-items-center gap-2 mb-2">
           <Button icon="pi pi-arrow-left" text @click="$router.push('/')" />
           <h1 class="m-0">{{ game.name }}</h1>
+          <Button
+            v-if="authStore.isAuthenticated"
+            :icon="game.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'"
+            :severity="game.favorited ? 'danger' : 'secondary'"
+            rounded
+            text
+            @click="toggleFav"
+          />
         </div>
         <div class="flex gap-2 flex-wrap mb-3">
           <Tag :value="game.platform" severity="info" />
@@ -104,6 +112,56 @@
       </div>
     </div>
 
+    <Divider />
+    <div class="comments-section">
+      <h3>{{ t('game.comments') }}</h3>
+
+      <div v-if="authStore.isAuthenticated" class="flex gap-2 mb-3">
+        <Textarea
+          v-model="newCommentText"
+          :placeholder="t('game.comment_placeholder')"
+          rows="2"
+          class="w-full"
+          autoResize
+        />
+        <Button
+          :label="t('game.comment_add')"
+          icon="pi pi-send"
+          severity="primary"
+          @click="submitComment"
+          :disabled="!newCommentText.trim()"
+          class="comment-submit-btn"
+        />
+      </div>
+      <small v-else class="text-color-secondary">{{ t('game.comment_login') }}</small>
+
+      <div v-if="comments.length === 0 && !commentsLoading" class="text-color-secondary text-sm">
+        {{ t('game.comment_empty') }}
+      </div>
+      <div v-else-if="commentsLoading" class="flex flex-column gap-2">
+        <Skeleton v-for="i in 3" :key="i" width="100%" height="4rem" />
+      </div>
+      <div v-else class="comments-list">
+        <div v-for="comment in comments" :key="comment.id" class="comment-item">
+          <div class="comment-header">
+            <Avatar :label="comment.username?.[0]?.toUpperCase()" size="small" shape="circle" />
+            <span class="font-semibold text-sm">{{ comment.username }}</span>
+            <small class="text-color-secondary">{{ comment.createdAt }}</small>
+          </div>
+          <p class="comment-text">{{ comment.text }}</p>
+          <Button
+            v-if="comment.canDelete"
+            :label="t('game.comment_delete')"
+            icon="pi pi-trash"
+            size="small"
+            severity="danger"
+            text
+            @click="deleteComment(comment.id)"
+          />
+        </div>
+      </div>
+    </div>
+
     <Dialog v-model:visible="viewerVisible" modal :style="{ width: '90vw', maxWidth: '1000px' }"
       :header="screenshotHeader"
       :dismissableMask="true"
@@ -141,6 +199,8 @@ import Button from 'primevue/button'
 import Divider from 'primevue/divider'
 import Dialog from 'primevue/dialog'
 import Rating from 'primevue/rating'
+import Textarea from 'primevue/textarea'
+import Avatar from 'primevue/avatar'
 import { useToast } from 'primevue/usetoast'
 import { downloadsApi } from '../api/downloads'
 
@@ -169,6 +229,18 @@ const viewerIndex = ref(0)
 const viewerRef = ref(null)
 const screenshotLoaded = reactive({})
 const userRating = ref(0)
+const comments = ref([])
+const commentsLoading = ref(false)
+const newCommentText = ref('')
+
+async function toggleFav() {
+  try {
+    const res = await gamesApi.toggleFavorite(game.value.id)
+    game.value.favorited = res.data.data.favorited
+  } catch {
+    toast.add({ severity: 'error', summary: t('filter.favorites_off'), life: 3000 })
+  }
+}
 
 function genreName(code) {
   return libraryStore.genreMap[code] || code
@@ -190,11 +262,22 @@ const trailerEmbedUrl = computed(() => {
   return match ? `https://www.youtube.com/embed/${match[1]}` : (url && url !== 'N/A' ? url : '')
 })
 
+async function loadComments() {
+  commentsLoading.value = true
+  try {
+    const res = await gamesApi.getComments(route.params.id)
+    comments.value = res.data.data || []
+  } finally {
+    commentsLoading.value = false
+  }
+}
+
 onMounted(async () => {
   try {
     const [gameRes] = await Promise.all([
       gamesApi.getGame(route.params.id),
-      libraryStore.filterOptions.genres?.length ? Promise.resolve() : libraryStore.fetchFilterOptions()
+      libraryStore.filterOptions.genres?.length ? Promise.resolve() : libraryStore.fetchFilterOptions(),
+      loadComments()
     ])
     game.value = gameRes.data.data
     userRating.value = game.value.userRating || 0
@@ -396,6 +479,27 @@ function nextImage() {
   if (viewerIndex.value < game.value.screenshotUrls.length - 1) viewerIndex.value++
 }
 
+async function submitComment() {
+  const text = newCommentText.value.trim()
+  if (!text) return
+  try {
+    const res = await gamesApi.addComment(route.params.id, text)
+    comments.value.unshift(res.data.data)
+    newCommentText.value = ''
+  } catch {
+    toast.add({ severity: 'error', summary: t('game.comment_add'), life: 3000 })
+  }
+}
+
+async function deleteComment(commentId) {
+  try {
+    await gamesApi.deleteComment(route.params.id, commentId)
+    comments.value = comments.value.filter(c => c.id !== commentId)
+  } catch {
+    toast.add({ severity: 'error', summary: t('game.comment_delete'), life: 3000 })
+  }
+}
+
 async function saveRating(val) {
   userRating.value = val
   try {
@@ -517,6 +621,36 @@ function onViewerKeydown(e) {
   left: 0;
   width: 100%;
   height: 100%;
+}
+.comments-section {
+  margin-top: 1rem;
+}
+.comment-submit-btn {
+  align-self: flex-end;
+}
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.comment-item {
+  background: var(--p-surface-100);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+.dark .comment-item {
+  background: var(--p-surface-800);
+}
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+.comment-text {
+  margin: 0.25rem 0;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 @media (max-width: 768px) {
   .game-main {

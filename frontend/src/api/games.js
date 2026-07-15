@@ -33,5 +33,23 @@ export const gamesApi = {
   },
   saveRating(id, rating) {
     return api.post(`/games/${id}/rating`, { rating })
+  },
+  getFavorite(id) {
+    return api.get(`/games/${id}/favorite`)
+  },
+  toggleFavorite(id) {
+    return api.post(`/games/${id}/favorite`)
+  },
+  getFavorites() {
+    return api.get('/games/favorites')
+  },
+  getComments(id) {
+    return api.get(`/games/${id}/comments`)
+  },
+  addComment(id, text) {
+    return api.post(`/games/${id}/comments`, { text })
+  },
+  deleteComment(gameId, commentId) {
+    return api.delete(`/games/${gameId}/comments/${commentId}`)
   }
 }

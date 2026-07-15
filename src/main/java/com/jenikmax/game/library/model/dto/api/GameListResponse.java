@@ -13,6 +13,7 @@ public class GameListResponse {
     private String logoUrl;
     private String logo;
     private Double avgRating;
+    private boolean favorited;
 
     public GameListResponse() {}
 
@@ -42,4 +43,6 @@ public class GameListResponse {
     public void setLogo(String logo) { this.logo = logo; }
     public Double getAvgRating() { return avgRating; }
     public void setAvgRating(Double avgRating) { this.avgRating = avgRating; }
+    public boolean isFavorited() { return favorited; }
+    public void setFavorited(boolean favorited) { this.favorited = favorited; }
 }

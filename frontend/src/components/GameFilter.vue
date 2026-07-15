@@ -80,6 +80,17 @@
           />
         </div>
 
+        <div class="field">
+          <ToggleButton
+            v-model="favoritesOnly"
+            :onLabel="t('filter.favorites_on')"
+            :offLabel="t('filter.favorites_off')"
+            :onIcon="'pi pi-heart-fill'"
+            :offIcon="'pi pi-heart'"
+            class="w-full"
+          />
+        </div>
+
         <div class="flex gap-2">
           <Button :label="t('filter.reset')" icon="pi pi-times" severity="secondary" @click="resetFilters" class="flex-1" />
         </div>
@@ -91,6 +102,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useI18n } from '../composables/useI18n'
+import ToggleButton from 'primevue/togglebutton'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import InputText from 'primevue/inputtext'
@@ -123,6 +135,7 @@ const selectedYears = ref([])
 const selectedGenres = ref([])
 const sortField = ref('')
 const sortType = ref('')
+const favoritesOnly = ref(false)
 const resetting = ref(false)
 
 function restoreState(state) {
@@ -133,6 +146,7 @@ function restoreState(state) {
   selectedGenres.value = state.selectedGenres || []
   sortField.value = state.sortField || ''
   sortType.value = state.sortType || ''
+  favoritesOnly.value = state.favoritesOnly || false
   setTimeout(() => { resetting.value = false }, 300)
 }
 
@@ -148,6 +162,7 @@ watch(selectedYears, debouncedApply, { deep: true })
 watch(selectedGenres, debouncedApply, { deep: true })
 watch(sortField, debouncedApply)
 watch(sortType, debouncedApply)
+watch(favoritesOnly, debouncedApply)
 
 const sortOptions = [
   { label: t('filter.sort_name'), value: 'name' },
@@ -178,7 +193,8 @@ function applyFilters() {
     years: [...selectedYears.value],
     genres: [...selectedGenres.value],
     sortField: sortField.value,
-    sortType: sortType.value
+    sortType: sortType.value,
+    favoritesOnly: favoritesOnly.value
   })
 }
 
@@ -190,6 +206,7 @@ function resetFilters() {
   selectedGenres.value = []
   sortField.value = ''
   sortType.value = ''
+  favoritesOnly.value = false
   resetting.value = false
   emit('reset')
 }

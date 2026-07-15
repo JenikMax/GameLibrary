@@ -40,20 +40,30 @@
     </template>
     <template #footer>
       <div class="flex gap-2 justify-content-between">
+        <div class="flex gap-2">
+          <Button
+            icon="pi pi-info-circle"
+            :label="t('game.details')"
+            severity="help"
+            size="small"
+            v-tooltip.left="t('game.details_tooltip')"
+            @click="goToGame"
+          />
+          <Button
+            icon="pi pi-download"
+            severity="success"
+            size="small"
+            v-tooltip.left="t('game.download_tooltip')"
+            @click="downloadGame"
+          />
+        </div>
         <Button
-          icon="pi pi-info-circle"
-          :label="t('game.details')"
-          severity="help"
+          :icon="game.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'"
+          :severity="game.favorited ? 'danger' : 'secondary'"
           size="small"
-          v-tooltip.left="t('game.details_tooltip')"
-          @click="goToGame"
-        />
-        <Button
-          icon="pi pi-download"
-          severity="success"
-          size="small"
-          v-tooltip.left="t('game.download_tooltip')"
-          @click="downloadGame"
+          rounded
+          @click.stop="toggleFav"
+          v-tooltip.left="t('filter.favorites_off')"
         />
       </div>
     </template>
@@ -96,6 +106,15 @@ function goToGame() {
 
 function downloadGame() {
   window.open(gamesApi.getDownloadUrl(props.game.id), '_blank')
+}
+
+async function toggleFav() {
+  try {
+    const res = await gamesApi.toggleFavorite(props.game.id)
+    props.game.favorited = res.data.data.favorited
+  } catch {
+    // ignore
+  }
 }
 </script>
 

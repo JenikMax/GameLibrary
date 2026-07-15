@@ -1,5 +1,6 @@
 package com.jenikmax.game.library.controller.api;
 
+import com.jenikmax.game.library.dao.api.FavoriteGameRepository;
 import com.jenikmax.game.library.dao.api.GameRatingRepository;
 import com.jenikmax.game.library.dao.api.ScreenshotRepository;
 import com.jenikmax.game.library.model.dto.GameDto;
@@ -39,6 +40,7 @@ public class LibraryController {
     private final String imagesDirectory;
     private final MessageSource messageSource;
     private final GameRatingRepository ratingRepository;
+    private final FavoriteGameRepository favoriteRepository;
     private final UserService userService;
 
     public LibraryController(LibraryService libraryService,
@@ -46,6 +48,7 @@ public class LibraryController {
                              ScraperConfigService scraperConfigService,
                              MessageSource messageSource,
                              GameRatingRepository ratingRepository,
+                             FavoriteGameRepository favoriteRepository,
                              UserService userService,
                              @Value("${game-library.images.directory:/gameLibrary/images}") String imagesDirectory) {
         this.libraryService = libraryService;
@@ -53,6 +56,7 @@ public class LibraryController {
         this.scraperConfigService = scraperConfigService;
         this.messageSource = messageSource;
         this.ratingRepository = ratingRepository;
+        this.favoriteRepository = favoriteRepository;
         this.userService = userService;
         this.imagesDirectory = imagesDirectory;
     }
@@ -74,6 +78,7 @@ public class LibraryController {
             @RequestParam(value = "genres", required = false) List<String> selectedGenres,
             @RequestParam(value = "sortField", required = false) String sortField,
             @RequestParam(value = "sortType", required = false) String sortType,
+            @RequestParam(value = "favoritesOnly", defaultValue = "false") boolean favoritesOnly,
             Locale locale) {
 
         searchText = searchText != null ? searchText : "";
@@ -84,6 +89,15 @@ public class LibraryController {
         sortType = sortType != null ? sortType : "";
 
         List<Long> gameIdList = libraryService.getGameIdList(searchText, selectedPlatforms, selectedYears, selectedGenres, sortField, sortType);
+        if (favoritesOnly) {
+            Long uid = getCurrentUserId();
+            if (uid != null) {
+                List<Long> favIds = favoriteRepository.findGameIdsByUserId(uid);
+                gameIdList.retainAll(favIds);
+            } else {
+                gameIdList.clear();
+            }
+        }
 
         int pageSize = 12;
         int totalPages = (gameIdList.size() + pageSize - 1) / pageSize;
@@ -98,6 +112,7 @@ public class LibraryController {
                 .collect(Collectors.toList());
 
         populateListRatings(items);
+        populateListFavorites(items);
 
         PageResponse<GameListResponse> pageResponse = new PageResponse<>(
                 items, page, totalPages, gameIdList.size(), pageSize);
@@ -276,6 +291,7 @@ public class LibraryController {
         resp.setRatingsCount(ratingRepository.countRatingsByGameId(gameId));
         if (userId != null) {
             ratingRepository.findUserRating(gameId, userId).ifPresent(resp::setUserRating);
+            resp.setFavorited(favoriteRepository.existsByUserIdAndGameId(userId, gameId));
         }
     }
 
@@ -291,6 +307,17 @@ public class LibraryController {
         }
         for (GameListResponse item : items) {
             item.setAvgRating(avgMap.getOrDefault(item.getId(), null));
+        }
+    }
+
+    private void populateListFavorites(List<GameListResponse> items) {
+        Long userId = getCurrentUserId();
+        if (userId == null || items.isEmpty()) return;
+        List<Long> ids = items.stream().map(GameListResponse::getId).collect(Collectors.toList());
+        List<Long> favIds = favoriteRepository.findGameIdsByUserId(userId);
+        Set<Long> favSet = new HashSet<>(favIds);
+        for (GameListResponse item : items) {
+            item.setFavorited(favSet.contains(item.getId()));
         }
     }
 

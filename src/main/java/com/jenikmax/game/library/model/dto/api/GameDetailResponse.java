@@ -20,6 +20,7 @@ public class GameDetailResponse {
     private Double avgRating;
     private Integer userRating;
     private Long ratingsCount;
+    private boolean favorited;
 
     public GameDetailResponse() {}
 
@@ -55,4 +56,6 @@ public class GameDetailResponse {
     public void setUserRating(Integer userRating) { this.userRating = userRating; }
     public Long getRatingsCount() { return ratingsCount; }
     public void setRatingsCount(Long ratingsCount) { this.ratingsCount = ratingsCount; }
+    public boolean isFavorited() { return favorited; }
+    public void setFavorited(boolean favorited) { this.favorited = favorited; }
 }
