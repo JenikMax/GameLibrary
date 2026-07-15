@@ -15,7 +15,7 @@ public interface UserService {
 
     UserDto updateUserPass(UserDto user);
 
-    UserDto resetUserPass(Long userId);
+    String resetUserPass(Long userId);
 
     UserDto changeUserActivity(Long userId, boolean isActive, String currentUsername);
 

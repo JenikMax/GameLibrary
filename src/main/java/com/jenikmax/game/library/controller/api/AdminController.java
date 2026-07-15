@@ -64,11 +64,11 @@ public class AdminController {
     }
 
     @PostMapping("/users/{id}/reset-pass")
-    public ResponseEntity<ApiResponse<Void>> resetPassword(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> resetPassword(@PathVariable Long id) {
         logger.info("REST reset password for user {}", id);
         try {
-            userService.resetUserPass(id);
-            return ResponseEntity.ok(ApiResponse.ok("Password reset successful", null));
+            String newPassword = userService.resetUserPass(id);
+            return ResponseEntity.ok(ApiResponse.ok("Password reset successful", newPassword));
         } catch (Exception e) {
             logger.error("Reset password error", e);
             return ResponseEntity.badRequest().body(ApiResponse.error("Failed to reset password"));

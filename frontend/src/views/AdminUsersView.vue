@@ -33,11 +33,22 @@
             severity="warn"
             text
             v-tooltip.left="t('admin.users.reset_password')"
-            @click="resetPassword(slotProps.data.id)"
+            @click="resetPassword(slotProps.data.id, slotProps.data.name)"
           />
         </template>
       </Column>
     </DataTable>
+
+    <Dialog v-model:visible="resetDialogVisible" :header="t('admin.users.password_reset_dialog_title')" :modal="true" :closable="true">
+      <p>{{ t('admin.users.password_reset_dialog_message', { user: resetDialogUser }) }}</p>
+      <div class="password-display">
+        <InputText :modelValue="resetDialogPassword" readonly fluid />
+        <Button icon="pi pi-copy" severity="info" @click="copyPassword" />
+      </div>
+      <template #footer>
+        <Button :label="t('common.cancel')" @click="resetDialogVisible = false" />
+      </template>
+    </Dialog>
   </div>
 </template>
 
@@ -50,12 +61,18 @@ import Column from 'primevue/column'
 import Avatar from 'primevue/avatar'
 import ToggleSwitch from 'primevue/toggleswitch'
 import Button from 'primevue/button'
+import Dialog from 'primevue/dialog'
+import InputText from 'primevue/inputtext'
 import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
 
 const users = ref([])
 const toast = useToast()
+
+const resetDialogVisible = ref(false)
+const resetDialogUser = ref('')
+const resetDialogPassword = ref('')
 
 onMounted(async () => {
   try {
@@ -84,13 +101,27 @@ async function toggleActive(id, value) {
   }
 }
 
-async function resetPassword(id) {
+async function resetPassword(id, userName) {
   try {
-    await adminApi.resetPassword(id)
-    toast.add({ severity: 'success', summary: t('admin.users.password_reset_success'), life: 3000 })
+    const res = await adminApi.resetPassword(id)
+    resetDialogUser.value = userName
+    resetDialogPassword.value = res.data.data
+    resetDialogVisible.value = true
   } catch {
     toast.add({ severity: 'error', summary: t('admin.users.password_reset_failed'), life: 3000 })
   }
+}
+
+function copyPassword() {
+  const ta = document.createElement('textarea')
+  ta.value = resetDialogPassword.value
+  ta.style.position = 'fixed'
+  ta.style.opacity = '0'
+  document.body.appendChild(ta)
+  ta.select()
+  document.execCommand('copy')
+  document.body.removeChild(ta)
+  toast.add({ severity: 'info', summary: t('admin.users.password_copied'), life: 2000 })
 }
 </script>
 
@@ -99,5 +130,10 @@ async function resetPassword(id) {
   max-width: 1000px;
   margin: 0 auto;
   padding: 1rem;
+}
+.password-display {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 </style>

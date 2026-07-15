@@ -117,6 +117,9 @@ const messages = {
     'admin.users.update_failed': 'Ошибка обновления',
     'admin.users.password_reset_success': 'Пароль сброшен',
     'admin.users.password_reset_failed': 'Ошибка сброса пароля',
+    'admin.users.password_reset_dialog_title': 'Пароль сброшен',
+    'admin.users.password_reset_dialog_message': 'Новый пароль для пользователя {user}:',
+    'admin.users.password_copied': 'Пароль скопирован',
     'profile.role_admin': 'Администратор',
     'profile.role_user': 'Пользователь',
     'profile.change_avatar': 'Сменить аватар',
@@ -322,6 +325,9 @@ const messages = {
     'admin.users.update_failed': 'Update failed',
     'admin.users.password_reset_success': 'Password reset',
     'admin.users.password_reset_failed': 'Reset failed',
+    'admin.users.password_reset_dialog_title': 'Password Reset',
+    'admin.users.password_reset_dialog_message': 'New password for user {user}:',
+    'admin.users.password_copied': 'Password copied',
     'profile.role_admin': 'Admin',
     'profile.role_user': 'User',
     'profile.change_avatar': 'Change Avatar',
@@ -416,9 +422,15 @@ const messages = {
 export function useI18n() {
   const localeStore = useLocaleStore()
 
-  function t(key) {
+  function t(key, params) {
     const dict = messages[localeStore.locale] || messages.en
-    return dict[key] || key
+    let val = dict[key] || key
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        val = val.replace(`{${k}}`, v)
+      }
+    }
+    return val
   }
 
   return { t }

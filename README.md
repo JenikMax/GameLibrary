@@ -276,7 +276,7 @@ cp .env.example .env   # edit secrets before first launch
 | `application.yml` JWT secret | Default fallback if env missing | `${JWT_SECRET}` — must be in env |
 | `postgresdb/ddl/1_init.sql` | Hardcoded password in SQL | `1_init.sh` — reads `${DB_PASSWORD}` from env |
 | `postgresdb/env.list` | Plaintext file in repo | Removed. Secrets via `.env` → docker-compose |
-| `UserDataService.java` | `qwerty1234` hardcoded | `SecureRandom` auto-generate, override via `RESET_PASSWORD_DEFAULT` |
+| `UserDataService.java` | `qwerty1234` hardcoded | `SecureRandom` auto-generate (8 байт, base64), возвращается в ответ API, отображается фронтендом. Переопределяется через `RESET_PASSWORD_DEFAULT` |
 | `ConfigEncryptionService.java` | Ephemeral AES key if env missing | Throws `IllegalStateException` — env is mandatory |
 | `docker-compose.yml` | Inline secrets | `${VAR}` references to `.env` |
 
@@ -724,7 +724,7 @@ cp .env.example .env   # отредактировать перед первым 
 | JWT secret с дефолтом при отсутствии env | `${JWT_SECRET}` — обязателен |
 | `1_init.sql` с паролем в SQL | `1_init.sh` — читает `${DB_PASSWORD}` из env |
 | `env.list` с plaintext в репозитории | Удалён. Секреты через `.env` → docker-compose |
-| `qwerty1234` в коде при сбросе пароля | `SecureRandom` + опция `RESET_PASSWORD_DEFAULT` |
+| `qwerty1234` в коде при сбросе пароля | `SecureRandom` (8 байт, base64) + `RESET_PASSWORD_DEFAULT`. Пароль возвращается в API и отображается в UI |
 | Эфемерный AES-ключ при отсутствии env | `IllegalStateException` — ключ обязателен |
 | Секреты в `docker-compose.yml` inline | `${VAR}` из `.env` |
 

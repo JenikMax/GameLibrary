@@ -32,9 +32,7 @@ public class UserDataService implements UserService {
 
     private final static List<String> BASE_64_EMPTY = Arrays.asList(BASE_64_JPEG_EMPTY, BASE_64_JPG_EMPTY, BASE_64_PNG_EMPTY);
 
-    private final static String DEFAULT_PASS = generateDefaultPass();
-
-    private static String generateDefaultPass() {
+    private static String generatePassword() {
         String envPass = System.getenv("RESET_PASSWORD_DEFAULT");
         if (envPass != null && !envPass.isEmpty()) return envPass;
         SecureRandom sr = new SecureRandom();
@@ -100,13 +98,14 @@ public class UserDataService implements UserService {
     }
 
     @Transactional
-    public UserDto resetUserPass(Long userId){
+    public String resetUserPass(Long userId){
         Optional<User> findResult = userRepository.findById(userId);
         if(!findResult.isPresent()) throw new IllegalArgumentException("UserNotFound");
         User currentUser = findResult.get();
-        currentUser.setPassword(passwordEncoder.encode(DEFAULT_PASS));
+        String newPassword = generatePassword();
+        currentUser.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(currentUser);
-        return getUserInfoByName(currentUser.getUsername());
+        return newPassword;
     }
 
     @Transactional
