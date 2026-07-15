@@ -8,8 +8,9 @@ services:
     volumes:
       #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/db/data:/var/lib/postgresql/data
       - /host_mnt/f/Work/Git/my_project/db/data:/var/lib/postgresql/data  #рабочий пример
-    env_file:
-      - ./postgresdb/env.list
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_PASSWORD=${DB_PASSWORD}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -39,11 +40,12 @@ services:
       - GAMES_DIRECTORY=/gameLibrary
       - IMAGES_DIRECTORY=/gameLibrary/images
       - SCRAPER_CONFIG_DIR=/scraper-config
-      - JWT_SECRET=5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437
+      - JWT_SECRET=${JWT_SECRET}
       # ⚠️ SCRAPER_ENCRYPTION_KEY — ключ шифрования API-ключей скраперов.
       # Если измените — пересохраните API-ключи в админке (/admin/scrapers).
       # Сгенерировать новый: openssl rand -base64 32
-      - SCRAPER_ENCRYPTION_KEY=9TBYQ1SL5z791jiCHB1aEADQG1kbl0Aive+pMA7F1DU=
+      - SCRAPER_ENCRYPTION_KEY=${SCRAPER_ENCRYPTION_KEY}
+      - DB_PASSWORD=${DB_PASSWORD}
       - TTORRENT_HASHING_THREADS=2
     volumes:
       #- /host_mnt/d/Work/MyProjects/gametest:/gameLibrary

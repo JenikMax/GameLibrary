@@ -16,6 +16,7 @@ import org.springframework.util.FileCopyUtils;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -31,7 +32,16 @@ public class UserDataService implements UserService {
 
     private final static List<String> BASE_64_EMPTY = Arrays.asList(BASE_64_JPEG_EMPTY, BASE_64_JPG_EMPTY, BASE_64_PNG_EMPTY);
 
-    private final static String DEFAULT_PASS = "qwerty1234";
+    private final static String DEFAULT_PASS = generateDefaultPass();
+
+    private static String generateDefaultPass() {
+        String envPass = System.getenv("RESET_PASSWORD_DEFAULT");
+        if (envPass != null && !envPass.isEmpty()) return envPass;
+        SecureRandom sr = new SecureRandom();
+        byte[] bytes = new byte[8];
+        sr.nextBytes(bytes);
+        return Base64.getEncoder().withoutPadding().encodeToString(bytes);
+    }
 
 
     private final UserRepository userRepository;

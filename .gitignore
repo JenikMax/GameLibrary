@@ -34,3 +34,6 @@ target/
 # IDE
 .idea/
 *.iml
+
+# Environment (secrets)
+.env
