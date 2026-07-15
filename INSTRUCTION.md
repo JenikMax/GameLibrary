@@ -1,9 +1,15 @@
 # GameLibrary — Пошаговая инструкция по развёртыванию
 
 > Полное руководство для тех, кто впервые запускает приложение.  
-> Если что-то пошло не так — смотрите раздел [Типовые проблемы](#типовые-проблемы) или [Troubleshooting](#troubleshooting) в README.md.
+> Если что-то пошло не так — смотрите раздел [Типовые проблемы](#10-типовые-проблемы) или [Common issues](#10-common-issues).
+
+<p align="center">
+  <a href="#ru">🇷🇺 Русский</a> &nbsp;|&nbsp; <a href="#en">🇬🇧 English</a>
+</p>
 
 ---
+
+<a name="ru"></a>
 
 ## Содержание
 
@@ -431,6 +437,8 @@ curl -X POST "https://id.twitch.tv/oauth2/token?client_id=ВАШ_CLIENT_ID&clien
 | **JWT** | Токен для входа — приложение запоминает его и вы не вводите пароль каждый раз |
 
 ---
+
+<a name="en"></a>
 
 # English version
 
