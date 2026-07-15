@@ -105,7 +105,16 @@ public class LibraryController {
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, gameIdList.size());
 
-        List<GameShortDto> paginatedGames = libraryService.getGameList(searchText, selectedPlatforms, selectedYears, selectedGenres, sortField, sortType, startIndex, endIndex);
+        List<GameShortDto> paginatedGames;
+        if (favoritesOnly) {
+            List<Long> pageIds = new ArrayList<>(gameIdList.subList(startIndex, endIndex));
+            paginatedGames = libraryService.getGameShortListByIds(pageIds);
+            Map<Long, Integer> idOrder = new HashMap<>();
+            for (int i = 0; i < pageIds.size(); i++) idOrder.put(pageIds.get(i), i);
+            paginatedGames.sort(Comparator.comparingInt(g -> idOrder.getOrDefault(g.getId(), Integer.MAX_VALUE)));
+        } else {
+            paginatedGames = libraryService.getGameList(searchText, selectedPlatforms, selectedYears, selectedGenres, sortField, sortType, startIndex, endIndex);
+        }
 
         List<GameListResponse> items = paginatedGames.stream()
                 .map(this::toGameListResponse)

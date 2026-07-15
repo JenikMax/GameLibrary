@@ -75,19 +75,23 @@ public class GameDataService implements GameService {
         List<Object> params = new ArrayList<>();
         String from = "from game_data g left join library.game_data_genre dg on dg.game_id = g.id";
         String where = buildSearchFilter(searchText, params);
+        boolean hasWhere = !where.isEmpty();
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
-            where += " and g.platform in (" + platformSql + ")";
+            where += (hasWhere ? " and " : " where ") + "g.platform in (" + platformSql + ")";
+            hasWhere = true;
             params.addAll(selectedPlatforms);
         }
         if(selectedYears.size() != 0){
             String yearsSql = String.join(",", Collections.nCopies(selectedYears.size(), "?"));
-            where += " and g.release_date in (" + yearsSql + ")";
+            where += (hasWhere ? " and " : " where ") + "g.release_date in (" + yearsSql + ")";
+            hasWhere = true;
             params.addAll(selectedYears);
         }
         if(selectedGenres.size() != 0){
             String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
-            where += " and g.id in (select game_id from library.game_data_genre where genre_code in (" + genresSql + "))";
+            where += (hasWhere ? " and " : " where ") + "g.id in (select game_id from library.game_data_genre where genre_code in (" + genresSql + "))";
+            hasWhere = true;
             params.addAll(selectedGenres);
         }
         String order = buildOrderClause(sortField, sortType);
@@ -102,19 +106,23 @@ public class GameDataService implements GameService {
         List<Object> params = new ArrayList<>();
         String from = "from game_data g left join library.game_data_genre dg on dg.game_id = g.id";
         String where = buildSearchFilter(searchText, params);
+        boolean hasWhere = !where.isEmpty();
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
-            where += " and g.platform in (" + platformSql + ")";
+            where += (hasWhere ? " and " : " where ") + "g.platform in (" + platformSql + ")";
+            hasWhere = true;
             params.addAll(selectedPlatforms);
         }
         if(selectedYears.size() != 0){
             String yearsSql = String.join(",", Collections.nCopies(selectedYears.size(), "?"));
-            where += " and g.release_date in (" + yearsSql + ")";
+            where += (hasWhere ? " and " : " where ") + "g.release_date in (" + yearsSql + ")";
+            hasWhere = true;
             params.addAll(selectedYears);
         }
         if(selectedGenres.size() != 0){
             String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
-            where += " and g.id in (select game_id from library.game_data_genre where genre_code in (" + genresSql + ") group by game_id having count(distinct genre_code) = " + selectedGenres.size() + ")";
+            where += (hasWhere ? " and " : " where ") + "g.id in (select game_id from library.game_data_genre where genre_code in (" + genresSql + ") group by game_id having count(distinct genre_code) = " + selectedGenres.size() + ")";
+            hasWhere = true;
             params.addAll(selectedGenres);
         }
         String order = buildOrderClause(sortField, sortType);
@@ -126,27 +134,43 @@ public class GameDataService implements GameService {
     }
 
     @Override
+    public List<GameShortDto> getGameShortListByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return java.util.Collections.emptyList();
+        String placeholders = String.join(",", java.util.Collections.nCopies(ids.size(), "?"));
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+                "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
+                "from game_data g left join library.game_data_genre dg on dg.game_id = g.id " +
+                "where g.id in (" + placeholders + ") " +
+                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo";
+        return sqlDao.executeShortGame(sql, ids.toArray());
+    }
+
+    @Override
     public List<Long> getGameShortIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         List<Object> params = new ArrayList<>();
         String from = "from game_data g";
         String where = buildSearchFilter(searchText, params);
+        boolean hasWhere = !where.isEmpty();
         if(selectedPlatforms.size() != 0){
             String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
-            where += " and g.platform in (" + platformSql + ")";
+            where += (hasWhere ? " and " : " where ") + "g.platform in (" + platformSql + ")";
+            hasWhere = true;
             params.addAll(selectedPlatforms);
         }
         if(selectedYears.size() != 0){
             String yearsSql = String.join(",", Collections.nCopies(selectedYears.size(), "?"));
-            where += " and g.release_date in (" + yearsSql + ")";
+            where += (hasWhere ? " and " : " where ") + "g.release_date in (" + yearsSql + ")";
+            hasWhere = true;
             params.addAll(selectedYears);
         }
         if(selectedGenres.size() != 0){
             String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
-            where += " and g.id in (select game_id from library.game_data_genre where genre_code in (" + genresSql + ") group by game_id having count(distinct genre_code) = " + selectedGenres.size() + ")";
+            where += (hasWhere ? " and " : " where ") + "g.id in (select game_id from library.game_data_genre where genre_code in (" + genresSql + ") group by game_id having count(distinct genre_code) = " + selectedGenres.size() + ")";
+            hasWhere = true;
             params.addAll(selectedGenres);
         }
         String order = buildOrderClause(sortField, sortType);
-        String sql = "select g.id" + from + where + order;
+        String sql = "select g.id " + from + where + order;
         return sqlDao.executeShortGameId(sql, params.toArray());
     }
 
@@ -165,6 +189,7 @@ public class GameDataService implements GameService {
         switch (sortField) {
             case "year":  sortField = "g.release_date"; break;
             case "create": sortField = "g.create_ts"; break;
+            case "rating": sortField = "coalesce((select avg(rating) from library.game_rating where game_id = g.id), 0)"; break;
             default:       sortField = "g.name";
         }
         boolean desc = sortType != null && sortType.equals("desc");

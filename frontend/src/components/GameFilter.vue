@@ -60,37 +60,6 @@
           />
         </div>
 
-        <div class="field">
-          <label>{{ t('filter.sort_by') }}</label>
-          <SelectButton
-            v-model="sortField"
-            :options="sortOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-          />
-        </div>
-        <div v-if="sortField" class="field">
-          <SelectButton
-            v-model="sortType"
-            :options="sortTypeOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-          />
-        </div>
-
-        <div class="field">
-          <ToggleButton
-            v-model="favoritesOnly"
-            :onLabel="t('filter.favorites_on')"
-            :offLabel="t('filter.favorites_off')"
-            :onIcon="'pi pi-heart-fill'"
-            :offIcon="'pi pi-heart'"
-            class="w-full"
-          />
-        </div>
-
         <div class="flex gap-2">
           <Button :label="t('filter.reset')" icon="pi pi-times" severity="secondary" @click="resetFilters" class="flex-1" />
         </div>
@@ -102,7 +71,6 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useI18n } from '../composables/useI18n'
-import ToggleButton from 'primevue/togglebutton'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import InputText from 'primevue/inputtext'
@@ -110,7 +78,6 @@ import InputIcon from 'primevue/inputicon'
 import IconField from 'primevue/iconfield'
 import Chip from 'primevue/chip'
 import MultiSelect from 'primevue/multiselect'
-import SelectButton from 'primevue/selectbutton'
 import Button from 'primevue/button'
 
 const { t } = useI18n()
@@ -133,9 +100,6 @@ const searchText = ref('')
 const selectedPlatforms = ref([])
 const selectedYears = ref([])
 const selectedGenres = ref([])
-const sortField = ref('')
-const sortType = ref('')
-const favoritesOnly = ref(false)
 const resetting = ref(false)
 
 function restoreState(state) {
@@ -144,9 +108,6 @@ function restoreState(state) {
   selectedPlatforms.value = state.selectedPlatforms || []
   selectedYears.value = state.selectedYears || []
   selectedGenres.value = state.selectedGenres || []
-  sortField.value = state.sortField || ''
-  sortType.value = state.sortType || ''
-  favoritesOnly.value = state.favoritesOnly || false
   setTimeout(() => { resetting.value = false }, 300)
 }
 
@@ -160,19 +121,6 @@ watch(searchText, debouncedApply)
 watch(selectedPlatforms, debouncedApply, { deep: true })
 watch(selectedYears, debouncedApply, { deep: true })
 watch(selectedGenres, debouncedApply, { deep: true })
-watch(sortField, debouncedApply)
-watch(sortType, debouncedApply)
-watch(favoritesOnly, debouncedApply)
-
-const sortOptions = [
-  { label: t('filter.sort_name'), value: 'name' },
-  { label: t('filter.sort_year'), value: 'year' },
-  { label: t('filter.sort_date'), value: 'create' }
-]
-const sortTypeOptions = [
-  { label: t('filter.asc'), value: 'asc' },
-  { label: t('filter.desc'), value: 'desc' }
-]
 
 function togglePlatform(p) {
   const idx = selectedPlatforms.value.indexOf(p)
@@ -191,10 +139,7 @@ function applyFilters() {
     searchText: searchText.value,
     platforms: [...selectedPlatforms.value],
     years: [...selectedYears.value],
-    genres: [...selectedGenres.value],
-    sortField: sortField.value,
-    sortType: sortType.value,
-    favoritesOnly: favoritesOnly.value
+    genres: [...selectedGenres.value]
   })
 }
 
@@ -204,11 +149,8 @@ function resetFilters() {
   selectedPlatforms.value = []
   selectedYears.value = []
   selectedGenres.value = []
-  sortField.value = ''
-  sortType.value = ''
-  favoritesOnly.value = false
-  resetting.value = false
   emit('reset')
+  setTimeout(() => { resetting.value = false }, 300)
 }
 </script>
 

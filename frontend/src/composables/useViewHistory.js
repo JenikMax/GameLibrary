@@ -14,7 +14,17 @@ function loadHistory() {
 }
 
 function saveHistory() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history.value))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history.value))
+  } catch {
+    history.value = history.value.slice(0, 5)
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(history.value))
+    } catch {
+      history.value = []
+      localStorage.removeItem(STORAGE_KEY)
+    }
+  }
 }
 
 export function useViewHistory() {
@@ -24,7 +34,6 @@ export function useViewHistory() {
       id: game.id,
       name: game.name,
       logoUrl: game.logoUrl || null,
-      logo: game.logo || null,
       platform: game.platform || null,
       timestamp: Date.now()
     })

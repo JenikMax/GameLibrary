@@ -112,18 +112,9 @@
       </div>
     </div>
 
-    <Divider v-if="related.samePlatform.length || related.sameGenre.length || related.sameSeries.length" />
-    <div v-if="related.samePlatform.length || related.sameGenre.length || related.sameSeries.length" class="related-section">
+    <Divider v-if="related.sameGenre.length || related.sameSeries.length" />
+    <div v-if="related.sameGenre.length || related.sameSeries.length" class="related-section">
       <h3>{{ t('game.related') }}</h3>
-      <div v-if="related.samePlatform.length" class="mb-3">
-        <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_platform') }}</h4>
-        <div class="related-strip">
-          <div v-for="g in related.samePlatform" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
-            <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" @error="$event.target.src = '/game-library/img/default.jpg'" />
-            <span class="related-name">{{ g.name }}</span>
-          </div>
-        </div>
-      </div>
       <div v-if="related.sameGenre.length" class="mb-3">
         <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_genre') }}</h4>
         <div class="related-strip">
@@ -266,7 +257,7 @@ const userRating = ref(0)
 const comments = ref([])
 const commentsLoading = ref(false)
 const newCommentText = ref('')
-const related = ref({ samePlatform: [], sameGenre: [], sameSeries: [] })
+const related = ref({ sameGenre: [], sameSeries: [] })
 
 async function toggleFav() {
   try {
@@ -300,7 +291,7 @@ const trailerEmbedUrl = computed(() => {
 async function loadRelated() {
   try {
     const res = await gamesApi.getRelated(route.params.id)
-    related.value = res.data.data || { samePlatform: [], sameGenre: [], sameSeries: [] }
+    related.value = res.data.data || { sameGenre: [], sameSeries: [] }
   } catch {
     // ignore
   }
@@ -325,7 +316,7 @@ onMounted(async () => {
     ])
     game.value = gameRes.data.data
     userRating.value = game.value.userRating || 0
-    addToHistory(game.value)
+    try { addToHistory(game.value) } catch {}
     loadRelated()
   } finally {
     loading.value = false

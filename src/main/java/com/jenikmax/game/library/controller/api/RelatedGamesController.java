@@ -20,26 +20,13 @@ public class RelatedGamesController {
 
     @GetMapping("/{id}/related")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getRelatedGames(@PathVariable Long id) {
-        List<GameShortDto> samePlatform = findByPlatform(id);
         List<GameShortDto> sameGenre = findByGenre(id);
         List<GameShortDto> sameSeries = findBySeries(id);
 
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("samePlatform", toSimpleList(samePlatform));
         result.put("sameGenre", toSimpleList(sameGenre));
         result.put("sameSeries", toSimpleList(sameSeries));
         return ResponseEntity.ok(ApiResponse.ok(result));
-    }
-
-    private List<GameShortDto> findByPlatform(Long gameId) {
-        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
-                "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
-                "from game_data g " +
-                "left join library.game_data_genre dg on dg.game_id = g.id " +
-                "where g.platform = (select platform from game_data where id = ?) and g.id != ? " +
-                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo " +
-                "order by g.name limit 6";
-        return sqlDao.executeShortGame(sql, new Object[]{gameId, gameId});
     }
 
     private List<GameShortDto> findByGenre(Long gameId) {
@@ -55,10 +42,11 @@ public class RelatedGamesController {
     }
 
     private List<GameShortDto> findBySeries(Long gameId) {
-        // extract base name (before first bracket or paren)
+        // extract base name: strip brackets, then trailing version numbers
         String baseSql = "select coalesce(" +
                 "nullif(regexp_replace(name, '\\s*\\(.*\\)$', ''), ''), " +
                 "nullif(regexp_replace(name, '\\s*\\[.*\\]$', ''), ''), " +
+                "nullif(regexp_replace(name, '\\s+\\d+.*$', ''), ''), " +
                 "name" +
                 ") from game_data where id = ?";
         List<Map<String, Object>> baseResult = sqlDao.execute(baseSql, new Object[]{gameId});
@@ -66,7 +54,20 @@ public class RelatedGamesController {
 
         String baseName = (String) baseResult.get(0).values().iterator().next();
         if (baseName == null || baseName.trim().isEmpty()) return Collections.emptyList();
+        baseName = baseName.trim();
 
+        List<GameShortDto> results = findByNamePrefix(gameId, baseName);
+        // if only found itself (or nothing), fallback to first-word matching
+        if (results.size() <= 1) {
+            String firstWord = baseName.contains(" ") ? baseName.substring(0, baseName.indexOf(' ')) : baseName;
+            if (!firstWord.equals(baseName)) {
+                results = findByNamePrefix(gameId, firstWord);
+            }
+        }
+        return results;
+    }
+
+    private List<GameShortDto> findByNamePrefix(Long gameId, String prefix) {
         String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
                 "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
                 "from game_data g " +
@@ -74,7 +75,7 @@ public class RelatedGamesController {
                 "where g.id != ? and g.name ilike ? " +
                 "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo " +
                 "order by g.name limit 6";
-        return sqlDao.executeShortGame(sql, new Object[]{gameId, baseName.trim() + "%"});
+        return sqlDao.executeShortGame(sql, new Object[]{gameId, prefix + "%"});
     }
 
     private List<Map<String, Object>> toSimpleList(List<GameShortDto> dtos) {

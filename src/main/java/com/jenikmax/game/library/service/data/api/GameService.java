@@ -20,6 +20,8 @@ public interface GameService {
 
     List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex);
 
+    List<GameShortDto> getGameShortListByIds(List<Long> ids);
+
     List<Long> getGameShortIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType);
 
     List<Game> getGameList();

@@ -12,7 +12,6 @@
       <div class="flex align-items-center justify-content-between mb-3">
         <h2 class="m-0">{{ t('library.title') }}</h2>
         <div class="flex gap-2 align-items-center">
-          <Badge :value="store.totalItems" severity="info" />
           <Button
             :label="t('library.random')"
             icon="pi pi-shuffle"
@@ -42,13 +41,35 @@
             @click="router.push(`/game/${g.id}`)"
           >
             <img
-              :src="g.logo || g.logoUrl || '/game-library/img/default.jpg'"
+              :src="g.logoUrl || '/game-library/api/images/games/' + g.id + '/logo'"
               :alt="g.name"
               class="history-img"
+              @error="$event.target.src = '/game-library/img/default.jpg'"
             />
             <span class="history-name">{{ g.name }}</span>
           </div>
         </div>
+      </div>
+
+      <div class="sort-bar flex align-items-center gap-2 mb-3">
+        <SelectButton
+          v-model="store.sortField"
+          :options="sortOptions"
+          optionLabel="label"
+          optionValue="value"
+          size="small"
+          @change="onSortChange"
+        />
+        <SelectButton
+          v-if="store.sortField"
+          v-model="store.sortType"
+          :options="sortTypeOptions"
+          optionLabel="label"
+          optionValue="value"
+          size="small"
+          @change="onSortChange"
+        />
+        <Badge :value="store.totalItems" severity="info" />
       </div>
 
       <ProgressBar v-if="store.loading" mode="indeterminate" class="mb-3" />
@@ -105,6 +126,7 @@ import Paginator from 'primevue/paginator'
 import ProgressBar from 'primevue/progressbar'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
+import SelectButton from 'primevue/selectbutton'
 
 const LIBRARY_STATE_KEY = 'libraryState'
 
@@ -130,6 +152,17 @@ const toast = useToast()
 const scanning = ref(false)
 const filterRef = ref(null)
 
+const sortOptions = [
+  { label: t('filter.sort_name'), value: 'name' },
+  { label: t('filter.sort_year'), value: 'year' },
+  { label: t('filter.sort_date'), value: 'create' },
+  { label: t('filter.sort_rating'), value: 'rating' }
+]
+const sortTypeOptions = [
+  { label: t('filter.asc'), value: 'asc' },
+  { label: t('filter.desc'), value: 'desc' }
+]
+
 onMounted(async () => {
   await store.fetchFilterOptions()
   const saved = sessionStorage.getItem(LIBRARY_STATE_KEY)
@@ -146,15 +179,15 @@ onMounted(async () => {
       searchText: state.searchText || '',
       selectedPlatforms: state.platforms || [],
       selectedYears: state.years || [],
-      selectedGenres: state.genres || [],
-      sortField: state.sortField || '',
-      sortType: state.sortType || '',
-      favoritesOnly: state.favoritesOnly || false
+      selectedGenres: state.genres || []
     })
     sessionStorage.removeItem(LIBRARY_STATE_KEY)
     await store.fetchGames(state.currentPage || 1)
   } else {
     store.resetFilters()
+    if (router.currentRoute.value.query.favorites === '1') {
+      store.favoritesOnly = true
+    }
     await store.fetchGames()
   }
 })
@@ -168,6 +201,10 @@ function onPageChange(event) {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+function onSortChange() {
+  store.fetchGames(1)
+}
+
 function handleApplyFilters(filters) {
   store.setSearch(filters.searchText)
   store.setFilters({
@@ -175,13 +212,14 @@ function handleApplyFilters(filters) {
     years: filters.years,
     genres: filters.genres
   })
-  store.setSort(filters.sortField, filters.sortType)
-  store.favoritesOnly = filters.favoritesOnly || false
   store.fetchGames(1)
 }
 
 function handleResetFilters() {
   store.resetFilters()
+  if (router.currentRoute.value.query.favorites === '1') {
+    store.favoritesOnly = true
+  }
   sessionStorage.removeItem(LIBRARY_STATE_KEY)
   store.fetchGames(1)
 }

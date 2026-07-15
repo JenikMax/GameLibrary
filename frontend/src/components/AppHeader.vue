@@ -4,7 +4,7 @@
 
       <template #end>
         <div class="flex align-items-center gap-2">
-          <div v-if="authStore.isAuthenticated" class="notification-area" @click="toggleNotifications">
+          <div v-if="authStore.isAuthenticated" ref="notificationAreaRef" class="notification-area" @click="toggleNotifications">
             <Button
               icon="pi pi-bell"
               :severity="unreadCount > 0 ? 'warning' : 'secondary'"
@@ -45,7 +45,7 @@
     </Menubar>
 
     <div v-if="showNotifications" class="notification-panel p-panel p-component">
-      <div class="p-panel-header">
+      <div class="p-panel-header px-3 pt-3 pb-0">
         <div class="flex align-items-center justify-content-between w-full">
           <span class="font-semibold">{{ t('notifications.title') }}</span>
           <Button
@@ -112,7 +112,6 @@ import { useToast } from 'primevue/usetoast'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const libraryStore = useLibraryStore()
 const { isDarkMode, toggleDarkMode } = useDarkMode()
 const { t } = useI18n()
 const toast = useToast()
@@ -122,13 +121,33 @@ const notifications = ref([])
 const unreadCount = ref(0)
 let pollTimer = null
 let isUnmounted = false
+const notificationAreaRef = ref(null)
+
+function onClickOutside(e) {
+  if (!showNotifications.value) return
+  const el = notificationAreaRef.value
+  if (el && !el.contains(e.target)) {
+    showNotifications.value = false
+  }
+}
 
 const items = computed(() => {
   const menu = [
     {
       label: t('nav.library'),
       icon: 'pi pi-th-large',
-      command: goToLibrary
+      items: [
+        {
+          label: t('nav.library_list'),
+          icon: 'pi pi-list',
+          command: goToLibrary
+        },
+        {
+          label: t('nav.library_favorites'),
+          icon: 'pi pi-heart',
+          command: goToFavorites
+        }
+      ]
     },
     {
       label: t('nav.downloads'),
@@ -213,13 +232,28 @@ function handleClickNotification(n) {
   }
 }
 
-function goToLibrary() {
+async function goToLibrary() {
   sessionStorage.removeItem('libraryState')
-  libraryStore.resetFilters()
-  if (router.currentRoute.value.path === '/') {
-    libraryStore.fetchGames(1)
+  const libStore = useLibraryStore()
+  libStore.resetFilters()
+  if (router.currentRoute.value.path === '/' && !router.currentRoute.value.query.favorites) {
+    libStore.fetchGames(1)
   } else {
-    router.push('/')
+    await router.push('/')
+    libStore.fetchGames(1)
+  }
+}
+
+async function goToFavorites() {
+  sessionStorage.removeItem('libraryState')
+  const libStore = useLibraryStore()
+  libStore.resetFilters()
+  libStore.favoritesOnly = true
+  if (router.currentRoute.value.path === '/' && router.currentRoute.value.query.favorites === '1') {
+    libStore.fetchGames(1)
+  } else {
+    await router.push('/?favorites=1')
+    libStore.fetchGames(1)
   }
 }
 
@@ -233,6 +267,7 @@ function handleLogout() {
 }
 
 onMounted(() => {
+  document.addEventListener('click', onClickOutside, true)
   if (authStore.isAuthenticated) {
     fetchNotifications()
     pollTimer = setInterval(() => {
@@ -242,6 +277,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  document.removeEventListener('click', onClickOutside, true)
   isUnmounted = true
   if (pollTimer) {
     clearInterval(pollTimer)
