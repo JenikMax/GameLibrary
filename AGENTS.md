@@ -31,6 +31,7 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - Scrapers (7 active): Playground (CSS selectors + search API), Igromania (JSON paths), WorldArt (CSS selectors), Steam (Storefront API, no key required), IGDB (Twitch OAuth), TheGamesDB (API key), PsxDataCenter (JSoup, PS1/PS2, no key).
 - State: Pinia stores for auth, library, locale.
 - Rich text: VueQuill + Quill 2 for game description editing.
+- **Phase 3 features**: rating 1-10 (`GameRating.java` + `RatingController`), favorites (`FavoriteController` + heart toggle), comments (`CommentController` with ownership check), notifications (`NotificationService` + bell icon with 15s polling), view history (composable `useViewHistory.js`, localStorage, max 20 items), related games (`RelatedGamesController`, 3 SQL queries: same platform, same genre, similar name).
 - Package root: `com.jenikmax.game.library`.
 
 ## IGDB Scraper Setup
@@ -131,3 +132,9 @@ PsxDataCenter (psxdatacenter.com) — скрапер для PS1 и PS2 без к
 - **Debounced filter (250ms)** (`GameFilter.vue`). Все поля фильтра (поиск, платформы, годы, жанры, сортировка) имеют `watch` с debounce 250ms и авто-применением. Отдельной кнопки Apply нет.
 - **Сканирование ФС в две фазы** (`GameScanerService.java`). Phase 1: запись метаданных в БД (без bytea). Phase 2: добавление изображений с `entityManager.clear()` после каждой игры — предотвращает OOM при больших библиотеках.
 - **OkHttpClient — единый инстанс** (`AppConfig.java`). Настроен в `@Bean OkHttpClient` с 30s timeout, Mozilla User-Agent. Используется всеми скраперами через `JsoupHelper`.
+- **Notification `isRead` — JavaBean boolean naming** (`Notification.java:51`). Геттер `isRead()` → Hibernate выводит имя свойства `read`, а не `isRead`. JPQL-запросы и derived query methods обязаны использовать `read` (например `n.read`, `countByUserIdAndReadFalse`). Поле БД `is_read` задаётся через `@Column(name = "is_read")`.
+- **Dark mode CSS: `.app-dark`, не `.dark`** (`main.js:23`). PrimeVue настроен с `darkModeSelector: '.app-dark'`. Все кастомные CSS-правила для тёмной темы должны использовать `.app-dark` (не `.dark`), иначе они не сработают.
+- **View history — localStorage + composable** (`useViewHistory.js`). Хранит до 20 ID игр в `localStorage.viewHistory`. Композабл подмешивается в `GameDetailView.vue` (добавление) и `LibraryView.vue` (стрип). Очистка только вручную или через localStorage API.
+- **Related games — 3 SQL запроса** (`RelatedGamesController.java`). Возвращает игры: 1) с той же платформой, 2) с тем же жанром, 3) с похожим названием через `regexp_replace`. Каждый запрос лимитирован, результаты объединяются в `LinkedHashSet` для дедупликации.
+- **Rating — `@IdClass` composite key** (`GameRating.java`). Сущность `GameRating` использует `@IdClass(GameRatingId.class)` с полями `gameId` и `userId`. JPQL-запросы обращаются к `n.gameId` и `n.userId` напрямую (не через связи).
+- **Comment ownership check** (`CommentController.java:46`). DELETE проверяет `comment.getUser().getId().equals(currentUserId)`, флаг `canDelete` вычисляется на бэкенде и отдаётся в DTO. Админ может удалить любой комментарий.

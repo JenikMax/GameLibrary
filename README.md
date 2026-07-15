@@ -48,6 +48,12 @@
 | P2P seeding via Transmission | Scraper config panel (API keys, enable/disable) |
 | Profile, avatar, password change | |
 | Russian / English UI | |
+| ⭐ Rating 1-10 per game | |
+| ❤️ Favorites collection with filter | |
+| 💬 Comments on game pages | |
+| 🔔 Notifications (torrent ready, scan done, etc.) | |
+| 👁 View history (last 20, stored in localStorage) | |
+| 🔗 Related games (same platform, genre, or similar name) | |
 
 ## ⚡ Quick Start
 
@@ -133,6 +139,14 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `GET /games/{id}/download-info` | USER, ADMIN | Download info (size, torrent cached flag) |
 | `POST /games/{id}/seed` | USER, ADMIN | Start seeding via Transmission |
 | `POST /games/{id}/prepare-download` | USER, ADMIN | Async .torrent preparation (for ≥5 GB games) |
+| `GET /games/{id}/rating` | USER, ADMIN | Get game rating |
+| `POST /games/{id}/rate` | USER, ADMIN | Rate game 1-10 |
+| `POST /games/{id}/favorite` | USER, ADMIN | Toggle favorite |
+| `GET /games/{id}/favorite` | USER, ADMIN | Check if favorited |
+| `GET /games/{id}/comments` | USER, ADMIN | Get game comments |
+| `POST /games/{id}/comments` | USER, ADMIN | Add comment |
+| `DELETE /games/{id}/comments/{commentId}` | USER, ADMIN | Delete own comment |
+| `GET /games/{id}/related` | USER, ADMIN | Related games by platform/genre/name |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Torrent preparation task status |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Seed task status |
@@ -145,6 +159,11 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `POST /downloads/{gid}/unpause` | USER, ADMIN | Resume torrent |
 | `GET /downloads/global-stat` | USER, ADMIN | Transmission session stats |
 | `GET /downloads/aria2-version` | USER, ADMIN | Transmission connectivity check |
+| **Notifications** | | |
+| `GET /notifications` | USER, ADMIN | Get latest 20 notifications |
+| `PUT /notifications/{id}/read` | USER, ADMIN | Mark notification as read |
+| `PUT /notifications/read-all` | USER, ADMIN | Mark all notifications as read |
+| `GET /notifications/unread-count` | USER, ADMIN | Unread notification count |
 | **Images** | | |
 | `GET /images/games/{gameId}/logo` | all | Game logo (FS → DB fallback) |
 | `GET /images/games/{gameId}/screenshots/{screenshotId}` | all | Screenshot (FS → DB fallback) |
@@ -223,9 +242,13 @@ Schema `library`:
 | `game_genre` | Genre dictionary (code, description, description_ru) — ~70 genres |
 | `game_data_genre` | M:N game ↔ genre |
 | `game_screenshot` | Screenshots (bytea) |
+| `game_rating` | Ratings 1-10 per user per game (unique constraint on user+game) |
+| `favorite_game` | User favorites (user_id + game_id) |
+| `game_comment` | Comments with ownership and timestamps |
+| `notification` | User notifications with `is_read` flag |
 | `library_user` | Users (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `1_init.sh` (schema), `2_library.sql` (tables + genres), `3_user.sql` (users + seed).
+DDL: `postgresdb/ddl/` — `1_init.sh` (schema), `2_library.sql` (tables + genres), `3_user.sql` (users + seed), `5_rating.sql`, `6_favorite.sql`, `7_comment.sql`, `8_notification.sql`.
 
 ## 🔒 Security
 
@@ -481,6 +504,12 @@ npm run dev
 | P2P-раздача через Transmission | Панель конфигурации скраперов |
 | Профиль, аватар, смена пароля | |
 | Русский / английский интерфейс | |
+| ⭐ Рейтинг игр 1-10 | |
+| ❤️ Избранное с фильтром в боковой панели | |
+| 💬 Комментарии на странице игры | |
+| 🔔 Уведомления (торрент готов, сканирование завершено и т.д.) | |
+| 👁 История просмотров (последние 20, localStorage) | |
+| 🔗 Связанные игры (платформа, жанр, похожее название) | |
 
 ## ⚡ Быстрый старт
 
@@ -566,6 +595,14 @@ make all                      # сборка backend + frontend, запуск do
 | `GET /games/{id}/download-info` | USER, ADMIN | Инфо о скачивании (размер, статус кэша) |
 | `POST /games/{id}/seed` | USER, ADMIN | Запустить раздачу |
 | `POST /games/{id}/prepare-download` | USER, ADMIN | Асинхронная подготовка .torrent (для ≥5 ГБ) |
+| `GET /games/{id}/rating` | USER, ADMIN | Получить рейтинг игры |
+| `POST /games/{id}/rate` | USER, ADMIN | Оценить игру 1-10 |
+| `POST /games/{id}/favorite` | USER, ADMIN | Добавить/удалить из избранного |
+| `GET /games/{id}/favorite` | USER, ADMIN | Проверить, в избранном ли |
+| `GET /games/{id}/comments` | USER, ADMIN | Получить комментарии |
+| `POST /games/{id}/comments` | USER, ADMIN | Добавить комментарий |
+| `DELETE /games/{id}/comments/{commentId}` | USER, ADMIN | Удалить свой комментарий |
+| `GET /games/{id}/related` | USER, ADMIN | Связанные игры |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Статус подготовки торрента |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Статус раздачи |
@@ -578,6 +615,11 @@ make all                      # сборка backend + frontend, запуск do
 | `POST /downloads/{gid}/unpause` | USER, ADMIN | Возобновить торрент |
 | `GET /downloads/global-stat` | USER, ADMIN | Статистика сессии Transmission |
 | `GET /downloads/aria2-version` | USER, ADMIN | Проверка связи с Transmission |
+| **Уведомления** | | |
+| `GET /notifications` | USER, ADMIN | Последние 20 уведомлений |
+| `PUT /notifications/{id}/read` | USER, ADMIN | Отметить прочитанным |
+| `PUT /notifications/read-all` | USER, ADMIN | Прочитать всё |
+| `GET /notifications/unread-count` | USER, ADMIN | Количество непрочитанных |
 | **Images** | | |
 | `GET /images/games/{gameId}/logo` | все | Логотип игры (ФС → БД fallback) |
 | `GET /images/games/{gameId}/screenshots/{screenshotId}` | все | Скриншот (ФС → БД fallback) |
@@ -646,6 +688,10 @@ make all                      # сборка backend + frontend, запуск do
 | `game_genre` | Справочник жанров (code, description, description_ru) — ~70 жанров |
 | `game_data_genre` | M:N игра ↔ жанр |
 | `game_screenshot` | Скриншоты (bytea) |
+| `game_rating` | Оценки 1-10 (unique user+game) |
+| `favorite_game` | Избранное пользователя |
+| `game_comment` | Комментарии с владельцем и временем |
+| `notification` | Уведомления с флагом `is_read` |
 | `library_user` | Пользователи (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
 DDL: `postgresdb/ddl/` — `1_init.sh` (схема), `2_library.sql` (таблицы + жанры), `3_user.sql` (пользователи + seed).
