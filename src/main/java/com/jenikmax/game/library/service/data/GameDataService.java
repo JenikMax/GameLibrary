@@ -169,6 +169,7 @@ public class GameDataService implements GameService {
         }
         boolean desc = sortType != null && sortType.equals("desc");
         return " order by " + sortField + (desc ? " desc" : "");
+    }
 
     @Override
     public List<String> getReleaseDates() {

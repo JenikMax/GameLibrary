@@ -11,6 +11,7 @@ public class TorrentTask {
 
     private final String taskId;
     private final Long gameId;
+    private final Long userId;
     private volatile Status status;
     private volatile int progress;
     private volatile String currentFile;
@@ -19,9 +20,10 @@ public class TorrentTask {
     private volatile String errorMessage;
     private final long createdAt;
 
-    public TorrentTask(String taskId, Long gameId) {
+    public TorrentTask(String taskId, Long gameId, Long userId) {
         this.taskId = taskId;
         this.gameId = gameId;
+        this.userId = userId;
         this.status = Status.PENDING;
         this.progress = 0;
         this.createdAt = System.currentTimeMillis();
@@ -33,6 +35,10 @@ public class TorrentTask {
 
     public Long getGameId() {
         return gameId;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     public Status getStatus() {

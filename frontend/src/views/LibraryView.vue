@@ -32,6 +32,25 @@
         </div>
       </div>
 
+      <div v-if="history.length > 0" class="mb-3">
+        <h4 class="m-0 mb-2">{{ t('history.title') }}</h4>
+        <div class="history-strip">
+          <div
+            v-for="g in history.slice(0, 10)"
+            :key="g.id"
+            class="history-item"
+            @click="router.push(`/game/${g.id}`)"
+          >
+            <img
+              :src="g.logo || g.logoUrl || '/game-library/img/default.jpg'"
+              :alt="g.name"
+              class="history-img"
+            />
+            <span class="history-name">{{ g.name }}</span>
+          </div>
+        </div>
+      </div>
+
       <ProgressBar v-if="store.loading" mode="indeterminate" class="mb-3" />
 
       <div v-if="!store.loading && store.games.length === 0" class="text-center p-5">
@@ -75,6 +94,7 @@ import { useRouter } from 'vue-router'
 import { useLibraryStore } from '../stores/library'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
+import { useViewHistory } from '../composables/useViewHistory'
 import { adminApi } from '../api/admin'
 import { gamesApi } from '../api/games'
 import { useToast } from 'primevue/usetoast'
@@ -104,6 +124,7 @@ function saveStateToSession() {
 const store = useLibraryStore()
 const authStore = useAuthStore()
 const { t } = useI18n()
+const { history } = useViewHistory()
 const router = useRouter()
 const toast = useToast()
 const scanning = ref(false)
@@ -212,6 +233,37 @@ async function handleScan() {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1rem;
+}
+.history-strip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+.history-item {
+  flex-shrink: 0;
+  width: 80px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s;
+}
+.history-item:hover {
+  transform: translateY(-2px);
+}
+.history-img {
+  width: 80px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+.history-name {
+  display: block;
+  font-size: 0.65rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0.15rem;
 }
 @media (max-width: 768px) {
   .library-layout {

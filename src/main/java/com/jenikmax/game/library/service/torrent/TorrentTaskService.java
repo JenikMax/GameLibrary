@@ -1,6 +1,7 @@
 package com.jenikmax.game.library.service.torrent;
 
 import com.jenikmax.game.library.service.downloads.DownloadTorrentService;
+import com.jenikmax.game.library.service.notification.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -27,15 +28,18 @@ public class TorrentTaskService implements DisposableBean {
     });
 
     private final DownloadTorrentService downloadTorrentService;
+    private final NotificationService notificationService;
 
-    public TorrentTaskService(DownloadTorrentService downloadTorrentService) {
+    public TorrentTaskService(DownloadTorrentService downloadTorrentService,
+                               NotificationService notificationService) {
         this.downloadTorrentService = downloadTorrentService;
+        this.notificationService = notificationService;
     }
 
-    public String submitSeedTask(Long gameId, String directoryPath) {
+    public String submitSeedTask(Long gameId, String directoryPath, Long userId) {
         pruneOldTasks();
         String taskId = UUID.randomUUID().toString();
-        TorrentTask task = new TorrentTask(taskId, gameId);
+        TorrentTask task = new TorrentTask(taskId, gameId, userId);
         tasks.put(taskId, task);
 
         executor.submit(() -> {
@@ -52,20 +56,32 @@ public class TorrentTaskService implements DisposableBean {
                 task.setSeedId(result.getSeedId());
                 task.setStatus(TorrentTask.Status.COMPLETED);
 
+                if (userId != null) {
+                    notificationService.create(userId, "seed_complete",
+                            "Раздача запущена",
+                            "Торрент для игры готов и добавлен в Transmission", gameId);
+                }
+
             } catch (Exception e) {
                 logger.error("Torrent creation failed for {}", directoryPath, e);
                 task.setStatus(TorrentTask.Status.FAILED);
                 task.setErrorMessage(e.getMessage() != null ? e.getMessage() : "Unknown error");
+
+                if (userId != null) {
+                    notificationService.create(userId, "seed_failed",
+                            "Ошибка раздачи",
+                            "Не удалось создать торрент: " + e.getMessage(), gameId);
+                }
             }
         });
 
         return taskId;
     }
 
-    public String submitDownloadTask(Long gameId, String directoryPath) {
+    public String submitDownloadTask(Long gameId, String directoryPath, Long userId) {
         pruneOldTasks();
         String taskId = UUID.randomUUID().toString();
-        TorrentTask task = new TorrentTask(taskId, gameId);
+        TorrentTask task = new TorrentTask(taskId, gameId, userId);
         tasks.put(taskId, task);
 
         executor.submit(() -> {
@@ -82,10 +98,22 @@ public class TorrentTaskService implements DisposableBean {
                 task.setSeedId(result.getSeedId());
                 task.setStatus(TorrentTask.Status.COMPLETED);
 
+                if (userId != null) {
+                    notificationService.create(userId, "download_ready",
+                            "Загрузка готова",
+                            "Торрент для скачивания подготовлен", gameId);
+                }
+
             } catch (Exception e) {
                 logger.error("Torrent creation failed for {}", directoryPath, e);
                 task.setStatus(TorrentTask.Status.FAILED);
                 task.setErrorMessage(e.getMessage() != null ? e.getMessage() : "Unknown error");
+
+                if (userId != null) {
+                    notificationService.create(userId, "download_failed",
+                            "Ошибка подготовки",
+                            "Не удалось подготовить торрент: " + e.getMessage(), gameId);
+                }
             }
         });
 

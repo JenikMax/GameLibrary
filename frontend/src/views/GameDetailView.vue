@@ -112,6 +112,38 @@
       </div>
     </div>
 
+    <Divider v-if="related.samePlatform.length || related.sameGenre.length || related.sameSeries.length" />
+    <div v-if="related.samePlatform.length || related.sameGenre.length || related.sameSeries.length" class="related-section">
+      <h3>{{ t('game.related') }}</h3>
+      <div v-if="related.samePlatform.length" class="mb-3">
+        <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_platform') }}</h4>
+        <div class="related-strip">
+          <div v-for="g in related.samePlatform" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
+            <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" @error="$event.target.src = '/game-library/img/default.jpg'" />
+            <span class="related-name">{{ g.name }}</span>
+          </div>
+        </div>
+      </div>
+      <div v-if="related.sameGenre.length" class="mb-3">
+        <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_genre') }}</h4>
+        <div class="related-strip">
+          <div v-for="g in related.sameGenre" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
+            <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" @error="$event.target.src = '/game-library/img/default.jpg'" />
+            <span class="related-name">{{ g.name }}</span>
+          </div>
+        </div>
+      </div>
+      <div v-if="related.sameSeries.length">
+        <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_series') }}</h4>
+        <div class="related-strip">
+          <div v-for="g in related.sameSeries" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
+            <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" @error="$event.target.src = '/game-library/img/default.jpg'" />
+            <span class="related-name">{{ g.name }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <Divider />
     <div class="comments-section">
       <h3>{{ t('game.comments') }}</h3>
@@ -190,6 +222,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useLibraryStore } from '../stores/library'
 import { useI18n } from '../composables/useI18n'
+import { useViewHistory } from '../composables/useViewHistory'
 import { gamesApi } from '../api/games'
 import Skeleton from 'primevue/skeleton'
 import ProgressBar from 'primevue/progressbar'
@@ -209,6 +242,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const libraryStore = useLibraryStore()
 const { t } = useI18n()
+const { addToHistory } = useViewHistory()
 
 const game = ref(null)
 const loading = ref(true)
@@ -232,6 +266,7 @@ const userRating = ref(0)
 const comments = ref([])
 const commentsLoading = ref(false)
 const newCommentText = ref('')
+const related = ref({ samePlatform: [], sameGenre: [], sameSeries: [] })
 
 async function toggleFav() {
   try {
@@ -262,6 +297,15 @@ const trailerEmbedUrl = computed(() => {
   return match ? `https://www.youtube.com/embed/${match[1]}` : (url && url !== 'N/A' ? url : '')
 })
 
+async function loadRelated() {
+  try {
+    const res = await gamesApi.getRelated(route.params.id)
+    related.value = res.data.data || { samePlatform: [], sameGenre: [], sameSeries: [] }
+  } catch {
+    // ignore
+  }
+}
+
 async function loadComments() {
   commentsLoading.value = true
   try {
@@ -281,6 +325,8 @@ onMounted(async () => {
     ])
     game.value = gameRes.data.data
     userRating.value = game.value.userRating || 0
+    addToHistory(game.value)
+    loadRelated()
   } finally {
     loading.value = false
   }
@@ -625,6 +671,39 @@ function onViewerKeydown(e) {
 .comments-section {
   margin-top: 1rem;
 }
+.related-section {
+  margin-top: 1rem;
+}
+.related-strip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+}
+.related-item {
+  flex-shrink: 0;
+  width: 100px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s;
+}
+.related-item:hover {
+  transform: translateY(-2px);
+}
+.related-img {
+  width: 100px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+.related-name {
+  display: block;
+  font-size: 0.7rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0.15rem;
+}
 .comment-submit-btn {
   align-self: flex-end;
 }
@@ -638,7 +717,7 @@ function onViewerKeydown(e) {
   border-radius: 8px;
   padding: 0.75rem;
 }
-.dark .comment-item {
+.app-dark .comment-item {
   background: var(--p-surface-800);
 }
 .comment-header {

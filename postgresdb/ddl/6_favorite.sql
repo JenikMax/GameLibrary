@@ -1,8 +1,7 @@
 \c "game-library"
 
 create sequence if not exists library.favorite_game_id_seq start 1;
-drop table if exists library.favorite_game;
-create table library.favorite_game
+create table if not exists library.favorite_game
 (
     id         bigserial primary key,
     user_id    bigint  not null references library.library_user (id),

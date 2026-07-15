@@ -51,5 +51,8 @@ export const gamesApi = {
   },
   deleteComment(gameId, commentId) {
     return api.delete(`/games/${gameId}/comments/${commentId}`)
+  },
+  getRelated(id) {
+    return api.get(`/games/${id}/related`)
   }
 }

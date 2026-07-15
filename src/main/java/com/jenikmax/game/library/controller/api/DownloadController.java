@@ -4,6 +4,7 @@ import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.api.ApiResponse;
 import com.jenikmax.game.library.model.dto.api.DownloadInfoResponse;
 import com.jenikmax.game.library.service.api.LibraryService;
+import com.jenikmax.game.library.service.data.api.UserService;
 import com.jenikmax.game.library.service.downloads.DownloadFileService;
 import com.jenikmax.game.library.service.downloads.DownloadTorrentService;
 import com.jenikmax.game.library.service.downloads.transmission.TransmissionService;
@@ -12,6 +13,8 @@ import com.jenikmax.game.library.service.torrent.TorrentTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -32,17 +35,20 @@ public class DownloadController {
     private final DownloadFileService downloadFileService;
     private final DownloadTorrentService torrentService;
     private final TorrentTaskService torrentTaskService;
+    private final UserService userService;
 
     public DownloadController(LibraryService libraryService,
                                TransmissionService transmissionService,
                                DownloadFileService downloadFileService,
                                DownloadTorrentService torrentService,
-                               TorrentTaskService torrentTaskService) {
+                               TorrentTaskService torrentTaskService,
+                               UserService userService) {
         this.libraryService = libraryService;
         this.transmissionService = transmissionService;
         this.downloadFileService = downloadFileService;
         this.torrentService = torrentService;
         this.torrentTaskService = torrentTaskService;
+        this.userService = userService;
     }
 
     @GetMapping("/games/{id}/download")
@@ -73,7 +79,8 @@ public class DownloadController {
         logger.info("Seed game via Transmission - {}", id);
         try {
             GameDto gameDto = libraryService.getGameInfo(id);
-            String taskId = torrentTaskService.submitSeedTask(id, gameDto.getDirectoryPath());
+            Long userId = getCurrentUserId();
+            String taskId = torrentTaskService.submitSeedTask(id, gameDto.getDirectoryPath(), userId);
 
             Map<String, Object> data = new HashMap<>();
             data.put("gameId", id);
@@ -94,7 +101,8 @@ public class DownloadController {
         logger.info("Prepare torrent download for game - {}", id);
         try {
             GameDto gameDto = libraryService.getGameInfo(id);
-            String taskId = torrentTaskService.submitDownloadTask(id, gameDto.getDirectoryPath());
+            Long userId = getCurrentUserId();
+            String taskId = torrentTaskService.submitDownloadTask(id, gameDto.getDirectoryPath(), userId);
 
             Map<String, Object> data = new HashMap<>();
             data.put("gameId", id);
@@ -204,6 +212,13 @@ public class DownloadController {
             return ResponseEntity.ok(ApiResponse.ok("Download resumed", null));
         }
         return ResponseEntity.badRequest().body(ApiResponse.error("Failed to resume download"));
+    }
+
+    private Long getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) return null;
+        var userDto = userService.getUserInfoByName(auth.getName());
+        return userDto != null ? userDto.getId() : null;
     }
 
     @GetMapping("/downloads/global-stat")
