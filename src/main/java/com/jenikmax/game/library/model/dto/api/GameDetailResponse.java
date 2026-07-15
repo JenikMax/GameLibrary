@@ -17,6 +17,9 @@ public class GameDetailResponse {
     private List<String> screenshotUrls;
     private String logo;
     private List<String> screenshots;
+    private Double avgRating;
+    private Integer userRating;
+    private Long ratingsCount;
 
     public GameDetailResponse() {}
 
@@ -46,4 +49,10 @@ public class GameDetailResponse {
     public void setLogo(String logo) { this.logo = logo; }
     public List<String> getScreenshots() { return screenshots; }
     public void setScreenshots(List<String> screenshots) { this.screenshots = screenshots; }
+    public Double getAvgRating() { return avgRating; }
+    public void setAvgRating(Double avgRating) { this.avgRating = avgRating; }
+    public Integer getUserRating() { return userRating; }
+    public void setUserRating(Integer userRating) { this.userRating = userRating; }
+    public Long getRatingsCount() { return ratingsCount; }
+    public void setRatingsCount(Long ratingsCount) { this.ratingsCount = ratingsCount; }
 }

@@ -27,5 +27,11 @@ export const gamesApi = {
   },
   getRandomGame() {
     return api.get('/games/random')
+  },
+  getRating(id) {
+    return api.get(`/games/${id}/rating`)
+  },
+  saveRating(id, rating) {
+    return api.post(`/games/${id}/rating`, { rating })
   }
 }

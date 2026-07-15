@@ -33,6 +33,18 @@
           <Tag :value="game.releaseDate" severity="warn" />
           <Tag v-for="g in game.genres" :key="g" :value="genreName(g)" severity="secondary" />
         </div>
+        <div class="flex align-items-center gap-3 mb-3">
+          <div class="flex align-items-center gap-1">
+            <Rating :modelValue="game.avgRating || 0" :stars="10" :cancel="false" readonly />
+            <span v-if="game.avgRating" class="text-sm font-semibold">{{ game.avgRating }}</span>
+            <small class="text-color-secondary">({{ game.ratingsCount || 0 }})</small>
+          </div>
+          <div v-if="authStore.isAuthenticated" class="flex align-items-center gap-1">
+            <span class="text-sm">{{ t('rating.my_rating') }}:</span>
+            <Rating :modelValue="userRating" :stars="10" @update:modelValue="saveRating" />
+          </div>
+          <small v-else class="text-color-secondary">{{ t('rating.login_to_rate') }}</small>
+        </div>
         <div class="flex gap-2 mb-3 flex-wrap">
           <Button :label="t('game.download')" icon="pi pi-download" severity="success"
             @click="downloadGame" :loading="preparing" />
@@ -128,6 +140,7 @@ import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import Divider from 'primevue/divider'
 import Dialog from 'primevue/dialog'
+import Rating from 'primevue/rating'
 import { useToast } from 'primevue/usetoast'
 import { downloadsApi } from '../api/downloads'
 
@@ -155,6 +168,7 @@ const viewerVisible = ref(false)
 const viewerIndex = ref(0)
 const viewerRef = ref(null)
 const screenshotLoaded = reactive({})
+const userRating = ref(0)
 
 function genreName(code) {
   return libraryStore.genreMap[code] || code
@@ -183,6 +197,7 @@ onMounted(async () => {
       libraryStore.filterOptions.genres?.length ? Promise.resolve() : libraryStore.fetchFilterOptions()
     ])
     game.value = gameRes.data.data
+    userRating.value = game.value.userRating || 0
   } finally {
     loading.value = false
   }
@@ -379,6 +394,18 @@ function prevImage() {
 
 function nextImage() {
   if (viewerIndex.value < game.value.screenshotUrls.length - 1) viewerIndex.value++
+}
+
+async function saveRating(val) {
+  userRating.value = val
+  try {
+    const res = await gamesApi.saveRating(game.value.id, val)
+    game.value.avgRating = res.data.data.avgRating
+    game.value.ratingsCount = res.data.data.ratingsCount
+  } catch {
+    userRating.value = game.value.userRating || 0
+    toast.add({ severity: 'error', summary: t('rating.rate'), life: 3000 })
+  }
 }
 
 function onViewerKeydown(e) {

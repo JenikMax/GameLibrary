@@ -1,11 +1,13 @@
 package com.jenikmax.game.library.controller.api;
 
+import com.jenikmax.game.library.dao.api.GameRatingRepository;
 import com.jenikmax.game.library.dao.api.ScreenshotRepository;
 import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.dto.api.*;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
+import com.jenikmax.game.library.service.data.api.UserService;
 import com.jenikmax.game.library.service.scraper.ScraperConfigService;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import org.slf4j.Logger;
@@ -13,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -20,9 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,16 +38,22 @@ public class LibraryController {
     private final ScraperConfigService scraperConfigService;
     private final String imagesDirectory;
     private final MessageSource messageSource;
+    private final GameRatingRepository ratingRepository;
+    private final UserService userService;
 
     public LibraryController(LibraryService libraryService,
                              ScreenshotRepository screenshotRepository,
                              ScraperConfigService scraperConfigService,
                              MessageSource messageSource,
+                             GameRatingRepository ratingRepository,
+                             UserService userService,
                              @Value("${game-library.images.directory:/gameLibrary/images}") String imagesDirectory) {
         this.libraryService = libraryService;
         this.screenshotRepository = screenshotRepository;
         this.scraperConfigService = scraperConfigService;
         this.messageSource = messageSource;
+        this.ratingRepository = ratingRepository;
+        this.userService = userService;
         this.imagesDirectory = imagesDirectory;
     }
 
@@ -89,6 +97,8 @@ public class LibraryController {
                 .map(this::toGameListResponse)
                 .collect(Collectors.toList());
 
+        populateListRatings(items);
+
         PageResponse<GameListResponse> pageResponse = new PageResponse<>(
                 items, page, totalPages, gameIdList.size(), pageSize);
 
@@ -118,14 +128,18 @@ public class LibraryController {
         if (gameDto == null) {
             return ResponseEntity.ok(ApiResponse.ok(null));
         }
-        return ResponseEntity.ok(ApiResponse.ok(toGameDetailResponse(gameDto)));
+        GameDetailResponse detailResp = toGameDetailResponse(gameDto);
+        populateRating(detailResp, gameDto.getId(), getCurrentUserId());
+        return ResponseEntity.ok(ApiResponse.ok(detailResp));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<GameDetailResponse>> getGame(@PathVariable Long id) {
         logger.info("REST get game - {}", id);
         GameDto gameDto = libraryService.getGameInfo(id);
-        return ResponseEntity.ok(ApiResponse.ok(toGameDetailResponse(gameDto)));
+        GameDetailResponse detailResp = toGameDetailResponse(gameDto);
+        populateRating(detailResp, id, getCurrentUserId());
+        return ResponseEntity.ok(ApiResponse.ok(detailResp));
     }
 
     @PostMapping("/{id}/edit")
@@ -254,5 +268,36 @@ public class LibraryController {
             // ignore, return base URL
         }
         return baseUrl;
+    }
+
+    private void populateRating(GameDetailResponse resp, Long gameId, Long userId) {
+        Double avg = ratingRepository.findAvgRatingByGameId(gameId);
+        resp.setAvgRating(avg != null ? Math.round(avg * 10.0) / 10.0 : null);
+        resp.setRatingsCount(ratingRepository.countRatingsByGameId(gameId));
+        if (userId != null) {
+            ratingRepository.findUserRating(gameId, userId).ifPresent(resp::setUserRating);
+        }
+    }
+
+    private void populateListRatings(List<GameListResponse> items) {
+        if (items.isEmpty()) return;
+        List<Long> ids = items.stream().map(GameListResponse::getId).collect(Collectors.toList());
+        List<Object[]> avgData = ratingRepository.findAvgRatingByGameIds(ids);
+        Map<Long, Double> avgMap = new HashMap<>();
+        for (Object[] row : avgData) {
+            Long gameId = (Long) row[0];
+            Double avg = row[1] != null ? (Double) row[1] : 0.0;
+            avgMap.put(gameId, Math.round(avg * 10.0) / 10.0);
+        }
+        for (GameListResponse item : items) {
+            item.setAvgRating(avgMap.getOrDefault(item.getId(), null));
+        }
+    }
+
+    private Long getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) return null;
+        var userDto = userService.getUserInfoByName(auth.getName());
+        return userDto != null ? userDto.getId() : null;
     }
 }

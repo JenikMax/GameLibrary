@@ -12,6 +12,7 @@ public class GameListResponse {
     private List<String> genres;
     private String logoUrl;
     private String logo;
+    private Double avgRating;
 
     public GameListResponse() {}
 
@@ -39,4 +40,6 @@ public class GameListResponse {
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
     public String getLogo() { return logo; }
     public void setLogo(String logo) { this.logo = logo; }
+    public Double getAvgRating() { return avgRating; }
+    public void setAvgRating(Double avgRating) { this.avgRating = avgRating; }
 }

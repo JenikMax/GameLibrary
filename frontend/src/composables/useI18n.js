@@ -182,6 +182,11 @@ const messages = {
     'admin.scrapers.no_config': 'Нет конфигураций',
     'not_found.message': 'Страница не найдена',
     'not_found.back': 'Вернуться в библиотеку',
+    'rating.title': 'Рейтинг',
+    'rating.my_rating': 'Моя оценка',
+    'rating.rate': 'Оценить',
+    'rating.login_to_rate': 'Войдите чтобы оценить',
+    'rating.count': '{n} оценок',
   },
   en: {
     'nav.library': 'Library',
@@ -364,6 +369,11 @@ const messages = {
     'admin.scrapers.no_config': 'No configurations',
     'not_found.message': 'Page not found',
     'not_found.back': 'Back to Library',
+    'rating.title': 'Rating',
+    'rating.my_rating': 'My rating',
+    'rating.rate': 'Rate',
+    'rating.login_to_rate': 'Log in to rate',
+    'rating.count': '{n} ratings',
   }
 }
 

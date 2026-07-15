@@ -21,6 +21,10 @@
         <Tag :value="game.platform" severity="info" />
         <Tag :value="game.releaseDate" severity="warn" />
       </div>
+      <div v-if="game.avgRating" class="flex gap-1 align-items-center mt-1">
+        <Rating :modelValue="game.avgRating" :stars="10" :cancel="false" readonly />
+        <span class="text-sm text-color-secondary">{{ game.avgRating }}</span>
+      </div>
     </template>
     <template #content>
       <div class="flex flex-wrap gap-1">
@@ -64,6 +68,7 @@ import { useLibraryStore } from '../stores/library'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
+import Rating from 'primevue/rating'
 import { gamesApi } from '../api/games'
 
 const props = defineProps({
