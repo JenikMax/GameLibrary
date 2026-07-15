@@ -14,6 +14,13 @@
         <div class="flex gap-2 align-items-center">
           <Badge :value="store.totalItems" severity="info" />
           <Button
+            :label="t('library.random')"
+            icon="pi pi-shuffle"
+            severity="info"
+            size="small"
+            @click="handleRandom"
+          />
+          <Button
             v-if="authStore.isAdmin"
             :label="t('library.scan')"
             icon="pi pi-refresh"
@@ -32,6 +39,11 @@
         <p class="text-xl mt-3">{{ t('library.no_games') }}</p>
       </div>
 
+      <div v-else-if="store.loading">
+        <div class="game-grid">
+          <GameCardSkeleton v-for="i in store.pageSize" :key="i" />
+        </div>
+      </div>
       <div v-else>
         <div v-if="store.totalItems > store.pageSize" class="flex justify-content-center mb-3">
           <Paginator
@@ -64,8 +76,10 @@ import { useLibraryStore } from '../stores/library'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
 import { adminApi } from '../api/admin'
+import { gamesApi } from '../api/games'
 import { useToast } from 'primevue/usetoast'
 import GameCard from '../components/GameCard.vue'
+import GameCardSkeleton from '../components/GameCardSkeleton.vue'
 import GameFilter from '../components/GameFilter.vue'
 import Paginator from 'primevue/paginator'
 import ProgressBar from 'primevue/progressbar'
@@ -145,6 +159,19 @@ function handleResetFilters() {
   store.resetFilters()
   sessionStorage.removeItem(LIBRARY_STATE_KEY)
   store.fetchGames(1)
+}
+
+async function handleRandom() {
+  try {
+    const res = await gamesApi.getRandomGame()
+    if (res.data.data) {
+      router.push(`/game/${res.data.data.id}`)
+    } else {
+      toast.add({ severity: 'warn', summary: t('library.random_failed'), life: 3000 })
+    }
+  } catch {
+    toast.add({ severity: 'error', summary: t('library.random_failed'), life: 3000 })
+  }
 }
 
 async function handleScan() {

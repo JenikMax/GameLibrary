@@ -15,6 +15,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -111,6 +112,15 @@ public class LibraryController {
         return ResponseEntity.ok(ApiResponse.ok(options));
     }
 
+    @GetMapping("/random")
+    public ResponseEntity<ApiResponse<GameDetailResponse>> getRandomGame() {
+        GameDto gameDto = libraryService.getRandomGame();
+        if (gameDto == null) {
+            return ResponseEntity.ok(ApiResponse.ok(null));
+        }
+        return ResponseEntity.ok(ApiResponse.ok(toGameDetailResponse(gameDto)));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<GameDetailResponse>> getGame(@PathVariable Long id) {
         logger.info("REST get game - {}", id);
@@ -119,7 +129,7 @@ public class LibraryController {
     }
 
     @PostMapping("/{id}/edit")
-    public ResponseEntity<ApiResponse<GameDetailResponse>> editGame(@PathVariable Long id, @RequestBody GameEditRequest gameEdit) {
+    public ResponseEntity<ApiResponse<GameDetailResponse>> editGame(@PathVariable Long id, @Valid @RequestBody GameEditRequest gameEdit) {
         logger.info("REST edit game - {}", id);
         try {
             // Delete screenshots by IDs before updating

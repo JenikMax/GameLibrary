@@ -24,5 +24,8 @@ export const gamesApi = {
   },
   getScrapers() {
     return api.get('/games/scrapers')
+  },
+  getRandomGame() {
+    return api.get('/games/random')
   }
 }

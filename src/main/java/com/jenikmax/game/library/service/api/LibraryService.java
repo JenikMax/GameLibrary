@@ -59,4 +59,6 @@ public interface LibraryService {
 
     ShortUser getUserInfo();
 
+    GameDto getRandomGame();
+
 }

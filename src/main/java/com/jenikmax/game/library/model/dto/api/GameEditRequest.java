@@ -1,10 +1,14 @@
 package com.jenikmax.game.library.model.dto.api;
 
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public class GameEditRequest {
 
+    @NotBlank(message = "Game name is required")
     private String name;
+
+    @NotBlank(message = "Platform is required")
     private String platform;
     private String releaseDate;
     private String directoryPath;

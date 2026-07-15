@@ -51,4 +51,6 @@ public interface GameService {
 
     List<String> getGameGenres();
 
+    Long findRandomGameId();
+
 }

@@ -18,11 +18,13 @@
             <div class="formgrid grid">
               <div class="field col-12 md:col-6">
                 <label for="name">{{ t('game.field.name') }}</label>
-                <InputText id="name" v-model="form.name" class="w-full" />
+                <InputText id="name" v-model="form.name" class="w-full" :class="{ 'p-invalid': errors.name }" />
+                <small v-if="errors.name" class="p-error">{{ errors.name }}</small>
               </div>
               <div class="field col-12 md:col-6">
                 <label for="platform">{{ t('game.field.platform') }}</label>
-                <InputText id="platform" v-model="form.platform" class="w-full" />
+                <InputText id="platform" v-model="form.platform" class="w-full" :class="{ 'p-invalid': errors.platform }" />
+                <small v-if="errors.platform" class="p-error">{{ errors.platform }}</small>
               </div>
               <div class="field col-12 md:col-4">
                 <label for="releaseDate">{{ t('game.field.release_date') }}</label>
@@ -179,6 +181,7 @@ const error = ref('')
 const success = ref('')
 const logoLoaded = ref(false)
 const existingSsLoaded = reactive({})
+const errors = ref({})
 
 const form = ref({
   name: '',
@@ -307,6 +310,15 @@ function removeNewScreenshot(index) {
 }
 
 async function handleSave() {
+  errors.value = {}
+  if (!form.value.name?.trim()) {
+    errors.value.name = t('game.field_required')
+  }
+  if (!form.value.platform?.trim()) {
+    errors.value.platform = t('game.field_required')
+  }
+  if (Object.keys(errors.value).length) return
+
   saving.value = true
   error.value = ''
   try {

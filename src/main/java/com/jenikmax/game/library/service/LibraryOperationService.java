@@ -285,6 +285,13 @@ public class LibraryOperationService implements LibraryService {
     }
 
     @Override
+    public GameDto getRandomGame() {
+        Long gameId = gameService.findRandomGameId();
+        if (gameId == null) return null;
+        return getGameInfo(gameId);
+    }
+
+    @Override
     public ShortUser getUserInfo() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();

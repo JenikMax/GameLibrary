@@ -16,7 +16,8 @@
           </div>
           <div class="field">
             <label for="password">{{ t('login.password') }}</label>
-            <Password id="password" v-model="password" class="w-full" toggleMask />
+            <Password id="password" v-model="password" class="w-full" toggleMask :feedback="true" />
+            <small class="text-muted">{{ t('login.password_requirements') }}</small>
           </div>
           <Button type="submit" :label="t('login.register')" icon="pi pi-user-plus" class="w-full mt-2" :loading="loading" />
         </form>
@@ -60,6 +61,10 @@ onBeforeUnmount(() => {
 async function handleRegister() {
   if (!username.value || !password.value) {
     error.value = t('login.fill_fields')
+    return
+  }
+  if (password.value.length < 8 || !/[A-Za-z]/.test(password.value) || !/\d/.test(password.value)) {
+    error.value = t('login.password_requirements')
     return
   }
   loading.value = true

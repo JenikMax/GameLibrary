@@ -9,6 +9,7 @@ import ProfileView from '../views/ProfileView.vue'
 import AdminUsersView from '../views/AdminUsersView.vue'
 import AdminScrapersView from '../views/AdminScrapersView.vue'
 import DownloadsView from '../views/DownloadsView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
 
 const routes = [
   {
@@ -64,6 +65,11 @@ const routes = [
     name: 'Downloads',
     component: DownloadsView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFoundView
   }
 ]
 

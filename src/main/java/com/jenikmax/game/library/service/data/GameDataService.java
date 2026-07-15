@@ -234,6 +234,11 @@ public class GameDataService implements GameService {
 
 
     @Override
+    public Long findRandomGameId() {
+        return sqlDao.executeIdGame("SELECT id FROM library.game_data ORDER BY RANDOM() LIMIT 1").stream().findFirst().orElse(null);
+    }
+
+    @Override
     public List<String> getGameGenres() {
         return sqlDao.executeByLowerStringList("select code from library.game_genre group by code order by description","code");
     }

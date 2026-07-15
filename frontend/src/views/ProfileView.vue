@@ -39,8 +39,10 @@
           <AccordionTab :header="t('profile.change_password')">
             <div class="field">
               <label for="newPass">{{ t('profile.new_password') }}</label>
-              <Password id="newPass" v-model="newPassword" class="w-full" toggleMask />
+              <Password id="newPass" v-model="newPassword" class="w-full" toggleMask :feedback="true" />
+              <small class="text-muted">{{ t('login.password_requirements') }}</small>
             </div>
+            <small v-if="passError" class="p-error">{{ passError }}</small>
             <Button :label="t('profile.change_password_btn')" icon="pi pi-key" @click="changePassword" :loading="changingPass" />
           </AccordionTab>
 
@@ -77,6 +79,7 @@ const authStore = useAuthStore()
 const toast = useToast()
 
 const newPassword = ref('')
+const passError = ref('')
 const selectedFile = ref(null)
 const previewUrl = ref('')
 const saving = ref(false)
@@ -115,7 +118,12 @@ async function uploadAvatar() {
 }
 
 async function changePassword() {
+  passError.value = ''
   if (!newPassword.value) return
+  if (newPassword.value.length < 8 || !/[A-Za-z]/.test(newPassword.value) || !/\d/.test(newPassword.value)) {
+    passError.value = t('login.password_requirements')
+    return
+  }
   changingPass.value = true
   message.value = ''
   try {

@@ -1,6 +1,17 @@
 <template>
-  <div v-if="loading" class="flex justify-content-center p-5">
-    <ProgressSpinner />
+  <div v-if="loading" class="game-detail-container">
+    <div class="game-main">
+      <div class="game-poster">
+        <Skeleton width="300px" height="450px" />
+      </div>
+      <div class="game-info">
+        <Skeleton width="60%" height="2rem" class="mb-3" />
+        <Skeleton width="30%" height="1.5rem" class="mb-3" />
+        <Skeleton width="100%" height="1rem" class="mb-2" />
+        <Skeleton width="100%" height="1rem" class="mb-2" />
+        <Skeleton width="80%" height="1rem" class="mb-2" />
+      </div>
+    </div>
   </div>
   <div v-else-if="game" class="game-detail-container">
     <div class="game-main">
@@ -110,7 +121,7 @@ import { useAuthStore } from '../stores/auth'
 import { useLibraryStore } from '../stores/library'
 import { useI18n } from '../composables/useI18n'
 import { gamesApi } from '../api/games'
-import ProgressSpinner from 'primevue/progressspinner'
+import Skeleton from 'primevue/skeleton'
 import ProgressBar from 'primevue/progressbar'
 import Image from 'primevue/image'
 import Tag from 'primevue/tag'
