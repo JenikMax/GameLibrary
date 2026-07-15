@@ -14,6 +14,10 @@
   <b>RU:</b> Каталогизатор компьютерных игр для NAS — сканирование ФС, сбор метаданных из 7 скраперов, просмотр и скачивание через P2P-торренты.
 </p>
 
+<p align="center">
+  <img src="frontend/public/preview.jpg" alt="GameLibrary Preview" width="800">
+</p>
+
 ---
 
 <p align="center">
