@@ -97,6 +97,7 @@
         <h1 th:text="#{view.profile.title} + ' ' + ${user.name}"></h1>
         <div class="avatar_div">
             <form th:action="@{'/profile'}" method="post">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                 <input type="hidden" name="id" th:value="${user.id}">
                 <input type="hidden" name="name" th:value="${user.name}">
                 <div class="avatar_ico">
@@ -137,6 +138,7 @@
         </div>
         <div class="pass_div">
             <form id="pass_form" th:action="@{'/profile/pass'}" method="post">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                 <input type="hidden" name="id" th:value="${user.id}">
                 <input type="hidden" name="name" th:value="${user.name}">
                 <div id="error" class="error"></div>

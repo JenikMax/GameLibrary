@@ -1,11 +1,17 @@
 import { ref, watch } from 'vue'
 
-const isDarkMode = ref(localStorage.getItem('darkMode') === 'true')
+let initialDarkMode = false
+try {
+  initialDarkMode = localStorage.getItem('darkMode') === 'true'
+} catch {
+  initialDarkMode = false
+}
+const isDarkMode = ref(initialDarkMode)
 
 export function useDarkMode() {
   function toggleDarkMode() {
     isDarkMode.value = !isDarkMode.value
-    localStorage.setItem('darkMode', isDarkMode.value)
+    try { localStorage.setItem('darkMode', isDarkMode.value) } catch {}
     updateClass()
   }
 

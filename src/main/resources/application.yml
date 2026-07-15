@@ -43,6 +43,8 @@ spring:
       default_schema: library
 
 game-library:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
   games:
     directory: ${GAMES_DIRECTORY:/gameLibrary}
     torrent:

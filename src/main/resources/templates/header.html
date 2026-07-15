@@ -1,4 +1,6 @@
 <div th:fragment="header">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <div class="header_library">
     <a th:href="@{/library}" style="text-decoration: none; color: inherit;">
         <img th:src="@{/img/logo.jpg}" alt="Logo">
@@ -6,6 +8,7 @@
 </div>
 <div class="header_search">
     <form th:action="@{/search}" method="post">
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
         <div class="search_container">
             <input type="text" th:placeholder="#{view.library.filter.search.name.placeholder}" name="searchText" id="h_searchText" th:value="${searchText}"><button id="h_searchButton" type="submit" th:text="#{view.navigation.find}"></button>
         </div>
@@ -13,6 +16,7 @@
 </div>
 <div class="header_user">
     <form th:action="@{/logout}" method="post">
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
         <div class="user_container">
             <div class="avatar">
                 <a th:href="@{/profile}" style="text-decoration: none; color: inherit;" th:alt="${user.name}">

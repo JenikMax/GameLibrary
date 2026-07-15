@@ -48,6 +48,7 @@ public class GameDataService implements GameService {
 
 
 
+    @SuppressWarnings("deprecation")
     public List<GameShortDto> getGameShortList(){
         String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
                 "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
@@ -56,6 +57,7 @@ public class GameDataService implements GameService {
         return sqlDao.executeShortGame(sql);
     }
 
+    @SuppressWarnings("deprecation")
     public List<GameShortDto> getGameShortList(int startIndex, int endIndex){
         String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
                 "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
@@ -66,6 +68,7 @@ public class GameDataService implements GameService {
     }
 
 
+    @SuppressWarnings("deprecation")
     public List<Long> getGameShortIdList(){
         return sqlDao.executeIdGame("select id from game_data order by name");
     }
@@ -186,31 +189,35 @@ public class GameDataService implements GameService {
 
     private String buildOrderClause(String sortField, String sortType) {
         if (sortField == null || sortField.isEmpty()) return " order by g.name";
-        switch (sortField) {
-            case "year":  sortField = "g.release_date"; break;
-            case "create": sortField = "g.create_ts"; break;
-            case "rating": sortField = "coalesce((select avg(rating) from library.game_rating where game_id = g.id), 0)"; break;
-            default:       sortField = "g.name";
-        }
+        sortField = switch (sortField) {
+            case "year" -> "g.release_date";
+            case "create" -> "g.create_ts";
+            case "rating" -> "coalesce((select avg(rating) from library.game_rating where game_id = g.id), 0)";
+            default -> "g.name";
+        };
         boolean desc = sortType != null && sortType.equals("desc");
         return " order by " + sortField + (desc ? " desc" : "");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public List<String> getReleaseDates() {
         return sqlDao.executeByStringList("select release_date from library.game_data group by release_date order by release_date","release_date");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public List<String> getGamesPlatforms() {
         return sqlDao.executeByStringList("select platform from library.game_data group by platform order by platform","platform");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public List<Genre> getGenres() {
         return sqlDao.getGenreList("select code from library.game_genre group by code order by description_ru","code");
     }
 
+    @SuppressWarnings("deprecation")
     public List<Genre> getGenres(Locale locale){
         if(locale.getLanguage().equals("ru")){
             return sqlDao.getGenreList("select code from library.game_genre group by code order by description_ru","code");
@@ -220,12 +227,13 @@ public class GameDataService implements GameService {
         }
     }
 
-
+    @SuppressWarnings("deprecation")
     @Override
     public Long findRandomGameId() {
         return sqlDao.executeIdGame("SELECT id FROM library.game_data ORDER BY RANDOM() LIMIT 1").stream().findFirst().orElse(null);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public List<String> getGameGenres() {
         return sqlDao.executeByLowerStringList("select code from library.game_genre group by code order by description","code");

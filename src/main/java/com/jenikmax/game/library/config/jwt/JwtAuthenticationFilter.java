@@ -1,5 +1,6 @@
 package com.jenikmax.game.library.config.jwt;
 
+import jakarta.servlet.http.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -7,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -16,8 +18,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
+@Order(1800)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
@@ -53,6 +57,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
+        }
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            return Arrays.stream(cookies)
+                    .filter(c -> "token".equals(c.getName()))
+                    .map(Cookie::getValue)
+                    .findFirst().orElse(null);
         }
         return null;
     }

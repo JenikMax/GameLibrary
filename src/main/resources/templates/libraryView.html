@@ -112,6 +112,7 @@
 
     <div class="filter">
         <form th:action="@{/filter}" id="filterForm" method="post">
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
             <script>
 
             </script>
@@ -150,6 +151,7 @@
             <button type="reset"  onclick="resetForm()" th:text="#{view.navigation.reset}"></button>
         </form>
         <form th:if="${user != null && user.isAdmin}" th:action="@{/scan}" method="post">
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
             <button type="submit" th:text="#{view.navigation.library.update}"></button>
         </form>
     </div>
@@ -157,6 +159,7 @@
         <h3 th:text="#{view.library.games.title}"></h3>
         <div class="sort-type">
             <form id="sortForm" th:action="@{/sort}" method="post">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                 <input type="hidden" id="sortField" name="sortFieldCurent" th:value="${sortField}"/>
                 <input type="hidden" id="sortType" name="sortTypeCurent" th:value="${sortType}"/>
                 <div class="sort-container">
@@ -168,6 +171,7 @@
         </div>
         <div class="pagination">
             <form id="paginationForm1" th:action="@{/filter}" method="post">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                 <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage1(this)">««</button>
                 <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="gotoPage1(this)">«</button>
                 <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="gotoPage1(this)" th:text="${number}"></button>
@@ -190,6 +194,7 @@
         </ul>
         <div class="pagination">
             <form id="paginationForm2" th:action="@{/filter}" method="post">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                 <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page='1'"  onclick="gotoPage2(this)">««</button>
                 <button th:classappend="${page == 1} ? 'disabled' : ''" type="submit" th:disabled="${page == 1}" th:attr="data-page=${page - 1}"  onclick="gotoPage2(this)">«</button>
                 <button th:each="number : ${pages}" type="button" th:classappend="${number == page} ? 'active' : ''" th:attr="data-page=${number}" onclick="gotoPage2(this)" th:text="${number}"></button>

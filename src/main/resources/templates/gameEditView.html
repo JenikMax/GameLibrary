@@ -152,6 +152,7 @@
     <div class="data">
         <h2 th:text="#{view.game.edit.data.title}"></h2>
         <form th:action="@{'/library/game/' + ${game.id} + '/grab'}" method="post">
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
             <label for="source" th:text="#{view.game.edit.data.source.title}"></label>
             <select id="source" name="source"  onchange="toggleUrlField()">
                 <option value="manual" th:text="#{view.game.edit.data.source.manual}"></option>
@@ -185,6 +186,7 @@
     <div class="edit">
         <h1 th:text="#{view.game.edit.title}"></h1>
         <form th:action="@{'/library/game/' + ${game.id} + '/edit'}" method="post">
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
             <input type="hidden" id="directoryPath" name="directoryPath" th:value="${game.directoryPath}">
             <input type="hidden" id="platform" name="platform" th:value="${game.platform}">
             <div class="game_name">

@@ -6,8 +6,11 @@ import com.jenikmax.game.library.model.exceptions.IllegalPassException;
 import com.jenikmax.game.library.model.exceptions.IllegalUsernameException;
 import com.jenikmax.game.library.service.data.UserDataService;
 import com.jenikmax.game.library.config.jwt.JwtTokenProvider;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,15 +30,19 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
     private final UserDataService userService;
+    private final long jwtExpirationMs;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserDataService userService) {
+    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserDataService userService,
+                           @Value("${game-library.jwt.expiration-ms:86400000}") long jwtExpirationMs) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.userService = userService;
+        this.jwtExpirationMs = jwtExpirationMs;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest,
+                                                             HttpServletResponse response) {
         logger.info("REST login request for user: {}", loginRequest.getUsername());
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -43,6 +50,14 @@ public class AuthController {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = tokenProvider.generateToken(authentication);
+
+            // Set httpOnly cookie (more secure than localStorage)
+            Cookie cookie = new Cookie("token", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
+            cookie.setPath("/game-library");
+            cookie.setMaxAge((int) (jwtExpirationMs / 1000));
+            response.addCookie(cookie);
 
             com.jenikmax.game.library.model.dto.ShortUser shortUser = userService.getUserInfoByName(loginRequest.getUsername());
             UserProfileResponse profile = new UserProfileResponse();
