@@ -60,22 +60,8 @@
         v-for="(entry, i) in games"
         :key="entry.id"
         class="game-card-wrapper"
-        @click="router.push(`/game/${entry.gameId}`)"
       >
-        <div class="game-card-preview surface-card border-1 border-round overflow-hidden cursor-pointer hover:shadow-2 transition-shadow">
-          <div class="game-logo-wrap">
-            <img
-              :src="`/game-library/api/images/games/${entry.gameId}/logo`"
-              :alt="entry.name"
-              class="game-logo"
-              @error="$event.target.src = '/game-library/img/default.jpg'"
-            />
-          </div>
-          <div class="p-2">
-            <div class="font-semibold text-sm">{{ entry.name }}</div>
-            <div class="text-xs text-color-secondary">{{ entry.platform }}</div>
-          </div>
-        </div>
+        <GameCard :game="entry.gameData" />
         <Button
           v-if="isOwner"
           icon="pi pi-times"
@@ -96,7 +82,7 @@
 
 <script setup>
 import { ref, onMounted, onActivated, watch, computed } from 'vue'
-import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
 import { useAuthStore } from '../stores/auth'
 import { collectionsApi } from '../api/collections'
@@ -107,6 +93,7 @@ import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
+import GameCard from '../components/GameCard.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -150,8 +137,15 @@ async function load() {
       const info = shortGames[i] || {}
       return {
         ...e,
-        name: info.name || `#${e.gameId}`,
-        platform: info.platform || ''
+        gameData: {
+          id: e.gameId,
+          name: info.name || `#${e.gameId}`,
+          platform: info.platform || '',
+          releaseDate: info.releaseDate || '',
+          genres: info.genres || [],
+          avgRating: info.avgRating || null,
+          logoUrl: `/game-library/api/images/games/${e.gameId}/logo`
+        }
       }
     })
   } catch {
@@ -214,28 +208,16 @@ async function handleRemove(gameId) {
 }
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1rem;
 }
 .game-card-wrapper {
   position: relative;
 }
-.game-card-preview {
-  transition: box-shadow 0.2s;
-}
-.game-logo-wrap {
-  aspect-ratio: 2 / 3;
-  overflow: hidden;
-  background: var(--p-surface-100);
-}
-.game-logo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 .remove-btn {
   position: absolute;
   top: 0.25rem;
   right: 0.25rem;
+  z-index: 1;
 }
 </style>
