@@ -1,5 +1,5 @@
 <template>
-  <Dialog :visible="visible" @update:visible="$emit('close')" :header="t('collections.add_to')" :modal="true" :closable="true" class="w-[600px]">
+  <Dialog :visible="visible" @update:visible="$emit('close')" :header="t('collections.add_to')" :modal="true" :closable="true" class="w-[700px]">
     <div v-if="loading" class="flex justify-content-center p-3">
       <ProgressSpinner style="width: 50px; height: 50px" />
     </div>
@@ -8,14 +8,14 @@
       {{ t('collections.no_collections') }}
     </div>
 
-    <div v-else>
+    <div v-else class="flex flex-column" style="max-height: 55vh; overflow: hidden">
       <InputText
         v-model="search"
         :placeholder="t('filter.search_placeholder')"
         class="w-full mb-2"
         size="small"
       />
-      <div class="picker-list max-h-20rem overflow-y-auto mb-2">
+      <div class="picker-list flex-1 overflow-y-auto" style="min-height: 0">
         <div
           v-for="collection in filteredCollections"
           :key="collection.id"
@@ -130,6 +130,9 @@ async function toggleGame(c) {
 <style scoped>
 .picker-list {
   scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  margin-bottom: 12px;
+  padding-right: 16px;
 }
 .collection-item {
   transition: background-color 0.15s ease;
