@@ -18,10 +18,6 @@
   <img src="frontend/public/preview.jpg" alt="GameLibrary Preview" width="800">
 </p>
 
-<p align="center">
-  <img src="frontend/public/collections.jpg" alt="GameLibrary Collections" width="800">
-</p>
-
 ---
 
 <p align="center">
@@ -65,6 +61,10 @@
 | 🔗 Related games (same genre or similar name) | |
 | 📊 Statistics dashboard (charts by platform/genre/year, top lists) | |
 | 📂 Game collections (playlists, public/private, reorder) | |
+
+<p align="center">
+  <img src="frontend/public/collections.jpg" alt="GameLibrary Collections" width="800">
+</p>
 
 ## ⚡ Quick Start
 
@@ -557,6 +557,10 @@ npm run dev
 | 🔗 Связанные игры (жанр или похожее название) | |
 | 📊 Статистика библиотеки (диаграммы по платформам/жанрам/годам, топы) | |
 | 📂 Коллекции игр (плейлисты, публичные/приватные, сортировка) | |
+
+<p align="center">
+  <img src="frontend/public/collections.jpg" alt="GameLibrary Collections" width="800">
+</p>
 
 ## ⚡ Быстрый старт
 
