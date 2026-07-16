@@ -4,6 +4,9 @@ export const collectionsApi = {
   list() {
     return api.get('/collections')
   },
+  listWithHero() {
+    return api.get('/collections/with-hero')
+  },
   get(id) {
     return api.get(`/collections/${id}`)
   },

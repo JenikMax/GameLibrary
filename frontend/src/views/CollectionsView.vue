@@ -33,23 +33,11 @@
     </div>
 
     <div v-else class="collections-grid">
-      <div
+      <CollectionCard
         v-for="c in collections"
         :key="c.id"
-        class="collection-card p-3 border-1 border-round surface-card cursor-pointer hover:shadow-2 transition-shadow"
-        @click="router.push(`/collections/${c.id}`)"
-      >
-        <div class="flex align-items-center justify-content-between mb-2">
-          <i class="pi pi-folder" style="font-size: 1.5rem; color: var(--p-primary-color)" />
-          <Tag v-if="c.isPublic" :value="t('collections.public')" severity="info" size="small" />
-        </div>
-        <h3 class="m-0 mb-1 text-base">{{ c.name }}</h3>
-        <p v-if="c.description" class="m-0 text-sm text-color-secondary line-clamp-2">{{ c.description }}</p>
-        <div class="flex align-items-center gap-2 mt-2 text-xs text-color-secondary">
-          <span>{{ c.gameCount }} {{ t('collections.games') }}</span>
-          <span>{{ c.username }}</span>
-        </div>
-      </div>
+        :collection="c"
+      />
     </div>
   </div>
 </template>
@@ -64,8 +52,8 @@ import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Checkbox from 'primevue/checkbox'
-import Tag from 'primevue/tag'
 import Button from 'primevue/button'
+import CollectionCard from '../components/CollectionCard.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -85,7 +73,7 @@ onActivated(load)
 async function load() {
   loading.value = true
   try {
-    const res = await collectionsApi.list()
+    const res = await collectionsApi.listWithHero()
     collections.value = res.data.data || []
   } catch {
     toast.add({ severity: 'error', summary: t('collections.load_failed'), life: 3000 })
@@ -119,22 +107,13 @@ async function handleCreate() {
 
 <style scoped>
 .collections-page {
-  max-width: 1000px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 1rem;
 }
 .collections-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-}
-.collection-card {
-  transition: box-shadow 0.2s;
-}
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
 }
 </style>

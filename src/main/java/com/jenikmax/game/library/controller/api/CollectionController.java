@@ -54,6 +54,13 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
+    @GetMapping("/with-hero")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> listCollectionsWithHero() {
+        Long currentUserId = getCurrentUserId();
+        List<Map<String, Object>> result = collectionService.getCollectionsWithHeroData(currentUserId);
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getCollection(@PathVariable Long id) {
         return collectionService.getById(id)
