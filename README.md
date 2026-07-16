@@ -18,6 +18,10 @@
   <img src="frontend/public/preview.jpg" alt="GameLibrary Preview" width="800">
 </p>
 
+<p align="center">
+  <img src="frontend/public/collections.jpg" alt="GameLibrary Collections" width="800">
+</p>
+
 ---
 
 <p align="center">
@@ -171,6 +175,7 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `PUT /api/collections/{id}/games/reorder` | USER, ADMIN | Reorder games in collection |
 | **Statistics** | | |
 | `GET /api/statistics` | USER, ADMIN | Library metrics (counts, charts, top lists) |
+| `POST /api/statistics/refresh-sizes` | USER, ADMIN | Reset cached game sizes — recomputed on next GET |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Torrent preparation task status |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Seed task status |
@@ -264,7 +269,7 @@ Schema `library`:
 
 | Table | Purpose |
 |-------|---------|
-| `game_data` | Games (id, name, platform, release_date, description, instruction, trailer_url, logo, directory_path) |
+| `game_data` | Games (id, name, platform, release_date, description, instruction, trailer_url, logo, directory_path, total_size_bytes) |
 | `game_genre` | Genre dictionary (code, description, description_ru) — ~70 genres |
 | `game_data_genre` | M:N game ↔ genre |
 | `game_screenshot` | Screenshots (bytea) |
@@ -662,6 +667,7 @@ make all                      # сборка backend + frontend, запуск do
 | `PUT /api/collections/{id}/games/reorder` | USER, ADMIN | Изменить порядок игр |
 | **Statistics** | | |
 | `GET /api/statistics` | USER, ADMIN | Метрики библиотеки (диаграммы, топы) |
+| `POST /api/statistics/refresh-sizes` | USER, ADMIN | Сбросить кэш размеров игр — пересчёт при следующем GET |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Статус подготовки торрента |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Статус раздачи |
@@ -745,7 +751,7 @@ make all                      # сборка backend + frontend, запуск do
 
 | Таблица | Назначение |
 |---------|-----------|
-| `game_data` | Игры (id, name, platform, release_date, description, instruction, trailer_url, logo, directory_path) |
+| `game_data` | Игры (id, name, platform, release_date, description, instruction, trailer_url, logo, directory_path, total_size_bytes) |
 | `game_genre` | Справочник жанров (code, description, description_ru) — ~70 жанров |
 | `game_data_genre` | M:N игра ↔ жанр |
 | `game_screenshot` | Скриншоты (bytea) |
