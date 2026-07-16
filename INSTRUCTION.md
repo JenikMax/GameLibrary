@@ -298,6 +298,10 @@ docker compose logs -f
    - Админ-панель → Пользователи
    - Кнопка «Добавить пользователя» (если она есть в UI) — или пользователи сами зарегистрируются через страницу `/register`
 
+3. Ознакомьтесь с новыми разделами в меню:
+   - **Статистика** (`/statistics`) — диаграммы по платформам, жанрам, годам, топы игр
+   - **Коллекции** (`/collections`) — создавайте плейлисты игр, делитесь ими с другими
+
 ---
 
 ## 8. Добавление игр в библиотеку
@@ -545,6 +549,10 @@ All 4 services should show `Up`.
 | Password | `password` |
 
 **Change password immediately** via profile menu → "Change Password".
+
+**Explore new features:**
+- **Statistics** (`/statistics`) — charts by platform, genre, year; top rated/most favorited
+- **Collections** (`/collections`) — create game playlists, make them public, reorder games
 
 ## 8. Add games
 

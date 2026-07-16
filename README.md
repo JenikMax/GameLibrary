@@ -59,6 +59,8 @@
 | 🔔 Notifications (torrent ready, scan done, etc.) | |
 | 👁 View history (last 20, stored in localStorage) | |
 | 🔗 Related games (same genre or similar name) | |
+| 📊 Statistics dashboard (charts by platform/genre/year, top lists) | |
+| 📂 Game collections (playlists, public/private, reorder) | |
 
 ## ⚡ Quick Start
 
@@ -124,6 +126,9 @@ Opens at `http://localhost` — login as `admin` / `password`.
 | `/admin/users` | ADMIN | User management |
 | `/admin/scrapers` | ADMIN | Scraper config (API keys, on/off) |
 | `/downloads` | USER, ADMIN | Transmission seeding status |
+| `/statistics` | USER, ADMIN | Library statistics dashboard (charts, top lists) |
+| `/collections` | USER, ADMIN | User game collections |
+| `/collections/:id` | USER, ADMIN | Collection detail (games grid) |
 
 ### API Endpoints
 
@@ -154,6 +159,18 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `POST /games/{id}/comments` | USER, ADMIN | Add comment |
 | `DELETE /games/{id}/comments/{commentId}` | USER, ADMIN | Delete own comment |
 | `GET /games/{id}/related` | USER, ADMIN | Related games by genre/name (same platform removed) |
+| **Collections** | | |
+| `GET /api/collections` | USER, ADMIN | List own + public collections |
+| `GET /api/collections/{id}` | USER, ADMIN | Get single collection |
+| `POST /api/collections` | USER, ADMIN | Create collection (`name`, `description?`, `isPublic?`) |
+| `PUT /api/collections/{id}` | USER, ADMIN | Update collection (name, description, isPublic) |
+| `DELETE /api/collections/{id}` | USER, ADMIN | Delete collection |
+| `GET /api/collections/{id}/games` | USER, ADMIN | List games in collection |
+| `POST /api/collections/{id}/games` | USER, ADMIN | Add game to collection |
+| `DELETE /api/collections/{id}/games/{gameId}` | USER, ADMIN | Remove game from collection |
+| `PUT /api/collections/{id}/games/reorder` | USER, ADMIN | Reorder games in collection |
+| **Statistics** | | |
+| `GET /api/statistics` | USER, ADMIN | Library metrics (counts, charts, top lists) |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Torrent preparation task status |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Seed task status |
@@ -254,9 +271,11 @@ Schema `library`:
 | `favorite_game` | User favorites (user_id + game_id) |
 | `game_comment` | Comments with ownership and timestamps |
 | `notification` | User notifications with `is_read` flag |
+| `game_collection` | User-created game collections (name, description, is_public, FK → user) |
+| `game_collection_entry` | M:N collection ↔ game (sort_order for reordering, unique constraint) |
 | `library_user` | Users (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `1_init.sh` (schema), `2_library.sql` (tables + genres), `3_user.sql` (users + seed), `4_search.sql` (full-text search), `5_rating.sql`, `6_favorite.sql`, `7_comment.sql`, `8_notification.sql`.
+DDL: `postgresdb/ddl/` — `1_init.sh` (schema), `2_library.sql` (tables + genres), `3_user.sql` (users + seed), `4_search.sql` (full-text search), `5_rating.sql`, `6_favorite.sql`, `7_comment.sql`, `8_notification.sql`, `9_collection.sql`.
 
 ## 🔒 Security
 
@@ -530,6 +549,8 @@ npm run dev
 | 🔔 Уведомления (торрент готов, сканирование завершено и т.д.) | |
 | 👁 История просмотров (последние 20, localStorage) | |
 | 🔗 Связанные игры (жанр или похожее название) | |
+| 📊 Статистика библиотеки (диаграммы по платформам/жанрам/годам, топы) | |
+| 📂 Коллекции игр (плейлисты, публичные/приватные, сортировка) | |
 
 ## ⚡ Быстрый старт
 
@@ -595,6 +616,9 @@ make all                      # сборка backend + frontend, запуск do
 | `/admin/users` | ADMIN | Управление пользователями |
 | `/admin/scrapers` | ADMIN | Настройка скраперов |
 | `/downloads` | USER, ADMIN | Статус раздач Transmission |
+| `/statistics` | USER, ADMIN | Статистика библиотеки (диаграммы, топы) |
+| `/collections` | USER, ADMIN | Коллекции игр |
+| `/collections/:id` | USER, ADMIN | Детали коллекции (сетка игр) |
 
 ### API Endpoints
 
@@ -625,6 +649,18 @@ make all                      # сборка backend + frontend, запуск do
 | `POST /games/{id}/comments` | USER, ADMIN | Добавить комментарий |
 | `DELETE /games/{id}/comments/{commentId}` | USER, ADMIN | Удалить свой комментарий |
 | `GET /games/{id}/related` | USER, ADMIN | Связанные игры (жанр или похожее название) |
+| **Collections** | | |
+| `GET /api/collections` | USER, ADMIN | Свои + публичные коллекции |
+| `GET /api/collections/{id}` | USER, ADMIN | Получить коллекцию |
+| `POST /api/collections` | USER, ADMIN | Создать коллекцию |
+| `PUT /api/collections/{id}` | USER, ADMIN | Обновить коллекцию |
+| `DELETE /api/collections/{id}` | USER, ADMIN | Удалить коллекцию |
+| `GET /api/collections/{id}/games` | USER, ADMIN | Список игр в коллекции |
+| `POST /api/collections/{id}/games` | USER, ADMIN | Добавить игру в коллекцию |
+| `DELETE /api/collections/{id}/games/{gameId}` | USER, ADMIN | Удалить игру из коллекции |
+| `PUT /api/collections/{id}/games/reorder` | USER, ADMIN | Изменить порядок игр |
+| **Statistics** | | |
+| `GET /api/statistics` | USER, ADMIN | Метрики библиотеки (диаграммы, топы) |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Статус подготовки торрента |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Статус раздачи |
@@ -715,9 +751,11 @@ make all                      # сборка backend + frontend, запуск do
 | `favorite_game` | Избранное пользователя |
 | `game_comment` | Комментарии с владельцем и временем |
 | `notification` | Уведомления с флагом `is_read` |
+| `game_collection` | Коллекции игр пользователей (name, description, is_public, FK → user) |
+| `game_collection_entry` | M:N коллекция ↔ игра (sort_order для сортировки, unique constraint) |
 | `library_user` | Пользователи (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `1_init.sh` (схема), `2_library.sql` (таблицы + жанры), `3_user.sql` (пользователи + seed), `4_search.sql` (полнотекстовый поиск), `5_rating.sql` (оценки), `6_favorite.sql` (избранное), `7_comment.sql` (комментарии), `8_notification.sql` (уведомления).
+DDL: `postgresdb/ddl/` — `1_init.sh` (схема), `2_library.sql` (таблицы + жанры), `3_user.sql` (пользователи + seed), `4_search.sql` (полнотекстовый поиск), `5_rating.sql` (оценки), `6_favorite.sql` (избранное), `7_comment.sql` (комментарии), `8_notification.sql` (уведомления), `9_collection.sql` (коллекции).
 
 ## 🔒 Безопасность
 
