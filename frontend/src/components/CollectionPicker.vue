@@ -1,5 +1,5 @@
 <template>
-  <Dialog :visible="visible" @update:visible="$emit('close')" :header="t('collections.add_to')" :modal="true" :closable="true" class="w-[700px]">
+  <Dialog :visible="visible" @update:visible="$emit('close')" :header="t('collections.add_to')" :modal="true" :closable="true" :dismissableMask="true" class="w-[700px]">
     <div v-if="loading" class="flex justify-content-center p-3">
       <ProgressSpinner style="width: 50px; height: 50px" />
     </div>
