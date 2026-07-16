@@ -258,6 +258,8 @@ const messages = {
     'statistics.no_data': 'Нет данных',
     'statistics.no_ratings': 'Нет оценок',
     'statistics.no_favorites': 'Нет в избранном',
+    'statistics.refresh_sizes': 'Обновить размер',
+    'statistics.refresh_sizes_confirm': 'Сбросить кэш размеров? При следующем открытии размер будет пересчитан заново.',
   },
   en: {
     'nav.library': 'Library',
@@ -516,6 +518,8 @@ const messages = {
     'statistics.no_data': 'No data',
     'statistics.no_ratings': 'No ratings',
     'statistics.no_favorites': 'No favorites',
+    'statistics.refresh_sizes': 'Refresh sizes',
+    'statistics.refresh_sizes_confirm': 'Reset size cache? On next open sizes will be recomputed from disk.',
   }
 }
 

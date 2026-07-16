@@ -2,6 +2,11 @@
   <div class="statistics-page">
     <h2 class="mb-3">{{ t('statistics.title') }}</h2>
 
+    <div class="flex justify-content-end mb-3">
+      <Button :label="t('statistics.refresh_sizes')" icon="pi pi-refresh" severity="secondary" size="small"
+        :loading="refreshing" @click="handleRefreshSizes" />
+    </div>
+
     <div v-if="loading" class="flex justify-content-center p-5">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem" />
     </div>
@@ -115,6 +120,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
 import { statisticsApi } from '../api/statistics'
+import Button from 'primevue/button'
 import { Bar, Pie } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -134,6 +140,22 @@ const router = useRouter()
 
 const stats = ref(null)
 const loading = ref(false)
+const refreshing = ref(false)
+
+async function handleRefreshSizes() {
+  if (!window.confirm(t('statistics.refresh_sizes_confirm'))) return
+  refreshing.value = true
+  try {
+    await statisticsApi.refreshSizes()
+    stats.value = null
+    loading.value = true
+    const res = await statisticsApi.get()
+    stats.value = res.data.data
+  } finally {
+    refreshing.value = false
+    loading.value = false
+  }
+}
 
 const chartOptions = {
   responsive: true,

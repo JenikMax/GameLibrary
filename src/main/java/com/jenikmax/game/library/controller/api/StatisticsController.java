@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -92,6 +93,14 @@ public class StatisticsController {
                         rs.getLong("id"), rs.getString("name"), rs.getLong("favorite_count"))));
 
         return ResponseEntity.ok(ApiResponse.ok(stats));
+    }
+
+    @PostMapping("/refresh-sizes")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> refreshSizes() {
+        int updated = jdbcTemplate.update(
+                "UPDATE library.game_data SET total_size_bytes = NULL WHERE total_size_bytes IS NOT NULL");
+        logger.info("Reset total_size_bytes for {} games", updated);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("resetCount", updated)));
     }
 
     private long count(String sql) {

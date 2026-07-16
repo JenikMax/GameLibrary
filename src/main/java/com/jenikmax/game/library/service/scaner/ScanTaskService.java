@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -131,7 +132,42 @@ public class ScanTaskService implements DisposableBean {
                         em.close();
                     }
                     imgDone++;
-                    task.setProgress(50 + imgDone * 45 / Math.max(newTotal, 1));
+                    task.setProgress(40 + imgDone * 30 / Math.max(newTotal, 1));
+                }
+
+                task.setStatus(ScanTask.Status.REFRESHING_SIZES);
+                Map<String, Long> existingMap = new LinkedHashMap<>();
+                for (Game fg : findGames) {
+                    Long id = storedMap.get(fg.getDirectoryPath());
+                    if (id != null) {
+                        existingMap.put(fg.getDirectoryPath(), id);
+                    }
+                }
+                int existTotal = existingMap.size();
+                int existDone = 0;
+                for (Map.Entry<String, Long> entry : existingMap.entrySet()) {
+                    String dirPath = entry.getKey();
+                    String displayName = dirPath.substring(dirPath.lastIndexOf('/') + 1);
+                    task.setCurrentGame("refreshing size: " + displayName);
+                    long size = scanerService.calculateGameDirSize(dirPath);
+                    EntityManager em = emf.createEntityManager();
+                    try {
+                        em.getTransaction().begin();
+                        Game game = em.find(Game.class, entry.getValue());
+                        if (game != null) {
+                            game.setTotalSizeBytes(size);
+                        }
+                        em.getTransaction().commit();
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        logger.warn("Failed to refresh size for game {}", entry.getValue(), e);
+                    } finally {
+                        em.close();
+                    }
+                    existDone++;
+                    task.setProgress(70 + existDone * 25 / Math.max(existTotal, 1));
                 }
 
                 for (Game gameShort : gamesToDelete) {
