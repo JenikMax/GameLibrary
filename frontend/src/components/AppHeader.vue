@@ -153,6 +153,16 @@ const items = computed(() => {
       label: t('nav.downloads'),
       icon: 'pi pi-download',
       command: () => router.push('/downloads')
+    },
+    {
+      label: t('nav.collections'),
+      icon: 'pi pi-folder',
+      command: goToCollections
+    },
+    {
+      label: t('nav.statistics'),
+      icon: 'pi pi-chart-bar',
+      command: goToStatistics
     }
   ]
   if (authStore.isAdmin) {
@@ -255,6 +265,14 @@ async function goToFavorites() {
     await router.push('/?favorites=1')
     libStore.fetchGames(1)
   }
+}
+
+async function goToCollections() {
+  await router.push('/collections')
+}
+
+async function goToStatistics() {
+  await router.push('/statistics')
 }
 
 function goToProfile() {

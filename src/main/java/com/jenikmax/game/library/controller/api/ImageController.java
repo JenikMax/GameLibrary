@@ -54,12 +54,12 @@ public class ImageController {
         if (Files.exists(filePath)) {
             return serveFileStream(filePath);
         }
-        Game game = gameRepository.getReferenceById(gameId);
-        if (game != null && game.getLogo() != null) {
+        Optional<Game> gameOpt = gameRepository.findById(gameId);
+        if (gameOpt.isPresent() && gameOpt.get().getLogo() != null) {
             return ResponseEntity.ok()
                     .header("Cache-Control", "no-cache, no-store, must-revalidate")
                     .contentType(MediaType.IMAGE_JPEG)
-                    .body(new InputStreamResource(new java.io.ByteArrayInputStream(game.getLogo())));
+                    .body(new InputStreamResource(new java.io.ByteArrayInputStream(gameOpt.get().getLogo())));
         }
         return ResponseEntity.notFound().build();
     }

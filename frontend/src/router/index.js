@@ -9,6 +9,9 @@ import ProfileView from '../views/ProfileView.vue'
 import AdminUsersView from '../views/AdminUsersView.vue'
 import AdminScrapersView from '../views/AdminScrapersView.vue'
 import DownloadsView from '../views/DownloadsView.vue'
+import CollectionsView from '../views/CollectionsView.vue'
+import CollectionDetailView from '../views/CollectionDetailView.vue'
+import StatisticsView from '../views/StatisticsView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 
 const routes = [
@@ -59,6 +62,24 @@ const routes = [
     name: 'AdminScrapers',
     component: AdminScrapersView,
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/collections',
+    name: 'Collections',
+    component: CollectionsView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/collections/:id',
+    name: 'CollectionDetail',
+    component: CollectionDetailView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/statistics',
+    name: 'Statistics',
+    component: StatisticsView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/downloads',

@@ -65,6 +65,12 @@
             v-tooltip.bottom="t('game.seed_tooltip')"
           />
           <Button
+            :label="t('collections.add_to')"
+            icon="pi pi-folder"
+            severity="secondary"
+            @click="showCollectionPicker = true"
+          />
+          <Button
             v-if="authStore.isAdmin"
             :label="t('game.edit')"
             icon="pi pi-pencil"
@@ -199,6 +205,14 @@
           class="nav-btn" @click="nextImage" :disabled="viewerIndex >= game.screenshotUrls.length - 1" />
       </div>
     </Dialog>
+
+    <!-- Рендерим CollectionPicker только когда он виден -->
+    <CollectionPicker
+      v-if="showCollectionPicker"
+      :visible="showCollectionPicker"
+      :game-id="route.params.id"
+      @close="showCollectionPicker = false"
+    />
   </div>
   <div v-else class="text-center p-5">
     <i class="pi pi-exclamation-triangle text-6xl"></i>
@@ -215,6 +229,7 @@ import { useLibraryStore } from '../stores/library'
 import { useI18n } from '../composables/useI18n'
 import { useViewHistory } from '../composables/useViewHistory'
 import { gamesApi } from '../api/games'
+import CollectionPicker from '../components/CollectionPicker.vue'
 import Skeleton from 'primevue/skeleton'
 import ProgressBar from 'primevue/progressbar'
 import Image from 'primevue/image'
@@ -233,6 +248,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const libraryStore = useLibraryStore()
 const { t } = useI18n()
+const showCollectionPicker = ref(false)
 const { addToHistory } = useViewHistory()
 
 const game = ref(null)
