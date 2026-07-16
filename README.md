@@ -197,7 +197,8 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `PUT /profile` | USER, ADMIN | Update profile (avatar, name) |
 | `POST /profile/pass` | USER, ADMIN | Change password |
 | **Admin — Scan** | | |
-| `POST /scan` | ADMIN | Start filesystem library scan |
+| `POST /scan` | ADMIN | Start async filesystem scan → `202 { taskId }` |
+| `GET /scan/status/{taskId}` | ADMIN | Scan task progress (`status`, `progress`, `currentGame`, `phase`) |
 | **Admin — Users** | | |
 | `GET /admin/users` | ADMIN | List all users |
 | `POST /admin/users/{id}/toggle-admin` | ADMIN | Toggle admin role |
@@ -687,7 +688,8 @@ make all                      # сборка backend + frontend, запуск do
 | `PUT /profile` | USER, ADMIN | Обновить профиль (аватар, имя) |
 | `POST /profile/pass` | USER, ADMIN | Сменить пароль |
 | **Admin — Scan** | | |
-| `POST /scan` | ADMIN | Сканирование ФС библиотеки |
+| `POST /scan` | ADMIN | Асинхронное сканирование ФС → `202 { taskId }` |
+| `GET /scan/status/{taskId}` | ADMIN | Прогресс сканирования (`status`, `progress`, `currentGame`, `phase`) |
 | **Admin — Users** | | |
 | `GET /admin/users` | ADMIN | Список пользователей |
 | `POST /admin/users/{id}/toggle-admin` | ADMIN | Смена роли |
