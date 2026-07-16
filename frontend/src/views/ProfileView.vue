@@ -48,7 +48,15 @@
 
           <AccordionTab v-if="authStore.isAdmin" :header="t('profile.admin_actions')">
             <div class="flex flex-column gap-2">
-              <Button :label="t('library.scan')" icon="pi pi-refresh" severity="warning" @click="scanLibrary" :loading="scanning" />
+              <Button :label="t('library.scan')" icon="pi pi-refresh" severity="warning" @click="scanLibrary" :loading="scanning" :disabled="!!scanTaskId" />
+              <div v-if="scanTaskId" class="scan-progress mt-2">
+                <div class="flex align-items-center justify-content-between mb-1">
+                  <small>{{ scanPhaseLabel }}</small>
+                  <small>{{ scanProgress }}%</small>
+                </div>
+                <ProgressBar :value="scanProgress" class="mb-1" />
+                <small class="text-muted" v-if="scanCurrentGame">{{ scanCurrentGame }}</small>
+              </div>
             </div>
           </AccordionTab>
         </Accordion>
@@ -58,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
 import { profileApi } from '../api/profile'
@@ -70,6 +78,7 @@ import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import FileUpload from 'primevue/fileupload'
 import Password from 'primevue/password'
+import ProgressBar from 'primevue/progressbar'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import { useToast } from 'primevue/usetoast'
@@ -87,6 +96,24 @@ const changingPass = ref(false)
 const scanning = ref(false)
 const message = ref('')
 const messageSeverity = ref('info')
+
+const scanTaskId = ref(null)
+const scanProgress = ref(0)
+const scanCurrentGame = ref('')
+const scanPhase = ref('')
+let scanPollTimer = null
+
+const scanPhaseLabel = computed(() => {
+  const phaseMap = {
+    'PENDING': t('scan.phase_scanning'),
+    'SCANNING_DIRS': t('scan.phase_scanning'),
+    'STORING_METADATA': t('scan.phase_metadata'),
+    'LOADING_IMAGES': t('scan.phase_images'),
+    'COMPLETED': '',
+    'FAILED': ''
+  }
+  return phaseMap[scanPhase.value] || ''
+})
 
 function onFileSelect(event) {
   const file = event.files[0]
@@ -141,14 +168,56 @@ async function changePassword() {
 async function scanLibrary() {
   scanning.value = true
   try {
-    await adminApi.scanLibrary()
-    toast.add({ severity: 'success', summary: t('library.scan_complete'), life: 3000 })
+    const res = await adminApi.scanLibrary()
+    const { taskId } = res.data.data
+    scanTaskId.value = taskId
+    scanProgress.value = 0
+    scanCurrentGame.value = ''
+    scanPhase.value = 'PENDING'
+    pollScanStatus()
   } catch {
-    toast.add({ severity: 'error', summary: t('library.scan_failed'), life: 3000 })
-  } finally {
     scanning.value = false
+    toast.add({ severity: 'error', summary: t('library.scan_failed'), life: 3000 })
   }
 }
+
+function pollScanStatus() {
+  if (!scanTaskId.value) return
+  scanPollTimer = setInterval(async () => {
+    try {
+      const res = await adminApi.getScanStatus(scanTaskId.value)
+      const task = res.data.data
+      scanProgress.value = task.progress || 0
+      scanCurrentGame.value = task.currentGame || ''
+      scanPhase.value = task.status
+      if (task.status === 'COMPLETED') {
+        clearInterval(scanPollTimer)
+        scanPollTimer = null
+        scanTaskId.value = null
+        scanning.value = false
+        toast.add({ severity: 'success', summary: t('library.scan_complete'), life: 3000 })
+      } else if (task.status === 'FAILED') {
+        clearInterval(scanPollTimer)
+        scanPollTimer = null
+        scanTaskId.value = null
+        scanning.value = false
+        toast.add({ severity: 'error', summary: t('library.scan_failed'), detail: task.errorMessage || '', life: 5000 })
+      }
+    } catch {
+      clearInterval(scanPollTimer)
+      scanPollTimer = null
+      scanTaskId.value = null
+      scanning.value = false
+    }
+  }, 500)
+}
+
+onBeforeUnmount(() => {
+  if (scanPollTimer) {
+    clearInterval(scanPollTimer)
+    scanPollTimer = null
+  }
+})
 </script>
 
 <style scoped>

@@ -72,6 +72,15 @@
         <Badge :value="store.totalItems" severity="info" />
       </div>
 
+      <div v-if="scanTaskId" class="scan-progress mb-3">
+        <div class="flex align-items-center justify-content-between mb-1">
+          <small>{{ scanPhaseLabel }}</small>
+          <small>{{ scanProgress }}%</small>
+        </div>
+        <ProgressBar :value="scanProgress" class="mb-1" />
+        <small class="text-muted" v-if="scanCurrentGame">{{ scanCurrentGame }}</small>
+      </div>
+
       <ProgressBar v-if="store.loading" mode="indeterminate" class="mb-3" />
 
       <div v-if="!store.loading && store.games.length === 0" class="text-center p-5">
@@ -110,7 +119,7 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLibraryStore } from '../stores/library'
 import { useAuthStore } from '../stores/auth'
@@ -150,7 +159,24 @@ const { history } = useViewHistory()
 const router = useRouter()
 const toast = useToast()
 const scanning = ref(false)
+const scanTaskId = ref(null)
+const scanProgress = ref(0)
+const scanCurrentGame = ref('')
+const scanPhase = ref('')
+let scanPollTimer = null
 const filterRef = ref(null)
+
+const scanPhaseLabel = computed(() => {
+  const phaseMap = {
+    'PENDING': t('scan.phase_scanning'),
+    'SCANNING_DIRS': t('scan.phase_scanning'),
+    'STORING_METADATA': t('scan.phase_metadata'),
+    'LOADING_IMAGES': t('scan.phase_images'),
+    'COMPLETED': '',
+    'FAILED': ''
+  }
+  return phaseMap[scanPhase.value] || ''
+})
 
 const sortOptions = [
   { label: t('filter.sort_name'), value: 'name' },
@@ -194,6 +220,10 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   saveStateToSession()
+  if (scanPollTimer) {
+    clearInterval(scanPollTimer)
+    scanPollTimer = null
+  }
 })
 
 function onPageChange(event) {
@@ -240,14 +270,49 @@ async function handleRandom() {
 async function handleScan() {
   scanning.value = true
   try {
-    await adminApi.scanLibrary()
-    toast.add({ severity: 'success', summary: t('library.scan_complete'), life: 3000 })
-    await store.fetchGames()
+    const res = await adminApi.scanLibrary()
+    const { taskId } = res.data.data
+    scanTaskId.value = taskId
+    scanProgress.value = 0
+    scanCurrentGame.value = ''
+    scanPhase.value = 'PENDING'
+    pollScanStatus()
   } catch {
-    toast.add({ severity: 'error', summary: t('library.scan_failed'), life: 3000 })
-  } finally {
     scanning.value = false
+    toast.add({ severity: 'error', summary: t('library.scan_failed'), life: 3000 })
   }
+}
+
+function pollScanStatus() {
+  if (!scanTaskId.value) return
+  scanPollTimer = setInterval(async () => {
+    try {
+      const res = await adminApi.getScanStatus(scanTaskId.value)
+      const task = res.data.data
+      scanProgress.value = task.progress || 0
+      scanCurrentGame.value = task.currentGame || ''
+      scanPhase.value = task.status
+      if (task.status === 'COMPLETED') {
+        clearInterval(scanPollTimer)
+        scanPollTimer = null
+        scanTaskId.value = null
+        scanning.value = false
+        toast.add({ severity: 'success', summary: t('library.scan_complete'), life: 3000 })
+        await store.fetchGames()
+      } else if (task.status === 'FAILED') {
+        clearInterval(scanPollTimer)
+        scanPollTimer = null
+        scanTaskId.value = null
+        scanning.value = false
+        toast.add({ severity: 'error', summary: t('library.scan_failed'), detail: task.errorMessage || '', life: 5000 })
+      }
+    } catch {
+      clearInterval(scanPollTimer)
+      scanPollTimer = null
+      scanTaskId.value = null
+      scanning.value = false
+    }
+  }, 500)
 }
 </script>
 

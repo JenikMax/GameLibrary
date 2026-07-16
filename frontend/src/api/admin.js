@@ -16,6 +16,9 @@ export const adminApi = {
   scanLibrary() {
     return api.post('/scan')
   },
+  getScanStatus(taskId) {
+    return api.get(`/scan/status/${taskId}`)
+  },
   getScraperConfigs() {
     return api.get('/admin/scraper-config')
   },
