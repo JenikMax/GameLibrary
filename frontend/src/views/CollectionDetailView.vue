@@ -163,7 +163,7 @@ async function load() {
 
 onMounted(load)
 onActivated(load)
-watch(() => route.params.id, load)
+watch(() => route.params.id, load, { immediate: true })
 
 async function handleUpdate() {
   if (!editName.value.trim()) return
