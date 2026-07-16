@@ -34,17 +34,25 @@
 
     <div v-else class="collections-grid">
       <CollectionCard
-        v-for="c in collections"
+        v-for="c in paginatedCollections"
         :key="c.id"
         :collection="c"
       />
     </div>
+
+    <Paginator
+      v-if="totalPages > 1"
+      :rows="pageSize"
+      :totalRecords="collections.length"
+      :first="(page - 1) * pageSize"
+      @page="page = $event.page + 1"
+      class="mt-3"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onActivated } from 'vue'
-import { useRouter, onBeforeRouteUpdate } from 'vue-router'
+import { ref, computed, onMounted, onActivated } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { collectionsApi } from '../api/collections'
 import { useToast } from 'primevue/usetoast'
@@ -53,10 +61,10 @@ import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
+import Paginator from 'primevue/paginator'
 import CollectionCard from '../components/CollectionCard.vue'
 
 const { t } = useI18n()
-const router = useRouter()
 const toast = useToast()
 
 const collections = ref([])
@@ -67,6 +75,14 @@ const newName = ref('')
 const newDescription = ref('')
 const newIsPublic = ref(false)
 
+const page = ref(1)
+const pageSize = 12
+const paginatedCollections = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return collections.value.slice(start, start + pageSize)
+})
+const totalPages = computed(() => Math.ceil(collections.value.length / pageSize))
+
 onMounted(load)
 onActivated(load)
 
@@ -75,6 +91,7 @@ async function load() {
   try {
     const res = await collectionsApi.listWithHero()
     collections.value = res.data.data || []
+    page.value = 1
   } catch {
     toast.add({ severity: 'error', summary: t('collections.load_failed'), life: 3000 })
   } finally {

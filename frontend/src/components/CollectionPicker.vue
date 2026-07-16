@@ -1,5 +1,5 @@
 <template>
-  <Dialog :visible="visible" @update:visible="$emit('close')" :header="t('collections.add_to')" :modal="true" :closable="true" class="w-[500px]">
+  <Dialog :visible="visible" @update:visible="$emit('close')" :header="t('collections.add_to')" :modal="true" :closable="true" class="w-[600px]">
     <div v-if="loading" class="flex justify-content-center p-3">
       <ProgressSpinner style="width: 50px; height: 50px" />
     </div>
@@ -8,20 +8,31 @@
       {{ t('collections.no_collections') }}
     </div>
 
-    <div v-else class="flex flex-column gap-2">
-      <div
-        v-for="collection in collections"
-        :key="collection.id"
-        class="collection-item flex align-items-center justify-content-between p-2 border-round cursor-pointer"
-        @click="toggleGame(collection)"
-      >
-        <div class="flex align-items-center gap-2">
-          <i class="pi pi-folder" />
-          <span>{{ collection.name }}</span>
-          <Tag :value="String(collection.gameCount)" severity="info" size="small" />
+    <div v-else>
+      <InputText
+        v-model="search"
+        :placeholder="t('filter.search_placeholder')"
+        class="w-full mb-2"
+        size="small"
+      />
+      <div class="picker-list max-h-20rem overflow-y-auto mb-2">
+        <div
+          v-for="collection in filteredCollections"
+          :key="collection.id"
+          class="collection-item flex align-items-center justify-content-between p-2 border-round cursor-pointer"
+          @click="toggleGame(collection)"
+        >
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-folder" />
+            <span>{{ collection.name }}</span>
+            <Tag :value="String(collection.gameCount)" severity="info" size="small" />
+          </div>
+          <i v-if="isInCollection(collection)" class="pi pi-check-circle text-green-500" />
+          <i v-else class="pi pi-plus-circle text-color-secondary" />
         </div>
-        <i v-if="isInCollection(collection)" class="pi pi-check-circle text-green-500" />
-        <i v-else class="pi pi-plus-circle text-color-secondary" />
+        <div v-if="filteredCollections.length === 0 && search" class="text-center text-color-secondary p-2 text-sm">
+          {{ t('library.no_games') }}
+        </div>
       </div>
     </div>
 
@@ -32,11 +43,12 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { collectionsApi } from '../api/collections'
 import { useToast } from 'primevue/usetoast'
 import Dialog from 'primevue/dialog'
+import InputText from 'primevue/inputtext'
 import ProgressSpinner from 'primevue/progressspinner'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
@@ -53,9 +65,19 @@ const toast = useToast()
 const collections = ref([])
 const loading = ref(false)
 const memberMap = ref({})
+const search = ref('')
+
+const filteredCollections = computed(() => {
+  const q = search.value.trim().toLowerCase()
+  if (!q) return collections.value
+  return collections.value.filter(c => c.name.toLowerCase().includes(q))
+})
 
 watch(() => props.visible, async (val) => {
-  if (val) await load()
+  if (val) {
+    search.value = ''
+    await load()
+  }
 })
 
 onMounted(async () => {
@@ -106,6 +128,9 @@ async function toggleGame(c) {
 </script>
 
 <style scoped>
+.picker-list {
+  scrollbar-width: thin;
+}
 .collection-item {
   transition: background-color 0.15s ease;
 }

@@ -224,7 +224,7 @@ async function handleRemove(gameId) {
   transition: box-shadow 0.2s;
 }
 .game-logo-wrap {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 2 / 3;
   overflow: hidden;
   background: var(--p-surface-100);
 }

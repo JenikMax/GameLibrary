@@ -135,8 +135,7 @@ function truncate(str, max) {
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  overflow-x: auto;
-  scrollbar-width: thin;
+  overflow-x: hidden;
 }
 
 .preview-empty {
