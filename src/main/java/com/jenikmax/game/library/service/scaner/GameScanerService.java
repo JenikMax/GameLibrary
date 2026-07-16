@@ -16,11 +16,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 @Service
@@ -122,6 +127,33 @@ public class GameScanerService implements ScanerService {
             }
         }
         return screenshots;
+    }
+
+    @Override
+    public long calculateGameDirSize(String directoryPath) {
+        Path path = Paths.get(directoryPath);
+        if (!Files.exists(path)) {
+            return 0;
+        }
+        long[] total = new long[1];
+        try {
+            Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), 3,
+                    new SimpleFileVisitor<>() {
+                        @Override
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                            total[0] += attrs.size();
+                            return FileVisitResult.CONTINUE;
+                        }
+
+                        @Override
+                        public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                            return FileVisitResult.SKIP_SUBTREE;
+                        }
+                    });
+        } catch (IOException e) {
+            logger.warn("Failed to compute directory size for {}", directoryPath, e);
+        }
+        return total[0];
     }
 
     public void storeGame(Game game){

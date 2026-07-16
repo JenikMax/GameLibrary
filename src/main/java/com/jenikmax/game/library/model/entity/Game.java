@@ -30,6 +30,7 @@ public class Game implements Serializable {
     private String trailerUrl;
     private String description;
     private String instruction;
+    private Long totalSizeBytes;
     private List<Screenshot> screenshots;
 
 
@@ -138,6 +139,15 @@ public class Game implements Serializable {
 
     public void setInstruction(String instruction) {
         this.instruction = instruction;
+    }
+
+    @Column(name = "total_size_bytes")
+    public Long getTotalSizeBytes() {
+        return this.totalSizeBytes;
+    }
+
+    public void setTotalSizeBytes(Long totalSizeBytes) {
+        this.totalSizeBytes = totalSizeBytes;
     }
 
     @OneToMany(

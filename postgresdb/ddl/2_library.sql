@@ -17,6 +17,8 @@ create table library.game_data
     logo              bytea
 );
 
+ALTER TABLE library.game_data ADD COLUMN IF NOT EXISTS total_size_bytes BIGINT DEFAULT NULL;
+
 drop table if exists library.game_genre;
 create table library.game_genre
 (

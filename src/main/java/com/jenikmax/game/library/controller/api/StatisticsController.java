@@ -1,6 +1,5 @@
 package com.jenikmax.game.library.controller.api;
 
-import com.jenikmax.game.library.dao.api.GameRepository;
 import com.jenikmax.game.library.model.dto.api.ApiResponse;
 import com.jenikmax.game.library.model.dto.api.StatisticsResponse;
 import org.slf4j.Logger;
@@ -12,26 +11,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/statistics")
 public class StatisticsController {
 
     private static final Logger logger = LoggerFactory.getLogger(StatisticsController.class);
+    private static final int MAX_DEPTH = 3;
 
     private final JdbcTemplate jdbcTemplate;
-    private final GameRepository gameRepository;
 
-    public StatisticsController(JdbcTemplate jdbcTemplate, GameRepository gameRepository) {
+    public StatisticsController(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.gameRepository = gameRepository;
     }
 
     @GetMapping
@@ -98,28 +100,59 @@ public class StatisticsController {
     }
 
     private long calculateTotalSize() {
-        List<String> dirs = gameRepository.findAll().stream()
-                .map(g -> g.getDirectoryPath())
-                .filter(d -> d != null && !d.isBlank())
-                .distinct()
-                .collect(Collectors.toList());
+        Long cachedSum = jdbcTemplate.queryForObject(
+                "SELECT SUM(total_size_bytes) FROM library.game_data WHERE total_size_bytes IS NOT NULL", Long.class);
+        if (cachedSum == null) {
+            cachedSum = 0L;
+        }
 
-        long total = 0;
-        for (String dir : dirs) {
-            Path path = Paths.get(dir);
-            if (Files.exists(path)) {
-                try {
-                    total += Files.walk(path)
-                            .filter(Files::isRegularFile)
-                            .mapToLong(p -> {
-                                try { return Files.size(p); } catch (IOException e) { return 0; }
-                            })
-                            .sum();
-                } catch (IOException e) {
-                    logger.warn("Failed to calculate size for {}", dir);
-                }
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+                "SELECT id, directory_path FROM library.game_data WHERE total_size_bytes IS NULL AND directory_path IS NOT NULL AND directory_path != ''");
+        Map<Long, String> uncached = new LinkedHashMap<>();
+        for (Map<String, Object> row : rows) {
+            uncached.put(((Number) row.get("id")).longValue(), (String) row.get("directory_path"));
+        }
+
+        if (!uncached.isEmpty()) {
+            for (Map.Entry<Long, String> entry : uncached.entrySet()) {
+                long size = computeDirSize(entry.getValue());
+                jdbcTemplate.update("UPDATE library.game_data SET total_size_bytes = ? WHERE id = ?", size, entry.getKey());
+                cachedSum += size;
+            }
+        } else {
+            Long fullSum = jdbcTemplate.queryForObject(
+                    "SELECT SUM(total_size_bytes) FROM library.game_data", Long.class);
+            if (fullSum != null) {
+                cachedSum = fullSum;
             }
         }
-        return total;
+
+        return cachedSum;
+    }
+
+    private long computeDirSize(String dirPath) {
+        Path path = Paths.get(dirPath);
+        if (!Files.exists(path)) {
+            return 0;
+        }
+        long[] total = new long[1];
+        try {
+            Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), MAX_DEPTH,
+                    new SimpleFileVisitor<>() {
+                        @Override
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                            total[0] += attrs.size();
+                            return FileVisitResult.CONTINUE;
+                        }
+
+                        @Override
+                        public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                            return FileVisitResult.SKIP_SUBTREE;
+                        }
+                    });
+        } catch (IOException e) {
+            logger.warn("Failed to compute size for {}", dirPath, e);
+        }
+        return total[0];
     }
 }

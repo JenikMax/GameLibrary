@@ -17,5 +17,7 @@ public interface ScanerService {
 
     List<Screenshot> getScreenshots(Game game);
 
+    long calculateGameDirSize(String directoryPath);
+
     void storeGame(Game game);
 }
