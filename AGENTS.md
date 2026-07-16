@@ -51,7 +51,7 @@ IGDB требует OAuth 2.0 через Twitch. Чтобы получить **C
 Куда прописать:
 - **Client-ID** → в админке (`GET /api/admin/scraper-config/igdb`) → поле `headers.Client-ID`
 - **access_token** → в админке → поле `encryptedApiKey` (админка зашифрует сама)
-- Либо отредактировать `scrapers/scrapers-config.json` напрямую — но тогда токен будет в plaintext, т.к. шифрование происходит только при записи через API.
+- Либо отредактировать файл конфигурации скрапера (`${SCRAPER_CONFIG_DIR}/scrapers-config.json`, по умолчанию `/gameLibrary/gameLibraryConfigs/scrapers/scrapers-config.json`) напрямую — но тогда токен будет в plaintext, т.к. шифрование происходит только при записи через API.
 
 ## TheGamesDB Scraper Setup
 
@@ -65,7 +65,7 @@ TheGamesDB требует API-ключ. Чтобы получить его:
 
 Куда прописать:
 - В админке (`GET /api/admin/scraper-config/thegamesdb`) → поле `encryptedApiKey`
-- Либо отредактировать `scrapers/scrapers-config.json` напрямую (будет в plaintext)
+- Либо отредактировать файл конфигурации скрапера (`${SCRAPER_CONFIG_DIR}/scrapers-config.json`, по умолчанию `/gameLibrary/gameLibraryConfigs/scrapers/scrapers-config.json`) напрямую (будет в plaintext)
 
 Лимит: 1000 запросов в месяц. Один поиск игры может использовать 2-3 запроса (поиск + жанры + скриншоты).
 
@@ -91,7 +91,7 @@ PsxDataCenter (psxdatacenter.com) — скрапер для PS1 и PS2 без к
 
 - **Plaintext DB passwords** in `application.yml` and `postgresdb/ddl/1_init.sql`.
 - **Torrent download limit is 5 GB** (not 1 GB). Code at `LibraryOperationService.java:225` uses `5L * 1024 * 1024 * 1024` as the boundary for ZIP vs .torrent download.
-- **TTORRENT_HASHING_THREADS** env var controls hashing parallelism for torrent creation. Default `2`. Set lower on low-CPU NAS to avoid I/O saturation.
+- **TTORRENT_HASHING_THREADS** env var defined in `docker-compose.yml:51` with default `2`. **Not currently read by any Java code** — exists as placeholder for future torrent hashing parallelism control. Set lower on low-CPU NAS to avoid I/O saturation if wired up.
 - `Game.java` is a decompiled `.class` → `@Entity` uses annotated getters, not fields. Keep this pattern.
 - **Frontend must be built separately** before Docker (`npm run build` or `make build-frontend`). Dev server (`npm run dev`) proxies `/game-library/*` to `:8080`.
 - **OkHttp 4.x API order**: `RequestBody.create(MediaType, String)` — MediaType first.
@@ -99,7 +99,7 @@ PsxDataCenter (psxdatacenter.com) — скрапер для PS1 и PS2 без к
 - **Multi-stage Docker build** requires Docker 19.03+ and BuildKit.
 - **Tracker announce URL** must be reachable from user torrent clients. Set `TRACKER_ANNOUNCE_URL` to your NAS IP/hostname in `docker-compose.yml`.
 - **uTP must be enabled** in Transmission for P2P connections with uTorrent on Windows. Without it, even though the tracker correctly returns the seeder, data transfer fails because uTorrent cannot connect over pure TCP.
-  - The modern key is `preferred_transports`, set **both** in `gameLibraryConfigs/tracker/config/settings.json`:
+  - The modern key is `preferred_transports`, set **both** in `gameLibraryConfigs/tracker/config/settings.json` (монтируется в `/config` контейнера transmission):
     ```json
     "preferred_transports": ["utp", "tcp"],
     "utp-enabled": true
@@ -126,7 +126,7 @@ PsxDataCenter (psxdatacenter.com) — скрапер для PS1 и PS2 без к
 - **Download preview (prepare-download)**. Для игр ≥5 ГБ запускается асинхронная задача `TorrentTaskService`, которая готовит .torrent-файл в фоне. Статус проверяется через `GET /api/download/prepare-status/{taskId}`. После готовности клиенту отдаётся .torrent для скачивания через Transmission.
 - **Admin password reset — случайная генерация** (`UserDataService.java:102-110`). При сбросе пароля админом генерируется новый пароль (8 байт, base64) через `SecureRandom`. Новый пароль возвращается в API-ответе и отображается в диалоговом окне на фронтенде. Можно переопределить через переменную окружения `RESET_PASSWORD_DEFAULT`.
 - **`GET /downloads/aria2-version` проверяет Transmission, не Aria2**. Эндпоинт назван legacy, но на самом деле проверяет connectivity с Transmission RPC. Возвращает `"Transmission is connected"` / `"Transmission is not available"`.
-- **Route transition — cross-fade** (`App.vue:9`). Переходы между страницами используют `<Transition name="route-fade">` без `mode="out-in"`. Старый контент затухает одновременно с появлением нового — без белых вспышек. `.main-container` имеет `background-color: var(--p-surface-50)` (light) / `var(--p-surface-950)` (dark).
+- **Route transition — cross-fade** (`App.vue:9`). Переходы между страницами используют `<Transition name="route-fade" mode="out-in">`. Старый контент затухает, затем появляется новый — без белых вспышек. `.main-container` имеет `background-color: var(--p-surface-50)` (light) / `var(--p-surface-950)` (dark).
 - **AppHeader — full-width background + centered content + подменю** (`AppHeader.vue`). Меню фиксировано сверху, фон растянут на всю ширину через `app-header-wrapper`. Внутренний `Menubar` центрирован с `max-width: 1400px`. Пункт «Библиотека» содержит подменю: «Список» (`/`) и «Избранное» (`/?favorites=1`). Панель уведомлений закрывается по клику вне области.
 - **primeflex.css — кастомный utility framework** (`frontend/src/assets/styles/primeflex.css`, ~20k строк). Самописный CSS-фреймворк с классами для grid, flex, spacing, colors, surfaces. Не является npm-пакетом.
 - **i18n — кастомный composable без библиотеки** (`useI18n.js`). Встроенный словарь на 179 ключей (RU/EN) без vue-i18n. При смене языка — `window.location.reload()` для перезапуска приложения.
@@ -137,7 +137,7 @@ PsxDataCenter (psxdatacenter.com) — скрапер для PS1 и PS2 без к
 - **Dark mode CSS: `.app-dark`, не `.dark`** (`main.js:23`). PrimeVue настроен с `darkModeSelector: '.app-dark'`. Все кастомные CSS-правила для тёмной темы должны использовать `.app-dark` (не `.dark`), иначе они не сработают.
 - **View history — localStorage + composable** (`useViewHistory.js`). Хранит до 20 ID игр в `localStorage.viewHistory`. Композабл подмешивается в `GameDetailView.vue` (добавление) и `LibraryView.vue` (стрип). Очистка только вручную или через localStorage API. При превышении квоты localStorage поэтапно урезает историю до 5, затем до 0.
 - **Related games — 2 SQL запроса** (`RelatedGamesController.java`). Возвращает игры: 1) с тем же жанром, 2) с похожим названием через `regexp_replace` и fallback на первое слово при пустом результате. Каждый запрос лимитирован, результаты объединяются в `LinkedHashSet` для дедупликации. «Та же платформа» удалена из-за шума.
-- **Rating — `@IdClass` composite key** (`GameRating.java`). Сущность `GameRating` использует `@IdClass(GameRatingId.class)` с полями `gameId` и `userId`. JPQL-запросы обращаются к `n.gameId` и `n.userId` напрямую (не через связи).
+- **Rating 1-10** (`GameRating.java` + `RatingController`). Сущность `GameRating` использует `@Id` + `@GeneratedValue` с `@ManyToOne` связями на `Game` и `User`.
 - **Comment ownership check** (`CommentController.java:46`). DELETE проверяет `comment.getUser().getId().equals(currentUserId)`, флаг `canDelete` вычисляется на бэкенде и отдаётся в DTO. Админ может удалить любой комментарий.
 - **Favorites list — два SQL-запроса** (`LibraryController.java:91-117`). При `favoritesOnly=true` сначала выполняется `getGameIdList()` для получения всех ID (с фильтрами текста/жанров/платформ), затем `retainAll()` выделяет только ID из избранного. После этого `getGameShortListByIds()` загружает полноценные DTO **только для этих ID**, с последующей сортировкой в порядке `gameIdList` для сохранения пагинации. Ранее использовался `getGameList()` с offset/limit, который возвращал игры из общего списка, игнорируя фильтр избранного.
 - **CORS: `CORS_ALLOWED_ORIGINS` нужно явно добавить в docker-compose.yml** (`docker-compose.yml:49`). Переменная `CORS_ALLOWED_ORIGINS` не прокинута в контейнер по умолчанию — её нет в `environment` секции `backend`. Если вы обращаетесь к API напрямую (не через Nginx на порту 80), а не через reverse-proxy, браузер шлёт `Origin` и Spring CORS блокирует запрос. Исправление: `.env` → `CORS_ALLOWED_ORIGINS=http://ваш-хост:порт`, и `docker-compose.yml` → `backend.environment` → `- CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}`.

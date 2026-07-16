@@ -122,7 +122,7 @@ SCRAPER_ENCRYPTION_KEY=u9Lx+7kPq3Rm8Yv2Wn5Bt0Jf4Dg1Hs6Kc=
 Выполните:
 
 ```bash
-mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,tracker/{config,watch,complete,incomplete,torrents}}}
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,tracker/{config,watch,complete,incomplete,torrents}}}
 ```
 
 Что получится:
@@ -133,6 +133,7 @@ mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,tracker/
 ├── images/                         # сюда будут сохраняться обложки и скриншоты
 └── gameLibraryConfigs/
     ├── db/data/                    # файлы базы данных PostgreSQL (создадутся сами)
+    ├── scrapers/                   # конфигурация скраперов (scrapers-config.json)
     └── tracker/
         ├── config/                 # сюда Transmission сохранит settings.json
         ├── watch/                  # киньте .torrent — Transmission сам подхватит
@@ -147,6 +148,7 @@ mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,tracker/
 mkdir D:\GameLibrary\games
 mkdir D:\GameLibrary\images
 mkdir D:\GameLibrary\gameLibraryConfigs\db\data
+mkdir D:\GameLibrary\gameLibraryConfigs\scrapers
 mkdir D:\GameLibrary\gameLibraryConfigs\tracker\config
 mkdir D:\GameLibrary\gameLibraryConfigs\tracker\watch
 mkdir D:\GameLibrary\gameLibraryConfigs\tracker\complete
@@ -417,7 +419,6 @@ curl -X POST "https://id.twitch.tv/oauth2/token?client_id=ВАШ_CLIENT_ID&clien
 - **Пароль admin / password** — смените его сразу после входа.
 - **Файл `.env`** содержит пароли — не коммитьте его в Git (он уже в `.gitignore`).
 - **Порты:** Если порт 80 занят (Apache, Nginx), отредактируйте `docker-compose.yml` — измените `"80:80"` на `"8080:80"`, тогда сайт будет на `http://localhost:8080`.
-- **Для продакшена** обязательно настройте HTTPS (SSL-сертификат в Nginx).
 - После изменения `.env` нужно перезапустить контейнеры: `docker compose down && docker compose up -d`.
 
 ---
@@ -494,12 +495,12 @@ openssl rand -base64 32       # for SCRAPER_ENCRYPTION_KEY
 ## 4. Create directory structure
 
 ```bash
-mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,tracker/{config,watch,complete,incomplete,torrents}}}
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,tracker/{config,watch,complete,incomplete,torrents}}}
 ```
 
 On Windows (PowerShell):
 ```powershell
-mkdir D:\GameLibrary\games, D:\GameLibrary\images, D:\GameLibrary\gameLibraryConfigs\db\data, D:\GameLibrary\gameLibraryConfigs\tracker\config, D:\GameLibrary\gameLibraryConfigs\tracker\watch, D:\GameLibrary\gameLibraryConfigs\tracker\complete, D:\GameLibrary\gameLibraryConfigs\tracker\incomplete, D:\GameLibrary\gameLibraryConfigs\tracker\torrents
+mkdir D:\GameLibrary\games, D:\GameLibrary\images, D:\GameLibrary\gameLibraryConfigs\db\data, D:\GameLibrary\gameLibraryConfigs\scrapers, D:\GameLibrary\gameLibraryConfigs\tracker\config, D:\GameLibrary\gameLibraryConfigs\tracker\watch, D:\GameLibrary\gameLibraryConfigs\tracker\complete, D:\GameLibrary\gameLibraryConfigs\tracker\incomplete, D:\GameLibrary\gameLibraryConfigs\tracker\torrents
 ```
 
 > **Windows:** Share these folders in Docker Desktop → Settings → Resources → File Sharing.
@@ -595,5 +596,4 @@ Place games in `/mnt/nas/gameLibrary/games/<Platform>/<Game Name>/`, then go to 
 - Change the `admin` password immediately after first login.
 - **Never commit `.env`** to Git (it's already in `.gitignore`).
 - If port 80 is busy, change `"80:80"` to `"8080:80"` in `docker-compose.yml`.
-- Set up HTTPS for production.
 - Restart containers after changing `.env`: `docker compose down && docker compose up -d`.

@@ -236,7 +236,7 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `JWT_EXPIRATION_MS` | `86400000` | Token TTL (24 hours) |
 | `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Directory with `scrapers-config.json` |
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Temp directory for .torrent files |
-| `TTORRENT_HASHING_THREADS` | `2` | Threads for torrent hashing (lower on low-CPU NAS) |
+| `TTORRENT_HASHING_THREADS` | `2` | Placeholder for torrent hashing threads (not yet read by Java code) |
 | `CORS_ALLOWED_ORIGINS` | *(empty — same-origin only)* | Allowed CORS origins (comma-separated), e.g. `http://nas.local:8090`. Required if accessing backend directly (not through Nginx reverse proxy on port 80) |
 | `RESET_PASSWORD_DEFAULT` | *(auto-generated)* | Override default password for admin password-reset |
 
@@ -256,7 +256,7 @@ Schema `library`:
 | `notification` | User notifications with `is_read` flag |
 | `library_user` | Users (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `1_init.sh` (schema), `2_library.sql` (tables + genres), `3_user.sql` (users + seed), `5_rating.sql`, `6_favorite.sql`, `7_comment.sql`, `8_notification.sql`.
+DDL: `postgresdb/ddl/` — `1_init.sh` (schema), `2_library.sql` (tables + genres), `3_user.sql` (users + seed), `4_search.sql` (full-text search), `5_rating.sql`, `6_favorite.sql`, `7_comment.sql`, `8_notification.sql`.
 
 ## 🔒 Security
 
@@ -287,14 +287,9 @@ cp .env.example .env   # edit secrets before first launch
 | `ConfigEncryptionService.java` | Ephemeral AES key if env missing | Throws `IllegalStateException` — env is mandatory |
 | `docker-compose.yml` | Inline secrets | `${VAR}` references to `.env` |
 
-### ⚠️ Still to address
-- HTTPS termination (add TLS certs to Nginx)
-- Rate limiting on `/api/auth/login`
-- Enable CSRF for legacy Thymeleaf forms
-
 ## 🕷 Scrapers
 
-All config stored in `scrapers/scrapers-config.json`, managed via `/api/admin/scraper-config`.
+All config stored in `${SCRAPER_CONFIG_DIR}/scrapers-config.json` (defaults to `/gameLibrary/gameLibraryConfigs/scrapers/scrapers-config.json`), managed via `/api/admin/scraper-config`.
 
 | Scraper | Method | Auth | What it scrapes |
 |---------|--------|------|----------------|
@@ -359,6 +354,7 @@ Create on host before launching:
 ├── images/                            # Screenshots and covers
 └── gameLibraryConfigs/                # Config files
     ├── db/data/                       # PostgreSQL data (mount → postgresdb:/var/lib/postgresql/data)
+    ├── scrapers/                      # Scraper config (scrapers-config.json)
     └── tracker/
         ├── config/                    # Transmission settings.json (auto-created)
         ├── watch/                     # Auto-add .torrent files
@@ -369,7 +365,7 @@ Create on host before launching:
 
 ```bash
 # Create the full directory structure at once:
-mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,tracker/{config,watch,complete,incomplete,torrents}}}
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,tracker/{config,watch,complete,incomplete,torrents}}}
 ```
 
 > **Volume reference** — each path in `docker-compose.yml` serves a specific purpose:
@@ -424,6 +420,7 @@ Edit `gameLibraryConfigs/tracker/config/settings.json` on host for:
 export $(grep -v '^#' .env | xargs)
 
 # Backend (requires local PostgreSQL + Transmission)
+#   —alone profile overrides DB host/port, paths, and tracker settings from application-alone.yml
 mvn spring-boot:run -Dspring.profiles.active=alone
 
 # Frontend (Vite dev server, proxies /game-library/* to :8080)
@@ -701,7 +698,7 @@ make all                      # сборка backend + frontend, запуск do
 | `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Директория с `scrapers-config.json` |
 | `SCRAPER_ENCRYPTION_KEY` | не задан | AES-256 ключ (base64) для шифрования API-ключей. **Обязателен.** Сгенерировать: `openssl rand -base64 32` |
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная папка для .torrent файлов |
-| `TTORRENT_HASHING_THREADS` | `2` | Потоков для хеширования торрентов (меньше на слабых NAS) |
+| `TTORRENT_HASHING_THREADS` | `2` | Placeholder — пока не читается Java-кодом |
 | `CORS_ALLOWED_ORIGINS` | *(пусто — только same-origin)* | Разрешённые CORS-источники (через запятую), например `http://nas.local:8090`. Нужен при прямом доступе к API (не через Nginx reverse-proxy на порту 80) |
 
 ### База данных
@@ -720,7 +717,7 @@ make all                      # сборка backend + frontend, запуск do
 | `notification` | Уведомления с флагом `is_read` |
 | `library_user` | Пользователи (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `1_init.sh` (схема), `2_library.sql` (таблицы + жанры), `3_user.sql` (пользователи + seed).
+DDL: `postgresdb/ddl/` — `1_init.sh` (схема), `2_library.sql` (таблицы + жанры), `3_user.sql` (пользователи + seed), `4_search.sql` (полнотекстовый поиск), `5_rating.sql` (оценки), `6_favorite.sql` (избранное), `7_comment.sql` (комментарии), `8_notification.sql` (уведомления).
 
 ## 🔒 Безопасность
 
@@ -751,14 +748,9 @@ cp .env.example .env   # отредактировать перед первым 
 | Эфемерный AES-ключ при отсутствии env | `IllegalStateException` — ключ обязателен |
 | Секреты в `docker-compose.yml` inline | `${VAR}` из `.env` |
 
-### ⚠️ Ещё предстоит
-- HTTPS (TLS-сертификаты в Nginx)
-- Rate limiting на `/api/auth/login`
-- CSRF для Thymeleaf-форм
-
 ## 🕷 Скраперы
 
-Конфиг: `scrapers/scrapers-config.json`, управление через `/api/admin/scraper-config`.
+Конфиг: `${SCRAPER_CONFIG_DIR}/scrapers-config.json` (по умолчанию `/gameLibrary/gameLibraryConfigs/scrapers/scrapers-config.json`), управление через `/api/admin/scraper-config`.
 
 | Скрапер | Метод | Авторизация | Что собирает |
 |---------|-------|-------------|-------------|
@@ -823,6 +815,7 @@ cp .env.example .env
 ├── images/                            # Скриншоты и обложки
 └── gameLibraryConfigs/                # Конфигурационные файлы
     ├── db/data/                       # Данные PostgreSQL (mount → postgresdb:/var/lib/postgresql/data)
+    ├── scrapers/                      # Конфиги скраперов (scrapers-config.json)
     └── tracker/
         ├── config/                    # Transmission settings.json (авто-создание)
         ├── watch/                     # Авто-добавление .torrent
@@ -833,7 +826,7 @@ cp .env.example .env
 
 ```bash
 # Создать полную структуру каталогов одной командой:
-mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,tracker/{config,watch,complete,incomplete,torrents}}}
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,tracker/{config,watch,complete,incomplete,torrents}}}
 ```
 
 > **Справочник томов** — для чего каждый путь в `docker-compose.yml`:
@@ -888,6 +881,7 @@ docker compose up --build -d                  # запуск всех серви
 export $(grep -v '^#' .env | xargs)
 
 # Backend (нужен локальный PostgreSQL + Transmission)
+#   —alone profile переопределяет DB host/port, пути и настройки трекера из application-alone.yml
 mvn spring-boot:run -Dspring.profiles.active=alone
 
 # Frontend (Vite dev server, проксирует /game-library/* на :8080)
