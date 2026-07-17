@@ -15,6 +15,7 @@ import com.jenikmax.game.library.service.data.api.GameService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,15 +36,17 @@ public class GameDataService implements GameService {
     private final GameRepository gameRepository;
     private final GameGenreRepository gameGenreRepository;
     private final ScreenshotRepository screenshotRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, ScreenshotRepository screenshotRepository) {
+    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, ScreenshotRepository screenshotRepository, JdbcTemplate jdbcTemplate) {
         this.sqlDao = sqlDao;
         this.gameRepository = gameRepository;
         this.gameGenreRepository = gameGenreRepository;
         this.screenshotRepository = screenshotRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
 
@@ -51,22 +54,18 @@ public class GameDataService implements GameService {
     @SuppressWarnings("deprecation")
     public List<GameShortDto> getGameShortList(){
         String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
-                "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes, " +
-                "string_agg(dt.tag_code, ',' order by dt.tag_code) filter (where dt.tag_code is not null) as tag_codes " +
-                "from game_data g left join library.game_data_genre dg on dg.game_id = g.id " +
-                "left join library.game_data_tag dt on dt.game_id = g.id " +
-                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo order by g.name";
+                "(select string_agg(dg.genre_code, ',' order by dg.genre_code) from library.game_data_genre dg where dg.game_id = g.id) as genre_codes, " +
+                "(select string_agg(dt.tag_code, ',' order by dt.tag_code) from library.game_data_tag dt where dt.game_id = g.id) as tag_codes " +
+                "from game_data g order by g.name";
         return sqlDao.executeShortGame(sql);
     }
 
     @SuppressWarnings("deprecation")
     public List<GameShortDto> getGameShortList(int startIndex, int endIndex){
         String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
-                "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes, " +
-                "string_agg(dt.tag_code, ',' order by dt.tag_code) filter (where dt.tag_code is not null) as tag_codes " +
-                "from game_data g left join library.game_data_genre dg on dg.game_id = g.id " +
-                "left join library.game_data_tag dt on dt.game_id = g.id " +
-                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo order by g.name" +
+                "(select string_agg(dg.genre_code, ',' order by dg.genre_code) from library.game_data_genre dg where dg.game_id = g.id) as genre_codes, " +
+                "(select string_agg(dt.tag_code, ',' order by dt.tag_code) from library.game_data_tag dt where dt.game_id = g.id) as tag_codes " +
+                "from game_data g order by g.name" +
                 (endIndex != 0 ? " offset " + startIndex + " limit " + (endIndex - startIndex) : "");
         return sqlDao.executeShortGame(sql);
     }
@@ -82,14 +81,13 @@ public class GameDataService implements GameService {
         return getGameShortList(searchText, selectedPlatforms, selectedYears, selectedGenres, null, sortField, sortType, 0, 0);
     }
 
-    @Override
     public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType,int startIndex, int endIndex) {
         return getGameShortList(searchText, selectedPlatforms, selectedYears, selectedGenres, null, sortField, sortType, startIndex, endIndex);
     }
 
     public List<GameShortDto> getGameShortList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags, String sortField, String sortType, int startIndex, int endIndex) {
         List<Object> params = new ArrayList<>();
-        String from = "from game_data g left join library.game_data_genre dg on dg.game_id = g.id left join library.game_data_tag dt on dt.game_id = g.id";
+        String from = "from game_data g";
         String where = buildSearchFilter(searchText, params);
         boolean hasWhere = !where.isEmpty();
         if(selectedPlatforms.size() != 0){
@@ -119,9 +117,9 @@ public class GameDataService implements GameService {
         String order = buildOrderClause(sortField, sortType);
         String limit = (endIndex != 0) ? " offset " + startIndex + " limit " + (endIndex - startIndex) : "";
         String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
-                "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes, " +
-                "string_agg(dt.tag_code, ',' order by dt.tag_code) filter (where dt.tag_code is not null) as tag_codes " +
-                from + where + " group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo" + order + limit;
+                "(select string_agg(dg.genre_code, ',' order by dg.genre_code) from library.game_data_genre dg where dg.game_id = g.id) as genre_codes, " +
+                "(select string_agg(dt.tag_code, ',' order by dt.tag_code) from library.game_data_tag dt where dt.game_id = g.id) as tag_codes " +
+                from + where + order + limit;
         return sqlDao.executeShortGame(sql, params.toArray());
     }
 
@@ -130,12 +128,10 @@ public class GameDataService implements GameService {
         if (ids == null || ids.isEmpty()) return java.util.Collections.emptyList();
         String placeholders = String.join(",", java.util.Collections.nCopies(ids.size(), "?"));
         String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
-                "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes, " +
-                "string_agg(dt.tag_code, ',' order by dt.tag_code) filter (where dt.tag_code is not null) as tag_codes " +
-                "from game_data g left join library.game_data_genre dg on dg.game_id = g.id " +
-                "left join library.game_data_tag dt on dt.game_id = g.id " +
-                "where g.id in (" + placeholders + ") " +
-                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo";
+                "(select string_agg(dg.genre_code, ',' order by dg.genre_code) from library.game_data_genre dg where dg.game_id = g.id) as genre_codes, " +
+                "(select string_agg(dt.tag_code, ',' order by dt.tag_code) from library.game_data_tag dt where dt.game_id = g.id) as tag_codes " +
+                "from game_data g " +
+                "where g.id in (" + placeholders + ")";
         return sqlDao.executeShortGame(sql, ids.toArray());
     }
 
@@ -180,7 +176,20 @@ public class GameDataService implements GameService {
 
     @SuppressWarnings("deprecation")
     public List<String> getTags() {
-        return sqlDao.executeByStringList("select tag_code from library.game_data_tag group by tag_code order by tag_code", "tag_code");
+        return sqlDao.executeByStringList("select code from library.game_tag union select tag_code from library.game_data_tag order by 1", "code");
+    }
+
+    public void ensureTagsExist(List<String> tagCodes) {
+        if (tagCodes == null || tagCodes.isEmpty()) return;
+        for (String code : tagCodes) {
+            if (code != null && !code.isBlank()) {
+                String trimmed = code.trim();
+                jdbcTemplate.update(
+                    "INSERT INTO library.game_tag (code, description, description_ru) VALUES (?, ?, ?) ON CONFLICT (code) DO NOTHING",
+                    trimmed, trimmed, trimmed
+                );
+            }
+        }
     }
 
     // ─── helpers ───────────────────────────────────────────────────────────────

@@ -22,6 +22,10 @@
         <Tag v-for="g in game.genres?.slice(0, 4)" :key="g" :value="genreName(g)" severity="secondary" size="small" class="genre-chip" />
         <span v-if="game.genres?.length > 4" class="text-color-secondary text-xs">+{{ game.genres.length - 4 }}</span>
       </div>
+      <div v-if="game.tags?.length" class="row-tags">
+        <Tag v-for="tag in game.tags.slice(0, 3)" :key="tag" :value="tag" severity="info" size="small" rounded />
+        <span v-if="game.tags.length > 3" class="text-color-secondary text-xs">+{{ game.tags.length - 3 }}</span>
+      </div>
     </div>
     <div class="row-actions" @click.stop>
       <Button
@@ -160,6 +164,12 @@ async function toggleFav() {
   font-size: 0.65rem !important;
   padding: 0.1rem 0.4rem !important;
 }
+.row-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
 .row-actions {
   display: flex;
   align-items: center;
@@ -167,7 +177,8 @@ async function toggleFav() {
   flex-shrink: 0;
 }
 @media (max-width: 768px) {
-  .row-genres {
+  .row-genres,
+  .row-tags {
     display: none;
   }
   .row-img-wrap {

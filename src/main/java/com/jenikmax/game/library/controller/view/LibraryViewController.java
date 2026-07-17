@@ -54,6 +54,7 @@ public class LibraryViewController {
                        @RequestParam(value = "selectedYears", required = false) List<String> selectedYears,
                        @RequestParam(value = "message", required = false) String message,
                        @RequestParam(value = "selectedGenres", required = false) List<String> selectedGenres,
+                       @RequestParam(value = "selectedTags", required = false) List<String> selectedTags,
                        @RequestParam(value = "sortField", required = false) String sortField,
                        @RequestParam(value = "sortType", required = false) String sortType) {
         logger.info("Open library");
@@ -62,10 +63,11 @@ public class LibraryViewController {
         selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
         selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
         selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
+        selectedTags = selectedTags != null ? selectedTags : new ArrayList<>();
         sortField = sortField != null ? sortField : "";
         sortType = sortType != null ? sortType : "";
 
-        List<Long> gameIdList = libraryService.getGameIdList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType);
+        List<Long> gameIdList = libraryService.getGameIdList(searchText,selectedPlatforms,selectedYears,selectedGenres,selectedTags,sortField,sortType);
 
         int pageSize = 12;
         int totalPages = (gameIdList.size() + pageSize - 1) / pageSize;
@@ -73,7 +75,7 @@ public class LibraryViewController {
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min((startIndex + pageSize), gameIdList.size());
 
-        List<GameShortDto> paginatedGames = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,sortField,sortType, startIndex, endIndex);
+        List<GameShortDto> paginatedGames = libraryService.getGameList(searchText,selectedPlatforms,selectedYears,selectedGenres,selectedTags,sortField,sortType, startIndex, endIndex);
 
         List<String> years = libraryService.getReleaseDates();
         List<String> platforms = libraryService.getGamesPlatforms();

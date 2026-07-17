@@ -202,6 +202,7 @@ public class LibraryController {
             gameDto.setInstruction(gameEdit.getInstruction());
             gameDto.setTrailerUrl(gameEdit.getTrailerUrl());
             gameDto.setGenres(gameEdit.getGenres() != null ? gameEdit.getGenres() : new ArrayList<>());
+            gameDto.setTags(gameEdit.getTags() != null ? gameEdit.getTags() : existing.getTags());
             gameDto.setDirectoryPath(gameEdit.getDirectoryPath());
 
             // Handle logo: use new one if provided, else keep existing

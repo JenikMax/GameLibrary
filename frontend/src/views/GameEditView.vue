@@ -54,18 +54,14 @@
                   scrollHeight="400px"
                 />
               </div>
-              <div class="field col-12" v-if="allTags.length">
+              <div class="field col-12">
                 <label for="tags">{{ t('filter.tags') }}</label>
-                <MultiSelect
-                  id="tags"
+                <TagInput
                   v-model="form.tags"
-                  :options="allTags"
-                  :placeholder="t('filter.tags_placeholder')"
-                  display="chip"
-                  filter
-                  class="w-full"
-                  scrollHeight="300px"
-                  :allowEmpty="true"
+                  :allTags="allTags"
+                  :placeholder="t('tags.input_placeholder')"
+                  :filterPlaceholder="t('tags.filter_placeholder')"
+                  :emptyText="t('tags.empty')"
                 />
               </div>
               <div class="field col-12">
@@ -168,10 +164,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
 import { gamesApi } from '../api/games'
+import { useLocaleStore } from '../stores/locale'
+import { useLibraryStore } from '../stores/library'
 import ProgressSpinner from 'primevue/progressspinner'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
@@ -180,12 +178,15 @@ import MultiSelect from 'primevue/multiselect'
 import Select from 'primevue/select'
 import Checkbox from 'primevue/checkbox'
 import Message from 'primevue/message'
+import TagInput from '../components/TagInput.vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import 'quill/dist/quill.snow.css'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const localeStore = useLocaleStore()
+const libraryStore = useLibraryStore()
 
 const game = ref(null)
 const loading = ref(true)
@@ -293,6 +294,14 @@ onMounted(async () => {
   }
 })
 
+watch(() => localeStore.locale, async () => {
+  try {
+    const res = await gamesApi.getFilterOptions()
+    allGenres.value = res.data.data.genres || []
+    allTags.value = res.data.data.tags || []
+  } catch { /* ignore */ }
+})
+
 function handleLogoUpload(e) {
   const file = e.target.files[0]
   if (!file) return
@@ -341,6 +350,7 @@ async function handleSave() {
   error.value = ''
   try {
     await gamesApi.editGame(route.params.id, form.value)
+    await libraryStore.fetchFilterOptions()
     await router.replace(`/game/${route.params.id}`)
   } catch (e) {
     if (e.response?.status === 413) {

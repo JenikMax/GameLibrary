@@ -108,14 +108,14 @@
 
       <div v-else-if="store.loading">
         <div class="game-grid">
-          <GameCardSkeleton v-for="i in store.pageSize.value" :key="i" />
+          <GameCardSkeleton v-for="i in store.pageSize" :key="i" />
         </div>
       </div>
       <div v-else>
-        <div v-if="store.totalItems > store.pageSize.value" class="flex justify-content-center mb-3">
+        <div v-if="store.totalItems > store.pageSize" class="flex justify-content-center mb-3">
           <Paginator
-            :first="(store.currentPage - 1) * store.pageSize.value"
-            :rows="store.pageSize.value"
+            :first="(store.currentPage - 1) * store.pageSize"
+            :rows="store.pageSize"
             :totalRecords="store.totalItems"
             @page="onPageChange"
           />
@@ -126,10 +126,10 @@
         <TransitionGroup name="list-slide" tag="div" class="game-list" v-else>
           <GameListRow v-for="game in store.games" :key="game.id" :game="game" />
         </TransitionGroup>
-        <div v-if="store.totalItems > store.pageSize.value" class="flex justify-content-center mt-4">
+        <div v-if="store.totalItems > store.pageSize" class="flex justify-content-center mt-4">
           <Paginator
-            :first="(store.currentPage - 1) * store.pageSize.value"
-            :rows="store.pageSize.value"
+            :first="(store.currentPage - 1) * store.pageSize"
+            :rows="store.pageSize"
             :totalRecords="store.totalItems"
             @page="onPageChange"
           />

@@ -118,6 +118,15 @@ public class CollectionController {
 
     @GetMapping("/{id}/games")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getGames(@PathVariable Long id) {
+        Optional<GameCollection> optCollection = collectionService.getById(id);
+        if (optCollection.isEmpty()) return ResponseEntity.notFound().build();
+        GameCollection collection = optCollection.get();
+
+        if (collection.getIsSmart() && collection.getSmartRules() != null) {
+            List<Map<String, Object>> smartGames = collectionService.findSmartGames(collection.getSmartRules(), 100);
+            return ResponseEntity.ok(ApiResponse.ok(smartGames));
+        }
+
         List<GameCollectionEntry> entries = collectionService.getEntries(id);
         List<Map<String, Object>> result = new ArrayList<>();
         for (GameCollectionEntry e : entries) {
@@ -173,7 +182,11 @@ public class CollectionController {
         m.put("isPublic", c.getIsPublic());
         m.put("isSmart", c.getIsSmart());
         m.put("smartRules", c.getSmartRules());
-        m.put("gameCount", collectionService.getEntryCount(c.getId()));
+        if (c.getIsSmart() && c.getSmartRules() != null) {
+            m.put("gameCount", collectionService.countSmartGames(c.getSmartRules()));
+        } else {
+            m.put("gameCount", collectionService.getEntryCount(c.getId()));
+        }
         m.put("createdAt", c.getCreatedAt() != null ? c.getCreatedAt().toString() : null);
         m.put("updatedAt", c.getUpdatedAt() != null ? c.getUpdatedAt().toString() : null);
         return m;

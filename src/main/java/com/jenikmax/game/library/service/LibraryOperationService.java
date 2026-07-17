@@ -129,7 +129,6 @@ public class LibraryOperationService implements LibraryService {
         return getGameList(searchText, selectedPlatforms, selectedYears, selectedGenres, null, sortField, sortType, 0, 0);
     }
 
-    @Override
     public List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType, int startIndex, int endIndex) {
         return getGameList(searchText, selectedPlatforms, selectedYears, selectedGenres, null, sortField, sortType, startIndex, endIndex);
     }
@@ -144,7 +143,6 @@ public class LibraryOperationService implements LibraryService {
         return gameService.getGameShortListByIds(ids);
     }
 
-    @Override
     public List<Long> getGameIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         return getGameIdList(searchText, selectedPlatforms, selectedYears, selectedGenres, null, sortField, sortType);
     }
@@ -167,6 +165,7 @@ public class LibraryOperationService implements LibraryService {
 
     @Override
     public GameDto updateGameInfo(GameDto gameDto) {
+        gameService.ensureTagsExist(gameDto.getTags());
         Game game = GameConverter.dtoToGameEntityConverter(gameDto);
         gameService.updateGame(game);
         scanerService.storeGame(game);

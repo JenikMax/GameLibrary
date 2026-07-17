@@ -11,7 +11,7 @@
           <p v-if="collection.description" class="m-0 text-sm text-color-secondary">{{ collection.description }}</p>
           <div v-if="collection.isSmart && collection.smartRules" class="mt-1">
             <small class="text-color-secondary">{{ t('collections.smart_rules') }}: </small>
-            <code class="text-xs">{{ collection.smartRules }}</code>
+            <SmartRulesForm :modelValue="parsedRules" :options="libraryStore.filterOptions" readonly />
           </div>
         </div>
       </div>
@@ -49,8 +49,8 @@
         <label for="edit-smart">{{ t('collections.smart') }}</label>
       </div>
       <div v-if="editIsSmart" class="field">
-        <label for="edit-rules">{{ t('collections.smart_rules') }}</label>
-        <Textarea id="edit-rules" v-model="editSmartRules" class="w-full" rows="5" />
+        <label>{{ t('collections.smart_rules') }}</label>
+        <SmartRulesForm v-model="editSmartRulesObj" :options="libraryStore.filterOptions" />
       </div>
       <div class="field-checkbox">
         <Checkbox id="edit-public" v-model="editIsPublic" :binary="true" />
@@ -73,12 +73,12 @@
     <div v-else class="games-grid">
       <div
         v-for="(entry, i) in games"
-        :key="entry.id"
+        :key="entry.id || entry.gameId"
         class="game-card-wrapper"
       >
         <GameCard :game="entry.gameData" />
         <Button
-          v-if="isOwner"
+          v-if="isOwner && !collection.isSmart"
           icon="pi pi-times"
           rounded
           text
@@ -100,6 +100,7 @@ import { ref, onActivated, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
 import { useAuthStore } from '../stores/auth'
+import { useLibraryStore } from '../stores/library'
 import { collectionsApi } from '../api/collections'
 import { gamesApi } from '../api/games'
 import { useToast } from 'primevue/usetoast'
@@ -110,11 +111,13 @@ import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import GameCard from '../components/GameCard.vue'
+import SmartRulesForm from '../components/SmartRulesForm.vue'
 
 const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const libraryStore = useLibraryStore()
 const toast = useToast()
 
 const collection = ref(null)
@@ -126,8 +129,14 @@ const editName = ref('')
 const editDescription = ref('')
 const editIsPublic = ref(false)
 const editIsSmart = ref(false)
-const editSmartRules = ref('')
+const editSmartRulesObj = ref({})
 const updating = ref(false)
+
+const parsedRules = computed(() => {
+  if (!collection.value?.smartRules) return {}
+  try { return JSON.parse(collection.value.smartRules) }
+  catch { return {} }
+})
 
 const isOwner = computed(() =>
   collection.value && authStore.userId && collection.value.userId === authStore.userId
@@ -136,6 +145,9 @@ const isOwner = computed(() =>
 async function load() {
   loading.value = true
   try {
+    if (!libraryStore.filterOptions.genres?.length) {
+      await libraryStore.fetchFilterOptions()
+    }
     const [colRes, gamesRes] = await Promise.all([
       collectionsApi.get(route.params.id),
       collectionsApi.getGames(route.params.id)
@@ -146,32 +158,50 @@ async function load() {
     editDescription.value = collection.value.description || ''
     editIsPublic.value = collection.value.isPublic || false
     editIsSmart.value = collection.value.isSmart || false
-    editSmartRules.value = collection.value.smartRules || ''
+    try {
+      editSmartRulesObj.value = collection.value.smartRules ? JSON.parse(collection.value.smartRules) : {}
+    } catch {
+      editSmartRulesObj.value = {}
+    }
 
     const entries = gamesRes.data.data || []
-    const ids = entries.map(e => e.gameId)
 
-    const shortGames = await Promise.all(
-      ids.map(id =>
-        gamesApi.getGame(id).then(r => r.data.data).catch(() => null)
-      )
-    )
-
-    games.value = entries.map((e, i) => {
-      const info = shortGames[i] || {}
-      return {
-        ...e,
+    if (collection.value.isSmart) {
+      games.value = entries.map(e => ({
+        gameId: e.gameId,
         gameData: {
           id: e.gameId,
-          name: info.name || `#${e.gameId}`,
-          platform: info.platform || '',
-          releaseDate: info.releaseDate || '',
-          genres: info.genres || [],
-          avgRating: info.avgRating || null,
+          name: e.name || `#${e.gameId}`,
+          platform: e.platform || '',
+          releaseDate: e.releaseDate || '',
+          genres: e.genres || [],
+          avgRating: e.avgRating || null,
           logoUrl: `/game-library/api/images/games/${e.gameId}/logo`
         }
-      }
-    })
+      }))
+    } else {
+      const ids = entries.map(e => e.gameId)
+      const shortGames = await Promise.all(
+        ids.map(id =>
+          gamesApi.getGame(id).then(r => r.data.data).catch(() => null)
+        )
+      )
+      games.value = entries.map((e, i) => {
+        const info = shortGames[i] || {}
+        return {
+          ...e,
+          gameData: {
+            id: e.gameId,
+            name: info.name || `#${e.gameId}`,
+            platform: info.platform || '',
+            releaseDate: info.releaseDate || '',
+            genres: info.genres || [],
+            avgRating: info.avgRating || null,
+            logoUrl: `/game-library/api/images/games/${e.gameId}/logo`
+          }
+        }
+      })
+    }
   } catch {
     toast.add({ severity: 'error', summary: t('collections.load_failed'), life: 3000 })
   } finally {
@@ -193,7 +223,8 @@ async function handleUpdate() {
       isSmart: editIsSmart.value
     }
     if (editIsSmart.value) {
-      payload.smartRules = editSmartRules.value.trim() || null
+      const rulesStr = Object.keys(editSmartRulesObj.value).length ? JSON.stringify(editSmartRulesObj.value) : null
+      payload.smartRules = rulesStr
     }
     await collectionsApi.update(route.params.id, payload)
     showEditDialog.value = false

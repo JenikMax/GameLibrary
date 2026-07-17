@@ -148,7 +148,7 @@
     <Divider />
     <div class="reviews-section">
       <TabView>
-        <TabPanel :header="t('review.title')" :headerStyle="{ display: 'flex', alignItems: 'center', gap: '0.5rem' }">
+        <TabPanel>
           <template #header>
             <span>{{ t('review.title') }}</span>
             <Badge v-if="reviews.length" :value="reviews.length" severity="secondary" size="small" />
@@ -232,7 +232,7 @@
           </div>
         </TabPanel>
 
-        <TabPanel :header="t('game.comments')" :headerStyle="{ display: 'flex', alignItems: 'center', gap: '0.5rem' }">
+        <TabPanel>
           <template #header>
             <span>{{ t('game.comments') }}</span>
             <Badge v-if="comments.length" :value="comments.length" severity="secondary" size="small" />

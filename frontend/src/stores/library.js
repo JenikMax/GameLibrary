@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { gamesApi } from '../api/games'
+import { useLocaleStore } from './locale'
 
 export const useLibraryStore = defineStore('library', () => {
   const games = ref([])
@@ -16,7 +17,7 @@ export const useLibraryStore = defineStore('library', () => {
   const sortField = ref('')
   const sortType = ref('')
   const favoritesOnly = ref(false)
-  const filterOptions = ref({ years: [], platforms: [], genres: [] })
+  const filterOptions = ref({ years: [], platforms: [], genres: [], tags: [] })
   const pageSize = ref(12)
   const viewMode = ref('grid')
 
@@ -98,6 +99,11 @@ export const useLibraryStore = defineStore('library', () => {
       map[g.code] = g.name
     }
     return map
+  })
+
+  const localeStore = useLocaleStore()
+  watch(() => localeStore.locale, () => {
+    fetchFilterOptions()
   })
 
   return {

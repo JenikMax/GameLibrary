@@ -28,6 +28,8 @@ public interface GameService {
 
     List<String> getTags();
 
+    void ensureTagsExist(List<String> tagCodes);
+
     List<Game> getGameList();
 
     List<Object[]> getGameDirectoryPaths();

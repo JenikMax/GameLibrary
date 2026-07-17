@@ -19,9 +19,8 @@
         <label for="col-smart">{{ t('collections.smart') }}</label>
       </div>
       <div v-if="newIsSmart" class="field">
-        <label for="col-rules">{{ t('collections.smart_rules') }}</label>
-        <Textarea id="col-rules" v-model="newSmartRules" class="w-full" rows="5" placeholder='{"platforms":["PC"],"genres":["rpg"],"minRating":7}' />
-        <small class="text-color-secondary">{{ t('collections.smart_rules_hint') }}</small>
+        <label>{{ t('collections.smart_rules') }}</label>
+        <SmartRulesForm v-model="newSmartRulesObj" :options="store.filterOptions" />
       </div>
       <div class="field-checkbox">
         <Checkbox id="col-public" v-model="newIsPublic" :binary="true" />
@@ -64,6 +63,7 @@
 import { ref, computed, onMounted, onActivated } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { collectionsApi } from '../api/collections'
+import { useLibraryStore } from '../stores/library'
 import { useToast } from 'primevue/usetoast'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
@@ -72,9 +72,11 @@ import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
 import Paginator from 'primevue/paginator'
 import CollectionCard from '../components/CollectionCard.vue'
+import SmartRulesForm from '../components/SmartRulesForm.vue'
 
 const { t } = useI18n()
 const toast = useToast()
+const store = useLibraryStore()
 
 const collections = ref([])
 const loading = ref(false)
@@ -84,7 +86,7 @@ const newName = ref('')
 const newDescription = ref('')
 const newIsPublic = ref(false)
 const newIsSmart = ref(false)
-const newSmartRules = ref('')
+const newSmartRulesObj = ref({})
 
 const page = ref(1)
 const pageSize = 12
@@ -94,7 +96,12 @@ const paginatedCollections = computed(() => {
 })
 const totalPages = computed(() => Math.ceil(collections.value.length / pageSize))
 
-onMounted(load)
+onMounted(async () => {
+  if (!store.filterOptions.genres?.length) {
+    await store.fetchFilterOptions()
+  }
+  load()
+})
 onActivated(load)
 
 async function load() {
@@ -120,8 +127,8 @@ async function handleCreate() {
       isPublic: newIsPublic.value,
       isSmart: newIsSmart.value
     }
-    if (newIsSmart.value && newSmartRules.value.trim()) {
-      payload.smartRules = newSmartRules.value.trim()
+    if (newIsSmart.value && Object.keys(newSmartRulesObj.value).length) {
+      payload.smartRules = JSON.stringify(newSmartRulesObj.value)
     }
     await collectionsApi.create(payload)
     showCreateDialog.value = false
@@ -129,7 +136,7 @@ async function handleCreate() {
     newDescription.value = ''
     newIsPublic.value = false
     newIsSmart.value = false
-    newSmartRules.value = ''
+    newSmartRulesObj.value = {}
     await load()
     toast.add({ severity: 'success', summary: t('collections.created'), life: 2000 })
   } catch {

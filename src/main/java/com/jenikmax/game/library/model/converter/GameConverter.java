@@ -69,8 +69,6 @@ public class GameConverter {
         }
         return entity;
     }
-        return entity;
-    }
 
     public static GameDto gameToDtoConverter(Game entity){
         GameDto dto = new GameDto();
