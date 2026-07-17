@@ -133,6 +133,7 @@ function onImgError(e) {
   align-items: flex-end;
   padding: 14px;
   overflow-x: hidden;
+  background: var(--p-surface-800);
 }
 
 .preview-empty {
@@ -142,7 +143,7 @@ function onImgError(e) {
   justify-content: center;
   width: 100%;
   gap: 6px;
-  color: var(--p-text-muted-color);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.85rem;
 }
 
@@ -163,7 +164,7 @@ function onImgError(e) {
   height: 73px;
   object-fit: cover;
   border-radius: 6px;
-  background: var(--p-surface-200);
+  background: var(--p-surface-700);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   border: 1.5px solid rgba(255, 255, 255, 0.3);
 }
