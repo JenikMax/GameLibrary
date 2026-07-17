@@ -219,15 +219,17 @@
               <p v-if="r.text" class="comment-text">{{ r.text }}</p>
               <div v-if="r.pros" class="review-pros"><i class="pi pi-plus-circle text-green-500" /> <span>{{ r.pros }}</span></div>
               <div v-if="r.cons" class="review-cons"><i class="pi pi-minus-circle text-red-500" /> <span>{{ r.cons }}</span></div>
-              <Button
-                v-if="r.canDelete"
-                :label="t('game.comment_delete')"
-                icon="pi pi-trash"
-                size="small"
-                severity="danger"
-                text
-                @click="deleteReview(r.id)"
-              />
+              <div class="review-actions">
+                <Button
+                  v-if="r.canDelete"
+                  :label="t('game.comment_delete')"
+                  icon="pi pi-trash"
+                  size="small"
+                  severity="danger"
+                  text
+                  @click="deleteReview(r.id)"
+                />
+              </div>
             </div>
           </div>
         </TabPanel>
@@ -895,9 +897,16 @@ function onViewerKeydown(e) {
   background: var(--p-surface-100);
   border-radius: 8px;
   padding: 0.75rem;
+  position: relative;
 }
 .app-dark .review-item {
   background: var(--p-surface-800);
+}
+.review-item .comment-header {
+  margin-bottom: 0.5rem;
+}
+.review-scores {
+  margin-bottom: 0.5rem;
 }
 .review-scores span {
   background: var(--p-surface-200);
@@ -907,15 +916,23 @@ function onViewerKeydown(e) {
 .app-dark .review-scores span {
   background: var(--p-surface-700);
 }
+.review-item .comment-text {
+  margin-bottom: 0.5rem;
+}
 .review-pros, .review-cons {
   display: flex;
   align-items: flex-start;
   gap: 0.25rem;
-  margin: 0.25rem 0;
+  margin: 0.5rem 0;
   font-size: 0.85rem;
 }
 .review-pros i { flex-shrink: 0; margin-top: 0.15rem; }
 .review-cons i { flex-shrink: 0; margin-top: 0.15rem; }
+.review-actions {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
 .aggregated-scores {
   background: var(--p-surface-50);
   border-radius: 8px;
