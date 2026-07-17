@@ -61,7 +61,7 @@
 | 🔗 Related games (same genre or similar name) | |
 | 📊 Statistics dashboard (charts by platform/genre/year, top lists) | |
 | 📂 Game collections (playlists, public/private, reorder) | |
-| 📝 Detailed reviews (gameplay/graphics/story/music scores 1-10, pros/cons) | |
+| 📝 Detailed reviews (gameplay/graphics/story/music scores 1-10, pros/cons, delete button in corner) | |
 | 🏷️ Tags (custom labels, filter in sidebar) | |
 | 🧠 Smart collections (JSON rules, auto-badge) | |
 
@@ -566,7 +566,7 @@ npm run dev
 | 🔗 Связанные игры (жанр или похожее название) | |
 | 📊 Статистика библиотеки (диаграммы по платформам/жанрам/годам, топы) | |
 | 📂 Коллекции игр (плейлисты, публичные/приватные, сортировка) | |
-| 📝 Подробные рецензии (оценки геймплея/графики/сюжета/музыки 1-10, плюсы/минусы) | |
+| 📝 Подробные рецензии (оценки геймплея/графики/сюжета/музыки 1-10, плюсы/минусы, кнопка удаления в углу) | |
 | 🏷️ Теги (пользовательские метки, фильтр в боковой панели) | |
 | 🧠 Умные коллекции (JSON-правила, автоматическая маркировка) | |
 
