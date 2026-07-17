@@ -3,7 +3,7 @@
     <h2 class="mb-3">{{ t('statistics.title') }}</h2>
 
     <div class="flex justify-content-end mb-3">
-      <Button :label="t('statistics.refresh_sizes')" icon="pi pi-refresh" severity="secondary" size="small"
+      <Button v-if="authStore.isAdmin" :label="t('statistics.refresh_sizes')" icon="pi pi-refresh" severity="secondary" size="small"
         :loading="refreshing" @click="handleRefreshSizes" />
     </div>
 
@@ -118,6 +118,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
 import { statisticsApi } from '../api/statistics'
 import Button from 'primevue/button'
@@ -137,6 +138,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tool
 
 const { t } = useI18n()
 const router = useRouter()
+const authStore = useAuthStore()
 
 const stats = ref(null)
 const loading = ref(false)
