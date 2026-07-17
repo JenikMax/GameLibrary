@@ -202,9 +202,15 @@ async function load() {
         }
       })
     }
-  } catch {
-    toast.add({ severity: 'error', summary: t('collections.load_failed'), life: 3000 })
-  } finally {
+    games.value.sort((a, b) => {
+      const ra = a.gameData.avgRating ?? 0
+      const rb = b.gameData.avgRating ?? 0
+      if (rb !== ra) return rb - ra
+      return (a.gameData.name || '').localeCompare(b.gameData.name || '')
+    })
+    } catch {
+      toast.add({ severity: 'error', summary: t('collections.load_failed'), life: 3000 })
+    } finally {
     loading.value = false
   }
 }

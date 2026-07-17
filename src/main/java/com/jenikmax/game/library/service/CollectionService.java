@@ -142,7 +142,7 @@ public class CollectionService {
             List<Object> params = new ArrayList<>();
             buildSmartRulesConditions(rules, sql, params);
             sql.append(" GROUP BY g.id, g.name, g.platform, g.release_date");
-            sql.append(" ORDER BY g.name ASC");
+            sql.append(" ORDER BY avg_rating DESC, g.name ASC");
             if (limit > 0) sql.append(" LIMIT ").append(limit);
             return jdbcTemplate.query(sql.toString(), params.toArray(), (rs, rn) -> {
                 Map<String, Object> m = new LinkedHashMap<>();
