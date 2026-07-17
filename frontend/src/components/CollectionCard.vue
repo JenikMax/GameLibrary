@@ -84,7 +84,7 @@ function onImgError(e) {
 }
 
 .hero-section {
-  height: 70%;
+  height: 80%;
   min-height: 200px;
   background-size: cover;
   background-position: center;
@@ -128,11 +128,10 @@ function onImgError(e) {
 }
 
 .preview-strip {
-  height: 30%;
-  min-height: 120px;
+  height: 20%;
   display: flex;
-  align-items: center;
-  padding: 10px 14px;
+  align-items: flex-end;
+  padding: 14px;
   overflow-x: hidden;
 }
 
