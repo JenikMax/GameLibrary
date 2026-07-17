@@ -61,6 +61,9 @@
 | 🔗 Related games (same genre or similar name) | |
 | 📊 Statistics dashboard (charts by platform/genre/year, top lists) | |
 | 📂 Game collections (playlists, public/private, reorder) | |
+| 📝 Detailed reviews (gameplay/graphics/story/music scores 1-10, pros/cons) | |
+| 🏷️ Tags (custom labels, filter in sidebar) | |
+| 🧠 Smart collections (JSON rules, auto-badge) | |
 
 <p align="center">
   <img src="frontend/public/collections.jpg" alt="GameLibrary Collections" width="800">
@@ -163,6 +166,9 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `POST /games/{id}/comments` | USER, ADMIN | Add comment |
 | `DELETE /games/{id}/comments/{commentId}` | USER, ADMIN | Delete own comment |
 | `GET /games/{id}/related` | USER, ADMIN | Related games by genre/name (same platform removed) |
+| `GET /games/{id}/reviews` | USER, ADMIN | Get game reviews with aggregated scores |
+| `POST /games/{id}/reviews` | USER, ADMIN | Add/update review (text, pros, cons, 4 category scores 1-10) |
+| `DELETE /games/{id}/reviews/{reviewId}` | USER, ADMIN | Delete own review |
 | **Collections** | | |
 | `GET /api/collections` | USER, ADMIN | List own + public collections |
 | `GET /api/collections/{id}` | USER, ADMIN | Get single collection |
@@ -277,11 +283,14 @@ Schema `library`:
 | `favorite_game` | User favorites (user_id + game_id) |
 | `game_comment` | Comments with ownership and timestamps |
 | `notification` | User notifications with `is_read` flag |
-| `game_collection` | User-created game collections (name, description, is_public, FK → user) |
+| `game_collection` | User-created game collections (name, description, is_public, is_smart, smart_rules, FK → user) |
 | `game_collection_entry` | M:N collection ↔ game (sort_order for reordering, unique constraint) |
+| `game_tag` | Tag dictionary (code, description, description_ru) |
+| `game_data_tag` | M:N game ↔ tag |
+| `game_review` | Reviews with category scores (gameplay/graphics/story/music 1-10), pros/cons, text (unique user+game) |
 | `library_user` | Users (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `1_init.sh` (schema), `2_library.sql` (tables + genres), `3_user.sql` (users + seed), `4_search.sql` (full-text search), `5_rating.sql`, `6_favorite.sql`, `7_comment.sql`, `8_notification.sql`, `9_collection.sql`.
+DDL: `postgresdb/ddl/` — `1_init.sh` (schema), `2_library.sql` (tables + genres), `3_user.sql` (users + seed), `4_search.sql` (full-text search), `5_rating.sql`, `6_favorite.sql`, `7_comment.sql`, `8_notification.sql`, `9_collection.sql`, `10_tags.sql`, `11_smart_collection.sql`, `12_review.sql`.
 
 ## 🔒 Security
 
@@ -557,6 +566,9 @@ npm run dev
 | 🔗 Связанные игры (жанр или похожее название) | |
 | 📊 Статистика библиотеки (диаграммы по платформам/жанрам/годам, топы) | |
 | 📂 Коллекции игр (плейлисты, публичные/приватные, сортировка) | |
+| 📝 Подробные рецензии (оценки геймплея/графики/сюжета/музыки 1-10, плюсы/минусы) | |
+| 🏷️ Теги (пользовательские метки, фильтр в боковой панели) | |
+| 🧠 Умные коллекции (JSON-правила, автоматическая маркировка) | |
 
 <p align="center">
   <img src="frontend/public/collections.jpg" alt="GameLibrary Collections" width="800">
@@ -659,6 +671,9 @@ make all                      # сборка backend + frontend, запуск do
 | `POST /games/{id}/comments` | USER, ADMIN | Добавить комментарий |
 | `DELETE /games/{id}/comments/{commentId}` | USER, ADMIN | Удалить свой комментарий |
 | `GET /games/{id}/related` | USER, ADMIN | Связанные игры (жанр или похожее название) |
+| `GET /games/{id}/reviews` | USER, ADMIN | Получить рецензии с агрегированными оценками |
+| `POST /games/{id}/reviews` | USER, ADMIN | Добавить/обновить рецензию (текст, плюсы, минусы, 4 категории оценок 1-10) |
+| `DELETE /games/{id}/reviews/{reviewId}` | USER, ADMIN | Удалить свою рецензию |
 | **Collections** | | |
 | `GET /api/collections` | USER, ADMIN | Свои + публичные коллекции |
 | `GET /api/collections/{id}` | USER, ADMIN | Получить коллекцию |
@@ -763,11 +778,14 @@ make all                      # сборка backend + frontend, запуск do
 | `favorite_game` | Избранное пользователя |
 | `game_comment` | Комментарии с владельцем и временем |
 | `notification` | Уведомления с флагом `is_read` |
-| `game_collection` | Коллекции игр пользователей (name, description, is_public, FK → user) |
+| `game_collection` | Коллекции игр пользователей (name, description, is_public, is_smart, smart_rules, FK → user) |
 | `game_collection_entry` | M:N коллекция ↔ игра (sort_order для сортировки, unique constraint) |
+| `game_tag` | Справочник тегов (code, description, description_ru) |
+| `game_data_tag` | M:N игра ↔ тег |
+| `game_review` | Рецензии с оценками по категориям (геймплей/графика/сюжет/музыка 1-10), плюсы/минусы, текст (unique user+game) |
 | `library_user` | Пользователи (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `1_init.sh` (схема), `2_library.sql` (таблицы + жанры), `3_user.sql` (пользователи + seed), `4_search.sql` (полнотекстовый поиск), `5_rating.sql` (оценки), `6_favorite.sql` (избранное), `7_comment.sql` (комментарии), `8_notification.sql` (уведомления), `9_collection.sql` (коллекции).
+DDL: `postgresdb/ddl/` — `1_init.sh` (схема), `2_library.sql` (таблицы + жанры), `3_user.sql` (пользователи + seed), `4_search.sql` (полнотекстовый поиск), `5_rating.sql` (оценки), `6_favorite.sql` (избранное), `7_comment.sql` (комментарии), `8_notification.sql` (уведомления), `9_collection.sql` (коллекции), `10_tags.sql` (теги), `11_smart_collection.sql` (умные коллекции), `12_review.sql` (рецензии).
 
 ## 🔒 Безопасность
 
