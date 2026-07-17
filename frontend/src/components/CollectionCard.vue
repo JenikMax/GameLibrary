@@ -99,7 +99,7 @@ function truncate(str, max) {
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(transparent 30%, rgba(0, 0, 0, 0.75) 100%);
+  background: linear-gradient(transparent 30%, rgba(0, 0, 0, 0.9) 100%);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
