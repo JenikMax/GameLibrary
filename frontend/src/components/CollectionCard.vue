@@ -166,7 +166,6 @@ function onImgError(e) {
   border-radius: 6px;
   background: var(--p-surface-700);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
 }
 
 .preview-overflow {
