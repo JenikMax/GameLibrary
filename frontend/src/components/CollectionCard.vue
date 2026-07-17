@@ -29,14 +29,14 @@
         <span>{{ t('collections.no_games_yet') }}</span>
       </div>
       <template v-else>
-        <div v-for="pg in collection.previewGames" :key="pg.gameId" class="preview-item">
+        <div v-for="(pg, index) in collection.previewGames" :key="pg.gameId" class="preview-item"
+             :style="{ zIndex: collection.previewGames.length - index }">
           <img
             :src="`/game-library/api/images/games/${pg.gameId}/logo`"
             :alt="pg.name"
             class="preview-thumb"
             @error="onImgError"
           />
-          <span class="preview-name">{{ truncate(pg.name, 20) }}</span>
         </div>
         <div v-if="collection.overflow > 0" class="preview-overflow">
           <div class="overflow-inner">
@@ -70,11 +70,6 @@ const heroStyle = computed(() => {
 
 function onImgError(e) {
   e.target.src = '/game-library/img/default.jpg'
-}
-
-function truncate(str, max) {
-  if (!str) return ''
-  return str.length > max ? str.slice(0, max) + '\u2026' : str
 }
 </script>
 
@@ -137,7 +132,6 @@ function truncate(str, max) {
   min-height: 120px;
   display: flex;
   align-items: center;
-  gap: 10px;
   padding: 10px 14px;
   overflow-x: hidden;
 }
@@ -157,35 +151,33 @@ function truncate(str, max) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
   flex-shrink: 0;
+  position: relative;
+}
+
+.preview-item + .preview-item {
+  margin-left: -19px;
 }
 
 .preview-thumb {
-  width: 80px;
-  height: 106px;
+  width: 55px;
+  height: 73px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--p-surface-200);
-}
-
-.preview-name {
-  font-size: 0.65rem;
-  max-width: 80px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--p-text-muted-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
 }
 
 .preview-overflow {
   flex-shrink: 0;
+  margin-left: -19px;
 }
 
 .overflow-inner {
-  width: 80px;
-  height: 106px;
-  border-radius: 8px;
+  width: 55px;
+  height: 73px;
+  border-radius: 6px;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;

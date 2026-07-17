@@ -286,7 +286,7 @@ public class CollectionService {
 
             if (c.getIsSmart() && c.getSmartRules() != null) {
                 gameCount = (int) countSmartGames(c.getSmartRules());
-                List<Map<String, Object>> smartGames = findSmartGames(c.getSmartRules(), 4);
+                List<Map<String, Object>> smartGames = findSmartGames(c.getSmartRules(), 8);
                 games = smartGames.stream().map(sg -> new Object[]{
                         c.getId(), sg.get("gameId"), sg.get("name"), sg.get("avgRating")
                 }).toList();
@@ -309,7 +309,7 @@ public class CollectionService {
 
                 List<Map<String, Object>> previews = new ArrayList<>();
                 int total = games.size();
-                int maxPreviews = Math.min(total, 2);
+                int maxPreviews = Math.min(total, 7);
                 for (int i = 0; i < maxPreviews; i++) {
                     Object[] g = games.get(i);
                     Map<String, Object> pg = new LinkedHashMap<>();
@@ -318,7 +318,7 @@ public class CollectionService {
                     previews.add(pg);
                 }
                 m.put("previewGames", previews);
-                int overflow = total - maxPreviews;
+                int overflow = gameCount - maxPreviews;
                 m.put("overflow", Math.max(overflow, 0));
             }
 
