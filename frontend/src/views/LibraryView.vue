@@ -52,23 +52,19 @@
       </div>
 
       <div class="sort-bar flex align-items-center gap-2 mb-3 flex-wrap">
-        <SelectButton
-          v-model="store.sortField"
-          :options="sortOptions"
-          optionLabel="label"
-          optionValue="value"
-          size="small"
-          @change="onSortChange"
-        />
-        <SelectButton
-          v-if="store.sortField"
-          v-model="store.sortType"
-          :options="sortTypeOptions"
-          optionLabel="label"
-          optionValue="value"
-          size="small"
-          @change="onSortChange"
-        />
+        <div class="sort-buttons">
+          <button
+            v-for="opt in sortOptions"
+            :key="opt.value"
+            class="sort-btn"
+            :class="{ 'sort-btn--active': isActiveSort(opt.value) }"
+            @click="toggleSort(opt.value)"
+          >
+            <span>{{ opt.label }}</span>
+            <i v-if="isActiveSort(opt.value)" class="pi sort-arrow" :class="sortArrowIcon(opt.value)" />
+          </button>
+        </div>
+        <span class="flex-grow-1" />
         <span class="text-color-secondary text-sm">{{ t('filter.page_size') }}:</span>
         <SelectButton
           v-model="store.pageSize"
@@ -79,7 +75,7 @@
           @change="onPageSizeChange"
         />
         <Button
-          :icon="store.viewMode === 'grid' ? 'pi pi-th-large' : 'pi pi-bars'"
+          :icon="store.viewMode === 'grid' ? 'pi pi-bars' : 'pi pi-th-large'"
           severity="secondary"
           text
           rounded
@@ -209,15 +205,32 @@ const sortOptions = [
   { label: t('filter.sort_date'), value: 'create' },
   { label: t('filter.sort_rating'), value: 'rating' }
 ]
-const sortTypeOptions = [
-  { label: t('filter.asc'), value: 'asc' },
-  { label: t('filter.desc'), value: 'desc' }
-]
 const pageSizeOptions = [
   { label: '12', value: 12 },
   { label: '24', value: 24 },
   { label: '48', value: 48 }
 ]
+
+function isActiveSort(field) {
+  return store.sortField === field
+}
+
+function sortArrowIcon(field) {
+  return store.sortField === field && store.sortType === 'desc' ? 'pi-arrow-down' : 'pi-arrow-up'
+}
+
+function toggleSort(field) {
+  if (store.sortField !== field) {
+    store.sortField = field
+    store.sortType = 'asc'
+  } else if (store.sortType === 'asc') {
+    store.sortType = 'desc'
+  } else {
+    store.sortField = ''
+    store.sortType = ''
+  }
+  store.fetchGames(1)
+}
 
 onMounted(async () => {
   await store.fetchFilterOptions()
@@ -263,10 +276,6 @@ onBeforeUnmount(() => {
 function onPageChange(event) {
   store.fetchGames(event.page + 1)
   window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-function onSortChange() {
-  store.fetchGames(1)
 }
 
 function onPageSizeChange() {
@@ -411,6 +420,44 @@ function pollScanStatus() {
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-top: 0.15rem;
+}
+.sort-buttons {
+  display: inline-flex;
+}
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--p-content-border-color);
+  background: var(--p-content-background);
+  color: var(--p-text-color);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  margin-left: -1px;
+}
+.sort-btn:first-child {
+  border-radius: 6px 0 0 6px;
+  margin-left: 0;
+}
+.sort-btn:last-child {
+  border-radius: 0 6px 6px 0;
+}
+.sort-btn:hover {
+  background: var(--p-content-hover-background);
+}
+.sort-btn--active {
+  background: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
+  border-color: var(--p-primary-color);
+  z-index: 1;
+}
+.sort-btn--active:hover {
+  background: var(--p-primary-hover-color);
+}
+.sort-arrow {
+  font-size: 0.65rem;
 }
 @media (max-width: 768px) {
   .library-layout {
