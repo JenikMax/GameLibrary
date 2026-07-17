@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onActivated, watch, computed } from 'vue'
+import { ref, onActivated, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
 import { useAuthStore } from '../stores/auth'
@@ -155,7 +155,6 @@ async function load() {
   }
 }
 
-onMounted(load)
 onActivated(load)
 watch(() => route.params.id, load, { immediate: true })
 
