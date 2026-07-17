@@ -12,4 +12,6 @@ public interface GameTagRepository extends JpaRepository<GameTag, Long> {
 
     @Query("SELECT DISTINCT gt.tagCode FROM GameTag gt ORDER BY gt.tagCode")
     List<String> findAllTagCodes();
+
+    void deleteByGameId(Long gameId);
 }

@@ -118,9 +118,11 @@ public class ScanTaskService implements DisposableBean {
                             game.setLogo(logo);
                             List<Screenshot> screenshots = scanerService.getScreenshots(game);
                             game.getScreenshots().clear();
-                            game.getScreenshots().addAll(screenshots);
+                            for (Screenshot s : screenshots) {
+                                s.setGame(game);
+                                em.persist(s);
+                            }
                             game.setTotalSizeBytes(scanerService.calculateGameDirSize(game.getDirectoryPath()));
-                            gameService.updateGameImages(game);
                         }
                         em.getTransaction().commit();
                     } catch (Exception e) {

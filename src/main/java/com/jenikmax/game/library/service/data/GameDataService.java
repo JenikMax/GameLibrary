@@ -2,6 +2,7 @@ package com.jenikmax.game.library.service.data;
 
 import com.jenikmax.game.library.dao.api.GameGenreRepository;
 import com.jenikmax.game.library.dao.api.GameRepository;
+import com.jenikmax.game.library.dao.api.GameTagRepository;
 import com.jenikmax.game.library.dao.api.ScreenshotRepository;
 import com.jenikmax.game.library.dao.api.SqlDao;
 import com.jenikmax.game.library.model.converter.GameConverter;
@@ -35,16 +36,18 @@ public class GameDataService implements GameService {
     private final SqlDao sqlDao;
     private final GameRepository gameRepository;
     private final GameGenreRepository gameGenreRepository;
+    private final GameTagRepository gameTagRepository;
     private final ScreenshotRepository screenshotRepository;
     private final JdbcTemplate jdbcTemplate;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, ScreenshotRepository screenshotRepository, JdbcTemplate jdbcTemplate) {
+    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, GameTagRepository gameTagRepository, ScreenshotRepository screenshotRepository, JdbcTemplate jdbcTemplate) {
         this.sqlDao = sqlDao;
         this.gameRepository = gameRepository;
         this.gameGenreRepository = gameGenreRepository;
+        this.gameTagRepository = gameTagRepository;
         this.screenshotRepository = screenshotRepository;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -328,6 +331,7 @@ public class GameDataService implements GameService {
     @Transactional
     @Override
     public void updateGameImages(Game game) {
+        jdbcTemplate.update("DELETE FROM library.game_screenshot WHERE game_id = ?", game.getId());
         gameRepository.save(game);
     }
 
@@ -341,6 +345,10 @@ public class GameDataService implements GameService {
     @Transactional
     @Override
     public void updateGame(Game game) {
+        jdbcTemplate.update("DELETE FROM library.game_data_tag WHERE game_id = ?", game.getId());
+        jdbcTemplate.update("DELETE FROM library.game_data_genre WHERE game_id = ?", game.getId());
+        jdbcTemplate.update("DELETE FROM library.game_screenshot WHERE game_id = ?", game.getId());
+        entityManager.clear();
         gameRepository.save(game);
     }
 
