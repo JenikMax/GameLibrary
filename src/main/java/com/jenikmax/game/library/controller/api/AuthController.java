@@ -23,6 +23,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Auth", description = "Authentication and registration")
 public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);

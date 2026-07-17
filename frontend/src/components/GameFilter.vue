@@ -60,6 +60,19 @@
           />
         </div>
 
+        <div class="field" v-if="options.tags && options.tags.length">
+          <label>{{ t('filter.tags') }}</label>
+          <MultiSelect
+            v-model="selectedTags"
+            :options="options.tags"
+            :placeholder="t('filter.tags_placeholder')"
+            filter
+            display="chip"
+            class="w-full"
+            scrollHeight="300px"
+          />
+        </div>
+
         <div class="flex gap-2">
           <Button :label="t('filter.reset')" icon="pi pi-times" severity="secondary" @click="resetFilters" class="flex-1" />
         </div>
@@ -100,14 +113,16 @@ const searchText = ref('')
 const selectedPlatforms = ref([])
 const selectedYears = ref([])
 const selectedGenres = ref([])
+const selectedTags = ref([])
 const resetting = ref(false)
 
 function restoreState(state) {
   resetting.value = true
   searchText.value = state.searchText || ''
-  selectedPlatforms.value = state.selectedPlatforms || []
-  selectedYears.value = state.selectedYears || []
-  selectedGenres.value = state.selectedGenres || []
+  selectedPlatforms.value = state.selectedPlatforms || state.platforms || []
+  selectedYears.value = state.selectedYears || state.years || []
+  selectedGenres.value = state.selectedGenres || state.genres || []
+  selectedTags.value = state.selectedTags || state.tags || []
   setTimeout(() => { resetting.value = false }, 300)
 }
 
@@ -121,6 +136,7 @@ watch(searchText, debouncedApply)
 watch(selectedPlatforms, debouncedApply, { deep: true })
 watch(selectedYears, debouncedApply, { deep: true })
 watch(selectedGenres, debouncedApply, { deep: true })
+watch(selectedTags, debouncedApply, { deep: true })
 
 function togglePlatform(p) {
   const idx = selectedPlatforms.value.indexOf(p)
@@ -139,7 +155,8 @@ function applyFilters() {
     searchText: searchText.value,
     platforms: [...selectedPlatforms.value],
     years: [...selectedYears.value],
-    genres: [...selectedGenres.value]
+    genres: [...selectedGenres.value],
+    tags: [...selectedTags.value]
   })
 }
 
@@ -149,6 +166,7 @@ function resetFilters() {
   selectedPlatforms.value = []
   selectedYears.value = []
   selectedGenres.value = []
+  selectedTags.value = []
   emit('reset')
   setTimeout(() => { resetting.value = false }, 300)
 }

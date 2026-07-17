@@ -84,6 +84,23 @@ a {
   transform: scale(0.95);
 }
 
+/* List view transition */
+.list-slide-enter-active {
+  transition: all 0.2s ease-out;
+}
+.list-slide-leave-active {
+  transition: all 0.15s ease-in;
+  position: absolute;
+}
+.list-slide-enter-from {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+.list-slide-leave-to {
+  opacity: 0;
+  transform: translateX(10px);
+}
+
 /* Route fade transition (navigation between views) */
 .route-fade-enter-active,
 .route-fade-leave-active {

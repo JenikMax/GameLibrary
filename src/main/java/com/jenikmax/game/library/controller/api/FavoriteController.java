@@ -18,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/games")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Favorites", description = "User favorites management")
 public class FavoriteController {
 
     private final FavoriteGameRepository favoriteRepository;

@@ -11,6 +11,9 @@ import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.UserService;
 import com.jenikmax.game.library.service.scraper.ScraperConfigService;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +33,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/games")
+@Tag(name = "Library", description = "Game library browsing, filtering, and management")
 public class LibraryController {
 
     private static final Logger logger = LoggerFactory.getLogger(LibraryController.class);
@@ -70,25 +74,33 @@ public class LibraryController {
     }
 
     @GetMapping
+    @Operation(summary = "Get paginated game list", description = "Returns filtered, sorted, paginated list of games")
     public ResponseEntity<ApiResponse<PageResponse<GameListResponse>>> getGames(
-            @RequestParam(value = "page", defaultValue = "1") int page,
+            @Parameter(description = "Page number (1-based)", example = "1") @RequestParam(value = "page", defaultValue = "1") int page,
+            @Parameter(description = "Items per page: 12, 24, or 48", example = "12") @RequestParam(value = "pageSize", defaultValue = "12") int pageSize,
             @RequestParam(value = "search", required = false) String searchText,
             @RequestParam(value = "platforms", required = false) List<String> selectedPlatforms,
             @RequestParam(value = "years", required = false) List<String> selectedYears,
             @RequestParam(value = "genres", required = false) List<String> selectedGenres,
+            @RequestParam(value = "tags", required = false) List<String> selectedTags,
             @RequestParam(value = "sortField", required = false) String sortField,
             @RequestParam(value = "sortType", required = false) String sortType,
             @RequestParam(value = "favoritesOnly", defaultValue = "false") boolean favoritesOnly,
             Locale locale) {
 
+        if (pageSize != 12 && pageSize != 24 && pageSize != 48) {
+            pageSize = 12;
+        }
+
         searchText = searchText != null ? searchText : "";
         selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
         selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
         selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
+        selectedTags = selectedTags != null ? selectedTags : new ArrayList<>();
         sortField = sortField != null ? sortField : "";
         sortType = sortType != null ? sortType : "";
 
-        List<Long> gameIdList = libraryService.getGameIdList(searchText, selectedPlatforms, selectedYears, selectedGenres, sortField, sortType);
+        List<Long> gameIdList = libraryService.getGameIdList(searchText, selectedPlatforms, selectedYears, selectedGenres, selectedTags, sortField, sortType);
         if (favoritesOnly) {
             Long uid = getCurrentUserId();
             if (uid != null) {
@@ -99,7 +111,6 @@ public class LibraryController {
             }
         }
 
-        int pageSize = 12;
         int totalPages = (gameIdList.size() + pageSize - 1) / pageSize;
         totalPages = totalPages == 0 ? 1 : totalPages;
         int startIndex = (page - 1) * pageSize;
@@ -113,7 +124,7 @@ public class LibraryController {
             for (int i = 0; i < pageIds.size(); i++) idOrder.put(pageIds.get(i), i);
             paginatedGames.sort(Comparator.comparingInt(g -> idOrder.getOrDefault(g.getId(), Integer.MAX_VALUE)));
         } else {
-            paginatedGames = libraryService.getGameList(searchText, selectedPlatforms, selectedYears, selectedGenres, sortField, sortType, startIndex, endIndex);
+            paginatedGames = libraryService.getGameList(searchText, selectedPlatforms, selectedYears, selectedGenres, selectedTags, sortField, sortType, startIndex, endIndex);
         }
 
         List<GameListResponse> items = paginatedGames.stream()
@@ -134,6 +145,7 @@ public class LibraryController {
         List<String> years = libraryService.getReleaseDates();
         List<String> platforms = libraryService.getGamesPlatforms();
         List<Genre> genres = libraryService.getGenres(locale);
+        List<String> tags = libraryService.getTags();
 
         FilterOptionsResponse options = new FilterOptionsResponse();
         options.setYears(years);
@@ -142,6 +154,7 @@ public class LibraryController {
                 .map(g -> new FilterOptionsResponse.GenreItem(g.name(),
                         messageSource.getMessage("enum.genre." + g.name(), null, g.getName(), locale)))
                 .collect(Collectors.toList()));
+        options.setTags(tags);
 
         return ResponseEntity.ok(ApiResponse.ok(options));
     }
@@ -244,6 +257,7 @@ public class LibraryController {
         resp.setPlatform(dto.getPlatform());
         resp.setReleaseDate(dto.getReleaseDate());
         resp.setGenres(dto.getGenres());
+        resp.setTags(dto.getTags());
         resp.setLogoUrl(buildLogoUrl(dto.getId()));
         resp.setLogo(dto.getLogo());
         return resp;
@@ -257,6 +271,7 @@ public class LibraryController {
         resp.setReleaseDate(dto.getReleaseDate());
         resp.setDirectoryPath(dto.getDirectoryPath());
         resp.setGenres(dto.getGenres());
+        resp.setTags(dto.getTags());
         resp.setLogoUrl(buildLogoUrl(dto.getId()));
         resp.setTrailerUrl(dto.getTrailerUrl());
         resp.setDescription(dto.getDescription());

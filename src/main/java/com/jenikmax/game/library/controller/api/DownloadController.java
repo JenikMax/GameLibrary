@@ -26,6 +26,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Downloads", description = "Game downloads and seeding")
 public class DownloadController {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadController.class);

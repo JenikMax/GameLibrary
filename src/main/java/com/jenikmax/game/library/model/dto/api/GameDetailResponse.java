@@ -10,6 +10,7 @@ public class GameDetailResponse {
     private String releaseDate;
     private String directoryPath;
     private List<String> genres;
+    private List<String> tags;
     private String logoUrl;
     private String trailerUrl;
     private String description;
@@ -36,6 +37,8 @@ public class GameDetailResponse {
     public void setDirectoryPath(String directoryPath) { this.directoryPath = directoryPath; }
     public List<String> getGenres() { return genres; }
     public void setGenres(List<String> genres) { this.genres = genres; }
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
     public String getLogoUrl() { return logoUrl; }
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
     public String getTrailerUrl() { return trailerUrl; }

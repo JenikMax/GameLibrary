@@ -54,6 +54,20 @@
                   scrollHeight="400px"
                 />
               </div>
+              <div class="field col-12" v-if="allTags.length">
+                <label for="tags">{{ t('filter.tags') }}</label>
+                <MultiSelect
+                  id="tags"
+                  v-model="form.tags"
+                  :options="allTags"
+                  :placeholder="t('filter.tags_placeholder')"
+                  display="chip"
+                  filter
+                  class="w-full"
+                  scrollHeight="300px"
+                  :allowEmpty="true"
+                />
+              </div>
               <div class="field col-12">
                 <label for="description">{{ t('game.field.description') }}</label>
                 <QuillEditor v-model:content="form.description" content-type="html"
@@ -190,6 +204,7 @@ const form = ref({
   directoryPath: '',
   trailerUrl: '',
   genres: [],
+  tags: [],
   description: '',
   instruction: '',
   logo: '',
@@ -201,6 +216,7 @@ const existingScreenshots = ref([])
 const newScreenshotPreviews = ref([])
 const logoPreview = ref('')
 const allGenres = ref([])
+const allTags = ref([])
 const scrapeSources = ref([])
 const scrapeFields = [
   { key: 'title', labelKey: 'game.scraper.field.title' },
@@ -252,6 +268,7 @@ onMounted(async () => {
       directoryPath: g.directoryPath || '',
       trailerUrl: g.trailerUrl || '',
       genres: g.genres || [],
+      tags: g.tags || [],
       description: g.description || '',
       instruction: g.instruction || '',
       logo: '',
@@ -265,6 +282,7 @@ onMounted(async () => {
     })
     newScreenshotPreviews.value = []
     allGenres.value = filterRes.data.data.genres || []
+    allTags.value = filterRes.data.data.tags || []
     const sources = (scraperRes.data.data || []).map(s => ({ label: s.displayName || s.type, value: s.type }))
     scrapeSources.value = sources
     if (sources.length > 0 && !scrape.value.source) {
@@ -348,6 +366,7 @@ async function handleScrape() {
       directoryPath: g.directoryPath || form.value.directoryPath,
       trailerUrl: g.trailerUrl || form.value.trailerUrl,
       genres: g.genres || form.value.genres,
+      tags: g.tags || form.value.tags || [],
       description: g.description || form.value.description,
       instruction: g.instruction || form.value.instruction,
       logo: g.logo || form.value.logo || '',

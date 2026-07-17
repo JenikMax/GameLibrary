@@ -28,4 +28,14 @@ app.use(ToastService)
 app.use(ConfirmationService)
 app.directive('tooltip', Tooltip)
 
+app.config.errorHandler = (err, instance, info) => {
+  console.error('[Vue Error]', err)
+  console.error('Component:', instance?.$options?.name || instance?.$options?.__name || 'unknown')
+  console.error('Info:', info)
+}
+
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('[Unhandled Promise Rejection]', event.reason)
+})
+
 app.mount('#app')

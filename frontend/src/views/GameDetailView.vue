@@ -41,6 +41,9 @@
           <Tag :value="game.releaseDate" severity="warn" />
           <Tag v-for="g in game.genres" :key="g" :value="genreName(g)" severity="secondary" />
         </div>
+        <div v-if="game.tags?.length" class="flex gap-2 flex-wrap mb-3">
+          <Tag v-for="tag in game.tags" :key="tag" :value="tag" severity="info" rounded />
+        </div>
         <div class="flex align-items-center gap-3 mb-3">
           <div class="flex align-items-center gap-1">
             <Rating :modelValue="game.avgRating || 0" :stars="10" :cancel="false" readonly />
@@ -111,6 +114,7 @@
           alt="screenshot"
           class="screenshot-thumb img-fade"
           :class="{ loaded: screenshotLoaded[i] }"
+          loading="lazy"
           @click="openGallery(i)"
           @load="screenshotLoaded[i] = true"
           @error="screenshotLoaded[i] = true"
@@ -121,74 +125,165 @@
     <Divider v-if="related.sameGenre.length || related.sameSeries.length" />
     <div v-if="related.sameGenre.length || related.sameSeries.length" class="related-section">
       <h3>{{ t('game.related') }}</h3>
-      <div v-if="related.sameGenre.length" class="mb-3">
-        <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_genre') }}</h4>
-        <div class="related-strip">
-          <div v-for="g in related.sameGenre" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
-            <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" @error="$event.target.src = '/game-library/img/default.jpg'" />
-            <span class="related-name">{{ g.name }}</span>
+        <div v-if="related.sameGenre.length" class="mb-3">
+          <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_genre') }}</h4>
+          <div class="related-strip">
+            <div v-for="g in related.sameGenre" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
+              <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" loading="lazy" @error="$event.target.src = '/game-library/img/default.jpg'" />
+              <span class="related-name">{{ g.name }}</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div v-if="related.sameSeries.length">
-        <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_series') }}</h4>
-        <div class="related-strip">
-          <div v-for="g in related.sameSeries" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
-            <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" @error="$event.target.src = '/game-library/img/default.jpg'" />
-            <span class="related-name">{{ g.name }}</span>
+        <div v-if="related.sameSeries.length">
+          <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_series') }}</h4>
+          <div class="related-strip">
+            <div v-for="g in related.sameSeries" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
+              <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" loading="lazy" @error="$event.target.src = '/game-library/img/default.jpg'" />
+              <span class="related-name">{{ g.name }}</span>
+            </div>
           </div>
         </div>
-      </div>
     </div>
 
     <Divider />
-    <div class="comments-section">
-      <h3>{{ t('game.comments') }}</h3>
+    <div class="reviews-section">
+      <TabView>
+        <TabPanel :header="t('review.title')" :headerStyle="{ display: 'flex', alignItems: 'center', gap: '0.5rem' }">
+          <template #header>
+            <span>{{ t('review.title') }}</span>
+            <Badge v-if="reviews.length" :value="reviews.length" severity="secondary" size="small" />
+          </template>
 
-      <div v-if="authStore.isAuthenticated" class="flex gap-2 mb-3">
-        <Textarea
-          v-model="newCommentText"
-          :placeholder="t('game.comment_placeholder')"
-          rows="2"
-          class="w-full"
-          autoResize
-        />
-        <Button
-          :label="t('game.comment_add')"
-          icon="pi pi-send"
-          severity="primary"
-          @click="submitComment"
-          :disabled="!newCommentText.trim()"
-          class="comment-submit-btn"
-        />
-      </div>
-      <small v-else class="text-color-secondary">{{ t('game.comment_login') }}</small>
-
-      <div v-if="comments.length === 0 && !commentsLoading" class="text-color-secondary text-sm">
-        {{ t('game.comment_empty') }}
-      </div>
-      <div v-else-if="commentsLoading" class="flex flex-column gap-2">
-        <Skeleton v-for="i in 3" :key="i" width="100%" height="4rem" />
-      </div>
-      <div v-else class="comments-list">
-        <div v-for="comment in comments" :key="comment.id" class="comment-item">
-          <div class="comment-header">
-            <Avatar :label="comment.username?.[0]?.toUpperCase()" size="small" shape="circle" />
-            <span class="font-semibold text-sm">{{ comment.username }}</span>
-            <small class="text-color-secondary">{{ comment.createdAt }}</small>
+          <div v-if="reviewsAggregated" class="aggregated-scores mb-3">
+            <h4 class="text-sm font-semibold mb-2">{{ t('review.avg_scores') }}</h4>
+            <div class="flex flex-wrap gap-3">
+              <div v-if="reviewsAggregated.gameplay" class="score-pill">
+                <small>{{ t('review.gameplay') }}</small>
+                <ProgressBar :value="reviewsAggregated.gameplay * 10" :showValue="false" style="height: 6px" />
+                <span class="text-sm font-bold">{{ reviewsAggregated.gameplay }}</span>
+              </div>
+              <div v-if="reviewsAggregated.graphics" class="score-pill">
+                <small>{{ t('review.graphics') }}</small>
+                <ProgressBar :value="reviewsAggregated.graphics * 10" :showValue="false" style="height: 6px" />
+                <span class="text-sm font-bold">{{ reviewsAggregated.graphics }}</span>
+              </div>
+              <div v-if="reviewsAggregated.story" class="score-pill">
+                <small>{{ t('review.story') }}</small>
+                <ProgressBar :value="reviewsAggregated.story * 10" :showValue="false" style="height: 6px" />
+                <span class="text-sm font-bold">{{ reviewsAggregated.story }}</span>
+              </div>
+              <div v-if="reviewsAggregated.music" class="score-pill">
+                <small>{{ t('review.music') }}</small>
+                <ProgressBar :value="reviewsAggregated.music * 10" :showValue="false" style="height: 6px" />
+                <span class="text-sm font-bold">{{ reviewsAggregated.music }}</span>
+              </div>
+            </div>
           </div>
-          <p class="comment-text">{{ comment.text }}</p>
-          <Button
-            v-if="comment.canDelete"
-            :label="t('game.comment_delete')"
-            icon="pi pi-trash"
-            size="small"
-            severity="danger"
-            text
-            @click="deleteComment(comment.id)"
-          />
-        </div>
-      </div>
+
+          <div v-if="authStore.isAuthenticated" class="mb-3">
+            <Button
+              v-if="!showReviewForm"
+              :label="userReview ? t('review.edit') : t('review.write')"
+              :icon="userReview ? 'pi pi-pencil' : 'pi pi-plus'"
+              severity="help"
+              size="small"
+              @click="showReviewForm = true"
+            />
+            <ReviewForm
+              v-else
+              :review="userReview"
+              @submit="submitReview"
+              @cancel="showReviewForm = false"
+            />
+          </div>
+
+          <div v-if="reviews.length === 0 && !reviewsLoading" class="text-color-secondary text-sm">
+            {{ t('review.empty') }}
+          </div>
+          <div v-else-if="reviewsLoading" class="flex flex-column gap-2">
+            <Skeleton v-for="i in 3" :key="i" width="100%" height="6rem" />
+          </div>
+          <div v-else class="reviews-list">
+            <div v-for="r in reviews" :key="r.id" class="review-item">
+              <div class="comment-header">
+                <Avatar :label="r.username?.[0]?.toUpperCase()" size="small" shape="circle" />
+                <span class="font-semibold text-sm">{{ r.username }}</span>
+                <small class="text-color-secondary">{{ r.createdAt }}</small>
+              </div>
+              <div v-if="r.gameplayScore || r.graphicsScore || r.storyScore || r.musicScore" class="review-scores flex flex-wrap gap-2 mb-2">
+                <span v-if="r.gameplayScore" class="text-xs"><i class="pi pi-gamepad" style="font-size: 0.7rem" /> {{ r.gameplayScore }}</span>
+                <span v-if="r.graphicsScore" class="text-xs"><i class="pi pi-image" style="font-size: 0.7rem" /> {{ r.graphicsScore }}</span>
+                <span v-if="r.storyScore" class="text-xs"><i class="pi pi-book" style="font-size: 0.7rem" /> {{ r.storyScore }}</span>
+                <span v-if="r.musicScore" class="text-xs"><i class="pi pi-volume-up" style="font-size: 0.7rem" /> {{ r.musicScore }}</span>
+              </div>
+              <p v-if="r.text" class="comment-text">{{ r.text }}</p>
+              <div v-if="r.pros" class="review-pros"><i class="pi pi-plus-circle text-green-500" /> <span>{{ r.pros }}</span></div>
+              <div v-if="r.cons" class="review-cons"><i class="pi pi-minus-circle text-red-500" /> <span>{{ r.cons }}</span></div>
+              <Button
+                v-if="r.canDelete"
+                :label="t('game.comment_delete')"
+                icon="pi pi-trash"
+                size="small"
+                severity="danger"
+                text
+                @click="deleteReview(r.id)"
+              />
+            </div>
+          </div>
+        </TabPanel>
+
+        <TabPanel :header="t('game.comments')" :headerStyle="{ display: 'flex', alignItems: 'center', gap: '0.5rem' }">
+          <template #header>
+            <span>{{ t('game.comments') }}</span>
+            <Badge v-if="comments.length" :value="comments.length" severity="secondary" size="small" />
+          </template>
+
+          <div v-if="authStore.isAuthenticated" class="flex gap-2 mb-3">
+            <Textarea
+              v-model="newCommentText"
+              :placeholder="t('game.comment_placeholder')"
+              rows="2"
+              class="w-full"
+              autoResize
+            />
+            <Button
+              :label="t('game.comment_add')"
+              icon="pi pi-send"
+              severity="primary"
+              @click="submitComment"
+              :disabled="!newCommentText.trim()"
+              class="comment-submit-btn"
+            />
+          </div>
+          <small v-else class="text-color-secondary">{{ t('game.comment_login') }}</small>
+
+          <div v-if="comments.length === 0 && !commentsLoading" class="text-color-secondary text-sm">
+            {{ t('game.comment_empty') }}
+          </div>
+          <div v-else-if="commentsLoading" class="flex flex-column gap-2">
+            <Skeleton v-for="i in 3" :key="i" width="100%" height="4rem" />
+          </div>
+          <div v-else class="comments-list">
+            <div v-for="comment in comments" :key="comment.id" class="comment-item">
+              <div class="comment-header">
+                <Avatar :label="comment.username?.[0]?.toUpperCase()" size="small" shape="circle" />
+                <span class="font-semibold text-sm">{{ comment.username }}</span>
+                <small class="text-color-secondary">{{ comment.createdAt }}</small>
+              </div>
+              <p class="comment-text">{{ comment.text }}</p>
+              <Button
+                v-if="comment.canDelete"
+                :label="t('game.comment_delete')"
+                icon="pi pi-trash"
+                size="small"
+                severity="danger"
+                text
+                @click="deleteComment(comment.id)"
+              />
+            </div>
+          </div>
+        </TabPanel>
+      </TabView>
     </div>
 
     <Dialog v-model:visible="viewerVisible" modal :style="{ width: '90vw', maxWidth: '1000px' }"
@@ -240,6 +335,10 @@ import Dialog from 'primevue/dialog'
 import Rating from 'primevue/rating'
 import Textarea from 'primevue/textarea'
 import Avatar from 'primevue/avatar'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import Badge from 'primevue/badge'
+import ReviewForm from '../components/ReviewForm.vue'
 import { useToast } from 'primevue/usetoast'
 import { downloadsApi } from '../api/downloads'
 
@@ -274,6 +373,11 @@ const comments = ref([])
 const commentsLoading = ref(false)
 const newCommentText = ref('')
 const related = ref({ sameGenre: [], sameSeries: [] })
+const reviews = ref([])
+const reviewsLoading = ref(false)
+const reviewsAggregated = ref(null)
+const showReviewForm = ref(false)
+const userReview = ref(null)
 
 async function toggleFav() {
   try {
@@ -309,7 +413,22 @@ async function loadRelated() {
     const res = await gamesApi.getRelated(route.params.id)
     related.value = res.data.data || { sameGenre: [], sameSeries: [] }
   } catch {
-    // ignore
+    // silent — related games is non-critical
+  }
+}
+
+async function loadReviews() {
+  reviewsLoading.value = true
+  try {
+    const res = await gamesApi.getReviews(route.params.id)
+    const data = res.data.data
+    reviews.value = data.reviews || []
+    reviewsAggregated.value = data.aggregatedScores || null
+    userReview.value = reviews.value.find(r => r.userId === authStore.userId) || null
+  } catch {
+    // error handled by global axios interceptor
+  } finally {
+    reviewsLoading.value = false
   }
 }
 
@@ -318,6 +437,8 @@ async function loadComments() {
   try {
     const res = await gamesApi.getComments(route.params.id)
     comments.value = res.data.data || []
+  } catch {
+    // error handled by global axios interceptor
   } finally {
     commentsLoading.value = false
   }
@@ -328,12 +449,15 @@ onMounted(async () => {
     const [gameRes] = await Promise.all([
       gamesApi.getGame(route.params.id),
       libraryStore.filterOptions.genres?.length ? Promise.resolve() : libraryStore.fetchFilterOptions(),
-      loadComments()
+      loadComments(),
+      loadReviews()
     ])
     game.value = gameRes.data.data
     userRating.value = game.value.userRating || 0
     try { addToHistory(game.value) } catch {}
     loadRelated()
+  } catch {
+    // error handled by global axios interceptor
   } finally {
     loading.value = false
   }
@@ -565,6 +689,27 @@ async function saveRating(val) {
   }
 }
 
+async function submitReview(data) {
+  try {
+    await gamesApi.addReview(route.params.id, data)
+    showReviewForm.value = false
+    await loadReviews()
+    toast.add({ severity: 'success', summary: t('review.submitted'), life: 3000 })
+  } catch {
+    toast.add({ severity: 'error', summary: t('review.submit_failed'), life: 3000 })
+  }
+}
+
+async function deleteReview(reviewId) {
+  try {
+    await gamesApi.deleteReview(route.params.id, reviewId)
+    await loadReviews()
+    toast.add({ severity: 'info', summary: t('review.deleted'), life: 3000 })
+  } catch {
+    toast.add({ severity: 'error', summary: t('review.delete_failed'), life: 3000 })
+  }
+}
+
 function onViewerKeydown(e) {
   if (e.key === 'ArrowLeft') { prevImage(); e.preventDefault() }
   if (e.key === 'ArrowRight') { nextImage(); e.preventDefault() }
@@ -737,6 +882,58 @@ function onViewerKeydown(e) {
   margin: 0.25rem 0;
   white-space: pre-wrap;
   word-break: break-word;
+}
+.reviews-section {
+  margin-top: 1rem;
+}
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.review-item {
+  background: var(--p-surface-100);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+.app-dark .review-item {
+  background: var(--p-surface-800);
+}
+.review-scores span {
+  background: var(--p-surface-200);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+.app-dark .review-scores span {
+  background: var(--p-surface-700);
+}
+.review-pros, .review-cons {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+}
+.review-pros i { flex-shrink: 0; margin-top: 0.15rem; }
+.review-cons i { flex-shrink: 0; margin-top: 0.15rem; }
+.aggregated-scores {
+  background: var(--p-surface-50);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+.app-dark .aggregated-scores {
+  background: var(--p-surface-800);
+}
+.score-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 80px;
+}
+.score-pill small {
+  font-size: 0.7rem;
+  color: var(--p-text-muted-color);
 }
 @media (max-width: 768px) {
   .game-main {

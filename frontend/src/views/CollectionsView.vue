@@ -15,6 +15,15 @@
         <Textarea id="col-desc" v-model="newDescription" class="w-full" rows="3" />
       </div>
       <div class="field-checkbox">
+        <Checkbox id="col-smart" v-model="newIsSmart" :binary="true" />
+        <label for="col-smart">{{ t('collections.smart') }}</label>
+      </div>
+      <div v-if="newIsSmart" class="field">
+        <label for="col-rules">{{ t('collections.smart_rules') }}</label>
+        <Textarea id="col-rules" v-model="newSmartRules" class="w-full" rows="5" placeholder='{"platforms":["PC"],"genres":["rpg"],"minRating":7}' />
+        <small class="text-color-secondary">{{ t('collections.smart_rules_hint') }}</small>
+      </div>
+      <div class="field-checkbox">
         <Checkbox id="col-public" v-model="newIsPublic" :binary="true" />
         <label for="col-public">{{ t('collections.public') }}</label>
       </div>
@@ -74,6 +83,8 @@ const creating = ref(false)
 const newName = ref('')
 const newDescription = ref('')
 const newIsPublic = ref(false)
+const newIsSmart = ref(false)
+const newSmartRules = ref('')
 
 const page = ref(1)
 const pageSize = 12
@@ -103,15 +114,22 @@ async function handleCreate() {
   if (!newName.value.trim()) return
   creating.value = true
   try {
-    await collectionsApi.create({
+    const payload = {
       name: newName.value.trim(),
       description: newDescription.value.trim(),
-      isPublic: newIsPublic.value
-    })
+      isPublic: newIsPublic.value,
+      isSmart: newIsSmart.value
+    }
+    if (newIsSmart.value && newSmartRules.value.trim()) {
+      payload.smartRules = newSmartRules.value.trim()
+    }
+    await collectionsApi.create(payload)
     showCreateDialog.value = false
     newName.value = ''
     newDescription.value = ''
     newIsPublic.value = false
+    newIsSmart.value = false
+    newSmartRules.value = ''
     await load()
     toast.add({ severity: 'success', summary: t('collections.created'), life: 2000 })
   } catch {

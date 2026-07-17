@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,7 +20,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("GameLibrary API")
                         .version("1.0")
-                        .description("REST API for Game Library application")
+                        .description("REST API for Game Library application. Use the JWT token from /api/auth/login in the Authorize button.")
                         .license(new License().name("MIT")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
@@ -28,6 +29,25 @@ public class OpenApiConfig {
                                         .name(securitySchemeName)
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
-                                        .bearerFormat("JWT")));
+                                        .bearerFormat("JWT")
+                                        .description("JWT token obtained from /api/auth/login")));
+    }
+
+    @Bean
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+                .group("public")
+                .displayName("Public API")
+                .pathsToMatch("/api/games/**", "/api/auth/**", "/api/collections/**", "/api/statistics/**", "/api/notifications/**", "/api/profile/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi adminApi() {
+        return GroupedOpenApi.builder()
+                .group("admin")
+                .displayName("Admin API")
+                .pathsToMatch("/api/admin/**", "/api/scan/**")
+                .build();
     }
 }

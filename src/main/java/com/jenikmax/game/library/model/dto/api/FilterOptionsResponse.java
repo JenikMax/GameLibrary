@@ -7,6 +7,7 @@ public class FilterOptionsResponse {
     private List<String> years;
     private List<String> platforms;
     private List<GenreItem> genres;
+    private List<String> tags;
 
     public List<String> getYears() { return years; }
     public void setYears(List<String> years) { this.years = years; }
@@ -14,6 +15,8 @@ public class FilterOptionsResponse {
     public void setPlatforms(List<String> platforms) { this.platforms = platforms; }
     public List<GenreItem> getGenres() { return genres; }
     public void setGenres(List<GenreItem> genres) { this.genres = genres; }
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
 
     public static class GenreItem {
         private String code;

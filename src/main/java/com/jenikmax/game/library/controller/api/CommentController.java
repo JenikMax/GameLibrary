@@ -17,6 +17,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/games")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Comments", description = "Game comments")
 public class CommentController {
 
     private final GameCommentRepository commentRepository;

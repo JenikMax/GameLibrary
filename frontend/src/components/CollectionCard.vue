@@ -6,7 +6,10 @@
     <div class="hero-section" :style="heroStyle">
       <div class="hero-overlay">
         <div class="hero-content">
-          <h3 class="hero-title">{{ collection.name }}</h3>
+          <div class="flex align-items-center gap-2 mb-1">
+            <h3 class="hero-title m-0">{{ collection.name }}</h3>
+            <Tag v-if="collection.isSmart" :value="t('collections.smart')" severity="info" size="small" rounded />
+          </div>
           <p v-if="collection.description" class="hero-desc line-clamp-2">
             {{ collection.description }}
           </p>
@@ -49,6 +52,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
+import Tag from 'primevue/tag'
 
 const props = defineProps({
   collection: { type: Object, required: true }

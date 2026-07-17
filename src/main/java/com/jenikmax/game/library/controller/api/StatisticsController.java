@@ -27,6 +27,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/statistics")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Statistics", description = "Library statistics and charts")
 public class StatisticsController {
 
     private static final Logger logger = LoggerFactory.getLogger(StatisticsController.class);

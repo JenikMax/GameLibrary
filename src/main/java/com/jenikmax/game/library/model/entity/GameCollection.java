@@ -14,6 +14,8 @@ public class GameCollection implements Serializable {
     private String description;
     private User user;
     private boolean isPublic;
+    private boolean isSmart;
+    private String smartRules;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -39,6 +41,14 @@ public class GameCollection implements Serializable {
     @Column(name = "is_public", nullable = false)
     public boolean getIsPublic() { return isPublic; }
     public void setIsPublic(boolean isPublic) { this.isPublic = isPublic; }
+
+    @Column(name = "is_smart", nullable = false)
+    public boolean getIsSmart() { return isSmart; }
+    public void setIsSmart(boolean isSmart) { this.isSmart = isSmart; }
+
+    @Column(name = "smart_rules", columnDefinition = "text")
+    public String getSmartRules() { return smartRules; }
+    public void setSmartRules(String smartRules) { this.smartRules = smartRules; }
 
     @Column(name = "created_at")
     public Timestamp getCreatedAt() { return createdAt; }

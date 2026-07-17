@@ -4,6 +4,7 @@ import com.jenikmax.game.library.model.dto.GameDto;
 import com.jenikmax.game.library.model.dto.GameShortDto;
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.GameGenre;
+import com.jenikmax.game.library.model.entity.GameTag;
 import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 
@@ -36,6 +37,12 @@ public class GameConverter {
         for (GameGenre gameGenre : entity.getGenres()){
             dto.getGenres().add(gameGenreToDtoConverter(gameGenre));
         }
+        dto.setTags(new ArrayList<>());
+        if (entity.getTags() != null) {
+            for (GameTag gameTag : entity.getTags()){
+                dto.getTags().add(gameTag.getTagCode());
+            }
+        }
         return dto;
     }
 
@@ -53,6 +60,15 @@ public class GameConverter {
             GameGenre gg = dtoToGameGenreEntityConverter(genre,entity);
             if (gg != null) entity.getGenres().add(gg);
         }
+        entity.setTags(new ArrayList<>());
+        if (dto.getTags() != null) {
+            for (String tag : dto.getTags()){
+                GameTag gt = dtoToGameTagEntityConverter(tag, entity);
+                if (gt != null) entity.getTags().add(gt);
+            }
+        }
+        return entity;
+    }
         return entity;
     }
 
@@ -75,6 +91,12 @@ public class GameConverter {
         dto.setGenres(new ArrayList<>());
         for (GameGenre gameGenre : entity.getGenres()){
             dto.getGenres().add(gameGenreToDtoConverter(gameGenre));
+        }
+        dto.setTags(new ArrayList<>());
+        if (entity.getTags() != null) {
+            for (GameTag gameTag : entity.getTags()){
+                dto.getTags().add(gameTag.getTagCode());
+            }
         }
         return dto;
     }
@@ -103,6 +125,13 @@ public class GameConverter {
             for(String genre : dto.getGenres()){
                 GameGenre gg = dtoToGameGenreEntityConverter(genre,entity);
                 if (gg != null) entity.getGenres().add(gg);
+            }
+        }
+        entity.setTags(new ArrayList<>());
+        if (dto.getTags() != null) {
+            for (String tag : dto.getTags()){
+                GameTag gt = dtoToGameTagEntityConverter(tag, entity);
+                if (gt != null) entity.getTags().add(gt);
             }
         }
         return entity;
@@ -144,6 +173,13 @@ public class GameConverter {
         entity.setName("screenshot" + game.getScreenshots().size() + ".jpg");
         entity.setSource(Base64.getDecoder().decode(screenshot.replaceAll(BASE_64_JPEG_PREFIX,"").replaceAll(BASE_64_JPG_PREFIX,"").replaceAll(BASE_64_PNG_PREFIX,"")));
         //entity.setSource(Base64.getDecoder().decode(screenshot.replaceFirst(BASE_64_JPEG_PREFIX + "|"+ BASE_64_JPG_PREFIX + "|" + BASE_64_PNG_PREFIX, "")));
+        return entity;
+    }
+
+    public static GameTag dtoToGameTagEntityConverter(String tag, Game game){
+        GameTag entity = new GameTag();
+        entity.setGame(game);
+        entity.setTagCode(tag);
         return entity;
     }
 

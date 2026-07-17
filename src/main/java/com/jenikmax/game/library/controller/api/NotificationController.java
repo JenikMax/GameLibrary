@@ -13,6 +13,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/notifications")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Notifications", description = "User notifications")
 public class NotificationController {
 
     private final NotificationService notificationService;

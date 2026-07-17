@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/profile")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Profile", description = "User profile management")
 public class ProfileController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);

@@ -1,3 +1,4 @@
+import { watch } from 'vue'
 import { useLocaleStore } from '../stores/locale'
 
 const messages = {
@@ -34,6 +35,8 @@ const messages = {
     'filter.genres': 'Жанры',
     'filter.genres_placeholder': 'Выберите жанры',
     'filter.genres_search': 'Поиск жанров...',
+    'filter.tags': 'Теги',
+    'filter.tags_placeholder': 'Выберите теги',
     'filter.favorites_on': 'Избранное',
     'filter.favorites_off': 'Все игры',
     'filter.sort_by': 'Сортировка',
@@ -45,6 +48,9 @@ const messages = {
     'filter.desc': 'По убыванию',
     'filter.apply': 'Применить',
     'filter.reset': 'Сбросить',
+    'filter.page_size': 'На странице',
+    'view.list': 'Список',
+    'view.grid': 'Сетка',
     'game.details': 'Подробнее',
     'game.details_tooltip': 'Просмотр игры',
     'game.download': 'Скачать',
@@ -242,6 +248,9 @@ const messages = {
     'collections.remove_failed': 'Ошибка удаления игры',
     'collections.no_games_yet': 'Нет игр',
     'collections.game_count': '{n} игр',
+    'collections.smart': 'Умная коллекция',
+    'collections.smart_rules': 'Правила (JSON)',
+    'collections.smart_rules_hint': 'Пример: {"platforms":["PC"],"genres":["rpg"],"minRating":7}',
     'statistics.title': 'Статистика библиотеки',
     'statistics.total_games': 'Всего игр',
     'statistics.total_size': 'На диске',
@@ -260,6 +269,26 @@ const messages = {
     'statistics.no_favorites': 'Нет в избранном',
     'statistics.refresh_sizes': 'Обновить размер',
     'statistics.refresh_sizes_confirm': 'Сбросить кэш размеров? При следующем открытии размер будет пересчитан заново.',
+    'review.title': 'Обзоры',
+    'review.write': 'Написать обзор',
+    'review.edit': 'Редактировать обзор',
+    'review.gameplay': 'Геймплей',
+    'review.graphics': 'Графика',
+    'review.story': 'Сюжет',
+    'review.music': 'Музыка',
+    'review.text': 'Текст обзора',
+    'review.text_placeholder': 'Расскажите о вашем опыте...',
+    'review.pros': 'Плюсы',
+    'review.pros_placeholder': 'Что понравилось...',
+    'review.cons': 'Минусы',
+    'review.cons_placeholder': 'Что не понравилось...',
+    'review.submit': 'Опубликовать',
+    'review.submitted': 'Обзор опубликован',
+    'review.submit_failed': 'Не удалось опубликовать обзор',
+    'review.deleted': 'Обзор удалён',
+    'review.delete_failed': 'Не удалось удалить обзор',
+    'review.empty': 'Обзоров пока нет',
+    'review.avg_scores': 'Средние оценки',
   },
   en: {
     'nav.library': 'Library',
@@ -294,6 +323,8 @@ const messages = {
     'filter.genres': 'Genres',
     'filter.genres_placeholder': 'Select genres',
     'filter.genres_search': 'Search genres...',
+    'filter.tags': 'Tags',
+    'filter.tags_placeholder': 'Select tags',
     'filter.favorites_on': 'Favorites',
     'filter.favorites_off': 'All games',
     'filter.sort_by': 'Sort by',
@@ -305,6 +336,9 @@ const messages = {
     'filter.desc': 'Desc',
     'filter.apply': 'Apply',
     'filter.reset': 'Reset',
+    'filter.page_size': 'Per page',
+    'view.list': 'List',
+    'view.grid': 'Grid',
     'game.details': 'Details',
     'game.details_tooltip': 'View details',
     'game.download': 'Download',
@@ -502,6 +536,9 @@ const messages = {
     'collections.remove_failed': 'Failed to remove game',
     'collections.no_games_yet': 'No games yet',
     'collections.game_count': '{n} games',
+    'collections.smart': 'Smart collection',
+    'collections.smart_rules': 'Rules (JSON)',
+    'collections.smart_rules_hint': 'Example: {"platforms":["PC"],"genres":["rpg"],"minRating":7}',
     'statistics.title': 'Library Statistics',
     'statistics.total_games': 'Total games',
     'statistics.total_size': 'On disk',
@@ -520,6 +557,26 @@ const messages = {
     'statistics.no_favorites': 'No favorites',
     'statistics.refresh_sizes': 'Refresh sizes',
     'statistics.refresh_sizes_confirm': 'Reset size cache? On next open sizes will be recomputed from disk.',
+    'review.title': 'Reviews',
+    'review.write': 'Write review',
+    'review.edit': 'Edit review',
+    'review.gameplay': 'Gameplay',
+    'review.graphics': 'Graphics',
+    'review.story': 'Story',
+    'review.music': 'Music',
+    'review.text': 'Review text',
+    'review.text_placeholder': 'Tell us about your experience...',
+    'review.pros': 'Pros',
+    'review.pros_placeholder': 'What you liked...',
+    'review.cons': 'Cons',
+    'review.cons_placeholder': 'What you disliked...',
+    'review.submit': 'Publish',
+    'review.submitted': 'Review published',
+    'review.submit_failed': 'Failed to publish review',
+    'review.deleted': 'Review deleted',
+    'review.delete_failed': 'Failed to delete review',
+    'review.empty': 'No reviews yet',
+    'review.avg_scores': 'Average scores',
   }
 }
 
@@ -536,6 +593,10 @@ export function useI18n() {
     }
     return val
   }
+
+  watch(() => localeStore.locale, (newLocale) => {
+    document.documentElement.lang = newLocale
+  }, { immediate: true })
 
   return { t }
 }

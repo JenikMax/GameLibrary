@@ -2,7 +2,7 @@ import api from './axios'
 
 export const notificationsApi = {
   getNotifications() {
-    return api.get('/notifications')
+    return api.get('/notifications', { skipToast: true })
   },
   markAsRead(id) {
     return api.put(`/notifications/${id}/read`)

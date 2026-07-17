@@ -10,6 +10,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/games")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Related Games", description = "Related games by genre and series")
 public class RelatedGamesController {
 
     private final SqlDao sqlDao;

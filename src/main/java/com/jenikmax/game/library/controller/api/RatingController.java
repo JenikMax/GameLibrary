@@ -18,6 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/games")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Ratings", description = "Game ratings 1-10")
 public class RatingController {
 
     private final GameRatingRepository ratingRepository;

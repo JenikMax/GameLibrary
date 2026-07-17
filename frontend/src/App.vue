@@ -15,15 +15,30 @@
 </template>
 
 <script setup>
+import { onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from './stores/auth'
 import { useDarkMode } from './composables/useDarkMode'
 import AppHeader from './components/AppHeader.vue'
 import LocaleSwitcher from './components/LocaleSwitcher.vue'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
+import { useToast } from 'primevue/usetoast'
 
 const authStore = useAuthStore()
 const { isDarkMode } = useDarkMode()
+const toast = useToast()
+
+function onApiError(e) {
+  toast.add({ severity: 'error', summary: e.detail, life: 5000 })
+}
+
+onMounted(() => {
+  window.addEventListener('api-error', onApiError)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('api-error', onApiError)
+})
 </script>
 
 <style>

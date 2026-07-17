@@ -4,8 +4,15 @@
       <div class="flex align-items-center gap-2">
         <Button icon="pi pi-arrow-left" text rounded @click="router.push('/collections')" />
         <div>
-          <h2 class="m-0">{{ collection.name }}</h2>
+          <div class="flex align-items-center gap-2">
+            <h2 class="m-0">{{ collection.name }}</h2>
+            <Tag v-if="collection.isSmart" :value="t('collections.smart')" severity="info" size="small" rounded />
+          </div>
           <p v-if="collection.description" class="m-0 text-sm text-color-secondary">{{ collection.description }}</p>
+          <div v-if="collection.isSmart && collection.smartRules" class="mt-1">
+            <small class="text-color-secondary">{{ t('collections.smart_rules') }}: </small>
+            <code class="text-xs">{{ collection.smartRules }}</code>
+          </div>
         </div>
       </div>
       <div class="flex gap-2">
@@ -36,6 +43,14 @@
       <div class="field">
         <label for="edit-desc">{{ t('collections.description') }}</label>
         <Textarea id="edit-desc" v-model="editDescription" class="w-full" rows="3" />
+      </div>
+      <div class="field-checkbox">
+        <Checkbox id="edit-smart" v-model="editIsSmart" :binary="true" />
+        <label for="edit-smart">{{ t('collections.smart') }}</label>
+      </div>
+      <div v-if="editIsSmart" class="field">
+        <label for="edit-rules">{{ t('collections.smart_rules') }}</label>
+        <Textarea id="edit-rules" v-model="editSmartRules" class="w-full" rows="5" />
       </div>
       <div class="field-checkbox">
         <Checkbox id="edit-public" v-model="editIsPublic" :binary="true" />
@@ -93,6 +108,7 @@ import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
+import Tag from 'primevue/tag'
 import GameCard from '../components/GameCard.vue'
 
 const { t } = useI18n()
@@ -109,6 +125,8 @@ const showEditDialog = ref(false)
 const editName = ref('')
 const editDescription = ref('')
 const editIsPublic = ref(false)
+const editIsSmart = ref(false)
+const editSmartRules = ref('')
 const updating = ref(false)
 
 const isOwner = computed(() =>
@@ -123,6 +141,12 @@ async function load() {
       collectionsApi.getGames(route.params.id)
     ])
     collection.value = colRes.data.data
+
+    editName.value = collection.value.name || ''
+    editDescription.value = collection.value.description || ''
+    editIsPublic.value = collection.value.isPublic || false
+    editIsSmart.value = collection.value.isSmart || false
+    editSmartRules.value = collection.value.smartRules || ''
 
     const entries = gamesRes.data.data || []
     const ids = entries.map(e => e.gameId)
@@ -162,11 +186,16 @@ async function handleUpdate() {
   if (!editName.value.trim()) return
   updating.value = true
   try {
-    await collectionsApi.update(route.params.id, {
+    const payload = {
       name: editName.value.trim(),
       description: editDescription.value.trim(),
-      isPublic: editIsPublic.value
-    })
+      isPublic: editIsPublic.value,
+      isSmart: editIsSmart.value
+    }
+    if (editIsSmart.value) {
+      payload.smartRules = editSmartRules.value.trim() || null
+    }
+    await collectionsApi.update(route.params.id, payload)
     showEditDialog.value = false
     await load()
     toast.add({ severity: 'success', summary: t('collections.updated'), life: 2000 })

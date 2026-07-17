@@ -17,6 +17,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/collections")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Collections", description = "User game collections management")
 public class CollectionController {
 
     private final CollectionService collectionService;
@@ -73,12 +74,19 @@ public class CollectionController {
         String name = (String) body.get("name");
         String description = (String) body.getOrDefault("description", "");
         boolean isPublic = Boolean.TRUE.equals(body.get("isPublic"));
+        boolean isSmart = Boolean.TRUE.equals(body.get("isSmart"));
+        String smartRules = (String) body.getOrDefault("smartRules", null);
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Name is required"));
         }
         Long userId = getCurrentUserId();
         if (userId == null) return ResponseEntity.status(401).body(ApiResponse.error("Unauthorized"));
         GameCollection c = collectionService.create(name, description, isPublic, userId);
+        if (isSmart) {
+            c.setIsSmart(true);
+            c.setSmartRules(smartRules);
+            c = collectionRepository.save(c);
+        }
         return ResponseEntity.ok(ApiResponse.ok(toMap(c)));
     }
 
@@ -89,10 +97,15 @@ public class CollectionController {
         String name = (String) body.get("name");
         String description = (String) body.getOrDefault("description", "");
         boolean isPublic = Boolean.TRUE.equals(body.get("isPublic"));
+        boolean isSmart = Boolean.TRUE.equals(body.get("isSmart"));
+        String smartRules = (String) body.getOrDefault("smartRules", null);
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Name is required"));
         }
         GameCollection c = collectionService.update(id, name, description, isPublic);
+        c.setIsSmart(isSmart);
+        c.setSmartRules(isSmart ? smartRules : null);
+        c = collectionRepository.save(c);
         return ResponseEntity.ok(ApiResponse.ok(toMap(c)));
     }
 
@@ -158,6 +171,8 @@ public class CollectionController {
         m.put("userId", c.getUser().getId());
         m.put("username", c.getUser().getUsername());
         m.put("isPublic", c.getIsPublic());
+        m.put("isSmart", c.getIsSmart());
+        m.put("smartRules", c.getSmartRules());
         m.put("gameCount", collectionService.getEntryCount(c.getId()));
         m.put("createdAt", c.getCreatedAt() != null ? c.getCreatedAt().toString() : null);
         m.put("updatedAt", c.getUpdatedAt() != null ? c.getUpdatedAt().toString() : null);

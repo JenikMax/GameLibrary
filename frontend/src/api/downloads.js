@@ -5,13 +5,13 @@ export const downloadsApi = {
     return api.post(`/games/${id}/seed`)
   },
   getSeedStatus(taskId) {
-    return api.get(`/seed/status/${taskId}`)
+    return api.get(`/seed/status/${taskId}`, { skipToast: true })
   },
   prepareDownload(id) {
     return api.post(`/games/${id}/prepare-download`)
   },
   getPrepareStatus(taskId) {
-    return api.get(`/download/prepare-status/${taskId}`)
+    return api.get(`/download/prepare-status/${taskId}`, { skipToast: true })
   },
   getActive() {
     return api.get('/downloads/active')

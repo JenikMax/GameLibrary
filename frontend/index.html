@@ -6,6 +6,21 @@
     <link rel="icon" type="image/png" href="/game-library/img/app_ico.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game Library</title>
+    <script>
+      (function() {
+        try {
+          var stored = localStorage.getItem('darkMode');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (stored === 'true' || (stored === null && prefersDark)) {
+            document.documentElement.classList.add('app-dark');
+          }
+          var lang = localStorage.getItem('locale');
+          if (lang) {
+            document.documentElement.lang = lang;
+          }
+        } catch(e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

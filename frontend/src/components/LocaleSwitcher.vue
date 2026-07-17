@@ -23,7 +23,6 @@ const langOptions = [
 const lang = ref(localeStore.locale)
 watch(lang, (val) => {
   localeStore.setLocale(val)
-  window.location.reload()
 })
 </script>
 

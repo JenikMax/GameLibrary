@@ -2,7 +2,12 @@ import { ref, watch } from 'vue'
 
 let initialDarkMode = false
 try {
-  initialDarkMode = localStorage.getItem('darkMode') === 'true'
+  const stored = localStorage.getItem('darkMode')
+  if (stored === 'true') {
+    initialDarkMode = true
+  } else if (stored === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    initialDarkMode = true
+  }
 } catch {
   initialDarkMode = false
 }

@@ -36,6 +36,21 @@
           rounded
           class="genre-tag"
         />
+        <Tag
+          v-for="tag in game.tags?.slice(0, 3)"
+          :key="tag"
+          :value="tag"
+          severity="info"
+          rounded
+          class="genre-tag"
+        />
+        <Tag
+          v-if="game.tags?.length > 3"
+          :value="'+' + (game.tags.length - 3)"
+          severity="info"
+          rounded
+          class="genre-tag"
+        />
       </div>
     </template>
     <template #footer>

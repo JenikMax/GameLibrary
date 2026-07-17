@@ -12,11 +12,17 @@ export const useLibraryStore = defineStore('library', () => {
   const selectedPlatforms = ref([])
   const selectedYears = ref([])
   const selectedGenres = ref([])
+  const selectedTags = ref([])
   const sortField = ref('')
   const sortType = ref('')
   const favoritesOnly = ref(false)
   const filterOptions = ref({ years: [], platforms: [], genres: [] })
-  const pageSize = 12
+  const pageSize = ref(12)
+  const viewMode = ref('grid')
+
+  function setViewMode(mode) {
+    viewMode.value = mode
+  }
 
   async function fetchGames(page = 1) {
     loading.value = true
@@ -24,10 +30,12 @@ export const useLibraryStore = defineStore('library', () => {
     try {
       const response = await gamesApi.getGames({
         page,
+        pageSize: pageSize.value,
         search: searchText.value || undefined,
         platforms: selectedPlatforms.value.length ? selectedPlatforms.value : undefined,
         years: selectedYears.value.length ? selectedYears.value : undefined,
         genres: selectedGenres.value.length ? selectedGenres.value : undefined,
+        tags: selectedTags.value.length ? selectedTags.value : undefined,
         sortField: sortField.value || undefined,
         sortType: sortType.value || undefined,
         favoritesOnly: favoritesOnly.value || undefined
@@ -38,6 +46,8 @@ export const useLibraryStore = defineStore('library', () => {
         totalItems.value = data.data.totalItems
         totalPages.value = data.data.totalPages
       }
+    } catch {
+      // error handled by global axios interceptor
     } finally {
       loading.value = false
     }
@@ -59,10 +69,11 @@ export const useLibraryStore = defineStore('library', () => {
     searchText.value = text
   }
 
-  function setFilters({ platforms, years, genres }) {
+  function setFilters({ platforms, years, genres, tags }) {
     selectedPlatforms.value = platforms || []
     selectedYears.value = years || []
     selectedGenres.value = genres || []
+    selectedTags.value = tags || []
   }
 
   function setSort(field, type) {
@@ -75,6 +86,7 @@ export const useLibraryStore = defineStore('library', () => {
     selectedPlatforms.value = []
     selectedYears.value = []
     selectedGenres.value = []
+    selectedTags.value = []
     sortField.value = ''
     sortType.value = ''
     favoritesOnly.value = false
@@ -90,8 +102,8 @@ export const useLibraryStore = defineStore('library', () => {
 
   return {
     games, totalItems, totalPages, currentPage, loading,
-    searchText, selectedPlatforms, selectedYears, selectedGenres,
-    sortField, sortType, favoritesOnly, filterOptions, pageSize, genreMap,
-    fetchGames, fetchFilterOptions, setSearch, setFilters, setSort, resetFilters
+    searchText, selectedPlatforms, selectedYears, selectedGenres, selectedTags,
+    sortField, sortType, favoritesOnly, filterOptions, pageSize, viewMode, genreMap,
+    fetchGames, fetchFilterOptions, setSearch, setFilters, setSort, resetFilters, setViewMode
   }
 })

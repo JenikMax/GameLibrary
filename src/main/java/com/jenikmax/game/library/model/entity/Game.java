@@ -32,6 +32,7 @@ public class Game implements Serializable {
     private String instruction;
     private Long totalSizeBytes;
     private List<Screenshot> screenshots;
+    private List<GameTag> tags;
 
 
     @Id
@@ -161,5 +162,18 @@ public class Game implements Serializable {
 
     public void setScreenshots(List<Screenshot> screenshots) {
         this.screenshots = screenshots;
+    }
+
+    @OneToMany(
+            mappedBy = "game",
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH},
+            orphanRemoval = true
+    )
+    public List<GameTag> getTags() {
+        return this.tags;
+    }
+
+    public void setTags(List<GameTag> tags) {
+        this.tags = tags;
     }
 }

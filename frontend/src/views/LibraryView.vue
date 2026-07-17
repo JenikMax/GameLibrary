@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div class="sort-bar flex align-items-center gap-2 mb-3">
+      <div class="sort-bar flex align-items-center gap-2 mb-3 flex-wrap">
         <SelectButton
           v-model="store.sortField"
           :options="sortOptions"
@@ -68,6 +68,24 @@
           optionValue="value"
           size="small"
           @change="onSortChange"
+        />
+        <span class="text-color-secondary text-sm">{{ t('filter.page_size') }}:</span>
+        <SelectButton
+          v-model="store.pageSize"
+          :options="pageSizeOptions"
+          optionLabel="label"
+          optionValue="value"
+          size="small"
+          @change="onPageSizeChange"
+        />
+        <Button
+          :icon="store.viewMode === 'grid' ? 'pi pi-th-large' : 'pi pi-bars'"
+          severity="secondary"
+          text
+          rounded
+          size="small"
+          @click="store.setViewMode(store.viewMode === 'grid' ? 'list' : 'grid')"
+          v-tooltip="store.viewMode === 'grid' ? t('view.list') : t('view.grid')"
         />
         <Badge :value="store.totalItems" severity="info" />
       </div>
@@ -90,25 +108,28 @@
 
       <div v-else-if="store.loading">
         <div class="game-grid">
-          <GameCardSkeleton v-for="i in store.pageSize" :key="i" />
+          <GameCardSkeleton v-for="i in store.pageSize.value" :key="i" />
         </div>
       </div>
       <div v-else>
-        <div v-if="store.totalItems > store.pageSize" class="flex justify-content-center mb-3">
+        <div v-if="store.totalItems > store.pageSize.value" class="flex justify-content-center mb-3">
           <Paginator
-            :first="(store.currentPage - 1) * store.pageSize"
-            :rows="store.pageSize"
+            :first="(store.currentPage - 1) * store.pageSize.value"
+            :rows="store.pageSize.value"
             :totalRecords="store.totalItems"
             @page="onPageChange"
           />
         </div>
-        <TransitionGroup name="card-list" tag="div" class="game-grid">
+        <TransitionGroup name="card-list" tag="div" class="game-grid" v-if="store.viewMode === 'grid'">
           <GameCard v-for="game in store.games" :key="game.id" :game="game" />
         </TransitionGroup>
-        <div v-if="store.totalItems > store.pageSize" class="flex justify-content-center mt-4">
+        <TransitionGroup name="list-slide" tag="div" class="game-list" v-else>
+          <GameListRow v-for="game in store.games" :key="game.id" :game="game" />
+        </TransitionGroup>
+        <div v-if="store.totalItems > store.pageSize.value" class="flex justify-content-center mt-4">
           <Paginator
-            :first="(store.currentPage - 1) * store.pageSize"
-            :rows="store.pageSize"
+            :first="(store.currentPage - 1) * store.pageSize.value"
+            :rows="store.pageSize.value"
             :totalRecords="store.totalItems"
             @page="onPageChange"
           />
@@ -129,6 +150,7 @@ import { adminApi } from '../api/admin'
 import { gamesApi } from '../api/games'
 import { useToast } from 'primevue/usetoast'
 import GameCard from '../components/GameCard.vue'
+import GameListRow from '../components/GameListRow.vue'
 import GameCardSkeleton from '../components/GameCardSkeleton.vue'
 import GameFilter from '../components/GameFilter.vue'
 import Paginator from 'primevue/paginator'
@@ -146,9 +168,12 @@ function saveStateToSession() {
     platforms: store.selectedPlatforms,
     years: store.selectedYears,
     genres: store.selectedGenres,
+    tags: store.selectedTags,
     sortField: store.sortField,
     sortType: store.sortType,
-    favoritesOnly: store.favoritesOnly
+    favoritesOnly: store.favoritesOnly,
+    pageSize: store.pageSize,
+    viewMode: store.viewMode
   }))
 }
 
@@ -188,6 +213,11 @@ const sortTypeOptions = [
   { label: t('filter.asc'), value: 'asc' },
   { label: t('filter.desc'), value: 'desc' }
 ]
+const pageSizeOptions = [
+  { label: '12', value: 12 },
+  { label: '24', value: 24 },
+  { label: '48', value: 48 }
+]
 
 onMounted(async () => {
   await store.fetchFilterOptions()
@@ -198,14 +228,18 @@ onMounted(async () => {
     store.selectedPlatforms = state.platforms || []
     store.selectedYears = state.years || []
     store.selectedGenres = state.genres || []
+    store.selectedTags = state.tags || []
     store.sortField = state.sortField || ''
     store.sortType = state.sortType || ''
     store.favoritesOnly = state.favoritesOnly || false
+    store.pageSize = state.pageSize || 12
+    store.viewMode = state.viewMode || 'grid'
     filterRef.value?.restoreState({
       searchText: state.searchText || '',
       selectedPlatforms: state.platforms || [],
       selectedYears: state.years || [],
-      selectedGenres: state.genres || []
+      selectedGenres: state.genres || [],
+      selectedTags: state.tags || []
     })
     sessionStorage.removeItem(LIBRARY_STATE_KEY)
     await store.fetchGames(state.currentPage || 1)
@@ -235,12 +269,17 @@ function onSortChange() {
   store.fetchGames(1)
 }
 
+function onPageSizeChange() {
+  store.fetchGames(1)
+}
+
 function handleApplyFilters(filters) {
   store.setSearch(filters.searchText)
   store.setFilters({
     platforms: filters.platforms,
     years: filters.years,
-    genres: filters.genres
+    genres: filters.genres,
+    tags: filters.tags
   })
   store.fetchGames(1)
 }
@@ -336,6 +375,11 @@ function pollScanStatus() {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1rem;
+}
+.game-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 .history-strip {
   display: flex;

@@ -17,7 +17,7 @@ export const adminApi = {
     return api.post('/scan')
   },
   getScanStatus(taskId) {
-    return api.get(`/scan/status/${taskId}`)
+    return api.get(`/scan/status/${taskId}`, { skipToast: true })
   },
   getScraperConfigs() {
     return api.get('/admin/scraper-config')

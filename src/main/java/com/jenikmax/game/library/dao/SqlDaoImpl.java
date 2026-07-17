@@ -50,6 +50,16 @@ public class SqlDaoImpl implements SqlDao {
                 dto.setGenres(new ArrayList<>());
             }
             try {
+                String tagCodes = rs.getString("tag_codes");
+                if (tagCodes != null && !tagCodes.isEmpty()) {
+                    dto.setTags(Arrays.asList(tagCodes.split(",")));
+                } else {
+                    dto.setTags(new ArrayList<>());
+                }
+            } catch (java.sql.SQLException e) {
+                dto.setTags(new ArrayList<>());
+            }
+            try {
                 byte[] logoBytes = rs.getBytes("logo");
                 if (logoBytes != null && logoBytes.length > 0) {
                     dto.setLogo(BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(logoBytes));
@@ -105,6 +115,16 @@ public class SqlDaoImpl implements SqlDao {
                 }
             } catch (java.sql.SQLException e) {
                 dto.setGenres(new ArrayList<>());
+            }
+            try {
+                String tagCodes = rs.getString("tag_codes");
+                if (tagCodes != null && !tagCodes.isEmpty()) {
+                    dto.setTags(Arrays.asList(tagCodes.split(",")));
+                } else {
+                    dto.setTags(new ArrayList<>());
+                }
+            } catch (java.sql.SQLException e) {
+                dto.setTags(new ArrayList<>());
             }
             try {
                 byte[] logoBytes = rs.getBytes("logo");

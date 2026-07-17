@@ -10,6 +10,7 @@ public class GameListResponse {
     private String platform;
     private String releaseDate;
     private List<String> genres;
+    private List<String> tags;
     private String logoUrl;
     private String logo;
     private Double avgRating;
@@ -37,6 +38,8 @@ public class GameListResponse {
     public void setReleaseDate(String releaseDate) { this.releaseDate = releaseDate; }
     public List<String> getGenres() { return genres; }
     public void setGenres(List<String> genres) { this.genres = genres; }
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
     public String getLogoUrl() { return logoUrl; }
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
     public String getLogo() { return logo; }

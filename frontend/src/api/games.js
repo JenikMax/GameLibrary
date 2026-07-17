@@ -8,7 +8,7 @@ export const gamesApi = {
     return api.get(`/games/${id}`)
   },
   getFilterOptions() {
-    return api.get('/games/filter-options')
+    return api.get('/games/filter-options', { skipToast: true })
   },
   editGame(id, data) {
     return api.post(`/games/${id}/edit`, data)
@@ -53,6 +53,15 @@ export const gamesApi = {
     return api.delete(`/games/${gameId}/comments/${commentId}`)
   },
   getRelated(id) {
-    return api.get(`/games/${id}/related`)
+    return api.get(`/games/${id}/related`, { skipToast: true })
+  },
+  getReviews(id) {
+    return api.get(`/games/${id}/reviews`)
+  },
+  addReview(id, data) {
+    return api.post(`/games/${id}/reviews`, data)
+  },
+  deleteReview(gameId, reviewId) {
+    return api.delete(`/games/${gameId}/reviews/${reviewId}`)
   }
 }
