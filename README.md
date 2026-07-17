@@ -130,7 +130,7 @@ Opens at `http://localhost` — login as `admin` / `password`.
 | `/admin/users` | ADMIN | User management |
 | `/admin/scrapers` | ADMIN | Scraper config (API keys, on/off) |
 | `/downloads` | USER, ADMIN | Transmission seeding status |
-| `/statistics` | USER, ADMIN | Library statistics dashboard (charts, top lists) |
+| `/statistics` | USER, ADMIN | Library statistics dashboard (charts, top lists); "Refresh Sizes" button — ADMIN only |
 | `/collections` | USER, ADMIN | User game collections |
 | `/collections/:id` | USER, ADMIN | Collection detail (games grid) |
 
@@ -175,7 +175,7 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `PUT /api/collections/{id}/games/reorder` | USER, ADMIN | Reorder games in collection |
 | **Statistics** | | |
 | `GET /api/statistics` | USER, ADMIN | Library metrics (counts, charts, top lists) |
-| `POST /api/statistics/refresh-sizes` | USER, ADMIN | Reset cached game sizes — recomputed on next GET |
+| `POST /api/statistics/refresh-sizes` | ADMIN | Reset cached game sizes — recomputed on next GET |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Torrent preparation task status |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Seed task status |
@@ -626,7 +626,7 @@ make all                      # сборка backend + frontend, запуск do
 | `/admin/users` | ADMIN | Управление пользователями |
 | `/admin/scrapers` | ADMIN | Настройка скраперов |
 | `/downloads` | USER, ADMIN | Статус раздач Transmission |
-| `/statistics` | USER, ADMIN | Статистика библиотеки (диаграммы, топы) |
+| `/statistics` | USER, ADMIN | Статистика библиотеки (диаграммы, топы); кнопка «Обновить размер» — только ADMIN |
 | `/collections` | USER, ADMIN | Коллекции игр |
 | `/collections/:id` | USER, ADMIN | Детали коллекции (сетка игр) |
 
@@ -671,7 +671,7 @@ make all                      # сборка backend + frontend, запуск do
 | `PUT /api/collections/{id}/games/reorder` | USER, ADMIN | Изменить порядок игр |
 | **Statistics** | | |
 | `GET /api/statistics` | USER, ADMIN | Метрики библиотеки (диаграммы, топы) |
-| `POST /api/statistics/refresh-sizes` | USER, ADMIN | Сбросить кэш размеров игр — пересчёт при следующем GET |
+| `POST /api/statistics/refresh-sizes` | ADMIN | Сбросить кэш размеров игр — пересчёт при следующем GET |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Статус подготовки торрента |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Статус раздачи |
