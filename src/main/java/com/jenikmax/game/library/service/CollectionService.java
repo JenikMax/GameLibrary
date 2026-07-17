@@ -309,8 +309,8 @@ public class CollectionService {
 
                 List<Map<String, Object>> previews = new ArrayList<>();
                 int total = games.size();
-                int maxPreviews = Math.min(total - 1, 2);
-                for (int i = 1; i <= maxPreviews; i++) {
+                int maxPreviews = Math.min(total, 2);
+                for (int i = 0; i < maxPreviews; i++) {
                     Object[] g = games.get(i);
                     Map<String, Object> pg = new LinkedHashMap<>();
                     pg.put("gameId", g[1]);
@@ -318,7 +318,7 @@ public class CollectionService {
                     previews.add(pg);
                 }
                 m.put("previewGames", previews);
-                int overflow = total - 1 - maxPreviews;
+                int overflow = total - maxPreviews;
                 m.put("overflow", Math.max(overflow, 0));
             }
 
