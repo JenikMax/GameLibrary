@@ -1,6 +1,7 @@
 server:
   max-http-header-size: 16KB
   tomcat:
+    uri-encoding: ISO-8859-1
     max-http-form-post-size: 100MB
     threads:
       max: 10
