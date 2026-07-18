@@ -63,7 +63,7 @@
 | 📂 Game collections (playlists, public/private, reorder) | |
 | 📝 Detailed reviews (gameplay/graphics/story/music scores 1-10, pros/cons, delete button in corner) | |
 | 🏷️ Tags (custom labels, filter in sidebar) | |
-| 🧠 Smart collections (JSON rules, auto-badge) | |
+| 🧠 Smart collections (server-side rules evaluation, auto-matched games) | |
 
 <p align="center">
   <img src="frontend/public/collections.jpg" alt="GameLibrary Collections" width="800">
@@ -93,6 +93,7 @@ Opens at `http://localhost` — login as `admin` / `password`.
 | Downloads | ZIP streaming (STORED, no compression) + BitTorrent via Transmission (JSON-RPC) |
 | P2P Tracker | Built-in HTTP tracker at `/api/tracker/announce` |
 | Scraping | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
+| Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
 | Build | Maven (JAR) + npm / Vite |
 | Containerization | Docker, docker-compose (4 services) |
 
@@ -136,6 +137,7 @@ Opens at `http://localhost` — login as `admin` / `password`.
 | `/statistics` | USER, ADMIN | Library statistics dashboard (charts, top lists); "Refresh Sizes" button — ADMIN only |
 | `/collections` | USER, ADMIN | User game collections |
 | `/collections/:id` | USER, ADMIN | Collection detail (games grid) |
+| `/*` (catch-all) | all | 404 Not Found page |
 
 ### API Endpoints
 
@@ -171,6 +173,7 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `DELETE /games/{id}/reviews/{reviewId}` | USER, ADMIN | Delete own review |
 | **Collections** | | |
 | `GET /api/collections` | USER, ADMIN | List own + public collections |
+| `GET /api/collections/with-hero` | USER, ADMIN | Collections with hero/preview game data for cards |
 | `GET /api/collections/{id}` | USER, ADMIN | Get single collection |
 | `POST /api/collections` | USER, ADMIN | Create collection (`name`, `description?`, `isPublic?`) |
 | `PUT /api/collections/{id}` | USER, ADMIN | Update collection (name, description, isPublic) |
@@ -290,7 +293,7 @@ Schema `library`:
 | `game_review` | Reviews with category scores (gameplay/graphics/story/music 1-10), pros/cons, text (unique user+game) |
 | `library_user` | Users (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `1_init.sh` (schema), `2_library.sql` (tables + genres), `3_user.sql` (users + seed), `4_search.sql` (full-text search), `5_rating.sql`, `6_favorite.sql`, `7_comment.sql`, `8_notification.sql`, `9_collection.sql`, `10_tags.sql`, `11_smart_collection.sql`, `12_review.sql`.
+DDL: `postgresdb/ddl/` — `01_init.sh` (schema), `02_library.sql` (tables + genres), `03_user.sql` (users + seed), `04_search.sql` (full-text search), `05_rating.sql`, `06_favorite.sql`, `07_comment.sql`, `08_notification.sql`, `09_collection.sql`, `10_smart_collection.sql`, `11_review.sql`, `12_tags.sql`.
 
 ## 🔒 Security
 
@@ -320,6 +323,7 @@ cp .env.example .env   # edit secrets before first launch
 | `UserDataService.java` | `qwerty1234` hardcoded | `SecureRandom` auto-generate (8 байт, base64), возвращается в ответ API, отображается фронтендом. Переопределяется через `RESET_PASSWORD_DEFAULT` |
 | `ConfigEncryptionService.java` | Ephemeral AES key if env missing | Throws `IllegalStateException` — env is mandatory |
 | `docker-compose.yml` | Inline secrets | `${VAR}` references to `.env` |
+| `RateLimitFilter` | No rate limiting | bucket4j: login 5 req/min, API 100 req/min per IP |
 
 ## 🕷 Scrapers
 
@@ -568,7 +572,7 @@ npm run dev
 | 📂 Коллекции игр (плейлисты, публичные/приватные, сортировка) | |
 | 📝 Подробные рецензии (оценки геймплея/графики/сюжета/музыки 1-10, плюсы/минусы, кнопка удаления в углу) | |
 | 🏷️ Теги (пользовательские метки, фильтр в боковой панели) | |
-| 🧠 Умные коллекции (JSON-правила, автоматическая маркировка) | |
+| 🧠 Умные коллекции (правила оцениваются на сервере, авто-подбор игр) | |
 
 <p align="center">
   <img src="frontend/public/collections.jpg" alt="GameLibrary Collections" width="800">
@@ -598,6 +602,7 @@ make all                      # сборка backend + frontend, запуск do
 | Скачивание | ZIP (STORED, без сжатия) + BitTorrent через Transmission (JSON-RPC) |
 | P2P-трекер | Встроенный HTTP-трекер — `/api/tracker/announce` |
 | Скрапинг | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
+| Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
 | Сборка | Maven (JAR) + npm / Vite |
 | Контейнеризация | Docker, docker-compose (4 сервиса) |
 
@@ -641,6 +646,7 @@ make all                      # сборка backend + frontend, запуск do
 | `/statistics` | USER, ADMIN | Статистика библиотеки (диаграммы, топы); кнопка «Обновить размер» — только ADMIN |
 | `/collections` | USER, ADMIN | Коллекции игр |
 | `/collections/:id` | USER, ADMIN | Детали коллекции (сетка игр) |
+| `/*` (catch-all) | все | Страница 404 Not Found |
 
 ### API Endpoints
 
@@ -676,6 +682,7 @@ make all                      # сборка backend + frontend, запуск do
 | `DELETE /games/{id}/reviews/{reviewId}` | USER, ADMIN | Удалить свою рецензию |
 | **Collections** | | |
 | `GET /api/collections` | USER, ADMIN | Свои + публичные коллекции |
+| `GET /api/collections/with-hero` | USER, ADMIN | Коллекции с hero/preview данными для карточек |
 | `GET /api/collections/{id}` | USER, ADMIN | Получить коллекцию |
 | `POST /api/collections` | USER, ADMIN | Создать коллекцию |
 | `PUT /api/collections/{id}` | USER, ADMIN | Обновить коллекцию |
@@ -785,7 +792,7 @@ make all                      # сборка backend + frontend, запуск do
 | `game_review` | Рецензии с оценками по категориям (геймплей/графика/сюжет/музыка 1-10), плюсы/минусы, текст (unique user+game) |
 | `library_user` | Пользователи (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `1_init.sh` (схема), `2_library.sql` (таблицы + жанры), `3_user.sql` (пользователи + seed), `4_search.sql` (полнотекстовый поиск), `5_rating.sql` (оценки), `6_favorite.sql` (избранное), `7_comment.sql` (комментарии), `8_notification.sql` (уведомления), `9_collection.sql` (коллекции), `10_tags.sql` (теги), `11_smart_collection.sql` (умные коллекции), `12_review.sql` (рецензии).
+DDL: `postgresdb/ddl/` — `01_init.sh` (схема), `02_library.sql` (таблицы + жанры), `03_user.sql` (пользователи + seed), `04_search.sql` (полнотекстовый поиск), `05_rating.sql` (оценки), `06_favorite.sql` (избранное), `07_comment.sql` (комментарии), `08_notification.sql` (уведомления), `09_collection.sql` (коллекции), `10_smart_collection.sql` (умные коллекции), `11_review.sql` (рецензии), `12_tags.sql` (теги).
 
 ## 🔒 Безопасность
 
@@ -815,6 +822,7 @@ cp .env.example .env   # отредактировать перед первым 
 | `qwerty1234` в коде при сбросе пароля | `SecureRandom` (8 байт, base64) + `RESET_PASSWORD_DEFAULT`. Пароль возвращается в API и отображается в UI |
 | Эфемерный AES-ключ при отсутствии env | `IllegalStateException` — ключ обязателен |
 | Секреты в `docker-compose.yml` inline | `${VAR}` из `.env` |
+| Без ограничения запросов | bucket4j: login 5 зап/мин, API 100 зап/мин на IP |
 
 ## 🕷 Скраперы
 
