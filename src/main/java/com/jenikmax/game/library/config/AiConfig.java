@@ -70,11 +70,8 @@ public class AiConfig {
 
     public static class AutoTag {
         private boolean enabled = true;
-        private String keywordFile;
 
         public boolean isEnabled() { return enabled; }
         public void setEnabled(boolean enabled) { this.enabled = enabled; }
-        public String getKeywordFile() { return keywordFile; }
-        public void setKeywordFile(String keywordFile) { this.keywordFile = keywordFile; }
     }
 }

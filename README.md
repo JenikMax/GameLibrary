@@ -438,6 +438,10 @@ Create on host before launching:
 └── gameLibraryConfigs/                # Config files
     ├── db/data/                       # PostgreSQL data (mount → postgresdb:/var/lib/postgresql/data)
     ├── scrapers/                      # Scraper config (scrapers-config.json)
+    ├── models/                        # ONNX models for AI features (semantic search, translation)
+    │   ├── multilingual-e5-small/     # Embedding model (~120 MB)
+    │   ├── opus-mt-ru-en/             # Translation ru→en (~300 MB)
+    │   └── opus-mt-en-ru/             # Translation en→ru (~300 MB)
     └── tracker/
         ├── config/                    # Transmission settings.json (auto-created)
         ├── watch/                     # Auto-add .torrent files
@@ -448,7 +452,7 @@ Create on host before launching:
 
 ```bash
 # Create the full directory structure at once:
-mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,tracker/{config,watch,complete,incomplete,torrents}}}
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,models,tracker/{config,watch,complete,incomplete,torrents}}}
 ```
 
 > **Volume reference** — each path in `docker-compose.yml` serves a specific purpose:
@@ -456,7 +460,7 @@ mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers
 > | Host path | Container path | Service | Purpose |
 > |-----------|---------------|---------|---------|
 > | `.../db/data` | `/var/lib/postgresql/data` | postgresdb | PostgreSQL database files |
-> | `...` (games root) | `/gameLibrary` | backend | Game files + images (games/, images/) |
+> | `...` (games root) | `/gameLibrary` | backend | Game files + images + models (games/, images/, gameLibraryConfigs/models/) |
 > | `.../tracker/torrents` | `/torrentDirTmp` | backend | Temporary .torrent files |
 > | `.../scrapers` | `/scraper-config` | backend | Scraper config (scrapers-config.json) |
 > | `.../games` | `/downloads/games` | transmission | Game files for seeding |
@@ -981,6 +985,10 @@ cp .env.example .env
 └── gameLibraryConfigs/                # Конфигурационные файлы
     ├── db/data/                       # Данные PostgreSQL (mount → postgresdb:/var/lib/postgresql/data)
     ├── scrapers/                      # Конфиги скраперов (scrapers-config.json)
+    ├── models/                        # ONNX-модели для AI-фич (семантический поиск, перевод)
+    │   ├── multilingual-e5-small/     # Модель embedding (~120 МБ)
+    │   ├── opus-mt-ru-en/             # Перевод ru→en (~300 МБ)
+    │   └── opus-mt-en-ru/             # Перевод en→ru (~300 МБ)
     └── tracker/
         ├── config/                    # Transmission settings.json (авто-создание)
         ├── watch/                     # Авто-добавление .torrent
@@ -991,7 +999,7 @@ cp .env.example .env
 
 ```bash
 # Создать полную структуру каталогов одной командой:
-mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,tracker/{config,watch,complete,incomplete,torrents}}}
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,models,tracker/{config,watch,complete,incomplete,torrents}}}
 ```
 
 > **Справочник томов** — для чего каждый путь в `docker-compose.yml`:
@@ -999,7 +1007,7 @@ mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers
 > | Путь на хосте | Путь в контейнере | Сервис | Назначение |
 > |--------------|-------------------|--------|------------|
 > | `.../db/data` | `/var/lib/postgresql/data` | postgresdb | Файлы базы данных PostgreSQL |
-> | `...` (корень) | `/gameLibrary` | backend | Файлы игр + изображения (games/, images/) |
+> | `...` (корень) | `/gameLibrary` | backend | Файлы игр + изображения + модели (games/, images/, gameLibraryConfigs/models/) |
 > | `.../tracker/torrents` | `/torrentDirTmp` | backend | Временные .torrent-файлы |
 > | `.../scrapers` | `/scraper-config` | backend | Конфиги скраперов (scrapers-config.json) |
 > | `.../games` | `/downloads/games` | transmission | Файлы игр для раздачи |

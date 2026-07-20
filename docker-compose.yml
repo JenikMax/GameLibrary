@@ -41,6 +41,9 @@ services:
       - GAMES_DIRECTORY=/gameLibrary
       - IMAGES_DIRECTORY=/gameLibrary/images
       - SCRAPER_CONFIG_DIR=/scraper-config
+      # ONNX-модели для AI-фич. По умолчанию лежат в ${GAME_LIBRARY_CONFIG_DIR}/models (под volume /gameLibrary).
+      # Переопределить: AI_MODELS_DIR=/my/custom/path в .env
+      #- AI_MODELS_DIR=${AI_MODELS_DIR:-/gameLibrary/gameLibraryConfigs/models}
       - JWT_SECRET=${JWT_SECRET}
       # ⚠️ SCRAPER_ENCRYPTION_KEY — ключ шифрования API-ключей скраперов.
       # Если измените — пересохраните API-ключи в админке (/admin/scrapers).
@@ -48,6 +51,8 @@ services:
       - SCRAPER_ENCRYPTION_KEY=${SCRAPER_ENCRYPTION_KEY}
       - DB_PASSWORD=${DB_PASSWORD}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      - AI_MODELS_DIR=${AI_MODELS_DIR}
+      - GAME_LIBRARY_CONFIG_DIR=${GAME_LIBRARY_CONFIG_DIR}
       - TTORRENT_HASHING_THREADS=2
     volumes:
       # Корень библиотеки игр. Внутри контейнера: games/ (файлы игр), images/ (скриншоты, обложки).

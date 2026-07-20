@@ -95,4 +95,3 @@ ai:
     beam-size: 4
   auto-tag:
     enabled: true
-    keyword-file: keywords.json
