@@ -2,28 +2,43 @@
 set -e
 
 MODELS_DIR="${1:-${GAME_LIBRARY_CONFIG_DIR:-/gameLibrary/gameLibraryConfigs}/models}"
+MODELS_DIR="$(realpath -m "$MODELS_DIR")"
 
 echo "=== GameLibrary ONNX Models Downloader ==="
 echo "Models will be saved to: $MODELS_DIR"
 echo ""
 
 check_python() {
-    if command -v python3 &>/dev/null; then
-        PYTHON=python3
-    elif command -v python &>/dev/null; then
-        PYTHON=python
-    else
-        echo "ERROR: Python 3 not found. Install it first:"
-        echo "  Ubuntu/Debian: sudo apt install python3 python3-pip"
-        echo "  CentOS/RHEL:   sudo yum install python3 python3-pip"
-        echo "  TOS/TerraMaster: install Python from App Center"
-        exit 1
-    fi
+    for ver in python3.12 python3.11 python3.10 python3; do
+        if command -v "$ver" &>/dev/null; then
+            local v=$("$ver" -c 'import sys; print(sys.version_info[:2])' 2>/dev/null)
+            if echo "$v" | grep -qE '(3, 10)|(3, 11)|(3, 12)'; then
+                PYTHON="$ver"
+                echo "  Using $PYTHON ($( $PYTHON --version 2>&1 ))"
+                return
+            fi
+        fi
+    done
+    echo "ERROR: Python 3.10-3.12 required but not found."
+    echo "You have: $(python3 --version 2>/dev/null || echo 'no python3')"
+    echo ""
+    echo "Install Python 3.12:"
+    echo "  sudo add-apt-repository -y ppa:deadsnakes/ppa"
+    echo "  sudo apt install -y python3.12 python3.12-venv"
+    exit 1
 }
 
 install_deps() {
     echo "Installing required Python packages..."
-    $PYTHON -m pip install --quiet optimum-cli[onnxruntime] huggingface_hub 2>&1 | tail -1
+    $PYTHON -m pip install --quiet --only-binary :all: \
+        "optimum[onnxruntime]>=1.25.0" \
+        "transformers==4.46.3" \
+        huggingface_hub
+    if ! $PYTHON -m pip show optimum &>/dev/null; then
+        echo "ERROR: Failed to install optimum. Try manually:"
+        echo "  Install Python 3.12, then: $PYTHON -m pip install --only-binary :all: \"optimum[onnxruntime]>=1.25.0\" \"transformers==4.46.3\" huggingface_hub"
+        exit 1
+    fi
 }
 
 export_model() {
@@ -36,14 +51,28 @@ export_model() {
         return
     fi
 
-    echo "  Downloading & converting $model_name ..."
+    local task_label="${task:-auto}"
+    echo "  Downloading & converting $model_name ($task_label) ..."
     mkdir -p "$target_dir"
-    $PYTHON -m optimum_cli export onnx \
+
+    local task_args=()
+    if [ -n "$task" ]; then
+        task_args=(--task "$task")
+    fi
+
+    optimum-cli export onnx \
         --model "$model_name" \
-        --task "$task" \
+        "${task_args[@]}" \
         --optimize O2 \
-        "$target_dir" 2>&1 | tail -3
-    echo "  [OK] $model_name -> $target_dir"
+        "$target_dir"
+
+    if [ -f "$target_dir/model.onnx" ]; then
+        echo "  [OK] $model_name -> $target_dir"
+    else
+        echo "  [FAIL] $model_name — model.onnx not created in $target_dir"
+        echo "  Check installed packages: $PYTHON -m pip show optimum onnxruntime huggingface_hub"
+        exit 1
+    fi
 }
 
 check_python
@@ -55,9 +84,9 @@ echo ""
 
 export_model "intfloat/multilingual-e5-small" "sentence-similarity" "$MODELS_DIR/multilingual-e5-small"
 
-export_model "Helsinki-NLP/opus-mt-ru-en" "translation" "$MODELS_DIR/opus-mt-ru-en"
+export_model "Helsinki-NLP/opus-mt-ru-en" "" "$MODELS_DIR/opus-mt-ru-en"
 
-export_model "Helsinki-NLP/opus-mt-en-ru" "translation" "$MODELS_DIR/opus-mt-en-ru"
+export_model "Helsinki-NLP/opus-mt-en-ru" "" "$MODELS_DIR/opus-mt-en-ru"
 
 echo ""
 echo "=== Done! ==="
