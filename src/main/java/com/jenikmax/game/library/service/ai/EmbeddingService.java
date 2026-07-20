@@ -1,6 +1,5 @@
 package com.jenikmax.game.library.service.ai;
 
-import com.jenikmax.game.library.config.AiConfig;
 import com.jenikmax.game.library.model.entity.Game;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
@@ -8,9 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 @Service
@@ -18,39 +14,16 @@ public class EmbeddingService {
 
     private static final Logger log = LoggerFactory.getLogger(EmbeddingService.class);
 
-    private final OnnxModelManager modelManager;
-    private final AiConfig aiConfig;
+    private final AiClient aiClient;
     private final JdbcTemplate jdbc;
-    private SentencePieceTokenizer tokenizer;
-    private volatile boolean modelAvailable = true;
 
-    public EmbeddingService(OnnxModelManager modelManager, AiConfig aiConfig, JdbcTemplate jdbc) {
-        this.modelManager = modelManager;
-        this.aiConfig = aiConfig;
+    public EmbeddingService(AiClient aiClient, JdbcTemplate jdbc) {
+        this.aiClient = aiClient;
         this.jdbc = jdbc;
     }
 
-    private synchronized SentencePieceTokenizer getTokenizer() {
-        if (tokenizer == null) {
-            AiConfig.Embedding embConfig = aiConfig.getEmbedding();
-            try {
-                Path vocabPath = Path.of(aiConfig.getModelsDir()).resolve(embConfig.getVocabFile());
-                tokenizer = new SentencePieceTokenizer(vocabPath.toString());
-            } catch (IOException e) {
-                log.warn("Embedding tokenizer not found at {}/{} — semantic search disabled",
-                        aiConfig.getModelsDir(), embConfig.getVocabFile());
-                modelAvailable = false;
-                return null;
-            }
-        }
-        return tokenizer;
-    }
-
     public boolean isAvailable() {
-        if (!aiConfig.getEmbedding().isEnabled() || !modelAvailable) return false;
-        Path modelPath = Path.of(aiConfig.getModelsDir()).resolve(aiConfig.getEmbedding().getModelFile());
-        Path vocabPath = Path.of(aiConfig.getModelsDir()).resolve(aiConfig.getEmbedding().getVocabFile());
-        return Files.exists(modelPath) && Files.exists(vocabPath);
+        return aiClient.isAvailable();
     }
 
     public float[] generateAndStore(Long gameId) {
@@ -82,16 +55,13 @@ public class EmbeddingService {
     }
 
     public float[] generateEmbedding(String text) {
-        if (!aiConfig.getEmbedding().isEnabled() || !modelAvailable) {
+        if (!isAvailable()) {
             return null;
         }
-        SentencePieceTokenizer tok = getTokenizer();
-        if (tok == null) return null;
         try {
-            return modelManager.generateEmbedding(tok, text);
+            return aiClient.embed(text);
         } catch (Exception e) {
             log.error("Embedding generation failed", e);
-            modelAvailable = false;
             return null;
         }
     }

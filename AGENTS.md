@@ -10,12 +10,12 @@ mvn spring-boot:run                          # run backend locally (needs Postgr
 cd frontend && npm run dev                   # run frontend dev server (:5173, proxies to :8080)
 ```
 
-No Maven wrapper — `mvn` must be on PATH. Java 25 target, `eclipse-temurin:25-jre` runtime (glibc required for ONNX Runtime native lib). No tests, no lint/format/typecheck config.
+No Maven wrapper — `mvn` must be on PATH. Java 25 target, `eclipse-temurin:25-jre` runtime. No tests, no lint/format/typecheck config.
 
 ## Docker
 
-`docker-compose.yml` starts four services: `frontend` (Nginx + Vue SPA, `:80`), `backend` (Spring Boot REST, `:8080`), `transmission` (torrent seeder, `:9091` RPC, `:51413`), `postgresdb` (`:5432`).  
-Memory limits: postgresdb 512m, backend 1536m, frontend 64m, transmission 256m. postgresdb has healthcheck.
+`docker-compose.yml` starts five services: `frontend` (Nginx + Vue SPA, `:80`), `backend` (Spring Boot REST, `:8080`), `ai-service` (Python FastAPI, `:8000`), `transmission` (torrent seeder, `:9091` RPC, `:51413`), `postgresdb` (`:5432`).  
+Memory limits: postgresdb 512m, backend 768m, ai-service 1536m, frontend 64m, transmission 256m. postgresdb has healthcheck.
 DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/docker-entrypoint-initdb.d/`.
 
 ## System Requirements
@@ -31,8 +31,8 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 | Resource | Minimum |
 |----------|---------|
 | CPU | 2 cores (Intel N4505 / ARM Cortex-A55 or better) |
-| RAM | 3 GB (backend container needs 1536m for ONNX models: ~750MB off-heap + 640MB JVM heap) |
-| Storage | 800 MB for app + ONNX models (~720MB: 120MB embedding, 600MB translation) + space for game library |
+| RAM | 4 GB (ai-service container needs 1536m for PyTorch + HF models) |
+| Storage | 2 GB for app + AI models (auto-downloaded on first start) + space for game library |
 | PostgreSQL | pgvector extension (use `pgvector/pgvector:pg16` Docker image) |
 
 Embedding inference: ~200-500ms/game on 2-core CPU. Translation: ~1-5s/description.
@@ -49,14 +49,14 @@ Embedding inference: ~200-500ms/game on 2-core CPU. Translation: ~1-5s/descripti
 - Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission 4.1.2 RPC for seeding.
 - Images: DB bytea with optional filesystem override at `images.directory/games/{id}/logo.jpg` (or `screenshots/`, `avatars/`).
 - Scrapers (7 active): Playground (CSS selectors + search API), Igromania (JSON paths), WorldArt (CSS selectors), Steam (Storefront API, no key required), IGDB (Twitch OAuth), TheGamesDB (API key), PsxDataCenter (JSoup, PS1/PS2, no key).
-- **AI features (ONNX Runtime + pgvector):**
-  - **Semantic search** (`EmbeddingService` + pgvector `vector(384)` + HNSW index). Embedding model: `intfloat/multilingual-e5-small` (~120MB ONNX). Toggle in `GameFilter.vue` (gated by `semanticAvailable` flag from backend). Async batch generation via `POST /api/embeddings/generate` (ADMIN, polling `/status/{taskId}`). Embedding auto-generated on game save.
-  - **Translation ru↔en** (`TranslationService`). Models: `Helsinki-NLP/opus-mt-ru-en` + `opus-mt-en-ru` (~300MB each ONNX). Auto-detect direction (Cyrillic text → ru→en, else en→ru). Cached in `game_data.description_en`. Button in `GameDetailView.vue`.
+- **AI features (Python AI service + pgvector):**
+  - **AI service** (`ai-service/`) — separate Python FastAPI container (`:8000`) with PyTorch + HuggingFace. Preloads all models at startup, auto-downloads from HuggingFace on first run. Endpoints: `GET /health`, `POST /translate`, `POST /embed`, `POST /embed/batch`. Java backend calls it via `AiClient` (OkHttp). Models stored in Docker volume `ai-models`.
+  - **Semantic search** (`EmbeddingService` + pgvector `vector(384)` + HNSW index). Embedding model: `intfloat/multilingual-e5-small` via `sentence-transformers`. Toggle in `GameFilter.vue` (gated by `semanticAvailable` flag from backend). Async batch generation via `POST /api/embeddings/generate` (ADMIN, polling `/status/{taskId}`). Embedding auto-generated on game save.
+  - **Translation ru↔en** (`TranslationService`). Models: `Helsinki-NLP/opus-mt-ru-en` + `opus-mt-en-ru` (MarianMT, ~300MB each). Auto-detect direction (Cyrillic text → ru→en, else en→ru). Cached in `game_data.description_en`. Button in `GameDetailView.vue`.
   - **Auto-tagging** (`AutoTagService` + `KeywordTagMapper`). Rules-based keyword→tag/genre matching (~125 rules). Reuses existing ~220 WorldArt genre mappings from `ScraperConfigService`. Button in `GameEditView.vue` → dialog with suggested tags/genres.
-  - **`SentencePieceTokenizer`** — pure Java BPE tokenizer (~230 lines), shared across all models. Loads HuggingFace `tokenizer.json`.
-  - **`OnnxModelManager`** — singleton, lazy-loads ONNX sessions, provides `generateEmbedding()` and `translate()`. Uses `ai.onnxruntime:onnxruntime:1.19.2`.
-  - **Models directory**: `${AI_MODELS_DIR}` or `${GAME_LIBRARY_CONFIG_DIR}/models/`. Must contain 3 subdirs: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/` — each with `model.onnx` and `tokenizer.json`. Download once via `bash scripts/download-models.sh /path/to/models`. Application starts without models — AI features gracefully disabled until models are installed.
-  - JVM opts: `-Xmx640m -Xms384m`. Models loaded off-heap (~750MB for all 3). Docker mem_limit: 1536m.
+  - **`AiClient.java`** — HTTP client to Python AI service. Uses OkHttp with 120s timeout for inference calls. Graceful degradation: returns original text / null on AI service failure.
+  - Application starts without AI service — AI features gracefully disabled until `ai-service` is available.
+  - ai-service Docker mem_limit: 1536m (PyTorch + models). Backend mem_limit: 768m (no ONNX).
   - PostgreSQL base image: `pgvector/pgvector:pg16` (includes pgvector extension).
 - State: Pinia stores for auth, library, locale.
 - Rich text: VueQuill + Quill 2 for game description editing.

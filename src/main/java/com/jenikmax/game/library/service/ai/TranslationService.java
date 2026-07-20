@@ -7,25 +7,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Service
 public class TranslationService {
 
     private static final Logger log = LoggerFactory.getLogger(TranslationService.class);
 
-    private final OnnxModelManager modelManager;
+    private final AiClient aiClient;
     private final AiConfig aiConfig;
     private final JdbcTemplate jdbc;
-    private final Map<String, SentencePieceTokenizer> tokenizers = new ConcurrentHashMap<>();
-    private volatile boolean modelAvailable = true;
 
-    public TranslationService(OnnxModelManager modelManager, AiConfig aiConfig, JdbcTemplate jdbc) {
-        this.modelManager = modelManager;
+    public TranslationService(AiClient aiClient, AiConfig aiConfig, JdbcTemplate jdbc) {
+        this.aiClient = aiClient;
         this.aiConfig = aiConfig;
         this.jdbc = jdbc;
     }
@@ -61,36 +53,18 @@ public class TranslationService {
     }
 
     public boolean isAvailable() {
-        if (!aiConfig.getTranslation().isEnabled() || !modelAvailable) return false;
-        for (var entry : aiConfig.getTranslation().getModels().entrySet()) {
-            Path modelPath = Path.of(aiConfig.getModelsDir()).resolve(entry.getValue().getModelFile());
-            if (!Files.exists(modelPath)) return false;
-        }
-        return true;
+        return aiClient.isAvailable();
     }
 
     public String translateText(String text, String direction) {
-        if (!aiConfig.getTranslation().isEnabled() || !modelAvailable) {
+        if (!isAvailable()) {
             return text;
         }
-
-        AiConfig.TranslationModel modelConfig = aiConfig.getTranslation().getModels().get(direction);
-        if (modelConfig == null) {
-            log.warn("No translation model configured for direction: {}", direction);
-            return text;
-        }
-
-        SentencePieceTokenizer tokenizer = getTokenizer(direction, modelConfig.getVocabFile());
-        if (tokenizer == null) return text;
-
-        int maxLength = aiConfig.getTranslation().getMaxLength();
 
         try {
-            return modelManager.translate(tokenizer, text,
-                    modelConfig.getModelFile(), modelConfig.getVocabFile(), maxLength);
+            return aiClient.translate(text, direction);
         } catch (Exception e) {
             log.error("Translation failed for direction: {}", direction, e);
-            modelAvailable = false;
             return text;
         }
     }
@@ -100,18 +74,5 @@ public class TranslationService {
                 .filter(c -> Character.UnicodeBlock.of(c) == Character.UnicodeBlock.CYRILLIC)
                 .count();
         return (cyrillic > text.length() * 0.3) ? "ru-en" : "en-ru";
-    }
-
-    private synchronized SentencePieceTokenizer getTokenizer(String direction, String vocabFile) {
-        return tokenizers.computeIfAbsent(direction, key -> {
-            try {
-                Path vocabPath = Path.of(aiConfig.getModelsDir()).resolve(vocabFile);
-                return new SentencePieceTokenizer(vocabPath.toString());
-            } catch (IOException e) {
-                log.warn("Translation tokenizer not found: {}/{}", aiConfig.getModelsDir(), vocabFile);
-                modelAvailable = false;
-                return null;
-            }
-        });
     }
 }

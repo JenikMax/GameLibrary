@@ -138,12 +138,6 @@
 			<version>8.7.0</version>
 		</dependency>
 
-		<!-- ONNX Runtime for AI inference -->
-		<dependency>
-			<groupId>com.microsoft.onnxruntime</groupId>
-			<artifactId>onnxruntime</artifactId>
-			<version>1.19.2</version>
-		</dependency>
 	</dependencies>
 
 	<build>

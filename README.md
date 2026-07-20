@@ -64,8 +64,8 @@
 | 📝 Detailed reviews (gameplay/graphics/story/music scores 1-10, pros/cons, delete button in corner) | |
 | 🏷️ Tags (custom labels, filter in sidebar) | |
 | 🧠 Smart collections (server-side rules evaluation, auto-matched games) | |
-| 🔍 Semantic search (vector search by description meaning, ONNX + pgvector) | |
-| 🌐 Translation ru↔en (game descriptions, ONNX AI, cached in DB) | |
+| 🔍 Semantic search (vector search by description meaning, Python AI service + pgvector) | |
+| 🌐 Translation ru↔en (game descriptions, Python AI service, cached in DB) | |
 | 🏷️ Auto-tagging (keyword-based tag & genre suggestions from description) | |
 
 <p align="center">
@@ -85,12 +85,12 @@ Opens at `http://localhost` — login as `admin` / `password`.
 
 ### AI Features (Optional)
 
-Semantic search & translation require ONNX models. Auto-tagging works without models.
+Semantic search & translation are powered by a separate Python AI service (`ai-service`). Auto-tagging works without AI.
+
+AI models are downloaded automatically on first start. No manual setup required. Just run:
 
 ```bash
-pip install optimum-cli[onnxruntime] huggingface_hub
-bash scripts/download-models.sh /mnt/nas/gameLibrary/gameLibraryConfigs/models
-docker compose restart backend
+docker compose up -d
 ```
 
 The `semantic search` toggle appears in the filter sidebar after the first scan/game edit generates embeddings.
@@ -109,7 +109,7 @@ The `semantic search` toggle appears in the filter sidebar after the first scan/
 | P2P Tracker | Built-in HTTP tracker at `/api/tracker/announce` |
 | Scraping | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
 | Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
-| AI / ML | ONNX Runtime 1.19.2 (off-heap inference), pgvector (vector similarity search), SentencePiece BPE tokenizer |
+| AI / ML | Python AI service (FastAPI + PyTorch + HuggingFace), pgvector (vector similarity search) |
 | Build | Maven (JAR) + npm / Vite |
 | Containerization | Docker, docker-compose (4 services) |
 
@@ -623,8 +623,8 @@ npm run dev
 | 📝 Подробные рецензии (оценки геймплея/графики/сюжета/музыки 1-10, плюсы/минусы, кнопка удаления в углу) | |
 | 🏷️ Теги (пользовательские метки, фильтр в боковой панели) | |
 | 🧠 Умные коллекции (правила оцениваются на сервере, авто-подбор игр) | |
-| 🔍 Семантический поиск (поиск по смыслу описания, ONNX + pgvector) | |
-| 🌐 Перевод ru↔en (описания игр через ONNX AI, кешируется в БД) | |
+| 🔍 Семантический поиск (поиск по смыслу описания, Python AI service + pgvector) | |
+| 🌐 Перевод ru↔en (описания игр через Python AI service, кешируется в БД) | |
 | 🏷️ Авто-теги (подбор тегов и жанров по ключевым словам из описания) | |
 
 <p align="center">
@@ -644,12 +644,12 @@ make all                      # сборка backend + frontend, запуск do
 
 ### AI-фичи (опционально)
 
-Семантический поиск и перевод требуют ONNX-модели. Авто-теги работают без моделей.
+Семантический поиск и перевод работают через отдельный Python AI сервис (`ai-service`). Авто-теги работают без AI.
+
+Модели скачиваются автоматически при первом запуске. Никакой ручной настройки не требуется. Просто запустите:
 
 ```bash
-pip install optimum-cli[onnxruntime] huggingface_hub
-bash scripts/download-models.sh /mnt/nas/gameLibrary/gameLibraryConfigs/models
-docker compose restart backend
+docker compose up -d
 ```
 
 Переключатель «Семантический поиск» появится в боковой панели фильтра после первой генерации embedding'ов (при сканировании или редактировании игры).
