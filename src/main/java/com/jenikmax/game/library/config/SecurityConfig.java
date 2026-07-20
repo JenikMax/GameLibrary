@@ -114,6 +114,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/scan").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/games/{id}/edit").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/games/{id}/grab").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/embeddings/generate").hasRole("ADMIN")
 
                 .requestMatchers("/api/**").hasAnyRole("ADMIN", "USER")
 

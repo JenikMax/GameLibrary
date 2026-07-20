@@ -9,6 +9,8 @@ import com.jenikmax.game.library.model.dto.api.*;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.UserService;
+import com.jenikmax.game.library.service.ai.AutoTagService;
+import com.jenikmax.game.library.service.ai.TranslationService;
 import com.jenikmax.game.library.service.scraper.ScraperConfigService;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +48,8 @@ public class LibraryController {
     private final GameRatingRepository ratingRepository;
     private final FavoriteGameRepository favoriteRepository;
     private final UserService userService;
+    private final AutoTagService autoTagService;
+    private final TranslationService translationService;
 
     public LibraryController(LibraryService libraryService,
                              ScreenshotRepository screenshotRepository,
@@ -54,6 +58,8 @@ public class LibraryController {
                              GameRatingRepository ratingRepository,
                              FavoriteGameRepository favoriteRepository,
                              UserService userService,
+                             AutoTagService autoTagService,
+                             TranslationService translationService,
                              @Value("${game-library.images.directory:/gameLibrary/images}") String imagesDirectory) {
         this.libraryService = libraryService;
         this.screenshotRepository = screenshotRepository;
@@ -62,6 +68,8 @@ public class LibraryController {
         this.ratingRepository = ratingRepository;
         this.favoriteRepository = favoriteRepository;
         this.userService = userService;
+        this.autoTagService = autoTagService;
+        this.translationService = translationService;
         this.imagesDirectory = imagesDirectory;
     }
 
@@ -86,6 +94,7 @@ public class LibraryController {
             @RequestParam(value = "sortField", required = false) String sortField,
             @RequestParam(value = "sortType", required = false) String sortType,
             @RequestParam(value = "favoritesOnly", defaultValue = "false") boolean favoritesOnly,
+            @RequestParam(value = "semantic", defaultValue = "false") boolean semantic,
             Locale locale) {
 
         if (pageSize != 12 && pageSize != 24 && pageSize != 48) {
@@ -100,7 +109,14 @@ public class LibraryController {
         sortField = sortField != null ? sortField : "";
         sortType = sortType != null ? sortType : "";
 
-        List<Long> gameIdList = libraryService.getGameIdList(searchText, selectedPlatforms, selectedYears, selectedGenres, selectedTags, sortField, sortType);
+        List<Long> gameIdList;
+        if (semantic && searchText != null && !searchText.trim().isEmpty()) {
+            List<Long> semanticIds = libraryService.semanticSearchGameIds(searchText.trim(), 200);
+            gameIdList = libraryService.filterGameIdsByCriteria(semanticIds,
+                    selectedPlatforms, selectedYears, selectedGenres, selectedTags);
+        } else {
+            gameIdList = libraryService.getGameIdList(searchText, selectedPlatforms, selectedYears, selectedGenres, selectedTags, sortField, sortType);
+        }
         if (favoritesOnly) {
             Long uid = getCurrentUserId();
             if (uid != null) {
@@ -155,6 +171,7 @@ public class LibraryController {
                         messageSource.getMessage("enum.genre." + g.name(), null, g.getName(), locale)))
                 .collect(Collectors.toList()));
         options.setTags(tags);
+        options.setSemanticAvailable(libraryService.isSemanticSearchAvailable());
 
         return ResponseEntity.ok(ApiResponse.ok(options));
     }
@@ -251,6 +268,30 @@ public class LibraryController {
         }
     }
 
+    @PostMapping("/{id}/suggest-tags")
+    public ResponseEntity<ApiResponse<AutoTagService.AutoTagResult>> suggestTags(@PathVariable Long id) {
+        GameDto gameDto = libraryService.getGameInfo(id);
+        if (gameDto == null) {
+            return ResponseEntity.notFound().build();
+        }
+        AutoTagService.AutoTagResult result = autoTagService.suggest(gameDto.getDescription());
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
+    @PostMapping("/auto-tag-preview")
+    public ResponseEntity<ApiResponse<AutoTagService.AutoTagResult>> autoTagPreview(
+            @RequestBody Map<String, String> body) {
+        String text = body.getOrDefault("text", "");
+        AutoTagService.AutoTagResult result = autoTagService.preview(text);
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
+    @PostMapping("/{id}/translate")
+    public ResponseEntity<ApiResponse<Map<String, String>>> translateDescription(@PathVariable Long id) {
+        String translated = translationService.translateAndCache(id);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("translatedText", translated)));
+    }
+
     private GameListResponse toGameListResponse(GameShortDto dto) {
         GameListResponse resp = new GameListResponse();
         resp.setId(dto.getId());
@@ -276,6 +317,7 @@ public class LibraryController {
         resp.setLogoUrl(buildLogoUrl(dto.getId()));
         resp.setTrailerUrl(dto.getTrailerUrl());
         resp.setDescription(dto.getDescription());
+        resp.setDescriptionEn(dto.getDescriptionEn());
         resp.setInstruction(dto.getInstruction());
 
         // Передаём base64 данные — нужны фронтенду для формы редактирования и grab-ответа

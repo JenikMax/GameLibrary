@@ -73,3 +73,26 @@ game-library:
     download-dir: ${TRANSMISSION_DOWNLOAD_DIR:/downloads}
   scraper:
     config-dir: ${SCRAPER_CONFIG_DIR:/gameLibrary/gameLibraryConfigs/scrapers}
+
+ai:
+  models-dir: ${AI_MODELS_DIR:${GAME_LIBRARY_CONFIG_DIR:/gameLibrary/gameLibraryConfigs}/models}
+  embedding:
+    enabled: true
+    model-file: multilingual-e5-small/model.onnx
+    vocab-file: multilingual-e5-small/tokenizer.json
+    dimension: 384
+    max-length: 512
+  translation:
+    enabled: true
+    models:
+      ru-en:
+        model-file: opus-mt-ru-en/model.onnx
+        vocab-file: opus-mt-ru-en/tokenizer.json
+      en-ru:
+        model-file: opus-mt-en-ru/model.onnx
+        vocab-file: opus-mt-en-ru/tokenizer.json
+    max-length: 512
+    beam-size: 4
+  auto-tag:
+    enabled: true
+    keyword-file: keywords.json

@@ -18,6 +18,14 @@
           </IconField>
         </div>
 
+        <div class="field" v-if="options.semanticAvailable">
+          <div class="flex align-items-center gap-2">
+            <ToggleSwitch v-model="semanticSearch" @change="applyFilters" />
+            <label>{{ t('filter.semantic') }}</label>
+          </div>
+          <small class="text-color-secondary ml-1">{{ t('filter.semantic_hint') }}</small>
+        </div>
+
         <div class="field">
           <label>{{ t('filter.platforms') }}</label>
           <div class="flex flex-wrap gap-2">
@@ -91,6 +99,7 @@ import InputIcon from 'primevue/inputicon'
 import IconField from 'primevue/iconfield'
 import Chip from 'primevue/chip'
 import MultiSelect from 'primevue/multiselect'
+import ToggleSwitch from 'primevue/toggleswitch'
 import Button from 'primevue/button'
 
 const { t } = useI18n()
@@ -114,19 +123,21 @@ const selectedPlatforms = ref([])
 const selectedYears = ref([])
 const selectedGenres = ref([])
 const selectedTags = ref([])
+const semanticSearch = ref(false)
 const resetting = ref(false)
 
 function restoreState(state) {
   resetting.value = true
-  searchText.value = state.searchText || ''
+  searchText.value = state.searchText || state.search || ''
   selectedPlatforms.value = state.selectedPlatforms || state.platforms || []
   selectedYears.value = state.selectedYears || state.years || []
   selectedGenres.value = state.selectedGenres || state.genres || []
   selectedTags.value = state.selectedTags || state.tags || []
+  semanticSearch.value = state.semanticSearch || state.semantic || false
   setTimeout(() => { resetting.value = false }, 300)
 }
 
-defineExpose({ restoreState })
+defineExpose({ restoreState, semanticSearch })
 
 const debouncedApply = debounce(() => {
   if (!resetting.value) applyFilters()
@@ -152,11 +163,12 @@ function toggleYear(y) {
 
 function applyFilters() {
   emit('apply', {
-    searchText: searchText.value,
+    search: searchText.value,
     platforms: [...selectedPlatforms.value],
     years: [...selectedYears.value],
     genres: [...selectedGenres.value],
-    tags: [...selectedTags.value]
+    tags: [...selectedTags.value],
+    semantic: semanticSearch.value
   })
 }
 
@@ -167,6 +179,7 @@ function resetFilters() {
   selectedYears.value = []
   selectedGenres.value = []
   selectedTags.value = []
+  semanticSearch.value = false
   emit('reset')
   setTimeout(() => { resetting.value = false }, 300)
 }

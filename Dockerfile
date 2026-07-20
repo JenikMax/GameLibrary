@@ -8,10 +8,11 @@ RUN mvn package -DskipTests -B
 
 # Stage 2: Runtime with JRE
 FROM eclipse-temurin:25-jre-alpine
+RUN apk add --no-cache libstdc++ libgcc
 WORKDIR /app
 COPY --from=build /build/target/game-library.jar app.jar
 
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Xmx512m -Xms256m -Xss512k -XX:+UseShenandoahGC -XX:+UnlockExperimentalVMOptions -XX:MaxMetaspaceSize=128m -XX:+ExitOnOutOfMemoryError -XX:+UseStringDeduplication"
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Xmx640m -Xms384m -Xss512k -XX:+UseShenandoahGC -XX:+UnlockExperimentalVMOptions -XX:MaxMetaspaceSize=128m -XX:+ExitOnOutOfMemoryError -XX:+UseStringDeduplication"
 
 VOLUME /gameLibrary
 VOLUME /torrentDirTmp

@@ -63,5 +63,14 @@ export const gamesApi = {
   },
   deleteReview(gameId, reviewId) {
     return api.delete(`/games/${gameId}/reviews/${reviewId}`)
+  },
+  suggestTags(id) {
+    return api.post(`/games/${id}/suggest-tags`)
+  },
+  autoTagPreview(text) {
+    return api.post('/games/auto-tag-preview', { text })
+  },
+  translateGame(id) {
+    return api.post(`/games/${id}/translate`)
   }
 }

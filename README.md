@@ -64,6 +64,9 @@
 | 📝 Detailed reviews (gameplay/graphics/story/music scores 1-10, pros/cons, delete button in corner) | |
 | 🏷️ Tags (custom labels, filter in sidebar) | |
 | 🧠 Smart collections (server-side rules evaluation, auto-matched games) | |
+| 🔍 Semantic search (vector search by description meaning, ONNX + pgvector) | |
+| 🌐 Translation ru↔en (game descriptions, ONNX AI, cached in DB) | |
+| 🏷️ Auto-tagging (keyword-based tag & genre suggestions from description) | |
 
 <p align="center">
   <img src="frontend/public/collections.jpg" alt="GameLibrary Collections" width="800">
@@ -94,6 +97,7 @@ Opens at `http://localhost` — login as `admin` / `password`.
 | P2P Tracker | Built-in HTTP tracker at `/api/tracker/announce` |
 | Scraping | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
 | Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
+| AI / ML | ONNX Runtime 1.19.2 (off-heap inference), pgvector (vector similarity search), SentencePiece BPE tokenizer |
 | Build | Maven (JAR) + npm / Vite |
 | Containerization | Docker, docker-compose (4 services) |
 
@@ -171,6 +175,12 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `GET /games/{id}/reviews` | USER, ADMIN | Get game reviews with aggregated scores |
 | `POST /games/{id}/reviews` | USER, ADMIN | Add/update review (text, pros, cons, 4 category scores 1-10) |
 | `DELETE /games/{id}/reviews/{reviewId}` | USER, ADMIN | Delete own review |
+| `POST /games/{id}/suggest-tags` | ADMIN | Auto-tag: suggest tags & genres from description |
+| `POST /games/{id}/translate` | USER, ADMIN | Translate game description ru↔en (cached) |
+| `POST /games/auto-tag-preview` | ADMIN | Auto-tag preview for arbitrary text |
+| **AI — Embeddings** | | |
+| `POST /api/embeddings/generate` | ADMIN | Async batch generation of embeddings → `202 { taskId }` |
+| `GET /api/embeddings/status/{taskId}` | ADMIN | Embedding generation task status |
 | **Collections** | | |
 | `GET /api/collections` | USER, ADMIN | List own + public collections |
 | `GET /api/collections/with-hero` | USER, ADMIN | Collections with hero/preview game data for cards |
@@ -270,6 +280,8 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Temp directory for .torrent files |
 | `TTORRENT_HASHING_THREADS` | `2` | Placeholder for torrent hashing threads (not yet read by Java code) |
 | `CORS_ALLOWED_ORIGINS` | *(empty — same-origin only)* | Allowed CORS origins (comma-separated), e.g. `http://nas.local:8090`. Required if accessing backend directly (not through Nginx reverse proxy on port 80) |
+| `AI_MODELS_DIR` | `${GAME_LIBRARY_CONFIG_DIR}/models` | Path to ONNX model files (3 subdirs: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/`) |
+| `GAME_LIBRARY_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs` | Root config dir (used for scrapers, tracker, models) |
 | `RESET_PASSWORD_DEFAULT` | *(auto-generated)* | Override default password for admin password-reset |
 
 ### Database Schema
@@ -278,7 +290,7 @@ Schema `library`:
 
 | Table | Purpose |
 |-------|---------|
-| `game_data` | Games (id, name, platform, release_date, description, instruction, trailer_url, logo, directory_path, total_size_bytes) |
+| `game_data` | Games (id, name, platform, release_date, description, description_en, instruction, trailer_url, logo, directory_path, total_size_bytes, embedding vector(384)) |
 | `game_genre` | Genre dictionary (code, description, description_ru) — ~70 genres |
 | `game_data_genre` | M:N game ↔ genre |
 | `game_screenshot` | Screenshots (bytea) |
@@ -293,7 +305,7 @@ Schema `library`:
 | `game_review` | Reviews with category scores (gameplay/graphics/story/music 1-10), pros/cons, text (unique user+game) |
 | `library_user` | Users (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `01_init.sh` (schema), `02_library.sql` (tables + genres), `03_user.sql` (users + seed), `04_search.sql` (full-text search), `05_rating.sql`, `06_favorite.sql`, `07_comment.sql`, `08_notification.sql`, `09_collection.sql`, `10_smart_collection.sql`, `11_review.sql`, `12_tags.sql`.
+DDL: `postgresdb/ddl/` — `01_init.sh` (schema), `02_library.sql` (tables + genres), `03_user.sql` (users + seed), `04_search.sql` (full-text search), `05_rating.sql`, `06_favorite.sql`, `07_comment.sql`, `08_notification.sql`, `09_collection.sql`, `10_smart_collection.sql`, `11_review.sql`, `12_tags.sql`, `13_vector.sql` (pgvector + embedding column + HNSW index + description_en).
 
 ## 🔒 Security
 
@@ -360,6 +372,27 @@ All config stored in `${SCRAPER_CONFIG_DIR}/scrapers-config.json` (defaults to `
 No API key required. The scraper works out of the box for PS1 and PS2 games. Supports both old (`<b>`-based) and new (inline-style) card markup.
 
 ## 🚀 Deployment
+
+### System Requirements
+
+#### Minimum (AI features disabled)
+| Resource | Minimum |
+|----------|---------|
+| CPU | 1 core |
+| RAM | 1 GB (Docker containers: postgres 512m + backend 768m + frontend 64m + transmission 256m) |
+| Storage | 100 MB for app + space for game library |
+| PostgreSQL | 16+ (standard `postgres:16` image) |
+
+#### With AI features
+| Resource | Minimum |
+|----------|---------|
+| CPU | 2 cores (Intel N4505 / ARM Cortex-A55 or better) |
+| RAM | 3 GB (backend needs 1536m: ~750MB off-heap for ONNX models + 640MB JVM heap) |
+| Storage | 800 MB (app + ONNX models: ~120MB embedding, ~600MB translation) + game library |
+| PostgreSQL | pgvector extension (`pgvector/pgvector:pg16` image) |
+
+> **Embedding inference**: ~200-500ms per game on 2-core CPU. **Translation**: ~1-5s per description.  
+> Both run on CPU only — no GPU required.
 
 ### Prerequisites
 
@@ -573,6 +606,9 @@ npm run dev
 | 📝 Подробные рецензии (оценки геймплея/графики/сюжета/музыки 1-10, плюсы/минусы, кнопка удаления в углу) | |
 | 🏷️ Теги (пользовательские метки, фильтр в боковой панели) | |
 | 🧠 Умные коллекции (правила оцениваются на сервере, авто-подбор игр) | |
+| 🔍 Семантический поиск (поиск по смыслу описания, ONNX + pgvector) | |
+| 🌐 Перевод ru↔en (описания игр через ONNX AI, кешируется в БД) | |
+| 🏷️ Авто-теги (подбор тегов и жанров по ключевым словам из описания) | |
 
 <p align="center">
   <img src="frontend/public/collections.jpg" alt="GameLibrary Collections" width="800">
@@ -680,6 +716,12 @@ make all                      # сборка backend + frontend, запуск do
 | `GET /games/{id}/reviews` | USER, ADMIN | Получить рецензии с агрегированными оценками |
 | `POST /games/{id}/reviews` | USER, ADMIN | Добавить/обновить рецензию (текст, плюсы, минусы, 4 категории оценок 1-10) |
 | `DELETE /games/{id}/reviews/{reviewId}` | USER, ADMIN | Удалить свою рецензию |
+| `POST /games/{id}/suggest-tags` | ADMIN | Авто-теги: предложить теги и жанры из описания |
+| `POST /games/{id}/translate` | USER, ADMIN | Перевести описание игры ru↔en (кешируется) |
+| `POST /games/auto-tag-preview` | ADMIN | Предпросмотр авто-тегов для произвольного текста |
+| **AI — Embeddings** | | |
+| `POST /api/embeddings/generate` | ADMIN | Асинхронная генерация embedding'ов → `202 { taskId }` |
+| `GET /api/embeddings/status/{taskId}` | ADMIN | Статус задачи генерации embedding'ов |
 | **Collections** | | |
 | `GET /api/collections` | USER, ADMIN | Свои + публичные коллекции |
 | `GET /api/collections/with-hero` | USER, ADMIN | Коллекции с hero/preview данными для карточек |
@@ -770,6 +812,8 @@ make all                      # сборка backend + frontend, запуск do
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная папка для .torrent файлов |
 | `TTORRENT_HASHING_THREADS` | `2` | Placeholder — пока не читается Java-кодом |
 | `CORS_ALLOWED_ORIGINS` | *(пусто — только same-origin)* | Разрешённые CORS-источники (через запятую), например `http://nas.local:8090`. Нужен при прямом доступе к API (не через Nginx reverse-proxy на порту 80) |
+| `AI_MODELS_DIR` | `${GAME_LIBRARY_CONFIG_DIR}/models` | Путь к ONNX-моделям (3 подпапки: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/`) |
+| `GAME_LIBRARY_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs` | Корень конфигов (скраперы, трекер, модели) |
 
 ### База данных
 
@@ -777,7 +821,7 @@ make all                      # сборка backend + frontend, запуск do
 
 | Таблица | Назначение |
 |---------|-----------|
-| `game_data` | Игры (id, name, platform, release_date, description, instruction, trailer_url, logo, directory_path, total_size_bytes) |
+| `game_data` | Игры (id, name, platform, release_date, description, description_en, instruction, trailer_url, logo, directory_path, total_size_bytes, embedding vector(384)) |
 | `game_genre` | Справочник жанров (code, description, description_ru) — ~70 жанров |
 | `game_data_genre` | M:N игра ↔ жанр |
 | `game_screenshot` | Скриншоты (bytea) |
@@ -792,7 +836,7 @@ make all                      # сборка backend + frontend, запуск do
 | `game_review` | Рецензии с оценками по категориям (геймплей/графика/сюжет/музыка 1-10), плюсы/минусы, текст (unique user+game) |
 | `library_user` | Пользователи (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `01_init.sh` (схема), `02_library.sql` (таблицы + жанры), `03_user.sql` (пользователи + seed), `04_search.sql` (полнотекстовый поиск), `05_rating.sql` (оценки), `06_favorite.sql` (избранное), `07_comment.sql` (комментарии), `08_notification.sql` (уведомления), `09_collection.sql` (коллекции), `10_smart_collection.sql` (умные коллекции), `11_review.sql` (рецензии), `12_tags.sql` (теги).
+DDL: `postgresdb/ddl/` — `01_init.sh` (схема), `02_library.sql` (таблицы + жанры), `03_user.sql` (пользователи + seed), `04_search.sql` (полнотекстовый поиск), `05_rating.sql` (оценки), `06_favorite.sql` (избранное), `07_comment.sql` (комментарии), `08_notification.sql` (уведомления), `09_collection.sql` (коллекции), `10_smart_collection.sql` (умные коллекции), `11_review.sql` (рецензии), `12_tags.sql` (теги), `13_vector.sql` (pgvector + embedding + HNSW-индекс + description_en).
 
 ## 🔒 Безопасность
 
@@ -860,7 +904,28 @@ cp .env.example .env   # отредактировать перед первым 
 
 ## 🚀 Развёртывание
 
-### Требования
+### Системные требования
+
+#### Минимальные (без AI-фич)
+| Ресурс | Минимум |
+|--------|---------|
+| CPU | 1 ядро |
+| RAM | 1 ГБ (Docker-контейнеры: postgres 512m + backend 768m + frontend 64m + transmission 256m) |
+| Диск | 100 МБ приложение + место под библиотеку игр |
+| PostgreSQL | 16+ (стандартный образ `postgres:16`) |
+
+#### С AI-фичами (рекомендуется)
+| Ресурс | Минимум |
+|--------|---------|
+| CPU | 2 ядра (Intel N4505 / ARM Cortex-A55 или лучше) |
+| RAM | 3 ГБ (backend нужно 1536m: ~750MB off-heap под ONNX-модели + 640MB JVM heap) |
+| Диск | 800 МБ (приложение + ONNX-модели: ~120MB embedding, ~600MB перевод) + библиотека игр |
+| PostgreSQL | расширение pgvector (образ `pgvector/pgvector:pg16`) |
+
+> **Embedding-инференс**: ~200-500ms на игру на 2-ядерном CPU. **Перевод**: ~1-5s на описание.  
+> Всё работает на CPU — GPU не требуется.
+
+### Требования (софт)
 
 | Компонент | Версия |
 |-----------|--------|

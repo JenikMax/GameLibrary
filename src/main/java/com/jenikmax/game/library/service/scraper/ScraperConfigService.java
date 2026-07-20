@@ -157,6 +157,10 @@ public class ScraperConfigService {
         return stored;
     }
 
+    public Map<String, List<String>> getWorldArtGenreMappings() {
+        return new LinkedHashMap<>(buildWorldArtGenreMappings());
+    }
+
     private void startWatchService() {
         watchThread = new Thread(() -> {
             try {

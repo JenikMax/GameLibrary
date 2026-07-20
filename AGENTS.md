@@ -15,8 +15,27 @@ No Maven wrapper — `mvn` must be on PATH. Java 25 target, `eclipse-temurin:25-
 ## Docker
 
 `docker-compose.yml` starts four services: `frontend` (Nginx + Vue SPA, `:80`), `backend` (Spring Boot REST, `:8080`), `transmission` (torrent seeder, `:9091` RPC, `:51413`), `postgresdb` (`:5432`).  
-Memory limits: postgresdb 512m, backend 768m, frontend 64m, transmission 256m. postgresdb has healthcheck.
+Memory limits: postgresdb 512m, backend 1536m, frontend 64m, transmission 256m. postgresdb has healthcheck.
 DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/docker-entrypoint-initdb.d/`.
+
+## System Requirements
+
+### Minimum (with AI features disabled)
+| Resource | Minimum |
+|----------|---------|
+| CPU | 1 core |
+| RAM | 1 GB (for containers: postgresdb 512m, backend 768m, frontend 64m, transmission 256m) |
+| Storage | 100 MB for app + space for game library |
+
+### With AI features (recommended)
+| Resource | Minimum |
+|----------|---------|
+| CPU | 2 cores (Intel N4505 / ARM Cortex-A55 or better) |
+| RAM | 3 GB (backend container needs 1536m for ONNX models: ~750MB off-heap + 640MB JVM heap) |
+| Storage | 800 MB for app + ONNX models (~720MB: 120MB embedding, 600MB translation) + space for game library |
+| PostgreSQL | pgvector extension (use `pgvector/pgvector:pg16` Docker image) |
+
+Embedding inference: ~200-500ms/game on 2-core CPU. Translation: ~1-5s/description.
 
 ## Architecture
 
@@ -30,6 +49,15 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 - Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission 4.1.2 RPC for seeding.
 - Images: DB bytea with optional filesystem override at `images.directory/games/{id}/logo.jpg` (or `screenshots/`, `avatars/`).
 - Scrapers (7 active): Playground (CSS selectors + search API), Igromania (JSON paths), WorldArt (CSS selectors), Steam (Storefront API, no key required), IGDB (Twitch OAuth), TheGamesDB (API key), PsxDataCenter (JSoup, PS1/PS2, no key).
+- **AI features (ONNX Runtime + pgvector):**
+  - **Semantic search** (`EmbeddingService` + pgvector `vector(384)` + HNSW index). Embedding model: `intfloat/multilingual-e5-small` (~120MB ONNX). Toggle in `GameFilter.vue` (gated by `semanticAvailable` flag from backend). Async batch generation via `POST /api/embeddings/generate` (ADMIN, polling `/status/{taskId}`). Embedding auto-generated on game save.
+  - **Translation ru↔en** (`TranslationService`). Models: `Helsinki-NLP/opus-mt-ru-en` + `opus-mt-en-ru` (~300MB each ONNX). Auto-detect direction (Cyrillic text → ru→en, else en→ru). Cached in `game_data.description_en`. Button in `GameDetailView.vue`.
+  - **Auto-tagging** (`AutoTagService` + `KeywordTagMapper`). Rules-based keyword→tag/genre matching (~125 rules). Reuses existing ~220 WorldArt genre mappings from `ScraperConfigService`. Button in `GameEditView.vue` → dialog with suggested tags/genres.
+  - **`SentencePieceTokenizer`** — pure Java BPE tokenizer (~230 lines), shared across all models. Loads HuggingFace `tokenizer.json`.
+  - **`OnnxModelManager`** — singleton, lazy-loads ONNX sessions, provides `generateEmbedding()` and `translate()`. Uses `ai.onnxruntime:onnxruntime:1.19.2`.
+  - **Models directory**: `${AI_MODELS_DIR}` or `${GAME_LIBRARY_CONFIG_DIR}/models/`. Must contain 3 subdirs: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/` — each with `model.onnx` and `tokenizer.json`.
+  - JVM opts: `-Xmx640m -Xms384m`. Models loaded off-heap (~750MB for all 3). Docker mem_limit: 1536m.
+  - PostgreSQL base image: `pgvector/pgvector:pg16` (includes pgvector extension).
 - State: Pinia stores for auth, library, locale.
 - Rich text: VueQuill + Quill 2 for game description editing.
 - **Phase 3 features**: rating 1-10 (`GameRating.java` + `RatingController`), favorites (`FavoriteController` + heart toggle, filter via `?favorites=1` URL param + store), comments (`CommentController` with ownership check), notifications (`NotificationService` + bell icon with 15s polling + click-outside close), view history (composable `useViewHistory.js`, localStorage, max 20 items, error handling for quota exceeded), related games (`RelatedGamesController`, 2 SQL queries: same genre, similar name with first-word fallback), statistics (`StatisticsController` + `StatisticsView.vue`, Chart.js dashboard with platform/genre/year charts + top lists), collections (`CollectionController` + `CollectionService` + `CollectionsView.vue`, user-created game playlists, public/private, reorder), tags (`GameTag.java` + `GameTagRepository`, managed via `LibraryController` filter-options and `GameEditView`, filter in `GameFilter`), reviews (`GameReview.java` + `ReviewController`, 4 category scores 1-10 (gameplay/graphics/story/music) + pros/cons + text, ownership check for delete), smart collections (`GameCollection.isSmart` + `smartRules` fields, rules **evaluated server-side** via `CollectionService.buildSmartRulesConditions()` — supports `platforms`, `genres`, `yearFrom`, `yearTo`, `minRating`, `tags`, `nameContains`; frontend uses structured `SmartRulesForm.vue` with MultiSelect/InputNumber/InputText).

@@ -1,4 +1,4 @@
-FROM postgres:16.14
+FROM pgvector/pgvector:pg16
 
 COPY ./postgresdb/ddl/01_init.sh /docker-entrypoint-initdb.d/
 COPY ./postgresdb/ddl/02_library.sql /docker-entrypoint-initdb.d/

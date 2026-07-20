@@ -13,6 +13,7 @@ import com.jenikmax.game.library.model.entity.GameGenre;
 import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.data.api.GameService;
+import com.jenikmax.game.library.service.ai.EmbeddingService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
@@ -39,17 +40,19 @@ public class GameDataService implements GameService {
     private final GameTagRepository gameTagRepository;
     private final ScreenshotRepository screenshotRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final EmbeddingService embeddingService;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, GameTagRepository gameTagRepository, ScreenshotRepository screenshotRepository, JdbcTemplate jdbcTemplate) {
+    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, GameTagRepository gameTagRepository, ScreenshotRepository screenshotRepository, JdbcTemplate jdbcTemplate, EmbeddingService embeddingService) {
         this.sqlDao = sqlDao;
         this.gameRepository = gameRepository;
         this.gameGenreRepository = gameGenreRepository;
         this.gameTagRepository = gameTagRepository;
         this.screenshotRepository = screenshotRepository;
         this.jdbcTemplate = jdbcTemplate;
+        this.embeddingService = embeddingService;
     }
 
 
@@ -136,6 +139,61 @@ public class GameDataService implements GameService {
                 "from game_data g " +
                 "where g.id in (" + placeholders + ")";
         return sqlDao.executeShortGame(sql, ids.toArray());
+    }
+
+    public List<Long> semanticSearchGameIds(String query, int limit) {
+        return embeddingService.semanticSearch(query, limit);
+    }
+
+    public List<Long> filterGameIdsByCriteria(List<Long> candidateIds,
+            List<String> selectedPlatforms, List<String> selectedYears,
+            List<String> selectedGenres, List<String> selectedTags) {
+        if (candidateIds == null || candidateIds.isEmpty()) return List.of();
+
+        List<Object> params = new ArrayList<>();
+        StringBuilder where = new StringBuilder();
+
+        String placeholders = String.join(",", Collections.nCopies(candidateIds.size(), "?"));
+        where.append(" where g.id in (").append(placeholders).append(")");
+        params.addAll(candidateIds);
+
+        if (selectedPlatforms != null && !selectedPlatforms.isEmpty()) {
+            String platformSql = String.join(",", Collections.nCopies(selectedPlatforms.size(), "?"));
+            where.append(" and g.platform in (").append(platformSql).append(")");
+            params.addAll(selectedPlatforms);
+        }
+        if (selectedYears != null && !selectedYears.isEmpty()) {
+            String yearsSql = String.join(",", Collections.nCopies(selectedYears.size(), "?"));
+            where.append(" and g.release_date in (").append(yearsSql).append(")");
+            params.addAll(selectedYears);
+        }
+        if (selectedGenres != null && !selectedGenres.isEmpty()) {
+            String genresSql = String.join(",", Collections.nCopies(selectedGenres.size(), "?"));
+            where.append(" and g.id in (select game_id from library.game_data_genre where genre_code in (")
+                    .append(genresSql).append(") group by game_id having count(distinct genre_code) = ")
+                    .append(selectedGenres.size()).append(")");
+            params.addAll(selectedGenres);
+        }
+        if (selectedTags != null && !selectedTags.isEmpty()) {
+            String tagsSql = String.join(",", Collections.nCopies(selectedTags.size(), "?"));
+            where.append(" and g.id in (select game_id from library.game_data_tag where tag_code in (")
+                    .append(tagsSql).append(") group by game_id having count(distinct tag_code) = ")
+                    .append(selectedTags.size()).append(")");
+            params.addAll(selectedTags);
+        }
+
+        String sql = "select g.id from game_data g " + where.toString();
+        return sqlDao.executeShortGameId(sql, params.toArray());
+    }
+
+    @Override
+    public boolean hasEmbeddings() {
+        return embeddingService.hasEmbeddings();
+    }
+
+    @Override
+    public int getMissingEmbeddingCount() {
+        return embeddingService.getMissingEmbeddingCount();
     }
 
     @Override

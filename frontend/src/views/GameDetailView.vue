@@ -92,8 +92,20 @@
           <small class="text-muted" v-else>{{ t('game.download_preparing') }}</small>
         </div>
         <Divider />
-        <h3>{{ t('game.description') }}</h3>
-        <p v-html="game.description" class="description-text"></p>
+        <div class="flex align-items-center gap-2 mb-2">
+          <h3 class="m-0">{{ showingTranslation ? t('game.translation') : t('game.description') }}</h3>
+          <Button
+            v-if="game.descriptionEn || !translating"
+            :label="showingTranslation ? t('game.show_original') : t('game.translate')"
+            :icon="showingTranslation ? 'pi pi-undo' : 'pi pi-language'"
+            size="small"
+            severity="secondary"
+            text
+            :loading="translating"
+            @click="toggleTranslation"
+          />
+        </div>
+        <p v-html="showingTranslation ? game.descriptionEn : game.description" class="description-text"></p>
         <div v-if="trailerEmbedUrl" class="video-wrapper">
           <iframe :src="trailerEmbedUrl" frameborder="0" allowfullscreen></iframe>
         </div>
@@ -380,6 +392,8 @@ const reviewsLoading = ref(false)
 const reviewsAggregated = ref(null)
 const showReviewForm = ref(false)
 const userReview = ref(null)
+const showingTranslation = ref(false)
+const translating = ref(false)
 
 async function toggleFav() {
   try {
@@ -387,6 +401,27 @@ async function toggleFav() {
     game.value.favorited = res.data.data.favorited
   } catch {
     toast.add({ severity: 'error', summary: t('filter.favorites_off'), life: 3000 })
+  }
+}
+
+async function toggleTranslation() {
+  if (showingTranslation.value) {
+    showingTranslation.value = false
+    return
+  }
+  if (game.value.descriptionEn) {
+    showingTranslation.value = true
+    return
+  }
+  translating.value = true
+  try {
+    const res = await gamesApi.translateGame(game.value.id)
+    game.value.descriptionEn = res.data.data.translatedText
+    showingTranslation.value = true
+  } catch {
+    toast.add({ severity: 'error', summary: t('game.translate_failed'), life: 3000 })
+  } finally {
+    translating.value = false
   }
 }
 

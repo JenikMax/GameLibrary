@@ -154,6 +154,21 @@ public class LibraryOperationService implements LibraryService {
     }
 
     @Override
+    public List<Long> semanticSearchGameIds(String query, int limit) {
+        return gameService.semanticSearchGameIds(query, limit);
+    }
+
+    @Override
+    public List<Long> filterGameIdsByCriteria(List<Long> candidateIds, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags) {
+        return gameService.filterGameIdsByCriteria(candidateIds, selectedPlatforms, selectedYears, selectedGenres, selectedTags);
+    }
+
+    @Override
+    public boolean isSemanticSearchAvailable() {
+        return gameService.hasEmbeddings();
+    }
+
+    @Override
     public List<String> getTags() {
         return gameService.getTags();
     }

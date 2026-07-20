@@ -168,6 +168,7 @@ function saveStateToSession() {
     sortField: store.sortField,
     sortType: store.sortType,
     favoritesOnly: store.favoritesOnly,
+    semanticSearch: store.semanticSearch,
     pageSize: store.pageSize,
     viewMode: store.viewMode
   }))
@@ -245,6 +246,7 @@ onMounted(async () => {
     store.sortField = state.sortField || ''
     store.sortType = state.sortType || ''
     store.favoritesOnly = state.favoritesOnly || false
+    store.semanticSearch = state.semanticSearch || false
     store.pageSize = state.pageSize || 12
     store.viewMode = state.viewMode || 'grid'
     filterRef.value?.restoreState({
@@ -252,7 +254,8 @@ onMounted(async () => {
       selectedPlatforms: state.platforms || [],
       selectedYears: state.years || [],
       selectedGenres: state.genres || [],
-      selectedTags: state.tags || []
+      selectedTags: state.tags || [],
+      semantic: state.semanticSearch || false
     })
     sessionStorage.removeItem(LIBRARY_STATE_KEY)
     await store.fetchGames(state.currentPage || 1)
@@ -283,13 +286,14 @@ function onPageSizeChange() {
 }
 
 function handleApplyFilters(filters) {
-  store.setSearch(filters.searchText)
+  store.setSearch(filters.search)
   store.setFilters({
     platforms: filters.platforms,
     years: filters.years,
     genres: filters.genres,
     tags: filters.tags
   })
+  store.semanticSearch = filters.semantic || false
   store.fetchGames(1)
 }
 

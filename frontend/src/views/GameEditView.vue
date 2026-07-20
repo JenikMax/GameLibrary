@@ -55,7 +55,18 @@
                 />
               </div>
               <div class="field col-12">
-                <label for="tags">{{ t('filter.tags') }}</label>
+                <div class="flex align-items-center justify-content-between mb-1">
+                  <label>{{ t('filter.tags') }}</label>
+                  <Button
+                    :label="t('game.auto_tag')"
+                    icon="pi pi-sparkles"
+                    size="small"
+                    severity="help"
+                    text
+                    :loading="autoTagLoading"
+                    @click="suggestTags"
+                  />
+                </div>
                 <TagInput
                   v-model="form.tags"
                   :allTags="allTags"
@@ -160,6 +171,36 @@
       <Button :label="t('common.cancel')" severity="secondary" @click="$router.push(`/game/${game.id}`)" />
       <Button :label="t('common.save')" icon="pi pi-check" @click="handleSave" :loading="saving" />
     </div>
+
+    <Dialog v-model:visible="autoTagDialog" :header="t('game.auto_tag_suggestions')" modal
+      :style="{ width: '450px' }">
+      <div v-if="suggestedTags.length" class="mb-3">
+        <h4 class="m-0 mb-2">{{ t('filter.tags') }}</h4>
+        <div v-for="tag in suggestedTags" :key="tag" class="flex align-items-center gap-2 mb-1">
+          <Checkbox v-model="selectedSuggestedTags" :value="tag" :inputId="'stag-' + tag" />
+          <label :for="'stag-' + tag">
+            <Tag :value="tag" severity="info" rounded />
+          </label>
+        </div>
+      </div>
+      <div v-if="suggestedGenres.length">
+        <h4 class="m-0 mb-2">{{ t('filter.genres') }}</h4>
+        <div v-for="genre in suggestedGenres" :key="genre" class="flex align-items-center gap-2 mb-1">
+          <Checkbox v-model="selectedSuggestedGenres" :value="genre" :inputId="'sgen-' + genre" />
+          <label :for="'sgen-' + genre">
+            <Tag :value="genreName(genre)" severity="secondary" />
+          </label>
+        </div>
+      </div>
+      <div v-if="!suggestedTags.length && !suggestedGenres.length" class="text-color-secondary text-sm">
+        {{ t('game.auto_tag_no_suggestions') }}
+      </div>
+      <template #footer>
+        <Button :label="t('game.auto_tag_apply')" icon="pi pi-check" @click="applySuggestedTags"
+          :disabled="!suggestedTags.length && !suggestedGenres.length" />
+        <Button :label="t('game.auto_tag_cancel')" severity="secondary" text @click="autoTagDialog = false" />
+      </template>
+    </Dialog>
   </div>
 </template>
 
@@ -178,6 +219,8 @@ import MultiSelect from 'primevue/multiselect'
 import Select from 'primevue/select'
 import Checkbox from 'primevue/checkbox'
 import Message from 'primevue/message'
+import Dialog from 'primevue/dialog'
+import Tag from 'primevue/tag'
 import TagInput from '../components/TagInput.vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import 'quill/dist/quill.snow.css'
@@ -218,6 +261,45 @@ const newScreenshotPreviews = ref([])
 const logoPreview = ref('')
 const allGenres = ref([])
 const allTags = ref([])
+
+const autoTagLoading = ref(false)
+const autoTagDialog = ref(false)
+const suggestedTags = ref([])
+const suggestedGenres = ref([])
+const selectedSuggestedTags = ref([])
+const selectedSuggestedGenres = ref([])
+
+function genreName(code) {
+  return libraryStore.genreMap[code] || code
+}
+
+async function suggestTags() {
+  autoTagLoading.value = true
+  try {
+    const res = await gamesApi.suggestTags(route.params.id)
+    const data = res.data.data
+    suggestedTags.value = (data.suggestedTags || []).filter(t => !form.value.tags.includes(t))
+    suggestedGenres.value = (data.suggestedGenres || []).filter(g => !form.value.genres.includes(g))
+
+    if (suggestedTags.value.length || suggestedGenres.value.length) {
+      selectedSuggestedTags.value = [...suggestedTags.value]
+      selectedSuggestedGenres.value = [...suggestedGenres.value]
+      autoTagDialog.value = true
+    } else {
+      autoTagDialog.value = false
+    }
+  } catch {
+    error.value = t('game.auto_tag_failed')
+  } finally {
+    autoTagLoading.value = false
+  }
+}
+
+function applySuggestedTags() {
+  form.value.tags = [...new Set([...form.value.tags, ...selectedSuggestedTags.value])]
+  form.value.genres = [...new Set([...form.value.genres, ...selectedSuggestedGenres.value])]
+  autoTagDialog.value = false
+}
 const scrapeSources = ref([])
 const scrapeFields = [
   { key: 'title', labelKey: 'game.scraper.field.title' },

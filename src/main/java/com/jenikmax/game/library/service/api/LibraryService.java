@@ -33,6 +33,12 @@ public interface LibraryService {
 
     List<Long> getGameIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags, String sortField, String sortType);
 
+    List<Long> semanticSearchGameIds(String query, int limit);
+
+    List<Long> filterGameIdsByCriteria(List<Long> candidateIds, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags);
+
+    boolean isSemanticSearchAvailable();
+
     List<String> getTags();
 
     GameDto getGameInfo(Long gameId);

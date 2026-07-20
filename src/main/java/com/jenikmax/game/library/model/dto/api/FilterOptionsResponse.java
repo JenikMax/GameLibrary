@@ -8,6 +8,7 @@ public class FilterOptionsResponse {
     private List<String> platforms;
     private List<GenreItem> genres;
     private List<String> tags;
+    private boolean semanticAvailable;
 
     public List<String> getYears() { return years; }
     public void setYears(List<String> years) { this.years = years; }
@@ -17,6 +18,8 @@ public class FilterOptionsResponse {
     public void setGenres(List<GenreItem> genres) { this.genres = genres; }
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
+    public boolean isSemanticAvailable() { return semanticAvailable; }
+    public void setSemanticAvailable(boolean semanticAvailable) { this.semanticAvailable = semanticAvailable; }
 
     public static class GenreItem {
         private String code;

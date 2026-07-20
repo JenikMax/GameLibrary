@@ -28,6 +28,14 @@ public interface GameService {
 
     List<String> getTags();
 
+    List<Long> semanticSearchGameIds(String query, int limit);
+
+    List<Long> filterGameIdsByCriteria(List<Long> candidateIds, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags);
+
+    boolean hasEmbeddings();
+
+    int getMissingEmbeddingCount();
+
     void ensureTagsExist(List<String> tagCodes);
 
     List<Game> getGameList();
