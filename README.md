@@ -89,7 +89,7 @@ Semantic search & translation require ONNX models. Auto-tagging works without mo
 
 ```bash
 pip install optimum-cli[onnxruntime] huggingface_hub
-bash scripts/download-models.sh /path/to/gameLibraryConfigs/models
+bash scripts/download-models.sh /mnt/nas/gameLibrary/gameLibraryConfigs/models
 docker compose restart backend
 ```
 
@@ -292,8 +292,8 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Temp directory for .torrent files |
 | `TTORRENT_HASHING_THREADS` | `2` | Placeholder for torrent hashing threads (not yet read by Java code) |
 | `CORS_ALLOWED_ORIGINS` | *(empty — same-origin only)* | Allowed CORS origins (comma-separated), e.g. `http://nas.local:8090`. Required if accessing backend directly (not through Nginx reverse proxy on port 80) |
-| `AI_MODELS_DIR` | `${GAME_LIBRARY_CONFIG_DIR}/models` | Path to ONNX model files (3 subdirs: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/`) |
-| `GAME_LIBRARY_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs` | Root config dir (used for scrapers, tracker, models) |
+| `AI_MODELS_DIR` | `/models` | ONNX model files (3 subdirs: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/`). Set in `.env` to override. |
+| `GAME_LIBRARY_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs` | Root config dir (used for scrapers, tracker) |
 | `RESET_PASSWORD_DEFAULT` | *(auto-generated)* | Override default password for admin password-reset |
 
 ### Database Schema
@@ -460,9 +460,10 @@ mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers
 > | Host path | Container path | Service | Purpose |
 > |-----------|---------------|---------|---------|
 > | `.../db/data` | `/var/lib/postgresql/data` | postgresdb | PostgreSQL database files |
-> | `...` (games root) | `/gameLibrary` | backend | Game files + images + models (games/, images/, gameLibraryConfigs/models/) |
+> | `...` (games root) | `/gameLibrary` | backend | Game files + images (games/, images/) |
 > | `.../tracker/torrents` | `/torrentDirTmp` | backend | Temporary .torrent files |
 > | `.../scrapers` | `/scraper-config` | backend | Scraper config (scrapers-config.json) |
+> | `.../models` | `/models` | backend | ONNX models for AI features (semantic search, translation) |
 > | `.../games` | `/downloads/games` | transmission | Game files for seeding |
 > | `.../tracker/config` | `/config` | transmission | Transmission settings.json |
 > | `.../tracker/watch` | `/watch` | transmission | Auto-add .torrent directory |
@@ -647,7 +648,7 @@ make all                      # сборка backend + frontend, запуск do
 
 ```bash
 pip install optimum-cli[onnxruntime] huggingface_hub
-bash scripts/download-models.sh /path/to/gameLibraryConfigs/models
+bash scripts/download-models.sh /mnt/nas/gameLibrary/gameLibraryConfigs/models
 docker compose restart backend
 ```
 
@@ -840,8 +841,8 @@ docker compose restart backend
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная папка для .torrent файлов |
 | `TTORRENT_HASHING_THREADS` | `2` | Placeholder — пока не читается Java-кодом |
 | `CORS_ALLOWED_ORIGINS` | *(пусто — только same-origin)* | Разрешённые CORS-источники (через запятую), например `http://nas.local:8090`. Нужен при прямом доступе к API (не через Nginx reverse-proxy на порту 80) |
-| `AI_MODELS_DIR` | `${GAME_LIBRARY_CONFIG_DIR}/models` | Путь к ONNX-моделям (3 подпапки: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/`) |
-| `GAME_LIBRARY_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs` | Корень конфигов (скраперы, трекер, модели) |
+| `AI_MODELS_DIR` | `/models` | Путь к ONNX-моделям (3 подпапки: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/`). Переопределяется в `.env`. |
+| `GAME_LIBRARY_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs` | Корень конфигов (скраперы, трекер) |
 
 ### База данных
 
@@ -1007,9 +1008,10 @@ mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers
 > | Путь на хосте | Путь в контейнере | Сервис | Назначение |
 > |--------------|-------------------|--------|------------|
 > | `.../db/data` | `/var/lib/postgresql/data` | postgresdb | Файлы базы данных PostgreSQL |
-> | `...` (корень) | `/gameLibrary` | backend | Файлы игр + изображения + модели (games/, images/, gameLibraryConfigs/models/) |
+> | `...` (корень) | `/gameLibrary` | backend | Файлы игр + изображения (games/, images/) |
 > | `.../tracker/torrents` | `/torrentDirTmp` | backend | Временные .torrent-файлы |
 > | `.../scrapers` | `/scraper-config` | backend | Конфиги скраперов (scrapers-config.json) |
+> | `.../models` | `/models` | backend | ONNX-модели для AI-фич (семантический поиск, перевод) |
 > | `.../games` | `/downloads/games` | transmission | Файлы игр для раздачи |
 > | `.../tracker/config` | `/config` | transmission | Настройки Transmission settings.json |
 > | `.../tracker/watch` | `/watch` | transmission | Авто-добавление .torrent |
