@@ -72,5 +72,8 @@ export const gamesApi = {
   },
   translateGame(id) {
     return api.post(`/games/${id}/translate`)
+  },
+  translateText(text) {
+    return api.post('/games/translate-text', { text })
   }
 }

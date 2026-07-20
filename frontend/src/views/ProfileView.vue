@@ -57,6 +57,17 @@
                 <ProgressBar :value="scanProgress" class="mb-1" />
                 <small class="text-muted" v-if="scanCurrentGame">{{ scanCurrentGame }}</small>
               </div>
+              <Divider />
+              <Button :label="t('admin.embeddings_generate')" icon="pi pi-bolt" severity="info" @click="generateEmbeddings(false)" :loading="embeddingGenerating" :disabled="!!embeddingTaskId" />
+              <Button :label="t('admin.embeddings_regenerate')" icon="pi pi-refresh" severity="danger" @click="generateEmbeddings(true)" :loading="embeddingGenerating" :disabled="!!embeddingTaskId" />
+              <div v-if="embeddingTaskId" class="scan-progress mt-2">
+                <div class="flex align-items-center justify-content-between mb-1">
+                  <small>{{ t('admin.embeddings_progress') }}</small>
+                  <small>{{ embeddingProgress }}%</small>
+                </div>
+                <ProgressBar :value="embeddingProgress" class="mb-1" />
+                <small class="text-muted" v-if="embeddingCurrentGame">{{ embeddingCurrentGame }}</small>
+              </div>
             </div>
           </AccordionTab>
         </Accordion>
@@ -81,6 +92,7 @@ import Password from 'primevue/password'
 import ProgressBar from 'primevue/progressbar'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
+import Divider from 'primevue/divider'
 import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
@@ -102,6 +114,12 @@ const scanProgress = ref(0)
 const scanCurrentGame = ref('')
 const scanPhase = ref('')
 let scanPollTimer = null
+
+const embeddingTaskId = ref(null)
+const embeddingProgress = ref(0)
+const embeddingCurrentGame = ref('')
+const embeddingGenerating = ref(false)
+let embeddingPollTimer = null
 
 const scanPhaseLabel = computed(() => {
   const phaseMap = {
@@ -212,10 +230,59 @@ function pollScanStatus() {
   }, 500)
 }
 
+async function generateEmbeddings(force) {
+  embeddingGenerating.value = true
+  try {
+    const res = await adminApi.generateEmbeddings(force)
+    const { taskId } = res.data.data
+    embeddingTaskId.value = taskId
+    embeddingProgress.value = 0
+    embeddingCurrentGame.value = ''
+    pollEmbeddingStatus()
+  } catch {
+    embeddingGenerating.value = false
+    toast.add({ severity: 'error', summary: t('admin.embeddings_failed'), life: 3000 })
+  }
+}
+
+function pollEmbeddingStatus() {
+  if (!embeddingTaskId.value) return
+  embeddingPollTimer = setInterval(async () => {
+    try {
+      const res = await adminApi.getEmbeddingStatus(embeddingTaskId.value)
+      const task = res.data.data
+      embeddingProgress.value = task.progress || 0
+      embeddingCurrentGame.value = task.currentGame || ''
+      if (task.status === 'COMPLETED') {
+        clearInterval(embeddingPollTimer)
+        embeddingPollTimer = null
+        embeddingTaskId.value = null
+        embeddingGenerating.value = false
+        toast.add({ severity: 'success', summary: t('admin.embeddings_complete'), life: 3000 })
+      } else if (task.status === 'FAILED') {
+        clearInterval(embeddingPollTimer)
+        embeddingPollTimer = null
+        embeddingTaskId.value = null
+        embeddingGenerating.value = false
+        toast.add({ severity: 'error', summary: t('admin.embeddings_failed'), detail: task.errorMessage || '', life: 5000 })
+      }
+    } catch {
+      clearInterval(embeddingPollTimer)
+      embeddingPollTimer = null
+      embeddingTaskId.value = null
+      embeddingGenerating.value = false
+    }
+  }, 500)
+}
+
 onBeforeUnmount(() => {
   if (scanPollTimer) {
     clearInterval(scanPollTimer)
     scanPollTimer = null
+  }
+  if (embeddingPollTimer) {
+    clearInterval(embeddingPollTimer)
+    embeddingPollTimer = null
   }
 })
 </script>

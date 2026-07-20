@@ -21,8 +21,9 @@ public class EmbeddingController {
 
     @PostMapping("/generate")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Map<String, String>>> generateEmbeddings() {
-        String taskId = taskService.submitGenerateEmbeddings();
+    public ResponseEntity<ApiResponse<Map<String, String>>> generateEmbeddings(
+            @RequestParam(defaultValue = "false") boolean force) {
+        String taskId = taskService.submitGenerateEmbeddings(force);
         return ResponseEntity.accepted().body(ApiResponse.ok(Map.of(
                 "taskId", taskId,
                 "statusUrl", "/api/embeddings/status/" + taskId

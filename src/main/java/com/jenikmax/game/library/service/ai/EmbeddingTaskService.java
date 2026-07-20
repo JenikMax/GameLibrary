@@ -40,7 +40,7 @@ public class EmbeddingTaskService implements DisposableBean {
         this.jdbc = jdbc;
     }
 
-    public String submitGenerateEmbeddings() {
+    public String submitGenerateEmbeddings(boolean force) {
         pruneOldTasks();
 
         String taskId = UUID.randomUUID().toString();
@@ -50,6 +50,10 @@ public class EmbeddingTaskService implements DisposableBean {
         executor.submit(() -> {
             try {
                 task.setStatus(EmbeddingTask.Status.GENERATING);
+
+                if (force) {
+                    jdbc.update("UPDATE library.game_data SET embedding = NULL WHERE embedding IS NOT NULL");
+                }
 
                 List<Long> gameIds = jdbc.queryForList(
                         "SELECT id FROM library.game_data " +

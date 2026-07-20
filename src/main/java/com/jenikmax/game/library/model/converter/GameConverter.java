@@ -80,7 +80,7 @@ public class GameConverter {
         dto.setTrailerUrl(entity.getTrailerUrl());
         dto.setPlatform(entity.getPlatform());
         dto.setDescription(entity.getDescription());
-        dto.setDescriptionEn(entity.getDescriptionEn());
+        dto.setDescriptionTranslated(entity.getDescriptionTranslated());
         dto.setInstruction(entity.getInstruction());
         dto.setLogo(BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(entity.getLogo()));
         dto.setScreenshots(new ArrayList<>());
@@ -110,7 +110,7 @@ public class GameConverter {
         entity.setTrailerUrl(dto.getTrailerUrl());
         entity.setPlatform(dto.getPlatform());
         entity.setDescription(dto.getDescription());
-        entity.setDescriptionEn(dto.getDescriptionEn());
+        entity.setDescriptionTranslated(dto.getDescriptionTranslated());
         entity.setInstruction(dto.getInstruction());
         entity.setLogo(Base64.getDecoder().decode(dto.getLogo().replaceAll(BASE_64_JPG_PREFIX,"").replaceAll(BASE_64_JPEG_PREFIX,"").replaceAll(BASE_64_PNG_PREFIX,"")));
         //entity.setLogo(Base64.getDecoder().decode(dto.getLogo().replaceFirst(BASE_64_JPEG_PREFIX + "|"+ BASE_64_JPG_PREFIX + "|" + BASE_64_PNG_PREFIX, "")));

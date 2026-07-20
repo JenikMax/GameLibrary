@@ -180,7 +180,7 @@ public class LibraryOperationService implements LibraryService {
     @Override
     public GameDto getGameInfo(Long gameId) {
         GameDto dto = GameConverter.gameToDtoConverter(gameService.getGameById(gameId));
-        dto.setDescriptionEn(gameService.getDescriptionEn(gameId));
+        dto.setDescriptionTranslated(gameService.getDescriptionTranslated(gameId));
         return dto;
     }
 
@@ -189,6 +189,7 @@ public class LibraryOperationService implements LibraryService {
         gameService.ensureTagsExist(gameDto.getTags());
         Game game = GameConverter.dtoToGameEntityConverter(gameDto);
         gameService.updateGame(game);
+        gameService.resetDescriptionTranslated(game.getId());
         scanerService.storeGame(game);
         embeddingService.generateAndStore(game.getId());
         return getGameInfo(gameDto.getId());

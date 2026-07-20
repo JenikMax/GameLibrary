@@ -32,7 +32,9 @@ public interface GameService {
 
     List<Long> filterGameIdsByCriteria(List<Long> candidateIds, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags);
 
-    String getDescriptionEn(Long gameId);
+    String getDescriptionTranslated(Long gameId);
+
+    void resetDescriptionTranslated(Long gameId);
 
     boolean hasEmbeddings();
 

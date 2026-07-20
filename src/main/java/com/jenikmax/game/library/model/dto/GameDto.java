@@ -7,7 +7,7 @@ public class GameDto extends GameShortDto {
 
     private String trailerUrl;
     private String description;
-    private String descriptionEn;
+    private String descriptionTranslated;
     private String instruction;
     private List<String> screenshots;
 
@@ -38,12 +38,12 @@ public class GameDto extends GameShortDto {
         this.description = description;
     }
 
-    public String getDescriptionEn() {
-        return descriptionEn;
+    public String getDescriptionTranslated() {
+        return descriptionTranslated;
     }
 
-    public void setDescriptionEn(String descriptionEn) {
-        this.descriptionEn = descriptionEn;
+    public void setDescriptionTranslated(String descriptionTranslated) {
+        this.descriptionTranslated = descriptionTranslated;
     }
 
     public String getInstruction() {

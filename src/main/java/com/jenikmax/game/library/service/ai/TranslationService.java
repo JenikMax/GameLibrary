@@ -28,7 +28,7 @@ public class TranslationService {
         }
 
         String cached = jdbc.queryForObject(
-                "SELECT description_en FROM library.game_data WHERE id = ?",
+                "SELECT description_translated FROM library.game_data WHERE id = ?",
                 String.class, gameId);
         if (cached != null && !cached.isEmpty()) {
             return cached;
@@ -46,7 +46,7 @@ public class TranslationService {
         String translated = translateText(cleanText, direction);
 
         jdbc.update(
-                "UPDATE library.game_data SET description_en = ? WHERE id = ?",
+                "UPDATE library.game_data SET description_translated = ? WHERE id = ?",
                 translated, gameId);
 
         return translated;
@@ -69,10 +69,28 @@ public class TranslationService {
         }
     }
 
+    public String translateArbitraryText(String text) {
+        if (!isAvailable() || text == null || text.isBlank()) {
+            return text;
+        }
+        String cleanText = Jsoup.parse(text).text();
+        String direction = detectDirection(cleanText);
+        return translateText(text, direction);
+    }
+
     private String detectDirection(String text) {
-        long cyrillic = text.codePoints()
-                .filter(c -> Character.UnicodeBlock.of(c) == Character.UnicodeBlock.CYRILLIC)
-                .count();
-        return (cyrillic > text.length() * 0.3) ? "ru-en" : "en-ru";
+        long cyrillicLetters = 0;
+        long latinLetters = 0;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (Character.UnicodeBlock.of(c) == Character.UnicodeBlock.CYRILLIC && Character.isLetter(c)) {
+                cyrillicLetters++;
+            } else if (Character.UnicodeBlock.of(c) == Character.UnicodeBlock.BASIC_LATIN && Character.isLetter(c)) {
+                latinLetters++;
+            }
+        }
+        long totalLetters = cyrillicLetters + latinLetters;
+        if (totalLetters == 0) return "ru-en";
+        return (cyrillicLetters > latinLetters) ? "ru-en" : "en-ru";
     }
 }

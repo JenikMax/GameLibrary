@@ -1,6 +1,5 @@
 package com.jenikmax.game.library.service.ai;
 
-import com.jenikmax.game.library.model.entity.Game;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,27 +28,30 @@ public class EmbeddingService {
     public float[] generateAndStore(Long gameId) {
         if (!isAvailable()) return null;
 
-        Game game = jdbc.queryForObject(
-                "SELECT id, name, description FROM library.game_data WHERE id = ?",
-                (rs, rowNum) -> {
-                    Game g = new Game();
-                    g.setId(rs.getLong("id"));
-                    g.setName(rs.getString("name"));
-                    g.setDescription(rs.getString("description"));
-                    return g;
+        Object[] row = jdbc.queryForObject(
+                "SELECT g.id, g.name, g.description, " +
+                "COALESCE((SELECT string_agg(dg.genre_code, ' ') FROM library.game_data_genre dg WHERE dg.game_id = g.id), '') AS genres " +
+                "FROM library.game_data g WHERE g.id = ?",
+                (rs, rowNum) -> new Object[]{
+                        rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getString("genres")
                 },
                 gameId);
 
-        if (game == null || game.getDescription() == null) {
-            return null;
-        }
+        if (row == null || row[2] == null) return null;
 
-        String text = buildEmbeddingText(game);
+        String name = (String) row[1];
+        String description = (String) row[2];
+        String genres = (String) row[3];
+
+        String text = buildEmbeddingText(name, description, genres);
         float[] embedding = generateEmbedding(text);
         if (embedding == null) return null;
 
         jdbc.update("UPDATE library.game_data SET embedding = ?::vector WHERE id = ?",
-                embedding, game.getId());
+                embedding, gameId);
 
         return embedding;
     }
@@ -67,7 +69,7 @@ public class EmbeddingService {
     }
 
     public List<Long> semanticSearch(String query, int limit) {
-        float[] queryEmbedding = generateEmbedding(query);
+        float[] queryEmbedding = generateEmbedding("query: " + query);
         if (queryEmbedding == null) return List.of();
 
         return jdbc.queryForList(
@@ -94,8 +96,8 @@ public class EmbeddingService {
         return count != null ? count.intValue() : 0;
     }
 
-    private String buildEmbeddingText(Game game) {
-        String desc = Jsoup.parse(game.getDescription()).text();
-        return game.getName() + " " + game.getName() + " " + desc;
+    private String buildEmbeddingText(String name, String description, String genres) {
+        String desc = Jsoup.parse(description).text();
+        return "passage: " + name + " " + name + " " + genres + " " + desc;
     }
 }

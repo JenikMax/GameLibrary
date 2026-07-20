@@ -295,6 +295,16 @@ public class LibraryController {
         return ResponseEntity.ok(ApiResponse.ok(Map.of("translatedText", translated)));
     }
 
+    @PostMapping("/translate-text")
+    public ResponseEntity<ApiResponse<Map<String, String>>> translateText(@RequestBody Map<String, String> body) {
+        if (!translationService.isAvailable()) {
+            return ResponseEntity.ok(ApiResponse.error("Translation models not installed. Run: bash scripts/download-models.sh"));
+        }
+        String text = body.getOrDefault("text", "");
+        String translated = translationService.translateArbitraryText(text);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("translatedText", translated)));
+    }
+
     private GameListResponse toGameListResponse(GameShortDto dto) {
         GameListResponse resp = new GameListResponse();
         resp.setId(dto.getId());
@@ -320,7 +330,7 @@ public class LibraryController {
         resp.setLogoUrl(buildLogoUrl(dto.getId()));
         resp.setTrailerUrl(dto.getTrailerUrl());
         resp.setDescription(dto.getDescription());
-        resp.setDescriptionEn(dto.getDescriptionEn());
+        resp.setDescriptionTranslated(dto.getDescriptionTranslated());
         resp.setInstruction(dto.getInstruction());
 
         // Передаём base64 данные — нужны фронтенду для формы редактирования и grab-ответа

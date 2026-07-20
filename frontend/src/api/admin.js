@@ -30,5 +30,11 @@ export const adminApi = {
   },
   reloadScraperConfig() {
     return api.post('/admin/scraper-config/reload')
+  },
+  generateEmbeddings(force = false) {
+    return api.post('/embeddings/generate', null, { params: { force } })
+  },
+  getEmbeddingStatus(taskId) {
+    return api.get(`/embeddings/status/${taskId}`, { skipToast: true })
   }
 }

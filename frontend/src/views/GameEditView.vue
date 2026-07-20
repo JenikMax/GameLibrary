@@ -76,7 +76,18 @@
                 />
               </div>
               <div class="field col-12">
-                <label for="description">{{ t('game.field.description') }}</label>
+                <div class="flex align-items-center justify-content-between mb-1">
+                  <label for="description" class="m-0">{{ t('game.field.description') }}</label>
+                  <Button
+                    :label="t('game.translate_description')"
+                    icon="pi pi-language"
+                    size="small"
+                    severity="help"
+                    text
+                    :loading="translatingDesc"
+                    @click="translateDescription"
+                  />
+                </div>
                 <QuillEditor v-model:content="form.description" content-type="html"
                   :options="editorOptions" class="quill-editor"
                   style="height:250px;display:flex;flex-direction:column" />
@@ -224,12 +235,14 @@ import Tag from 'primevue/tag'
 import TagInput from '../components/TagInput.vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import 'quill/dist/quill.snow.css'
+import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const localeStore = useLocaleStore()
 const libraryStore = useLibraryStore()
+const toast = useToast()
 
 const game = ref(null)
 const loading = ref(true)
@@ -264,6 +277,7 @@ const allTags = ref([])
 
 const autoTagLoading = ref(false)
 const autoTagDialog = ref(false)
+const translatingDesc = ref(false)
 const suggestedTags = ref([])
 const suggestedGenres = ref([])
 const selectedSuggestedTags = ref([])
@@ -416,6 +430,19 @@ function removeExistingScreenshot(id) {
 function removeNewScreenshot(index) {
   form.value.screenshots.splice(index, 1)
   newScreenshotPreviews.value.splice(index, 1)
+}
+
+async function translateDescription() {
+  if (!form.value.description) return
+  translatingDesc.value = true
+  try {
+    const res = await gamesApi.translateText(form.value.description)
+    form.value.description = res.data.data.translatedText
+  } catch {
+    toast.add({ severity: 'error', summary: t('game.translate_failed'), life: 3000 })
+  } finally {
+    translatingDesc.value = false
+  }
 }
 
 async function handleSave() {

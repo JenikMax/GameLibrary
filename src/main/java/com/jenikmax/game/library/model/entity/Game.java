@@ -30,7 +30,7 @@ public class Game implements Serializable {
     private String trailerUrl;
     private String description;
     private String instruction;
-    private String descriptionEn;
+    private String descriptionTranslated;
     private Long totalSizeBytes;
     private List<Screenshot> screenshots;
     private List<GameTag> tags;
@@ -144,12 +144,12 @@ public class Game implements Serializable {
     }
 
     @Transient
-    public String getDescriptionEn() {
-        return this.descriptionEn;
+    public String getDescriptionTranslated() {
+        return this.descriptionTranslated;
     }
 
-    public void setDescriptionEn(String descriptionEn) {
-        this.descriptionEn = descriptionEn;
+    public void setDescriptionTranslated(String descriptionTranslated) {
+        this.descriptionTranslated = descriptionTranslated;
     }
 
     @Column(name = "total_size_bytes")

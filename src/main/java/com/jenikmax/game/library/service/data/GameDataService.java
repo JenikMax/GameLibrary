@@ -187,13 +187,24 @@ public class GameDataService implements GameService {
     }
 
     @Override
-    public String getDescriptionEn(Long gameId) {
+    public String getDescriptionTranslated(Long gameId) {
         try {
             return jdbcTemplate.queryForObject(
-                    "SELECT description_en FROM library.game_data WHERE id = ?",
+                    "SELECT description_translated FROM library.game_data WHERE id = ?",
                     String.class, gameId);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    @Override
+    public void resetDescriptionTranslated(Long gameId) {
+        try {
+            jdbcTemplate.update(
+                    "UPDATE library.game_data SET description_translated = NULL WHERE id = ?",
+                    gameId);
+        } catch (Exception e) {
+            // ignore
         }
     }
 

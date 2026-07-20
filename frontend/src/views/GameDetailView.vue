@@ -95,17 +95,20 @@
         <div class="flex align-items-center gap-2 mb-2">
           <h3 class="m-0">{{ showingTranslation ? t('game.translation') : t('game.description') }}</h3>
           <Button
-            v-if="game.descriptionEn || !translating"
             :label="showingTranslation ? t('game.show_original') : t('game.translate')"
             :icon="showingTranslation ? 'pi pi-undo' : 'pi pi-language'"
             size="small"
             severity="secondary"
             text
             :loading="translating"
+            :disabled="translating"
             @click="toggleTranslation"
           />
         </div>
-        <p v-html="showingTranslation ? game.descriptionEn : game.description" class="description-text"></p>
+        <ProgressBar v-if="translating" mode="indeterminate" class="mb-2" style="height: 4px" />
+        <Transition name="fade" mode="out-in">
+          <p :key="showingTranslation ? 'translated' : 'original'" v-html="showingTranslation ? game.descriptionTranslated : game.description" class="description-text"></p>
+        </Transition>
         <div v-if="trailerEmbedUrl" class="video-wrapper">
           <iframe :src="trailerEmbedUrl" frameborder="0" allowfullscreen></iframe>
         </div>
@@ -409,14 +412,14 @@ async function toggleTranslation() {
     showingTranslation.value = false
     return
   }
-  if (game.value.descriptionEn) {
+  if (game.value.descriptionTranslated) {
     showingTranslation.value = true
     return
   }
   translating.value = true
   try {
     const res = await gamesApi.translateGame(game.value.id)
-    game.value.descriptionEn = res.data.data.translatedText
+    game.value.descriptionTranslated = res.data.data.translatedText
     showingTranslation.value = true
   } catch {
     toast.add({ severity: 'error', summary: t('game.translate_failed'), life: 3000 })
@@ -986,6 +989,12 @@ function onViewerKeydown(e) {
 .score-pill small {
   font-size: 0.7rem;
   color: var(--p-text-muted-color);
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 @media (max-width: 768px) {
   .game-main {

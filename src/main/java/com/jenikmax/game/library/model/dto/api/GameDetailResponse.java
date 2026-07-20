@@ -14,7 +14,7 @@ public class GameDetailResponse {
     private String logoUrl;
     private String trailerUrl;
     private String description;
-    private String descriptionEn;
+    private String descriptionTranslated;
     private String instruction;
     private List<String> screenshotUrls;
     private String logo;
@@ -46,8 +46,8 @@ public class GameDetailResponse {
     public void setTrailerUrl(String trailerUrl) { this.trailerUrl = trailerUrl; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    public String getDescriptionEn() { return descriptionEn; }
-    public void setDescriptionEn(String descriptionEn) { this.descriptionEn = descriptionEn; }
+    public String getDescriptionTranslated() { return descriptionTranslated; }
+    public void setDescriptionTranslated(String descriptionTranslated) { this.descriptionTranslated = descriptionTranslated; }
     public String getInstruction() { return instruction; }
     public void setInstruction(String instruction) { this.instruction = instruction; }
     public List<String> getScreenshotUrls() { return screenshotUrls; }
