@@ -75,7 +75,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - # Локальные LLM модели.
+      # Локальные LLM модели.
       - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/models:/models
     environment:
       - MODELS_DIR=/models
@@ -131,6 +131,3 @@ services:
     mem_limit: 256m
 
     restart: unless-stopped
-
-volumes:
-  ai-models:
