@@ -2,6 +2,7 @@ package com.jenikmax.game.library.service.scaner;
 
 import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.Screenshot;
+import com.jenikmax.game.library.service.ai.EmbeddingService;
 import com.jenikmax.game.library.service.data.api.GameService;
 import com.jenikmax.game.library.service.scaner.api.ScanerService;
 import jakarta.persistence.EntityManager;
@@ -41,6 +42,7 @@ public class ScanTaskService implements DisposableBean {
 
     private final ScanerService scanerService;
     private final GameService gameService;
+    private final EmbeddingService embeddingService;
     private final String rootDirectory;
 
     @PersistenceUnit
@@ -48,9 +50,11 @@ public class ScanTaskService implements DisposableBean {
 
     public ScanTaskService(ScanerService scanerService,
                            GameService gameService,
+                           EmbeddingService embeddingService,
                            @Value("${game-library.games.directory}") String rootDirectory) {
         this.scanerService = scanerService;
         this.gameService = gameService;
+        this.embeddingService = embeddingService;
         this.rootDirectory = rootDirectory;
     }
 
@@ -134,7 +138,17 @@ public class ScanTaskService implements DisposableBean {
                         em.close();
                     }
                     imgDone++;
-                    task.setProgress(40 + imgDone * 30 / Math.max(newTotal, 1));
+                    task.setProgress(40 + imgDone * 25 / Math.max(newTotal, 1));
+                }
+
+                // Генерация embedding для новых игр
+                if (embeddingService.isAvailable()) {
+                    int embDone = 0;
+                    for (Long gameId : newGameIds) {
+                        embeddingService.generateAndStore(gameId);
+                        embDone++;
+                        task.setProgress(65 + embDone * 15 / Math.max(newTotal, 1));
+                    }
                 }
 
                 task.setStatus(ScanTask.Status.REFRESHING_SIZES);

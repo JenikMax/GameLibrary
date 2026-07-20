@@ -32,7 +32,11 @@ public interface GameService {
 
     List<Long> filterGameIdsByCriteria(List<Long> candidateIds, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags);
 
+    String getDescriptionEn(Long gameId);
+
     boolean hasEmbeddings();
+
+    boolean isEmbeddingModelAvailable();
 
     int getMissingEmbeddingCount();
 

@@ -8,6 +8,7 @@ import com.jenikmax.game.library.model.entity.Game;
 import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
+import com.jenikmax.game.library.service.ai.EmbeddingService;
 import com.jenikmax.game.library.service.data.api.GameService;
 import com.jenikmax.game.library.service.data.api.UserService;
 import com.jenikmax.game.library.service.downloads.StreamingZipWriter;
@@ -44,18 +45,21 @@ public class LibraryOperationService implements LibraryService {
     private final ScanerService scanerService;
     private final ScraperFactory scraperFactory;
     private final DownloadService downloadService;
+    private final EmbeddingService embeddingService;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     public LibraryOperationService(@Value("${game-library.games.directory}") String rootDirectory,
-                                   GameService gameService, UserService userService, ScanerService scanerService, ScraperFactory scraperFactory, DownloadService downloadService) {
+                                   GameService gameService, UserService userService, ScanerService scanerService, ScraperFactory scraperFactory, DownloadService downloadService,
+                                   EmbeddingService embeddingService) {
         this.rootDirectory = rootDirectory;
         this.gameService = gameService;
         this.userService = userService;
         this.scanerService = scanerService;
         this.scraperFactory = scraperFactory;
         this.downloadService = downloadService;
+        this.embeddingService = embeddingService;
     }
 
     @Override
@@ -165,7 +169,7 @@ public class LibraryOperationService implements LibraryService {
 
     @Override
     public boolean isSemanticSearchAvailable() {
-        return gameService.hasEmbeddings();
+        return gameService.isEmbeddingModelAvailable() && gameService.hasEmbeddings();
     }
 
     @Override
@@ -175,7 +179,9 @@ public class LibraryOperationService implements LibraryService {
 
     @Override
     public GameDto getGameInfo(Long gameId) {
-        return GameConverter.gameToDtoConverter(gameService.getGameById(gameId));
+        GameDto dto = GameConverter.gameToDtoConverter(gameService.getGameById(gameId));
+        dto.setDescriptionEn(gameService.getDescriptionEn(gameId));
+        return dto;
     }
 
     @Override
@@ -184,6 +190,7 @@ public class LibraryOperationService implements LibraryService {
         Game game = GameConverter.dtoToGameEntityConverter(gameDto);
         gameService.updateGame(game);
         scanerService.storeGame(game);
+        embeddingService.generateAndStore(game.getId());
         return getGameInfo(gameDto.getId());
     }
 

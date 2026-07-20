@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.FloatBuffer;
 import java.nio.LongBuffer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,9 +33,13 @@ public class OnnxModelManager implements AutoCloseable {
 
     public synchronized OrtSession getSession(String modelFile) {
         if (closed) throw new IllegalStateException("OnnxModelManager is closed");
+        Path modelPath = modelsDir.resolve(modelFile);
+        if (!Files.exists(modelPath)) {
+            log.warn("ONNX model not found: {}", modelPath);
+            return null;
+        }
         return sessions.computeIfAbsent(modelFile, key -> {
             try {
-                Path modelPath = modelsDir.resolve(key);
                 log.info("Loading ONNX model: {}", modelPath);
                 return env.createSession(modelPath.toString(), new OrtSession.SessionOptions());
             } catch (OrtException e) {
@@ -49,6 +54,7 @@ public class OnnxModelManager implements AutoCloseable {
         long[] attentionMask = createAttentionMask(inputIds, tokenizer.getPadTokenId());
 
         OrtSession session = getSession(embConfig.getModelFile());
+        if (session == null) return null;
 
         try (var inputIdsTensor = OnnxTensor.createTensor(env, LongBuffer.wrap(inputIds),
                     new long[]{1, inputIds.length});
@@ -68,7 +74,7 @@ public class OnnxModelManager implements AutoCloseable {
         }
     }
 
-    private float[] extractEmbedding(OrtSession.Result result, long[] attentionMask, int dimension) {
+    private float[] extractEmbedding(OrtSession.Result result, long[] attentionMask, int dimension) throws OrtException {
         Object rawOutput = result.get(0).getValue();
 
         float[][] pooled;
@@ -124,10 +130,12 @@ public class OnnxModelManager implements AutoCloseable {
 
     public String translate(SentencePieceTokenizer tokenizer, String text,
                             String modelFile, String vocabFile, int maxLength) {
+        if (tokenizer == null) return text;
         long[] inputIds = tokenizer.encode(text, maxLength);
         long[] attentionMask = createAttentionMask(inputIds, tokenizer.getPadTokenId());
 
         OrtSession session = getSession(modelFile);
+        if (session == null) return text;
 
         try (var inputTensor = OnnxTensor.createTensor(env, LongBuffer.wrap(inputIds),
                     new long[]{1, inputIds.length});

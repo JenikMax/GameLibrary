@@ -10,7 +10,7 @@ mvn spring-boot:run                          # run backend locally (needs Postgr
 cd frontend && npm run dev                   # run frontend dev server (:5173, proxies to :8080)
 ```
 
-No Maven wrapper — `mvn` must be on PATH. Java 25 target, `eclipse-temurin:25-jre-alpine` runtime. No tests, no lint/format/typecheck config.
+No Maven wrapper — `mvn` must be on PATH. Java 25 target, `eclipse-temurin:25-jre` runtime (glibc required for ONNX Runtime native lib). No tests, no lint/format/typecheck config.
 
 ## Docker
 
@@ -55,7 +55,7 @@ Embedding inference: ~200-500ms/game on 2-core CPU. Translation: ~1-5s/descripti
   - **Auto-tagging** (`AutoTagService` + `KeywordTagMapper`). Rules-based keyword→tag/genre matching (~125 rules). Reuses existing ~220 WorldArt genre mappings from `ScraperConfigService`. Button in `GameEditView.vue` → dialog with suggested tags/genres.
   - **`SentencePieceTokenizer`** — pure Java BPE tokenizer (~230 lines), shared across all models. Loads HuggingFace `tokenizer.json`.
   - **`OnnxModelManager`** — singleton, lazy-loads ONNX sessions, provides `generateEmbedding()` and `translate()`. Uses `ai.onnxruntime:onnxruntime:1.19.2`.
-  - **Models directory**: `${AI_MODELS_DIR}` or `${GAME_LIBRARY_CONFIG_DIR}/models/`. Must contain 3 subdirs: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/` — each with `model.onnx` and `tokenizer.json`.
+  - **Models directory**: `${AI_MODELS_DIR}` or `${GAME_LIBRARY_CONFIG_DIR}/models/`. Must contain 3 subdirs: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/` — each with `model.onnx` and `tokenizer.json`. Download once via `bash scripts/download-models.sh /path/to/models`. Application starts without models — AI features gracefully disabled until models are installed.
   - JVM opts: `-Xmx640m -Xms384m`. Models loaded off-heap (~750MB for all 3). Docker mem_limit: 1536m.
   - PostgreSQL base image: `pgvector/pgvector:pg16` (includes pgvector extension).
 - State: Pinia stores for auth, library, locale.

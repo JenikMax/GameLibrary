@@ -187,8 +187,24 @@ public class GameDataService implements GameService {
     }
 
     @Override
+    public String getDescriptionEn(Long gameId) {
+        try {
+            return jdbcTemplate.queryForObject(
+                    "SELECT description_en FROM library.game_data WHERE id = ?",
+                    String.class, gameId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
     public boolean hasEmbeddings() {
         return embeddingService.hasEmbeddings();
+    }
+
+    @Override
+    public boolean isEmbeddingModelAvailable() {
+        return embeddingService.isAvailable();
     }
 
     @Override

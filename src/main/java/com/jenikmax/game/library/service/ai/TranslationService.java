@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +31,10 @@ public class TranslationService {
     }
 
     public String translateAndCache(Long gameId) {
+        if (!isAvailable()) {
+            return "";
+        }
+
         String cached = jdbc.queryForObject(
                 "SELECT description_en FROM library.game_data WHERE id = ?",
                 String.class, gameId);
@@ -55,6 +60,15 @@ public class TranslationService {
         return translated;
     }
 
+    public boolean isAvailable() {
+        if (!aiConfig.getTranslation().isEnabled() || !modelAvailable) return false;
+        for (var entry : aiConfig.getTranslation().getModels().entrySet()) {
+            Path modelPath = Path.of(aiConfig.getModelsDir()).resolve(entry.getValue().getModelFile());
+            if (!Files.exists(modelPath)) return false;
+        }
+        return true;
+    }
+
     public String translateText(String text, String direction) {
         if (!aiConfig.getTranslation().isEnabled() || !modelAvailable) {
             return text;
@@ -67,6 +81,8 @@ public class TranslationService {
         }
 
         SentencePieceTokenizer tokenizer = getTokenizer(direction, modelConfig.getVocabFile());
+        if (tokenizer == null) return text;
+
         int maxLength = aiConfig.getTranslation().getMaxLength();
 
         try {
@@ -92,7 +108,9 @@ public class TranslationService {
                 Path vocabPath = Path.of(aiConfig.getModelsDir()).resolve(vocabFile);
                 return new SentencePieceTokenizer(vocabPath.toString());
             } catch (IOException e) {
-                throw new RuntimeException("Failed to load tokenizer for " + direction, e);
+                log.warn("Translation tokenizer not found: {}/{}", aiConfig.getModelsDir(), vocabFile);
+                modelAvailable = false;
+                return null;
             }
         });
     }

@@ -143,9 +143,7 @@ public class Game implements Serializable {
         this.instruction = instruction;
     }
 
-    @Column(
-            name = "description_en"
-    )
+    @Transient
     public String getDescriptionEn() {
         return this.descriptionEn;
     }

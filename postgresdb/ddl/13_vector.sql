@@ -1,3 +1,5 @@
+\c "game-library"
+
 CREATE EXTENSION IF NOT EXISTS vector;
 
 ALTER TABLE library.game_data ADD COLUMN IF NOT EXISTS embedding vector(384);

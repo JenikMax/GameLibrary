@@ -7,8 +7,7 @@ COPY src ./src
 RUN mvn package -DskipTests -B
 
 # Stage 2: Runtime with JRE
-FROM eclipse-temurin:25-jre-alpine
-RUN apk add --no-cache libstdc++ libgcc
+FROM eclipse-temurin:25-jre
 WORKDIR /app
 COPY --from=build /build/target/game-library.jar app.jar
 

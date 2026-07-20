@@ -83,6 +83,18 @@ Opens at `http://localhost` — login as `admin` / `password`.
 
 > 📖 **Step-by-step deployment guide for beginners** → [INSTRUCTION.md](INSTRUCTION.md#en) (setup, scrapers, troubleshooting)
 
+### AI Features (Optional)
+
+Semantic search & translation require ONNX models. Auto-tagging works without models.
+
+```bash
+pip install optimum-cli[onnxruntime] huggingface_hub
+bash scripts/download-models.sh /path/to/gameLibraryConfigs/models
+docker compose restart backend
+```
+
+The `semantic search` toggle appears in the filter sidebar after the first scan/game edit generates embeddings.
+
 ## 📦 Tech Stack
 
 | Component | Technology |
@@ -624,6 +636,18 @@ make all                      # сборка backend + frontend, запуск do
 Открыть `http://localhost` — войти как `admin` / `password`.
 
 > 📖 **Пошаговая инструкция для новичков** → [INSTRUCTION.md](INSTRUCTION.md#ru) (развёртывание, настройка скраперов, решение проблем)
+
+### AI-фичи (опционально)
+
+Семантический поиск и перевод требуют ONNX-модели. Авто-теги работают без моделей.
+
+```bash
+pip install optimum-cli[onnxruntime] huggingface_hub
+bash scripts/download-models.sh /path/to/gameLibraryConfigs/models
+docker compose restart backend
+```
+
+Переключатель «Семантический поиск» появится в боковой панели фильтра после первой генерации embedding'ов (при сканировании или редактировании игры).
 
 ## 📦 Технологический стек
 

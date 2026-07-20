@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -36,13 +37,25 @@ public class EmbeddingService {
                 Path vocabPath = Path.of(aiConfig.getModelsDir()).resolve(embConfig.getVocabFile());
                 tokenizer = new SentencePieceTokenizer(vocabPath.toString());
             } catch (IOException e) {
-                throw new RuntimeException("Failed to load embedding tokenizer", e);
+                log.warn("Embedding tokenizer not found at {}/{} — semantic search disabled",
+                        aiConfig.getModelsDir(), embConfig.getVocabFile());
+                modelAvailable = false;
+                return null;
             }
         }
         return tokenizer;
     }
 
+    public boolean isAvailable() {
+        if (!aiConfig.getEmbedding().isEnabled() || !modelAvailable) return false;
+        Path modelPath = Path.of(aiConfig.getModelsDir()).resolve(aiConfig.getEmbedding().getModelFile());
+        Path vocabPath = Path.of(aiConfig.getModelsDir()).resolve(aiConfig.getEmbedding().getVocabFile());
+        return Files.exists(modelPath) && Files.exists(vocabPath);
+    }
+
     public float[] generateAndStore(Long gameId) {
+        if (!isAvailable()) return null;
+
         Game game = jdbc.queryForObject(
                 "SELECT id, name, description FROM library.game_data WHERE id = ?",
                 (rs, rowNum) -> {
@@ -72,8 +85,10 @@ public class EmbeddingService {
         if (!aiConfig.getEmbedding().isEnabled() || !modelAvailable) {
             return null;
         }
+        SentencePieceTokenizer tok = getTokenizer();
+        if (tok == null) return null;
         try {
-            return modelManager.generateEmbedding(getTokenizer(), text);
+            return modelManager.generateEmbedding(tok, text);
         } catch (Exception e) {
             log.error("Embedding generation failed", e);
             modelAvailable = false;

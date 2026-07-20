@@ -288,6 +288,9 @@ public class LibraryController {
 
     @PostMapping("/{id}/translate")
     public ResponseEntity<ApiResponse<Map<String, String>>> translateDescription(@PathVariable Long id) {
+        if (!translationService.isAvailable()) {
+            return ResponseEntity.ok(ApiResponse.error("Translation models not installed. Run: bash scripts/download-models.sh"));
+        }
         String translated = translationService.translateAndCache(id);
         return ResponseEntity.ok(ApiResponse.ok(Map.of("translatedText", translated)));
     }
