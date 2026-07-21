@@ -31,13 +31,15 @@ public class EmbeddingService {
 
         Object[] row = jdbc.queryForObject(
                 "SELECT g.id, g.name, g.description, " +
-                "COALESCE((SELECT string_agg(dg.genre_code, ' ') FROM library.game_data_genre dg WHERE dg.game_id = g.id), '') AS genres " +
+                "COALESCE((SELECT string_agg(gg.description, ' ') FROM library.game_data_genre dg JOIN library.game_genre gg ON gg.code = dg.genre_code WHERE dg.game_id = g.id), '') AS genres_en, " +
+                "COALESCE((SELECT string_agg(gg.description_ru, ' ') FROM library.game_data_genre dg JOIN library.game_genre gg ON gg.code = dg.genre_code WHERE dg.game_id = g.id), '') AS genres_ru " +
                 "FROM library.game_data g WHERE g.id = ?",
                 (rs, rowNum) -> new Object[]{
                         rs.getLong("id"),
                         rs.getString("name"),
                         rs.getString("description"),
-                        rs.getString("genres")
+                        rs.getString("genres_en"),
+                        rs.getString("genres_ru")
                 },
                 gameId);
 
@@ -45,9 +47,10 @@ public class EmbeddingService {
 
         String name = (String) row[1];
         String description = (String) row[2];
-        String genres = (String) row[3];
+        String genresEn = (String) row[3];
+        String genresRu = (String) row[4];
 
-        String text = buildEmbeddingText(name, description, genres);
+        String text = buildEmbeddingText(name, description, genresEn, genresRu);
         log.info("generateAndStore: gameId={}, textLength={}, textStart='{}'",
                 gameId, text.length(),
                 text.length() > 100 ? text.substring(0, 100) + "..." : text);
@@ -107,9 +110,9 @@ public class EmbeddingService {
         return count != null ? count.intValue() : 0;
     }
 
-    private String buildEmbeddingText(String name, String description, String genres) {
+    private String buildEmbeddingText(String name, String description, String genresEn, String genresRu) {
         String desc = Jsoup.parse(description).text();
-        return name + " " + name + " " + genres + " " + desc;
+        return name + " " + name + " " + genresEn + " " + genresRu + " " + desc;
     }
 
     public static String fixEncoding(String input) {
