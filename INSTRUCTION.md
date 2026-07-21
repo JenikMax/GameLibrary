@@ -230,7 +230,7 @@ docker compose up --build -d
 `--build` — пересобрать образы (нужно при первом запуске или после изменений).  
 `-d` — запустить в фоне.
 
-**Ожидаемый результат:** Docker скачает образы (PostgreSQL, Transmission) и запустит 4 контейнера.
+**Ожидаемый результат:** Docker скачает образы (PostgreSQL, Transmission, AI-сервис) и запустит 5 контейнеров.
 
 Проверить, что всё запустилось:
 
@@ -241,10 +241,11 @@ docker compose ps
 Должны гореть `Up` напротив всех четырёх сервисов:
 
 ```
-NAME                    STATUS
-game-library-backend    Up
-game-library-frontend   Up  
-game-library-db         Up  
+NAME                     STATUS
+game-library-backend     Up
+game-library-frontend    Up
+game-library-db          Up
+game-library-ai-service  Up
 game-library-transmission Up
 ```
 
@@ -539,7 +540,7 @@ Check containers:
 docker compose ps
 ```
 
-All 4 services should show `Up`.
+All 5 services should show `Up`.
 
 ## 7. First login
 

@@ -55,6 +55,7 @@
 | Russian / English UI | |
 | ⭐ Rating 1-10 per game | |
 | ❤️ Favorites collection with filter | |
+| 🌓 Dark mode (system-preference auto-detect, manual toggle) | |
 | 💬 Comments on game pages | |
 | 🔔 Notifications (torrent ready, scan done, etc.) | |
 | 👁 View history (last 20, stored in localStorage) | |
@@ -99,7 +100,7 @@ The `semantic search` toggle appears in the filter sidebar after the first scan/
 
 | Component | Technology |
 |-----------|-----------|
-| Backend | Spring Boot 4.0.7, Java 25 |
+| Backend | Spring Boot 4.0.7, Java 25, Virtual Threads (Project Loom) |
 | Frontend | Vue 3 + Vite 5, PrimeVue 4, Pinia, VueQuill (Quill 2) |
 | Database | PostgreSQL 16 (schema `library`) |
 | ORM / JDBC | Hibernate (managed by Boot 4.x), Spring Data JPA, HikariCP |
@@ -109,6 +110,7 @@ The `semantic search` toggle appears in the filter sidebar after the first scan/
 | P2P Tracker | Built-in HTTP tracker at `/api/tracker/announce` |
 | Scraping | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
 | Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
+| Images | DB bytea + FS override, ETag + Cache-Control (24h), lazy loading |
 | AI / ML | Python AI service (FastAPI + PyTorch + HuggingFace: sentence-transformers, MarianMT), pgvector (vector similarity search) |
 | Build | Maven (JAR) + npm / Vite |
 | Containerization | Docker, docker-compose (5 services) |
@@ -159,9 +161,11 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `POST /games/{id}/seed` | USER, ADMIN | Start seeding via Transmission |
 | `POST /games/{id}/prepare-download` | USER, ADMIN | Async .torrent preparation (for ≥5 GB games) |
 | `GET /games/{id}/rating` | USER, ADMIN | Get game rating |
-| `POST /games/{id}/rate` | USER, ADMIN | Rate game 1-10 |
+| `POST /games/{id}/rating` | USER, ADMIN | Rate game 1-10 |
 | `POST /games/{id}/favorite` | USER, ADMIN | Toggle favorite |
 | `GET /games/{id}/favorite` | USER, ADMIN | Check if favorited |
+| `GET /games/favorites` | USER, ADMIN | Get all favorited game IDs |
+| `GET /games/random` | USER, ADMIN | Get a random game |
 | `GET /games/{id}/comments` | USER, ADMIN | Get game comments |
 | `POST /games/{id}/comments` | USER, ADMIN | Add comment |
 | `DELETE /games/{id}/comments/{commentId}` | USER, ADMIN | Delete own comment |
@@ -169,26 +173,27 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `GET /games/{id}/reviews` | USER, ADMIN | Get game reviews with aggregated scores |
 | `POST /games/{id}/reviews` | USER, ADMIN | Add/update review (text, pros, cons, 4 category scores 1-10) |
 | `DELETE /games/{id}/reviews/{reviewId}` | USER, ADMIN | Delete own review |
-| `POST /games/{id}/suggest-tags` | ADMIN | Auto-tag: suggest tags & genres from description |
+| `POST /games/{id}/suggest-tags` | USER, ADMIN | Auto-tag: suggest tags & genres from description |
 | `POST /games/{id}/translate` | USER, ADMIN | Translate game description ru↔en (cached) |
-| `POST /games/auto-tag-preview` | ADMIN | Auto-tag preview for arbitrary text |
+| `POST /games/translate-text` | USER, ADMIN | Translate arbitrary text ru↔en |
+| `POST /games/auto-tag-preview` | USER, ADMIN | Auto-tag preview for arbitrary text |
 | **AI — Embeddings** | | |
-| `POST /api/embeddings/generate` | ADMIN | Async batch generation of embeddings → `202 { taskId }` |
-| `GET /api/embeddings/status/{taskId}` | ADMIN | Embedding generation task status |
+| `POST /embeddings/generate` | ADMIN | Async batch generation of embeddings → `202 { taskId }` |
+| `GET /embeddings/status/{taskId}` | USER, ADMIN | Embedding generation task status |
 | **Collections** | | |
-| `GET /api/collections` | USER, ADMIN | List own + public collections |
-| `GET /api/collections/with-hero` | USER, ADMIN | Collections with hero/preview game data for cards |
-| `GET /api/collections/{id}` | USER, ADMIN | Get single collection |
-| `POST /api/collections` | USER, ADMIN | Create collection (`name`, `description?`, `isPublic?`) |
-| `PUT /api/collections/{id}` | USER, ADMIN | Update collection (name, description, isPublic) |
-| `DELETE /api/collections/{id}` | USER, ADMIN | Delete collection |
-| `GET /api/collections/{id}/games` | USER, ADMIN | List games in collection |
-| `POST /api/collections/{id}/games` | USER, ADMIN | Add game to collection |
-| `DELETE /api/collections/{id}/games/{gameId}` | USER, ADMIN | Remove game from collection |
-| `PUT /api/collections/{id}/games/reorder` | USER, ADMIN | Reorder games in collection |
+| `GET /collections` | USER, ADMIN | List own + public collections |
+| `GET /collections/with-hero` | USER, ADMIN | Collections with hero/preview game data for cards |
+| `GET /collections/{id}` | USER, ADMIN | Get single collection |
+| `POST /collections` | USER, ADMIN | Create collection (`name`, `description?`, `isPublic?`) |
+| `PUT /collections/{id}` | USER, ADMIN | Update collection (name, description, isPublic) |
+| `DELETE /collections/{id}` | USER, ADMIN | Delete collection |
+| `GET /collections/{id}/games` | USER, ADMIN | List games in collection |
+| `POST /collections/{id}/games` | USER, ADMIN | Add game to collection |
+| `DELETE /collections/{id}/games/{gameId}` | USER, ADMIN | Remove game from collection |
+| `PUT /collections/{id}/games/reorder` | USER, ADMIN | Reorder games in collection |
 | **Statistics** | | |
-| `GET /api/statistics` | USER, ADMIN | Library metrics (counts, charts, top lists) |
-| `POST /api/statistics/refresh-sizes` | ADMIN | Reset cached game sizes — recomputed on next GET |
+| `GET /statistics` | USER, ADMIN | Library metrics (counts, charts, top lists) |
+| `POST /statistics/refresh-sizes` | ADMIN | Reset cached game sizes — recomputed on next GET |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Torrent preparation task status |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Seed task status |
@@ -202,10 +207,9 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `GET /downloads/global-stat` | USER, ADMIN | Transmission session stats |
 | `GET /downloads/aria2-version` | USER, ADMIN | Transmission connectivity check |
 | **Notifications** | | |
-| `GET /notifications` | USER, ADMIN | Get latest 20 notifications |
+| `GET /notifications` | USER, ADMIN | Get latest 20 notifications + unread count |
 | `PUT /notifications/{id}/read` | USER, ADMIN | Mark notification as read |
 | `PUT /notifications/read-all` | USER, ADMIN | Mark all notifications as read |
-| `GET /notifications/unread-count` | USER, ADMIN | Unread notification count |
 | **Images** | | |
 | `GET /images/games/{gameId}/logo` | all | Game logo (FS → DB fallback) |
 | `GET /images/games/{gameId}/screenshots/{screenshotId}` | all | Screenshot (FS → DB fallback) |
@@ -216,7 +220,7 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `POST /profile/pass` | USER, ADMIN | Change password |
 | **Admin — Scan** | | |
 | `POST /scan` | ADMIN | Start async filesystem scan → `202 { taskId }` |
-| `GET /scan/status/{taskId}` | ADMIN | Scan task progress (`status`, `progress`, `currentGame`, `phase`) |
+| `GET /scan/status/{taskId}` | USER, ADMIN | Scan task progress (`status`, `progress`, `currentGame`, `phase`) |
 | **Admin — Users** | | |
 | `GET /admin/users` | ADMIN | List all users |
 | `POST /admin/users/{id}/toggle-admin` | ADMIN | Toggle admin role |
@@ -270,13 +274,13 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `TRANSMISSION_RPC_URL` | `http://transmission:9091/transmission/rpc` | Transmission RPC endpoint |
 | `TRANSMISSION_DOWNLOAD_DIR` | `/downloads` | Download dir in Transmission container |
 | `JWT_EXPIRATION_MS` | `86400000` | Token TTL (24 hours) |
-| `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Directory with `scrapers-config.json` |
-| `TORRENT_DIR_TMP` | `/torrentDirTmp` | Temp directory for .torrent files |
+| `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Directory with `scrapers-config.json`. **In Docker:** overridden to `/scraper-config` via docker-compose.yml |
+| `TORRENT_DIR_TMP` | `/torrentDirTmp` | Temp directory for .torrent files. Available as env var in `application.yml`, but not passed through docker-compose — edit docker-compose.yml to override |
 | `TTORRENT_HASHING_THREADS` | `2` | Placeholder for torrent hashing threads (not yet read by Java code) |
-| `CORS_ALLOWED_ORIGINS` | *(empty — same-origin only)* | Allowed CORS origins (comma-separated), e.g. `http://nas.local:8090`. Required if accessing backend directly (not through Nginx reverse proxy on port 80) |
+| `CORS_ALLOWED_ORIGINS` | *(empty — same-origin only)* | Allowed CORS origins (comma-separated), e.g. `http://nas.local:8090`. Required if accessing backend directly (not through Nginx reverse proxy on port 8090) |
 | `AI_SERVICE_URL` | `http://ai-service:8000` | Python AI service endpoint |
-| `GAME_LIBRARY_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs` | Root config dir (used for scrapers, tracker) |
-| `RESET_PASSWORD_DEFAULT` | *(auto-generated)* | Override default password for admin password-reset |
+| `JWT_EXPIRATION_MS` | `86400000` | Token TTL in ms (24 hours). Available in `application.yml`, but not passed through docker-compose — edit docker-compose.yml to override |
+| `RESET_PASSWORD_DEFAULT` | *(auto-generated)* | Override default password for admin password-reset. Added via docker-compose.yml (`RESET_PASSWORD_DEFAULT=${RESET_PASSWORD_DEFAULT:-}`)
 
 ### Database Schema
 
@@ -284,7 +288,7 @@ Schema `library`:
 
 | Table | Purpose |
 |-------|---------|
-| `game_data` | Games (id, name, platform, release_date, description, description_en, instruction, trailer_url, logo, directory_path, total_size_bytes, embedding vector(384)) |
+| `game_data` | Games (id, name, platform, release_date, description, description_translated, instruction, trailer_url, logo, directory_path, total_size_bytes, embedding vector(384)) |
 | `game_genre` | Genre dictionary (code, description, description_ru) — ~70 genres |
 | `game_data_genre` | M:N game ↔ genre |
 | `game_screenshot` | Screenshots (bytea) |
@@ -299,7 +303,7 @@ Schema `library`:
 | `game_review` | Reviews with category scores (gameplay/graphics/story/music 1-10), pros/cons, text (unique user+game) |
 | `library_user` | Users (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `01_init.sh` (schema), `02_library.sql` (tables + genres), `03_user.sql` (users + seed), `04_search.sql` (full-text search), `05_rating.sql`, `06_favorite.sql`, `07_comment.sql`, `08_notification.sql`, `09_collection.sql`, `10_smart_collection.sql`, `11_review.sql`, `12_tags.sql`, `13_vector.sql` (pgvector + embedding column + HNSW index + description_en).
+DDL: `postgresdb/ddl/` — `01_init.sh` (schema), `02_library.sql` (tables + genres), `03_user.sql` (users + seed), `04_search.sql` (full-text search), `05_rating.sql`, `06_favorite.sql`, `07_comment.sql`, `08_notification.sql`, `09_collection.sql`, `10_smart_collection.sql`, `11_review.sql`, `12_tags.sql`, `13_vector.sql` (pgvector + embedding column + HNSW index + description_translated).
 
 ## 🔒 Security
 
@@ -460,7 +464,7 @@ docker compose up --build -d                  # start all services
 
 | Port | Service | Purpose |
 |------|---------|---------|
-| `:80` | Nginx | Vue SPA + API proxy |
+| `:8090` | Nginx | Vue SPA + API proxy |
 | `:8080` | Backend | REST API + HTTP tracker |
 | `:8000` | AI service | Translation + embedding inference |
 | `:9091` | Transmission | RPC web UI |
@@ -589,6 +593,7 @@ npm run dev
 | Русский / английский интерфейс | |
 | ⭐ Рейтинг игр 1-10 | |
 | ❤️ Избранное с фильтром в боковой панели | |
+| 🌓 Тёмная тема (авто-определение по системе, ручное переключение) | |
 | 💬 Комментарии на странице игры | |
 | 🔔 Уведомления (торрент готов, сканирование завершено и т.д.) | |
 | 👁 История просмотров (последние 20, localStorage) | |
@@ -633,7 +638,7 @@ docker compose up -d
 
 | Компонент | Технология |
 |-----------|-----------|
-| Backend | Spring Boot 4.0.7, Java 25 |
+| Backend | Spring Boot 4.0.7, Java 25, Virtual Threads (Project Loom) |
 | Frontend | Vue 3 + Vite 5, PrimeVue 4, Pinia, VueQuill (Quill 2) |
 | База данных | PostgreSQL 16 (схема `library`) |
 | ORM / JDBC | Hibernate (управляется Boot 4.x), Spring Data JPA, HikariCP |
@@ -643,6 +648,7 @@ docker compose up -d
 | P2P-трекер | Встроенный HTTP-трекер — `/api/tracker/announce` |
 | Скрапинг | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
 | Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
+| Изображения | DB bytea + FS override, ETag + Cache-Control (24ч), lazy loading |
 | AI / ML | Python AI сервис (FastAPI + PyTorch + HuggingFace: sentence-transformers, MarianMT), pgvector (векторный поиск) |
 | Сборка | Maven (JAR) + npm / Vite |
 | Контейнеризация | Docker, docker-compose (5 сервисов) |
@@ -693,9 +699,11 @@ docker compose up -d
 | `POST /games/{id}/seed` | USER, ADMIN | Запустить раздачу |
 | `POST /games/{id}/prepare-download` | USER, ADMIN | Асинхронная подготовка .torrent (для ≥5 ГБ) |
 | `GET /games/{id}/rating` | USER, ADMIN | Получить рейтинг игры |
-| `POST /games/{id}/rate` | USER, ADMIN | Оценить игру 1-10 |
+| `POST /games/{id}/rating` | USER, ADMIN | Оценить игру 1-10 |
 | `POST /games/{id}/favorite` | USER, ADMIN | Добавить/удалить из избранного |
 | `GET /games/{id}/favorite` | USER, ADMIN | Проверить, в избранном ли |
+| `GET /games/favorites` | USER, ADMIN | Список ID избранных игр |
+| `GET /games/random` | USER, ADMIN | Случайная игра |
 | `GET /games/{id}/comments` | USER, ADMIN | Получить комментарии |
 | `POST /games/{id}/comments` | USER, ADMIN | Добавить комментарий |
 | `DELETE /games/{id}/comments/{commentId}` | USER, ADMIN | Удалить свой комментарий |
@@ -703,26 +711,27 @@ docker compose up -d
 | `GET /games/{id}/reviews` | USER, ADMIN | Получить рецензии с агрегированными оценками |
 | `POST /games/{id}/reviews` | USER, ADMIN | Добавить/обновить рецензию (текст, плюсы, минусы, 4 категории оценок 1-10) |
 | `DELETE /games/{id}/reviews/{reviewId}` | USER, ADMIN | Удалить свою рецензию |
-| `POST /games/{id}/suggest-tags` | ADMIN | Авто-теги: предложить теги и жанры из описания |
+| `POST /games/{id}/suggest-tags` | USER, ADMIN | Авто-теги: предложить теги и жанры из описания |
 | `POST /games/{id}/translate` | USER, ADMIN | Перевести описание игры ru↔en (кешируется) |
-| `POST /games/auto-tag-preview` | ADMIN | Предпросмотр авто-тегов для произвольного текста |
+| `POST /games/translate-text` | USER, ADMIN | Перевести произвольный текст ru↔en |
+| `POST /games/auto-tag-preview` | USER, ADMIN | Предпросмотр авто-тегов для произвольного текста |
 | **AI — Embeddings** | | |
-| `POST /api/embeddings/generate` | ADMIN | Асинхронная генерация embedding'ов → `202 { taskId }` |
-| `GET /api/embeddings/status/{taskId}` | ADMIN | Статус задачи генерации embedding'ов |
+| `POST /embeddings/generate` | ADMIN | Асинхронная генерация embedding'ов → `202 { taskId }` |
+| `GET /embeddings/status/{taskId}` | USER, ADMIN | Статус задачи генерации embedding'ов |
 | **Collections** | | |
-| `GET /api/collections` | USER, ADMIN | Свои + публичные коллекции |
-| `GET /api/collections/with-hero` | USER, ADMIN | Коллекции с hero/preview данными для карточек |
-| `GET /api/collections/{id}` | USER, ADMIN | Получить коллекцию |
-| `POST /api/collections` | USER, ADMIN | Создать коллекцию |
-| `PUT /api/collections/{id}` | USER, ADMIN | Обновить коллекцию |
-| `DELETE /api/collections/{id}` | USER, ADMIN | Удалить коллекцию |
-| `GET /api/collections/{id}/games` | USER, ADMIN | Список игр в коллекции |
-| `POST /api/collections/{id}/games` | USER, ADMIN | Добавить игру в коллекцию |
-| `DELETE /api/collections/{id}/games/{gameId}` | USER, ADMIN | Удалить игру из коллекции |
-| `PUT /api/collections/{id}/games/reorder` | USER, ADMIN | Изменить порядок игр |
+| `GET /collections` | USER, ADMIN | Свои + публичные коллекции |
+| `GET /collections/with-hero` | USER, ADMIN | Коллекции с hero/preview данными для карточек |
+| `GET /collections/{id}` | USER, ADMIN | Получить коллекцию |
+| `POST /collections` | USER, ADMIN | Создать коллекцию |
+| `PUT /collections/{id}` | USER, ADMIN | Обновить коллекцию |
+| `DELETE /collections/{id}` | USER, ADMIN | Удалить коллекцию |
+| `GET /collections/{id}/games` | USER, ADMIN | Список игр в коллекции |
+| `POST /collections/{id}/games` | USER, ADMIN | Добавить игру в коллекцию |
+| `DELETE /collections/{id}/games/{gameId}` | USER, ADMIN | Удалить игру из коллекции |
+| `PUT /collections/{id}/games/reorder` | USER, ADMIN | Изменить порядок игр |
 | **Statistics** | | |
-| `GET /api/statistics` | USER, ADMIN | Метрики библиотеки (диаграммы, топы) |
-| `POST /api/statistics/refresh-sizes` | ADMIN | Сбросить кэш размеров игр — пересчёт при следующем GET |
+| `GET /statistics` | USER, ADMIN | Метрики библиотеки (диаграммы, топы) |
+| `POST /statistics/refresh-sizes` | ADMIN | Сбросить кэш размеров игр — пересчёт при следующем GET |
 | **Downloads** | | |
 | `GET /download/prepare-status/{taskId}` | USER, ADMIN | Статус подготовки торрента |
 | `GET /seed/status/{taskId}` | USER, ADMIN | Статус раздачи |
@@ -736,10 +745,9 @@ docker compose up -d
 | `GET /downloads/global-stat` | USER, ADMIN | Статистика сессии Transmission |
 | `GET /downloads/aria2-version` | USER, ADMIN | Проверка связи с Transmission |
 | **Уведомления** | | |
-| `GET /notifications` | USER, ADMIN | Последние 20 уведомлений |
+| `GET /notifications` | USER, ADMIN | Последние 20 уведомлений + счётчик непрочитанных |
 | `PUT /notifications/{id}/read` | USER, ADMIN | Отметить прочитанным |
 | `PUT /notifications/read-all` | USER, ADMIN | Прочитать всё |
-| `GET /notifications/unread-count` | USER, ADMIN | Количество непрочитанных |
 | **Images** | | |
 | `GET /images/games/{gameId}/logo` | все | Логотип игры (ФС → БД fallback) |
 | `GET /images/games/{gameId}/screenshots/{screenshotId}` | все | Скриншот (ФС → БД fallback) |
@@ -750,7 +758,7 @@ docker compose up -d
 | `POST /profile/pass` | USER, ADMIN | Сменить пароль |
 | **Admin — Scan** | | |
 | `POST /scan` | ADMIN | Асинхронное сканирование ФС → `202 { taskId }` |
-| `GET /scan/status/{taskId}` | ADMIN | Прогресс сканирования (`status`, `progress`, `currentGame`, `phase`) |
+| `GET /scan/status/{taskId}` | USER, ADMIN | Прогресс сканирования (`status`, `progress`, `currentGame`, `phase`) |
 | **Admin — Users** | | |
 | `GET /admin/users` | ADMIN | Список пользователей |
 | `POST /admin/users/{id}/toggle-admin` | ADMIN | Смена роли |
@@ -804,13 +812,13 @@ docker compose up -d
 | `TRANSMISSION_RPC_URL` | `http://transmission:9091/transmission/rpc` | RPC-эндпоинт Transmission |
 | `TRANSMISSION_DOWNLOAD_DIR` | `/downloads` | Папка загрузок в контейнере Transmission |
 | `JWT_EXPIRATION_MS` | `86400000` | Время жизни токена (24ч) |
-| `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Директория с `scrapers-config.json` |
-| `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная папка для .torrent файлов |
+| `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Директория с `scrapers-config.json`. **В Docker:** переопределено на `/scraper-config` через docker-compose.yml |
+| `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная папка для .torrent файлов. Доступна в `application.yml`, но не проброшена через docker-compose — добавьте в docker-compose.yml для переопределения |
 | `TTORRENT_HASHING_THREADS` | `2` | Placeholder — пока не читается Java-кодом |
-| `CORS_ALLOWED_ORIGINS` | *(пусто — только same-origin)* | Разрешённые CORS-источники (через запятую), например `http://nas.local:8090`. Нужен при прямом доступе к API (не через Nginx reverse-proxy на порту 80) |
+| `CORS_ALLOWED_ORIGINS` | *(пусто — только same-origin)* | Разрешённые CORS-источники (через запятую), например `http://nas.local:8090`. Нужен при прямом доступе к API (не через Nginx reverse-proxy на порту 8090) |
 | `AI_SERVICE_URL` | `http://ai-service:8000` | Эндпоинт Python AI сервиса |
-| `GAME_LIBRARY_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs` | Корень конфигов (скраперы, трекер) |
-| `RESET_PASSWORD_DEFAULT` | *(авто-генерация)* | Пароль по умолчанию при сбросе админом |
+| `JWT_EXPIRATION_MS` | `86400000` | Время жизни токена в мс (24ч). Доступна в `application.yml`, но не проброшена через docker-compose — добавьте в docker-compose.yml для переопределения |
+| `RESET_PASSWORD_DEFAULT` | *(авто-генерация)* | Пароль по умолчанию при сбросе админом. Добавить в docker-compose.yml: `RESET_PASSWORD_DEFAULT=${RESET_PASSWORD_DEFAULT:-}` |
 
 ### База данных
 
@@ -818,7 +826,7 @@ docker compose up -d
 
 | Таблица | Назначение |
 |---------|-----------|
-| `game_data` | Игры (id, name, platform, release_date, description, description_en, instruction, trailer_url, logo, directory_path, total_size_bytes, embedding vector(384)) |
+| `game_data` | Игры (id, name, platform, release_date, description, description_translated, instruction, trailer_url, logo, directory_path, total_size_bytes, embedding vector(384)) |
 | `game_genre` | Справочник жанров (code, description, description_ru) — ~70 жанров |
 | `game_data_genre` | M:N игра ↔ жанр |
 | `game_screenshot` | Скриншоты (bytea) |
@@ -833,7 +841,7 @@ docker compose up -d
 | `game_review` | Рецензии с оценками по категориям (геймплей/графика/сюжет/музыка 1-10), плюсы/минусы, текст (unique user+game) |
 | `library_user` | Пользователи (user_name, pass BCrypt, is_admin, is_active, avatar bytea) |
 
-DDL: `postgresdb/ddl/` — `01_init.sh` (схема), `02_library.sql` (таблицы + жанры), `03_user.sql` (пользователи + seed), `04_search.sql` (полнотекстовый поиск), `05_rating.sql` (оценки), `06_favorite.sql` (избранное), `07_comment.sql` (комментарии), `08_notification.sql` (уведомления), `09_collection.sql` (коллекции), `10_smart_collection.sql` (умные коллекции), `11_review.sql` (рецензии), `12_tags.sql` (теги), `13_vector.sql` (pgvector + embedding + HNSW-индекс + description_en).
+DDL: `postgresdb/ddl/` — `01_init.sh` (схема), `02_library.sql` (таблицы + жанры), `03_user.sql` (пользователи + seed), `04_search.sql` (полнотекстовый поиск), `05_rating.sql` (оценки), `06_favorite.sql` (избранное), `07_comment.sql` (комментарии), `08_notification.sql` (уведомления), `09_collection.sql` (коллекции), `10_smart_collection.sql` (умные коллекции), `11_review.sql` (рецензии), `12_tags.sql` (теги), `13_vector.sql` (pgvector + embedding + HNSW-индекс + description_translated).
 
 ## 🔒 Безопасность
 
@@ -994,7 +1002,7 @@ docker compose up --build -d                  # запуск всех серви
 
 | Порт | Сервис | Назначение |
 |------|--------|-----------|
-| `:80` | Nginx | Vue SPA + прокси на API |
+| `:8090` | Nginx | Vue SPA + прокси на API |
 | `:8080` | Backend | REST API + HTTP-трекер |
 | `:8000` | AI сервис | Перевод + embedding-инференс |
 | `:9091` | Transmission | RPC веб-интерфейс |

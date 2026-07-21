@@ -14,8 +14,8 @@ No Maven wrapper — `mvn` must be on PATH. Java 25 target, `eclipse-temurin:25-
 
 ## Docker
 
-`docker-compose.yml` starts five services: `frontend` (Nginx + Vue SPA, `:80`), `backend` (Spring Boot REST, `:8080`), `ai-service` (Python FastAPI, `:8000`), `transmission` (torrent seeder, `:9091` RPC, `:51413`), `postgresdb` (`:5432`).  
-Memory limits: postgresdb 512m, backend 768m, ai-service 1536m, frontend 64m, transmission 256m. postgresdb has healthcheck.
+`docker-compose.yml` starts five services: `frontend` (Nginx + Vue SPA, `:8090`), `backend` (Spring Boot REST, `:8080`), `ai-service` (Python FastAPI, `:8000`), `transmission` (torrent seeder, `:9091` RPC, `:51413`), `postgresdb` (`:5432`).  
+Memory limits: postgresdb 512m, backend 1024m, ai-service 2048m, frontend 64m, transmission 256m. postgresdb has healthcheck.
 DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/docker-entrypoint-initdb.d/`.
 
 ## System Requirements
@@ -52,11 +52,11 @@ Embedding inference: ~200-500ms/game on 2-core CPU. Translation: ~1-5s/descripti
 - **AI features (Python AI service + pgvector):**
   - **AI service** (`ai-service/`) — separate Python FastAPI container (`:8000`) with PyTorch + HuggingFace. Preloads all models at startup, auto-downloads from HuggingFace on first run. Endpoints: `GET /health`, `POST /translate`, `POST /embed`, `POST /embed/batch`. Java backend calls it via `AiClient` (OkHttp). Models stored in Docker volume `ai-models`.
   - **Semantic search** (`EmbeddingService` + pgvector `vector(384)` + HNSW index). Embedding model: `intfloat/multilingual-e5-small` via `sentence-transformers`. Toggle in `GameFilter.vue` (gated by `semanticAvailable` flag from backend). Async batch generation via `POST /api/embeddings/generate` (ADMIN, polling `/status/{taskId}`). Embedding auto-generated on game save.
-  - **Translation ru↔en** (`TranslationService`). Models: `Helsinki-NLP/opus-mt-ru-en` + `opus-mt-en-ru` (MarianMT, ~300MB each). Auto-detect direction (Cyrillic text → ru→en, else en→ru). Cached in `game_data.description_en`. Button in `GameDetailView.vue`.
+  - **Translation ru↔en** (`TranslationService`). Models: `Helsinki-NLP/opus-mt-ru-en` + `opus-mt-en-ru` (MarianMT, ~300MB each). Auto-detect direction (Cyrillic text → ru→en, else en→ru). Cached in `game_data.description_translated`. Button in `GameDetailView.vue`.
   - **Auto-tagging** (`AutoTagService` + `KeywordTagMapper`). Rules-based keyword→tag/genre matching (~125 rules). Reuses existing ~220 WorldArt genre mappings from `ScraperConfigService`. Button in `GameEditView.vue` → dialog with suggested tags/genres.
   - **`AiClient.java`** — HTTP client to Python AI service. Uses OkHttp with 120s timeout for inference calls. Graceful degradation: returns original text / null on AI service failure.
   - Application starts without AI service — AI features gracefully disabled until `ai-service` is available.
-  - ai-service Docker mem_limit: 1536m (PyTorch + models). Backend mem_limit: 768m (no ONNX).
+  - ai-service Docker mem_limit: 2048m (PyTorch + models). Backend mem_limit: 1024m.
   - PostgreSQL base image: `pgvector/pgvector:pg16` (includes pgvector extension).
 - State: Pinia stores for auth, library, locale.
 - Rich text: VueQuill + Quill 2 for game description editing.
