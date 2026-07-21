@@ -87,7 +87,7 @@ Opens at `http://localhost` — login as `admin` / `password`.
 
 Semantic search & translation are powered by a separate Python AI service (`ai-service`). Auto-tagging works without AI.
 
-AI models are downloaded automatically on first start. No manual setup required. Just run:
+AI models are downloaded automatically from HuggingFace on first start. No manual setup required. Just run:
 
 ```bash
 docker compose up -d
@@ -109,13 +109,21 @@ The `semantic search` toggle appears in the filter sidebar after the first scan/
 | P2P Tracker | Built-in HTTP tracker at `/api/tracker/announce` |
 | Scraping | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
 | Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
-| AI / ML | Python AI service (FastAPI + PyTorch + HuggingFace), pgvector (vector similarity search) |
+| AI / ML | Python AI service (FastAPI + PyTorch + HuggingFace: sentence-transformers, MarianMT), pgvector (vector similarity search) |
 | Build | Maven (JAR) + npm / Vite |
-| Containerization | Docker, docker-compose (4 services) |
+| Containerization | Docker, docker-compose (5 services) |
 
 ## 🏗 Architecture
 
 ```
+                         ┌──────────────────┐
+                         │  ai-service       │
+                         │  (FastAPI)        │
+                         │  :8000            │
+                         └────────┬──────────┘
+                                  │
+                    translate / embed / embed/batch
+                                  │
 ┌─────────┐   :80   ┌──────────┐   :8080  ┌──────────────────┐
 │ Browser │ ──────▶ │  Nginx   │ ──────▶  │   Backend        │
 └─────────┘         │ (Vue SPA)│          │  (REST API)      │
@@ -292,7 +300,7 @@ All under `/game-library/api/`. Auth: JWT Bearer token.
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Temp directory for .torrent files |
 | `TTORRENT_HASHING_THREADS` | `2` | Placeholder for torrent hashing threads (not yet read by Java code) |
 | `CORS_ALLOWED_ORIGINS` | *(empty — same-origin only)* | Allowed CORS origins (comma-separated), e.g. `http://nas.local:8090`. Required if accessing backend directly (not through Nginx reverse proxy on port 80) |
-| `AI_MODELS_DIR` | `/models` | ONNX model files (3 subdirs: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/`). Set in `.env` to override. |
+| `AI_SERVICE_URL` | `http://ai-service:8000` | Python AI service endpoint |
 | `GAME_LIBRARY_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs` | Root config dir (used for scrapers, tracker) |
 | `RESET_PASSWORD_DEFAULT` | *(auto-generated)* | Override default password for admin password-reset |
 
@@ -321,8 +329,6 @@ DDL: `postgresdb/ddl/` — `01_init.sh` (schema), `02_library.sql` (tables + gen
 
 ## 🔒 Security
 
-### Secrets Management
-
 All credentials are externalized via `.env` file (`.env` is in `.gitignore` — **never commit it**):
 
 ```bash
@@ -336,18 +342,15 @@ cp .env.example .env   # edit secrets before first launch
 | `JWT_SECRET` | `.env` → `docker-compose.yml` → backend → JWT token signing | ✅ |
 | `SCRAPER_ENCRYPTION_KEY` | `.env` → `docker-compose.yml` → backend → AES-256 scraper key encryption | ✅ |
 
-### Hardened defaults (as of v2)
+### Security measures
 
-| What changed | Before | After |
-|-------------|--------|-------|
-| `application.yml` DB password | Hardcoded plaintext | `${DB_PASSWORD}` — must be in env |
-| `application.yml` JWT secret | Default fallback if env missing | `${JWT_SECRET}` — must be in env |
-| `postgresdb/ddl/1_init.sql` | Hardcoded password in SQL | `1_init.sh` — reads `${DB_PASSWORD}` from env |
-| `postgresdb/env.list` | Plaintext file in repo | Removed. Secrets via `.env` → docker-compose |
-| `UserDataService.java` | `qwerty1234` hardcoded | `SecureRandom` auto-generate (8 байт, base64), возвращается в ответ API, отображается фронтендом. Переопределяется через `RESET_PASSWORD_DEFAULT` |
-| `ConfigEncryptionService.java` | Ephemeral AES key if env missing | Throws `IllegalStateException` — env is mandatory |
-| `docker-compose.yml` | Inline secrets | `${VAR}` references to `.env` |
-| `RateLimitFilter` | No rate limiting | bucket4j: login 5 req/min, API 100 req/min per IP |
+- **DB password**: `${DB_PASSWORD}` env variable — never hardcoded in `application.yml`
+- **JWT secret**: `${JWT_SECRET}` env variable — no default fallback
+- **DB init scripts**: `1_init.sh` reads `${DB_PASSWORD}` from environment, no plaintext passwords in SQL
+- **Admin password reset**: `SecureRandom` auto-generates 8-byte base64 password, returned in API response and displayed in UI. Override via `RESET_PASSWORD_DEFAULT` env
+- **Scraper key encryption**: AES-256 with `SCRAPER_ENCRYPTION_KEY` — `ConfigEncryptionService` throws `IllegalStateException` if env is missing
+- **Docker secrets**: all `${VAR}` placeholders in `docker-compose.yml` read from `.env`, no inline secrets
+- **Rate limiting**: bucket4j — login endpoint 5 req/min per IP+User-Agent, global API 100 req/min per IP. Returns HTTP 429
 
 ## 🕷 Scrapers
 
@@ -395,12 +398,12 @@ No API key required. The scraper works out of the box for PS1 and PS2 games. Sup
 | Storage | 100 MB for app + space for game library |
 | PostgreSQL | 16+ (standard `postgres:16` image) |
 
-#### With AI features
+#### With AI features (recommended)
 | Resource | Minimum |
 |----------|---------|
 | CPU | 2 cores (Intel N4505 / ARM Cortex-A55 or better) |
-| RAM | 3 GB (backend needs 1536m: ~750MB off-heap for ONNX models + 640MB JVM heap) |
-| Storage | 800 MB (app + ONNX models: ~120MB embedding, ~600MB translation) + game library |
+| RAM | 4 GB (ai-service container needs 1536m for PyTorch + HuggingFace models) |
+| Storage | 2 GB for app + AI models (auto-downloaded from HuggingFace on first start) + space for game library |
 | PostgreSQL | pgvector extension (`pgvector/pgvector:pg16` image) |
 
 > **Embedding inference**: ~200-500ms per game on 2-core CPU. **Translation**: ~1-5s per description.  
@@ -438,10 +441,7 @@ Create on host before launching:
 └── gameLibraryConfigs/                # Config files
     ├── db/data/                       # PostgreSQL data (mount → postgresdb:/var/lib/postgresql/data)
     ├── scrapers/                      # Scraper config (scrapers-config.json)
-    ├── models/                        # ONNX models for AI features (semantic search, translation)
-    │   ├── multilingual-e5-small/     # Embedding model (~120 MB)
-    │   ├── opus-mt-ru-en/             # Translation ru→en (~300 MB)
-    │   └── opus-mt-en-ru/             # Translation en→ru (~300 MB)
+    ├── models/                        # HuggingFace models for AI features (auto-downloaded, volume for persistence)
     └── tracker/
         ├── config/                    # Transmission settings.json (auto-created)
         ├── watch/                     # Auto-add .torrent files
@@ -463,7 +463,7 @@ mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers
 > | `...` (games root) | `/gameLibrary` | backend | Game files + images (games/, images/) |
 > | `.../tracker/torrents` | `/torrentDirTmp` | backend | Temporary .torrent files |
 > | `.../scrapers` | `/scraper-config` | backend | Scraper config (scrapers-config.json) |
-> | `.../models` | `/models` | backend | ONNX models for AI features (semantic search, translation) |
+> | `.../models` | `/models` | ai-service | HuggingFace models (auto-downloaded, persisted across restarts) |
 > | `.../games` | `/downloads/games` | transmission | Game files for seeding |
 > | `.../tracker/config` | `/config` | transmission | Transmission settings.json |
 > | `.../tracker/watch` | `/watch` | transmission | Auto-add .torrent directory |
@@ -488,6 +488,7 @@ docker compose up --build -d                  # start all services
 |------|---------|---------|
 | `:80` | Nginx | Vue SPA + API proxy |
 | `:8080` | Backend | REST API + HTTP tracker |
+| `:8000` | AI service | Translation + embedding inference |
 | `:9091` | Transmission | RPC web UI |
 | `:51413` | Transmission | P2P traffic (TCP/UDP) |
 | `:5432` | PostgreSQL | Database |
@@ -646,7 +647,7 @@ make all                      # сборка backend + frontend, запуск do
 
 Семантический поиск и перевод работают через отдельный Python AI сервис (`ai-service`). Авто-теги работают без AI.
 
-Модели скачиваются автоматически при первом запуске. Никакой ручной настройки не требуется. Просто запустите:
+Модели скачиваются автоматически с HuggingFace при первом запуске. Никакой ручной настройки не требуется. Просто запустите:
 
 ```bash
 docker compose up -d
@@ -668,12 +669,21 @@ docker compose up -d
 | P2P-трекер | Встроенный HTTP-трекер — `/api/tracker/announce` |
 | Скрапинг | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
 | Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
+| AI / ML | Python AI сервис (FastAPI + PyTorch + HuggingFace: sentence-transformers, MarianMT), pgvector (векторный поиск) |
 | Сборка | Maven (JAR) + npm / Vite |
-| Контейнеризация | Docker, docker-compose (4 сервиса) |
+| Контейнеризация | Docker, docker-compose (5 сервисов) |
 
 ## 🏗 Архитектура
 
 ```
+                         ┌──────────────────┐
+                         │  ai-service       │
+                         │  (FastAPI)        │
+                         │  :8000            │
+                         └────────┬──────────┘
+                                  │
+                    translate / embed / embed/batch
+                                  │
 ┌─────────┐   :80   ┌──────────┐   :8080  ┌──────────────────┐
 │ Browser │ ──────▶ │  Nginx   │ ──────▶  │   Backend        │
 └─────────┘         │ (Vue SPA)│          │  (REST API)      │
@@ -824,6 +834,17 @@ docker compose up -d
 
 ### Переменные окружения
 
+#### Обязательные (без значений по умолчанию — задаются в `.env`)
+
+| Переменная | Описание |
+|-----------|----------|
+| `POSTGRES_PASSWORD` | Пароль суперпользователя PostgreSQL |
+| `DB_PASSWORD` | Пароль пользователя приложения (`library-manager-user`) |
+| `JWT_SECRET` | Секрет JWT (сгенерировать: `openssl rand -hex 32`) |
+| `SCRAPER_ENCRYPTION_KEY` | AES-256 ключ (base64) для шифрования API-ключей скраперов (сгенерировать: `openssl rand -base64 32`) |
+
+#### Опциональные (со значениями по умолчанию)
+
 | Переменная | По умолчанию | Описание |
 |-----------|-------------|----------|
 | `SERVER_PORT` | `8080` | Порт backend |
@@ -834,15 +855,14 @@ docker compose up -d
 | `TRACKER_ANNOUNCE_URL` | `http://localhost:8080/game-library/api/tracker/announce` | URL announce в .torrent (должен быть доступен клиентам) |
 | `TRANSMISSION_RPC_URL` | `http://transmission:9091/transmission/rpc` | RPC-эндпоинт Transmission |
 | `TRANSMISSION_DOWNLOAD_DIR` | `/downloads` | Папка загрузок в контейнере Transmission |
-| `JWT_SECRET` | ключ по умолчанию | Секрет JWT |
 | `JWT_EXPIRATION_MS` | `86400000` | Время жизни токена (24ч) |
 | `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Директория с `scrapers-config.json` |
-| `SCRAPER_ENCRYPTION_KEY` | не задан | AES-256 ключ (base64) для шифрования API-ключей. **Обязателен.** Сгенерировать: `openssl rand -base64 32` |
 | `TORRENT_DIR_TMP` | `/torrentDirTmp` | Временная папка для .torrent файлов |
 | `TTORRENT_HASHING_THREADS` | `2` | Placeholder — пока не читается Java-кодом |
 | `CORS_ALLOWED_ORIGINS` | *(пусто — только same-origin)* | Разрешённые CORS-источники (через запятую), например `http://nas.local:8090`. Нужен при прямом доступе к API (не через Nginx reverse-proxy на порту 80) |
-| `AI_MODELS_DIR` | `/models` | Путь к ONNX-моделям (3 подпапки: `multilingual-e5-small/`, `opus-mt-ru-en/`, `opus-mt-en-ru/`). Переопределяется в `.env`. |
+| `AI_SERVICE_URL` | `http://ai-service:8000` | Эндпоинт Python AI сервиса |
 | `GAME_LIBRARY_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs` | Корень конфигов (скраперы, трекер) |
+| `RESET_PASSWORD_DEFAULT` | *(авто-генерация)* | Пароль по умолчанию при сбросе админом |
 
 ### База данных
 
@@ -869,8 +889,6 @@ DDL: `postgresdb/ddl/` — `01_init.sh` (схема), `02_library.sql` (табл
 
 ## 🔒 Безопасность
 
-### Управление секретами
-
 Все учётные данные вынесены в `.env` (`.env` в `.gitignore` — **не коммитить**):
 
 ```bash
@@ -884,18 +902,15 @@ cp .env.example .env   # отредактировать перед первым 
 | `JWT_SECRET` | `.env` → `docker-compose` → backend → подпись JWT | ✅ |
 | `SCRAPER_ENCRYPTION_KEY` | `.env` → `docker-compose` → backend → AES-256 шифрование ключей скраперов | ✅ |
 
-### Что изменилось (v2)
+### Принятые меры
 
-| Было | Стало |
-|------|-------|
-| Пароль БД в `application.yml` в открытую | `${DB_PASSWORD}` — только из env |
-| JWT secret с дефолтом при отсутствии env | `${JWT_SECRET}` — обязателен |
-| `1_init.sql` с паролем в SQL | `1_init.sh` — читает `${DB_PASSWORD}` из env |
-| `env.list` с plaintext в репозитории | Удалён. Секреты через `.env` → docker-compose |
-| `qwerty1234` в коде при сбросе пароля | `SecureRandom` (8 байт, base64) + `RESET_PASSWORD_DEFAULT`. Пароль возвращается в API и отображается в UI |
-| Эфемерный AES-ключ при отсутствии env | `IllegalStateException` — ключ обязателен |
-| Секреты в `docker-compose.yml` inline | `${VAR}` из `.env` |
-| Без ограничения запросов | bucket4j: login 5 зап/мин, API 100 зап/мин на IP |
+- **Пароль БД**: `${DB_PASSWORD}` — никогда не хранится в `application.yml` в открытую
+- **JWT secret**: `${JWT_SECRET}` — обязателен, без значения по умолчанию
+- **Скрипты инициализации БД**: `1_init.sh` читает `${DB_PASSWORD}` из окружения, без паролей в SQL
+- **Сброс пароля админом**: `SecureRandom` генерирует 8-байтовый пароль (base64), возвращается в API и отображается в UI. Переопределяется через `RESET_PASSWORD_DEFAULT`
+- **Шифрование ключей скраперов**: AES-256 через `SCRAPER_ENCRYPTION_KEY` — `ConfigEncryptionService` выбрасывает `IllegalStateException` при отсутствии переменной
+- **Секреты Docker**: все `${VAR}` в `docker-compose.yml` читаются из `.env`, никаких секретов в коде конфигурации
+- **Ограничение запросов**: bucket4j — login endpoint 5 запр/мин на IP+User-Agent, API 100 запр/мин на IP. Возвращает HTTP 429
 
 ## 🕷 Скраперы
 
@@ -947,8 +962,8 @@ cp .env.example .env   # отредактировать перед первым 
 | Ресурс | Минимум |
 |--------|---------|
 | CPU | 2 ядра (Intel N4505 / ARM Cortex-A55 или лучше) |
-| RAM | 3 ГБ (backend нужно 1536m: ~750MB off-heap под ONNX-модели + 640MB JVM heap) |
-| Диск | 800 МБ (приложение + ONNX-модели: ~120MB embedding, ~600MB перевод) + библиотека игр |
+| RAM | 4 ГБ (ai-service контейнеру нужно 1536m под PyTorch + HuggingFace модели) |
+| Диск | 2 ГБ (приложение + AI-модели, авто-загрузка с HuggingFace при первом запуске) + библиотека игр |
 | PostgreSQL | расширение pgvector (образ `pgvector/pgvector:pg16`) |
 
 > **Embedding-инференс**: ~200-500ms на игру на 2-ядерном CPU. **Перевод**: ~1-5s на описание.  
@@ -986,10 +1001,7 @@ cp .env.example .env
 └── gameLibraryConfigs/                # Конфигурационные файлы
     ├── db/data/                       # Данные PostgreSQL (mount → postgresdb:/var/lib/postgresql/data)
     ├── scrapers/                      # Конфиги скраперов (scrapers-config.json)
-    ├── models/                        # ONNX-модели для AI-фич (семантический поиск, перевод)
-    │   ├── multilingual-e5-small/     # Модель embedding (~120 МБ)
-    │   ├── opus-mt-ru-en/             # Перевод ru→en (~300 МБ)
-    │   └── opus-mt-en-ru/             # Перевод en→ru (~300 МБ)
+    ├── models/                        # HuggingFace модели для AI-фич (авто-загрузка, volume для сохранения)
     └── tracker/
         ├── config/                    # Transmission settings.json (авто-создание)
         ├── watch/                     # Авто-добавление .torrent
@@ -1011,7 +1023,7 @@ mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers
 > | `...` (корень) | `/gameLibrary` | backend | Файлы игр + изображения (games/, images/) |
 > | `.../tracker/torrents` | `/torrentDirTmp` | backend | Временные .torrent-файлы |
 > | `.../scrapers` | `/scraper-config` | backend | Конфиги скраперов (scrapers-config.json) |
-> | `.../models` | `/models` | backend | ONNX-модели для AI-фич (семантический поиск, перевод) |
+> | `.../models` | `/models` | ai-service | HuggingFace модели (авто-загрузка, сохраняются между перезапусками) |
 > | `.../games` | `/downloads/games` | transmission | Файлы игр для раздачи |
 > | `.../tracker/config` | `/config` | transmission | Настройки Transmission settings.json |
 > | `.../tracker/watch` | `/watch` | transmission | Авто-добавление .torrent |
@@ -1036,6 +1048,7 @@ docker compose up --build -d                  # запуск всех серви
 |------|--------|-----------|
 | `:80` | Nginx | Vue SPA + прокси на API |
 | `:8080` | Backend | REST API + HTTP-трекер |
+| `:8000` | AI сервис | Перевод + embedding-инференс |
 | `:9091` | Transmission | RPC веб-интерфейс |
 | `:51413` | Transmission | P2P-трафик (TCP/UDP) |
 | `:5432` | PostgreSQL | База данных |
