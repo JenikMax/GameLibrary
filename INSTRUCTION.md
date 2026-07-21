@@ -251,6 +251,27 @@ game-library-transmission Up
 
 ---
 
+### Если не нужен AI-сервис (экономия ресурсов)
+
+AI-сервис (`ai-service`) отвечает за семантический поиск и перевод описаний. Если он вам не нужен — можно не запускать, чтобы сэкономить ~2 ГБ RAM и ~2 ГБ на диске:
+
+1. **Заблокируйте ai-service в docker-compose.yml** — закомментируйте или удалите блок `ai-service:`:
+   ```yaml
+   #  ai-service:          # ← закомментировать весь блок
+   #    build: ...
+   #    ...
+   ```
+
+2. **PostgreSQL** — замените `pgvector/pgvector:pg16` на `postgres:16` в `postgresdb/Dockerfile` (pgvector нужен только для AI-поиска). Если pgvector уже стоит — ничего страшного, он просто не будет использоваться.
+
+3. **AI_SERVICE_URL** — можно удалить из `environment` бэкенда в `docker-compose.yml`, или оставить как есть: приложение стартует без ошибок, AI-функции просто отключатся.
+
+4. После правок — перезапустите: `docker compose up -d`.
+
+Без ai-service будет работать всё: библиотека, скрапинг, скачивание, торренты, статистика, коллекции, рейтинги, комментарии, рецензии. Недоступны будут только: семантический поиск, перевод ru↔en и авто-теги.
+
+---
+
 ## 6. Проверка — всё работает?
 
 Откройте браузер и перейдите по адресу:
@@ -530,6 +551,26 @@ cd frontend && npm install && npm run build && cd ..
 # 3. Start all services
 docker compose up --build -d
 ```
+
+### If you don't need the AI service (resource saving)
+
+The AI service (`ai-service`) handles semantic search and translation. If you don't need it — skip it to save ~2 GB RAM and ~2 GB disk:
+
+1. **Disable ai-service in docker-compose.yml** — comment out or delete the `ai-service:` block:
+   ```yaml
+   #  ai-service:          # ← comment out the whole block
+   #    build: ...
+   #    ...
+   ```
+
+2. **PostgreSQL** — replace `pgvector/pgvector:pg16` with `postgres:16` in `postgresdb/Dockerfile` (pgvector is only needed for AI search). If pgvector is already installed — no harm, it just won't be used.
+
+3. **AI_SERVICE_URL** — you can remove it from the backend `environment` in `docker-compose.yml`, or leave it: the application starts fine, AI features gracefully disable themselves.
+
+4. Restart: `docker compose up -d`.
+
+Without ai-service everything still works: library, scraping, downloads, torrents, statistics, collections, ratings, comments, reviews. Only unavailable: semantic search, ru↔en translation, and auto-tagging.
+
 
 ## 6. Verify it works
 
