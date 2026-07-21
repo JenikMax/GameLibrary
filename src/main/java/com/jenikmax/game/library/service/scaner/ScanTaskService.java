@@ -141,7 +141,7 @@ public class ScanTaskService implements DisposableBean {
                     task.setProgress(40 + imgDone * 25 / Math.max(newTotal, 1));
                 }
 
-                // Генерация embedding для новых игр
+                task.setStatus(ScanTask.Status.GENERATING_EMBEDDINGS);
                 if (embeddingService.isAvailable()) {
                     int embDone = 0;
                     for (Long gameId : newGameIds) {
@@ -183,7 +183,7 @@ public class ScanTaskService implements DisposableBean {
                         em.close();
                     }
                     existDone++;
-                    task.setProgress(70 + existDone * 25 / Math.max(existTotal, 1));
+                    task.setProgress(80 + existDone * 15 / Math.max(existTotal, 1));
                 }
 
                 for (Game gameShort : gamesToDelete) {

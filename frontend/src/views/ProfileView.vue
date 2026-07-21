@@ -127,6 +127,8 @@ const scanPhaseLabel = computed(() => {
     'SCANNING_DIRS': t('scan.phase_scanning'),
     'STORING_METADATA': t('scan.phase_metadata'),
     'LOADING_IMAGES': t('scan.phase_images'),
+    'GENERATING_EMBEDDINGS': t('scan.phase_embeddings'),
+    'REFRESHING_SIZES': t('scan.phase_sizes'),
     'COMPLETED': '',
     'FAILED': ''
   }

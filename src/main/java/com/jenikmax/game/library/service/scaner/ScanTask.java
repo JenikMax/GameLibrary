@@ -7,6 +7,7 @@ public class ScanTask {
         SCANNING_DIRS,
         STORING_METADATA,
         LOADING_IMAGES,
+        GENERATING_EMBEDDINGS,
         REFRESHING_SIZES,
         COMPLETED,
         FAILED
