@@ -9,6 +9,7 @@ import com.jenikmax.game.library.model.dto.api.*;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.UserService;
+import com.jenikmax.game.library.service.ai.EmbeddingService;
 import com.jenikmax.game.library.service.ai.AutoTagService;
 import com.jenikmax.game.library.service.ai.TranslationService;
 import com.jenikmax.game.library.service.scraper.ScraperConfigService;
@@ -101,7 +102,7 @@ public class LibraryController {
             pageSize = 12;
         }
 
-        searchText = searchText != null ? searchText : "";
+        searchText = searchText != null ? EmbeddingService.fixEncoding(searchText) : "";
         selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
         selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
         selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
@@ -114,6 +115,9 @@ public class LibraryController {
             List<Long> semanticIds = libraryService.semanticSearchGameIds(searchText.trim(), 200);
             gameIdList = libraryService.filterGameIdsByCriteria(semanticIds,
                     selectedPlatforms, selectedYears, selectedGenres, selectedTags);
+            Map<Long, Integer> order = new HashMap<>();
+            for (int i = 0; i < semanticIds.size(); i++) order.put(semanticIds.get(i), i);
+            gameIdList.sort(Comparator.comparingLong(id -> order.getOrDefault(id, Integer.MAX_VALUE)));
         } else {
             gameIdList = libraryService.getGameIdList(searchText, selectedPlatforms, selectedYears, selectedGenres, selectedTags, sortField, sortType);
         }
@@ -133,7 +137,7 @@ public class LibraryController {
         int endIndex = Math.min(startIndex + pageSize, gameIdList.size());
 
         List<GameShortDto> paginatedGames;
-        if (favoritesOnly) {
+        if (favoritesOnly || semantic) {
             List<Long> pageIds = new ArrayList<>(gameIdList.subList(startIndex, endIndex));
             paginatedGames = libraryService.getGameShortListByIds(pageIds);
             Map<Long, Integer> idOrder = new HashMap<>();

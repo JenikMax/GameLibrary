@@ -2,7 +2,7 @@
 
 CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA library;
 
-ALTER TABLE library.game_data ADD COLUMN IF NOT EXISTS embedding library.vector(384);
+ALTER TABLE library.game_data ADD COLUMN IF NOT EXISTS embedding library.vector(1024);
 
 ALTER TABLE library.game_data ADD COLUMN IF NOT EXISTS description_translated text;
 

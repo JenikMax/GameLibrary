@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
@@ -47,6 +48,9 @@ public class EmbeddingService {
         String genres = (String) row[3];
 
         String text = buildEmbeddingText(name, description, genres);
+        log.info("generateAndStore: gameId={}, textLength={}, textStart='{}'",
+                gameId, text.length(),
+                text.length() > 100 ? text.substring(0, 100) + "..." : text);
         float[] embedding = generateEmbedding(text);
         if (embedding == null) return null;
 
@@ -69,15 +73,22 @@ public class EmbeddingService {
     }
 
     public List<Long> semanticSearch(String query, int limit) {
-        float[] queryEmbedding = generateEmbedding("query: " + query);
-        if (queryEmbedding == null) return List.of();
+        log.info("semanticSearch: query='{}', limit={}", query, limit);
+        float[] queryEmbedding = generateEmbedding(query);
+        if (queryEmbedding == null) {
+            log.warn("semanticSearch: embedding generation returned null for query='{}'", query);
+            return List.of();
+        }
+        log.info("semanticSearch: embedding generated, dims={}", queryEmbedding.length);
 
-        return jdbc.queryForList(
+        List<Long> results = jdbc.queryForList(
                 "SELECT id FROM library.game_data " +
                 "WHERE embedding IS NOT NULL " +
                 "ORDER BY embedding <=> ?::vector " +
                 "LIMIT ?",
                 Long.class, queryEmbedding, limit);
+        log.info("semanticSearch: returned {} results for query='{}'", results.size(), query);
+        return results;
     }
 
     public boolean hasEmbeddings() {
@@ -98,6 +109,11 @@ public class EmbeddingService {
 
     private String buildEmbeddingText(String name, String description, String genres) {
         String desc = Jsoup.parse(description).text();
-        return "passage: " + name + " " + name + " " + genres + " " + desc;
+        return name + " " + name + " " + genres + " " + desc;
+    }
+
+    public static String fixEncoding(String input) {
+        if (input == null) return null;
+        return new String(input.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 }
