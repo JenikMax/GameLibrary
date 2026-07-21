@@ -24,14 +24,14 @@ DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/dock
 | Resource | Minimum |
 |----------|---------|
 | CPU | 1 core |
-| RAM | 1 GB (for containers: postgresdb 512m, backend 768m, frontend 64m, transmission 256m) |
+| RAM | 2 GB (for containers: postgresdb 512m, backend 1024m, frontend 64m, transmission 256m) |
 | Storage | 100 MB for app + space for game library |
 
 ### With AI features (recommended)
 | Resource | Minimum |
 |----------|---------|
 | CPU | 2 cores (Intel N4505 / ARM Cortex-A55 or better) |
-| RAM | 4 GB (ai-service container needs 1536m for PyTorch + HF models) |
+| RAM | 4 GB (containers: postgresdb 512m + backend 1024m + ai-service 2048m + frontend 64m + transmission 256m) |
 | Storage | 2 GB for app + AI models (auto-downloaded on first start) + space for game library |
 | PostgreSQL | pgvector extension (use `pgvector/pgvector:pg16` Docker image) |
 

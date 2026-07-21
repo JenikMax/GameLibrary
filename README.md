@@ -368,7 +368,7 @@ No API key required. The scraper works out of the box for PS1 and PS2 games. Sup
 | Resource | Minimum |
 |----------|---------|
 | CPU | 1 core |
-| RAM | 1 GB (Docker containers: postgres 512m + backend 768m + frontend 64m + transmission 256m) |
+| RAM | 2 GB (Docker containers: postgres 512m + backend 1024m + frontend 64m + transmission 256m) |
 | Storage | 100 MB for app + space for game library |
 | PostgreSQL | 16+ (standard `postgres:16` image) |
 
@@ -376,7 +376,7 @@ No API key required. The scraper works out of the box for PS1 and PS2 games. Sup
 | Resource | Minimum |
 |----------|---------|
 | CPU | 2 cores (Intel N4505 / ARM Cortex-A55 or better) |
-| RAM | 4 GB (ai-service container needs 1536m for PyTorch + HuggingFace models) |
+| RAM | 4 GB (Docker containers: postgres 512m + backend 1024m + ai-service 2048m + frontend 64m + transmission 256m) |
 | Storage | 2 GB for app + AI models (auto-downloaded from HuggingFace on first start) + space for game library |
 | PostgreSQL | pgvector extension (`pgvector/pgvector:pg16` image) |
 
@@ -902,7 +902,7 @@ cp .env.example .env   # отредактировать перед первым 
 | Ресурс | Минимум |
 |--------|---------|
 | CPU | 1 ядро |
-| RAM | 1 ГБ (Docker-контейнеры: postgres 512m + backend 768m + frontend 64m + transmission 256m) |
+| RAM | 2 ГБ (Docker-контейнеры: postgres 512m + backend 1024m + frontend 64m + transmission 256m) |
 | Диск | 100 МБ приложение + место под библиотеку игр |
 | PostgreSQL | 16+ (стандартный образ `postgres:16`) |
 
@@ -910,7 +910,7 @@ cp .env.example .env   # отредактировать перед первым 
 | Ресурс | Минимум |
 |--------|---------|
 | CPU | 2 ядра (Intel N4505 / ARM Cortex-A55 или лучше) |
-| RAM | 4 ГБ (ai-service контейнеру нужно 1536m под PyTorch + HuggingFace модели) |
+| RAM | 4 ГБ (Docker-контейнеры: postgres 512m + backend 1024m + ai-service 2048m + frontend 64m + transmission 256m) |
 | Диск | 2 ГБ (приложение + AI-модели, авто-загрузка с HuggingFace при первом запуске) + библиотека игр |
 | PostgreSQL | расширение pgvector (образ `pgvector/pgvector:pg16`) |
 
