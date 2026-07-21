@@ -12,7 +12,7 @@ class ModelLoader:
         "ru-en": "Helsinki-NLP/opus-mt-ru-en",
         "en-ru": "Helsinki-NLP/opus-mt-en-ru",
     }
-    EMBEDDING_MODEL = "BAAI/bge-m3"
+    EMBEDDING_MODEL = "intfloat/multilingual-e5-small"
 
     def __init__(self, models_dir: str):
         self.models_dir = models_dir
@@ -59,7 +59,7 @@ class ModelLoader:
     def _load_embedding_model(self, cache_dir: str):
         logger.info("Loading embedding model: %s", self.EMBEDDING_MODEL)
         try:
-            local_dir = os.path.join(self.models_dir, "bge-m3")
+            local_dir = os.path.join(self.models_dir, "multilingual-e5-small")
             if os.path.isdir(local_dir):
                 logger.info("  Using cached model at: %s", local_dir)
                 self.embedding_model = SentenceTransformer(local_dir, model_kwargs={"torch_dtype": "auto"})

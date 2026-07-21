@@ -77,7 +77,7 @@ public class EmbeddingService {
 
     public List<Long> semanticSearch(String query, int limit) {
         log.info("semanticSearch: query='{}', limit={}", query, limit);
-        float[] queryEmbedding = generateEmbedding(query);
+        float[] queryEmbedding = generateEmbedding("query: " + query);
         if (queryEmbedding == null) {
             log.warn("semanticSearch: embedding generation returned null for query='{}'", query);
             return List.of();
@@ -112,7 +112,7 @@ public class EmbeddingService {
 
     private String buildEmbeddingText(String name, String description, String genresEn, String genresRu) {
         String desc = Jsoup.parse(description).text();
-        return name + " " + name + " " + genresEn + " " + genresRu + " " + desc;
+        return "passage: " + name + " " + name + " " + genresEn + " " + genresRu + " " + desc;
     }
 
     public static String fixEncoding(String input) {
