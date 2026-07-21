@@ -88,6 +88,11 @@ Opens at `http://localhost` — login as `admin` / `password`.
 
 Semantic search & translation are powered by a separate Python AI service (`ai-service`). Auto-tagging works without AI.
 
+**AI models:**
+- Embedding (semantic search): [`intfloat/multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) — 384-dim vectors
+- Translation ru→en: [`Helsinki-NLP/opus-mt-ru-en`](https://huggingface.co/Helsinki-NLP/opus-mt-ru-en)
+- Translation en→ru: [`Helsinki-NLP/opus-mt-en-ru`](https://huggingface.co/Helsinki-NLP/opus-mt-en-ru)
+
 AI models are downloaded automatically from HuggingFace on first start. No manual setup required. Just run:
 
 ```bash
@@ -111,7 +116,7 @@ The `semantic search` toggle appears in the filter sidebar after the first scan/
 | Scraping | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
 | Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
 | Images | DB bytea + FS override, ETag + Cache-Control (24h), lazy loading |
-| AI / ML | Python AI service (FastAPI + PyTorch + HuggingFace: sentence-transformers, MarianMT), pgvector (vector similarity search) |
+| AI / ML | Python AI service (FastAPI + PyTorch + HuggingFace), pgvector. Models: [`multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) (embeddings), [`opus-mt-ru-en`](https://huggingface.co/Helsinki-NLP/opus-mt-ru-en) + [`opus-mt-en-ru`](https://huggingface.co/Helsinki-NLP/opus-mt-en-ru) (translation) |
 | Build | Maven (JAR) + npm / Vite |
 | Containerization | Docker, docker-compose (5 services) |
 
@@ -626,6 +631,11 @@ make all                      # сборка backend + frontend, запуск do
 
 Семантический поиск и перевод работают через отдельный Python AI сервис (`ai-service`). Авто-теги работают без AI.
 
+**AI-модели:**
+- Embedding (семантический поиск): [`intfloat/multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) — 384-мерные векторы
+- Перевод ru→en: [`Helsinki-NLP/opus-mt-ru-en`](https://huggingface.co/Helsinki-NLP/opus-mt-ru-en)
+- Перевод en→ru: [`Helsinki-NLP/opus-mt-en-ru`](https://huggingface.co/Helsinki-NLP/opus-mt-en-ru)
+
 Модели скачиваются автоматически с HuggingFace при первом запуске. Никакой ручной настройки не требуется. Просто запустите:
 
 ```bash
@@ -649,7 +659,7 @@ docker compose up -d
 | Скрапинг | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
 | Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
 | Изображения | DB bytea + FS override, ETag + Cache-Control (24ч), lazy loading |
-| AI / ML | Python AI сервис (FastAPI + PyTorch + HuggingFace: sentence-transformers, MarianMT), pgvector (векторный поиск) |
+| AI / ML | Python AI сервис (FastAPI + PyTorch + HuggingFace), pgvector. Модели: [`multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) (эмбеддинги), [`opus-mt-ru-en`](https://huggingface.co/Helsinki-NLP/opus-mt-ru-en) + [`opus-mt-en-ru`](https://huggingface.co/Helsinki-NLP/opus-mt-en-ru) (перевод) |
 | Сборка | Maven (JAR) + npm / Vite |
 | Контейнеризация | Docker, docker-compose (5 сервисов) |
 

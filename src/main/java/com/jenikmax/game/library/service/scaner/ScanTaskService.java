@@ -99,12 +99,14 @@ public class ScanTaskService implements DisposableBean {
 
                 task.setStatus(ScanTask.Status.STORING_METADATA);
                 List<Long> newGameIds = new ArrayList<>();
+                Map<Long, String> gameIdToName = new HashMap<>();
                 int metaDone = 0;
                 for (Game gameShort : newGames) {
                     task.setCurrentGame(gameShort.getName());
                     Game game = scanerService.getBasicGameInfo(gameShort);
                     game = gameService.storeGameMetadata(game);
                     newGameIds.add(game.getId());
+                    gameIdToName.put(game.getId(), game.getName());
                     metaDone++;
                     task.setProgress(10 + metaDone * 40 / Math.max(newTotal, 1));
                 }
@@ -145,6 +147,7 @@ public class ScanTaskService implements DisposableBean {
                 if (embeddingService.isAvailable()) {
                     int embDone = 0;
                     for (Long gameId : newGameIds) {
+                        task.setCurrentGame(gameIdToName.getOrDefault(gameId, "id=" + gameId));
                         embeddingService.generateAndStore(gameId);
                         embDone++;
                         task.setProgress(65 + embDone * 15 / Math.max(newTotal, 1));
