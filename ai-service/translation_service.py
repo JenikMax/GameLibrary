@@ -5,6 +5,7 @@ import torch
 
 logger = logging.getLogger(__name__)
 
+_HTML_TAG = re.compile(r'<[^>]*>')
 _SENTENCE_SPLIT = re.compile(r'(?<=[.!?])\s+(?=[A-ZА-ЯЁ0-9])')
 _BATCH_SIZE = 16
 
@@ -57,6 +58,7 @@ class TranslationService:
         if tokenizer is None or model is None:
             raise ValueError(f"No translation model for direction: {direction}")
 
+        text = _HTML_TAG.sub('', text)
         sentences = self._split_sentences(text)
 
         if len(sentences) <= 1:

@@ -75,7 +75,7 @@ public class TranslationService {
         }
         String cleanText = Jsoup.parse(text).text();
         String direction = detectDirection(cleanText);
-        return translateText(text, direction);
+        return translateText(cleanText, direction);
     }
 
     private String detectDirection(String text) {
