@@ -115,35 +115,9 @@ The `semantic search` toggle appears in the filter sidebar after the first scan/
 
 ## 🏗 Architecture
 
-```
-                         ┌──────────────────┐
-                         │  ai-service       │
-                         │  (FastAPI)        │
-                         │  :8000            │
-                         └────────┬──────────┘
-                                  │
-                    translate / embed / embed/batch
-                                  │
-┌─────────┐   :80   ┌──────────┐   :8080  ┌──────────────────┐
-│ Browser │ ──────▶ │  Nginx   │ ──────▶  │   Backend        │
-└─────────┘         │ (Vue SPA)│          │  (REST API)      │
-                    └──────────┘          │  + Tracker       │
-                                          └───┬────────┬─────┘
-                                              │        ▲
-                                              │        │ announce
-                                              │  ┌─────┴──────────┐
-                                              │  │  Transmission  │ :9091 RPC
-                                              │  │  (seeder)      │ :51413 P2P
-                                              │  └──────┬─────────┘
-                                              │         │
-                     ┌──────────────┐         │
-                     │  PostgreSQL  │  :5432  │
-                     └──────────────┘         │
-                     User torrent clients
-                     (qBittorrent, Transmission, etc.)
-                         │              ▲
-                         └───── P2P ────┘
-```
+<p align="center">
+  <img src="frontend/public/schema(eng).png" alt="GameLibrary Architecture" width="800">
+</p>
 
 ### Frontend Routes
 
@@ -675,35 +649,9 @@ docker compose up -d
 
 ## 🏗 Архитектура
 
-```
-                         ┌──────────────────┐
-                         │  ai-service       │
-                         │  (FastAPI)        │
-                         │  :8000            │
-                         └────────┬──────────┘
-                                  │
-                    translate / embed / embed/batch
-                                  │
-┌─────────┐   :80   ┌──────────┐   :8080  ┌──────────────────┐
-│ Browser │ ──────▶ │  Nginx   │ ──────▶  │   Backend        │
-└─────────┘         │ (Vue SPA)│          │  (REST API)      │
-                    └──────────┘          │  + Tracker       │
-                                          └───┬────────┬─────┘
-                                              │        ▲
-                                              │        │ announce
-                                              │  ┌─────┴──────────┐
-                                              │  │  Transmission  │ :9091 RPC
-                                              │  │  (seeder)      │ :51413 P2P
-                                              │  └──────┬─────────┘
-                                              │         │
-                     ┌──────────────┐         │
-                     │  PostgreSQL  │  :5432  │
-                     └──────────────┘         │
-                     Торрент-клиенты
-                     (qBittorrent, Transmission, и др.)
-                         │              ▲
-                         └───── P2P ────┘
-```
+<p align="center">
+  <img src="frontend/public/schema(rus).png" alt="Архитектура GameLibrary" width="800">
+</p>
 
 ### Маршруты Frontend
 
