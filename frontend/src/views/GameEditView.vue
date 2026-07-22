@@ -290,7 +290,7 @@ function genreName(code) {
 async function suggestTags() {
   autoTagLoading.value = true
   try {
-    const res = await gamesApi.suggestTags(route.params.id)
+    const res = await gamesApi.autoTagPreview(form.value.description)
     const data = res.data.data
     suggestedTags.value = (data.suggestedTags || []).filter(t => !form.value.tags.includes(t))
     suggestedGenres.value = (data.suggestedGenres || []).filter(g => !form.value.genres.includes(g))
