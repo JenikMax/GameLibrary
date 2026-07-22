@@ -41,7 +41,7 @@ class TranslationService:
         with torch.no_grad():
             output_ids = model.generate(
                 **inputs,
-                num_beams=4,
+                num_beams=2,
                 max_length=512,
                 early_stopping=True,
             )

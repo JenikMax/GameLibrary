@@ -28,7 +28,8 @@ public class AiClient {
         this.objectMapper = objectMapper;
         this.aiConfig = aiConfig;
         this.slowHttpClient = httpClient.newBuilder()
-                .readTimeout(120, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(300, TimeUnit.SECONDS)
                 .build();
     }
 
