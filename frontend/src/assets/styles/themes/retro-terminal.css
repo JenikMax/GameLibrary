@@ -663,13 +663,40 @@
 /* ═══════ COLLECTION CARDS ═══════ */
 [data-theme="retro-terminal"] .collection-card {
   border: 1px solid var(--rt-border);
-  background: var(--rt-bg-panel);
   border-radius: 0;
 }
 [data-theme="retro-terminal"] .collection-card:hover {
   border-color: #00ff88;
   box-shadow: 0 0 12px rgba(0,255,136,0.2);
 }
+
+/* Collection — Gradient Fade */
+[data-theme="retro-terminal"] .fade-grad {
+  background: linear-gradient(transparent 50%, #000 85%, #000 100%);
+}
+[data-theme="retro-terminal"] .fade-title {
+  color: #00ff88;
+  text-shadow: 0 0 8px rgba(0,255,136,0.6);
+  font-family: 'Courier New', monospace;
+}
+[data-theme="retro-terminal"] .fade-desc {
+  color: #00cc6a;
+}
+[data-theme="retro-terminal"] .fade-count {
+  color: #00cc6a;
+  font-family: 'Courier New', monospace;
+}
+[data-theme="retro-terminal"] .fade-thumb {
+  border-radius: 0;
+  border: 1px solid rgba(0,255,136,0.4);
+}
+[data-theme="retro-terminal"] .fade-ovfl {
+  border-radius: 0;
+  border: 1px solid rgba(0,255,136,0.3);
+  background: rgba(0,255,136,0.1);
+  color: #00ff88;
+}
+
 
 /* ═══════ STAT CARDS ═══════ */
 [data-theme="retro-terminal"] .stat-card {

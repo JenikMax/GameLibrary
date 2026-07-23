@@ -3,47 +3,32 @@
     class="collection-card border-round overflow-hidden surface-card cursor-pointer transition-all"
     @click="router.push(`/collections/${collection.id}`)"
   >
-    <div class="hero-section" :style="heroStyle">
-      <div class="hero-overlay">
-        <div class="hero-content">
-          <div class="flex align-items-center gap-2 mb-1">
-            <h3 class="hero-title m-0">{{ collection.name }}</h3>
-            <Tag v-if="collection.isSmart" :value="t('collections.smart')" severity="info" size="small" rounded />
-          </div>
-          <p v-if="collection.description" class="hero-desc line-clamp-2">
-            {{ collection.description }}
-          </p>
-          <span class="game-count-badge">
-            {{ t('collections.game_count', { n: collection.gameCount }) }}
-          </span>
-        </div>
+    <div class="fade-bg" :style="heroStyle"></div>
+    <div class="fade-grad"></div>
+    <div class="fade-info">
+      <div class="flex align-items-center gap-2 mb-1">
+        <h3 class="fade-title m-0">{{ collection.name }}</h3>
+        <Tag v-if="collection.isSmart" :value="t('collections.smart')" severity="info" size="small" rounded />
       </div>
-    </div>
-
-    <div class="preview-strip">
-      <div
-        v-if="!collection.previewGames || collection.previewGames.length === 0"
-        class="preview-empty"
-      >
-        <i class="pi pi-folder" style="font-size: 1.5rem; opacity: 0.4" />
-        <span>{{ t('collections.no_games_yet') }}</span>
-      </div>
-      <template v-else>
-        <div v-for="(pg, index) in collection.previewGames" :key="pg.gameId" class="preview-item"
-             :style="{ zIndex: collection.previewGames.length - index }">
+      <p v-if="collection.description" class="fade-desc line-clamp-1">{{ collection.description }}</p>
+      <span class="fade-count">{{ t('collections.game_count', { n: collection.gameCount }) }}</span>
+      <div class="fade-covers">
+        <div
+          v-for="pg in fadeGames"
+          :key="pg.gameId"
+          class="fade-thumb"
+        >
           <img
             :src="`/game-library/api/images/games/${pg.gameId}/logo`"
             :alt="pg.name"
-            class="preview-thumb"
+            class="fade-thumb-img"
             @error="onImgError"
           />
         </div>
-        <div v-if="collection.overflow > 0" class="preview-overflow">
-          <div class="overflow-inner">
-            <span class="overflow-text">+{{ collection.overflow }}</span>
-          </div>
+        <div v-if="collection.overflow > 0" class="fade-ovfl">
+          +{{ collection.overflow }}
         </div>
-      </template>
+      </div>
     </div>
   </div>
 </template>
@@ -68,131 +53,132 @@ const heroStyle = computed(() => {
   return { backgroundImage: `url(${img})` }
 })
 
+const fadeGames = computed(() => {
+  if (!props.collection.previewGames) return []
+  return props.collection.previewGames.slice(0, 4)
+})
+
 function onImgError(e) {
   e.target.src = '/game-library/img/default.jpg'
 }
 </script>
 
 <style scoped>
+/* ===== STRUCTURE ONLY ===== */
 .collection-card {
   aspect-ratio: 2 / 3;
+  position: relative;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .collection-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
-.hero-section {
-  height: 80%;
-  min-height: 200px;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-}
-
-.hero-overlay {
+.fade-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(transparent 30%, rgba(0, 0, 0, 0.9) 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 1.25rem;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
 }
 
-.hero-title {
-  margin: 0 0 0.3rem;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+.fade-grad {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 }
 
-.hero-desc {
-  margin: 0 0 0.6rem;
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.85);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-  line-height: 1.3;
-}
-
-.game-count-badge {
-  display: inline-block;
-  background: rgba(0, 0, 0, 0.45);
-  color: #fff;
-  font-size: 0.75rem;
-  padding: 3px 12px;
-  border-radius: 12px;
-  width: fit-content;
-}
-
-.preview-strip {
-  height: 20%;
-  display: flex;
-  align-items: flex-end;
+.fade-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
   padding: 14px;
-  overflow-x: hidden;
-  background: var(--p-surface-800);
 }
 
-.preview-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  gap: 6px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.85rem;
-}
-
-.preview-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.preview-item + .preview-item {
-  margin-left: -19px;
-}
-
-.preview-thumb {
-  width: 55px;
-  height: 73px;
-  object-fit: cover;
-  border-radius: 6px;
-  background: var(--p-surface-700);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-.preview-overflow {
-  flex-shrink: 0;
-  margin-left: -19px;
-}
-
-.overflow-inner {
-  width: 55px;
-  height: 73px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.overflow-text {
-  color: #fff;
+.fade-title {
   font-size: 1rem;
   font-weight: 700;
 }
 
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.fade-desc {
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+.fade-count {
+  font-size: 0.72rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.fade-covers {
+  display: flex;
+  gap: 4px;
+}
+
+.fade-thumb {
+  width: 34px;
+  height: 45px;
   overflow: hidden;
+  flex-shrink: 0;
+}
+
+.fade-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fade-ovfl {
+  width: 34px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+</style>
+
+<style>
+/* ===== LIGHT / DARK DEFAULT ===== */
+.fade-grad {
+  background: linear-gradient(transparent 50%, #1e1e22 85%, #1e1e22 100%);
+}
+
+.fade-title {
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.fade-desc {
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.fade-count {
+  color: #aaa;
+}
+
+.fade-thumb {
+  background: var(--p-surface-700);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.fade-ovfl {
+  background: rgba(255, 255, 255, 0.08);
+  color: #888;
+  border-radius: 4px;
 }
 </style>

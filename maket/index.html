@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collection Card Variants × 3 Themes</title>
+<style>
+/* ============ RESET & GLOBAL ============ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+  background: #1a1a1a;
+  color: #ccc;
+  padding: 32px;
+  min-width: 1280px;
+}
+h2 { color: #fff; margin: 40px 0 6px; font-size: 1.1rem; border-bottom: 1px solid #333; padding-bottom: 4px; }
+h2:first-child { margin-top: 0; }
+.row {
+  display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start;
+}
+.var-label {
+  min-width: 160px; padding-top: 60px; color: #777; font-size: 0.78rem;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+.var-label span { display: block; color: #aaa; font-size: 0.85rem; margin-bottom: 2px; }
+
+/* ============ THEME WRAPPERS ============ */
+.theme-col {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 12px; border-radius: 10px; min-width: 270px;
+}
+.theme-col-label {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+  font-weight: 600; margin-bottom: 2px;
+}
+.col-light { background: #edeae6; }
+.col-light .theme-col-label { color: #8c877e; }
+.col-dark  { background: #18181b; }
+.col-dark .theme-col-label { color: #666; }
+.col-retro { background: #000; border: 1px solid rgba(0,255,136,0.2); }
+.col-retro .theme-col-label { color: #00cc6a; font-family: 'Courier New', monospace; }
+
+/* ============ UTILITY ============ */
+.font-mono { font-family: 'Courier New', Courier, monospace !important; }
+.green   { color: #00ff88; }
+.green-glow { text-shadow: 0 0 8px rgba(0,255,136,0.5); }
+.green-border { border-color: #00ff88 !important; }
+.no-radius { border-radius: 0 !important; }
+.scanline::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 6px);
+}
+
+/* ================================================================ */
+/*  V1 — CLASSIC VERTICAL OVERLAY  (current design reference)       */
+/* ================================================================ */
+.c1 { width: 220px; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c1:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.col-light .c1 { background: #f5f3f0; }
+.col-dark  .c1 { background: #282623; }
+.col-retro .c1 { background: #000; border: 1px solid rgba(0,255,136,0.3); border-radius: 0; }
+.col-retro .c1:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+
+.c1-hero { height: 180px; background-size: cover; background-position: center; position: relative; }
+.c1-ovl  { position: absolute; inset: 0; background: linear-gradient(transparent 30%, rgba(0,0,0,0.9) 100%);
+           display: flex; flex-direction: column; justify-content: flex-end; padding: 14px; }
+.c1-title { color: #fff; font-size: 1.1rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.7); margin-bottom: 3px; }
+.col-retro .c1-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }
+.c1-badge { display: inline-block; background: rgba(0,0,0,0.5); color: #fff; font-size: 0.7rem;
+            padding: 2px 10px; border-radius: 10px; width: fit-content; }
+.col-retro .c1-badge { background: rgba(0,255,136,0.15); color: #00ff88; border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.c1-strip { height: 50px; display: flex; align-items: flex-end; padding: 10px; overflow: hidden; background: #282623; }
+.col-light .c1-strip { background: #3d3a36; }
+.col-retro .c1-strip { background: #001a0d; border-top: 1px solid rgba(0,255,136,0.2); }
+.c1-thumb { width: 38px; height: 50px; object-fit: cover; border-radius: 5px; background: #555;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+.c1-thumb + .c1-thumb { margin-left: -13px; }
+.col-retro .c1-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c1-overflow { width: 38px; height: 50px; border-radius: 5px; background: rgba(0,0,0,0.55);
+               display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: 700; margin-left: -13px; }
+.col-retro .c1-overflow { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+
+/* ================================================================ */
+/*  V2 — HORIZONTAL SPLIT  (hero left, info right)                  */
+/* ================================================================ */
+.c2 { width: 340px; height: 200px; border-radius: 8px; overflow: hidden; display: flex; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c2:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.col-retro .c2 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c2:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c2-hero { width: 45%; background-size: cover; background-position: center; position: relative; }
+.col-retro .c2-hero { border-right: 1px solid rgba(0,255,136,0.3); }
+.c2-right { width: 55%; background: #282623; display: flex; flex-direction: column; padding: 16px; justify-content: space-between; }
+.col-light .c2-right { background: #3d3a36; color: #fff; }
+.col-retro .c2-right { background: #000; }
+.c2-title { color: #fff; font-size: 1rem; font-weight: 700; }
+.col-retro .c2-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.5); font-family: 'Courier New', monospace; }
+.c2-meta { color: #aaa; font-size: 0.72rem; }
+.col-retro .c2-meta { color: #00cc6a; }
+.c2-covers { display: flex; gap: 4px; margin-top: auto; }
+.c2-thumb { width: 32px; height: 42px; object-fit: cover; border-radius: 4px; }
+.col-retro .c2-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c2-overflow { width: 32px; height: 42px; border-radius: 4px; background: rgba(0,0,0,0.5);
+               display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; font-weight: 700; }
+.col-retro .c2-overflow { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+
+/* ================================================================ */
+/*  V3 — FULL-BLEED OVERLAY  (hero 100%, all info overlaid)         */
+/* ================================================================ */
+.c3 { width: 220px; height: 280px; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c3:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.col-retro .c3 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c3:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c3-hero { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.c3-ovl { position: absolute; inset: 0; background: linear-gradient(transparent 20%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.92) 100%);
+          display: flex; flex-direction: column; justify-content: flex-end; padding: 14px; }
+.c3-title { color: #fff; font-size: 1.15rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.8); margin-bottom: 4px; }
+.col-retro .c3-title { color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.6); }
+.c3-covers { display: flex; gap: 3px; margin-top: 6px; }
+.c3-thumb { width: 28px; height: 37px; object-fit: cover; border-radius: 3px; }
+.col-retro .c3-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c3-ovfl { width: 28px; height: 37px; border-radius: 3px; background: rgba(0,0,0,0.5);
+           display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.65rem; }
+.col-retro .c3-ovfl { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+.c3-count { color: rgba(255,255,255,0.75); font-size: 0.72rem; }
+.col-retro .c3-count { color: #00cc6a; }
+
+/* ================================================================ */
+/*  V4 — BOTTOM SHELF  (hero 65%, clean shelf 35%)                  */
+/* ================================================================ */
+.c4 { width: 220px; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c4:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.col-retro .c4 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c4:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c4-hero { height: 170px; background-size: cover; background-position: center; position: relative; }
+.c4-hero-ovl { position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.7) 100%);
+               display: flex; align-items: flex-end; padding: 14px; }
+.c4-title { color: #fff; font-size: 1.05rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+.col-retro .c4-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }
+.c4-shelf { background: #1e1e22; padding: 10px 14px; display: flex; align-items: center; gap: 6px; }
+.col-light .c4-shelf { background: #3d3a36; }
+.col-retro .c4-shelf { background: #001a0d; border-top: 1px solid rgba(0,255,136,0.25); }
+.c4-thumb { width: 34px; height: 45px; object-fit: cover; border-radius: 4px; }
+.col-retro .c4-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c4-ovfl { width: 34px; height: 45px; border-radius: 4px; background: rgba(255,255,255,0.08);
+           display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 0.7rem; font-weight: 700; }
+.col-retro .c4-ovfl { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+.c4-count { margin-left: auto; color: #888; font-size: 0.72rem; }
+.col-retro .c4-count { color: #00cc6a; font-family: 'Courier New', monospace; }
+
+/* ================================================================ */
+/*  V5 — GLASS PANEL  (hero full, frosted glass info, covers below) */
+/* ================================================================ */
+.c5 { width: 220px; height: 290px; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c5:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.col-retro .c5 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c5:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c5-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.c5-glass { position: absolute; left: 10%; right: 10%; top: 42%; bottom: 18%;
+            background: rgba(30,30,30,0.55); backdrop-filter: blur(6px);
+            border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; }
+.col-retro .c5-glass { background: rgba(0,0,0,0.7); backdrop-filter: none; border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c5-title { color: #fff; font-size: 1rem; font-weight: 700; text-align: center; }
+.col-retro .c5-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.5); font-family: 'Courier New', monospace; }
+.c5-count { color: rgba(255,255,255,0.7); font-size: 0.72rem; margin-top: 4px; }
+.col-retro .c5-count { color: #00cc6a; }
+.c5-covers { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; }
+.c5-thumb { width: 30px; height: 40px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+.col-retro .c5-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+
+/* ================================================================ */
+/*  V6 — MAGAZINE COVER  (hero full, bold title, badges)            */
+/* ================================================================ */
+.c6 { width: 220px; height: 290px; border-radius: 6px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c6:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.col-retro .c6 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c6:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c6-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.c6-top { position: absolute; top: 0; left: 0; right: 0; padding: 16px 14px 30px;
+          background: linear-gradient(rgba(0,0,0,0.7) 0%, transparent 100%); }
+.c6-title { color: #fff; font-size: 1.25rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.7); line-height: 1.2; }
+.col-retro .c6-title { color: #00ff88; text-shadow: 0 0 12px rgba(0,255,136,0.6); }
+.c6-bot { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 14px 10px;
+          background: linear-gradient(transparent 0%, rgba(0,0,0,0.85) 100%); display: flex; align-items: flex-end; gap: 6px; }
+.c6-thumb { width: 30px; height: 40px; object-fit: cover; border-radius: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+.col-retro .c6-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c6-ovfl { width: 30px; height: 40px; border-radius: 3px; background: rgba(255,255,255,0.08);
+           display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; margin-left: 4px; }
+.col-retro .c6-ovfl { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+.c6-badge { position: absolute; top: 14px; right: 14px; background: #e74c3c; color: #fff; font-size: 0.65rem;
+            font-weight: 700; padding: 2px 8px; border-radius: 3px; text-transform: uppercase; }
+.col-retro .c6-badge { background: transparent; color: #00ff88; border: 1px solid #00ff88; border-radius: 0; font-family: 'Courier New', monospace; }
+
+/* ================================================================ */
+/*  V7 — SIDE TAB  (vertical tab left, hero right)                  */
+/* ================================================================ */
+.c7 { width: 320px; height: 190px; border-radius: 8px; overflow: hidden; display: flex; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c7:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.col-retro .c7 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c7:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c7-tab { width: 22%; min-width: 50px; background: #282623; display: flex; align-items: center; justify-content: center; }
+.col-light .c7-tab { background: #3d3a36; }
+.col-retro .c7-tab { background: #001a0d; border-right: 1px solid rgba(0,255,136,0.3); }
+.c7-tab-text { color: #ccc; font-size: 0.8rem; font-weight: 600; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.05em; }
+.col-retro .c7-tab-text { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.4); font-family: 'Courier New', monospace; }
+.c7-main { width: 78%; display: flex; flex-direction: column; }
+.c7-hero { flex: 1; background-size: cover; background-position: center; position: relative; }
+.c7-hero-ovl { position: absolute; inset: 0; background: linear-gradient(transparent 55%, rgba(0,0,0,0.6) 100%); }
+.c7-strip { background: #1e1e22; padding: 8px 12px; display: flex; gap: 5px; align-items: center; }
+.col-light .c7-strip { background: #3d3a36; }
+.col-retro .c7-strip { background: #001a0d; border-top: 1px solid rgba(0,255,136,0.2); }
+.c7-thumb { width: 30px; height: 40px; object-fit: cover; border-radius: 3px; }
+.col-retro .c7-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c7-ovfl { width: 30px; height: 40px; border-radius: 3px; background: rgba(255,255,255,0.08);
+           display: flex; align-items: center; justify-content: center; color: #888; font-size: 0.7rem; font-weight: 700; }
+.col-retro .c7-ovfl { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+.c7-count { margin-left: auto; color: #888; font-size: 0.7rem; }
+.col-retro .c7-count { color: #00cc6a; }
+
+/* ================================================================ */
+/*  V8 — CASCADE DIAGONAL  (covers fan out from top-right)          */
+/* ================================================================ */
+.c8 { width: 230px; height: 300px; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c8:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.col-retro .c8 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c8:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c8-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.c8-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 35px 14px 10px;
+           background: linear-gradient(transparent 0%, rgba(0,0,0,0.85) 100%); }
+.c8-title { color: #fff; font-size: 1.05rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+.col-retro .c8-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }
+.c8-count { color: rgba(255,255,255,0.7); font-size: 0.7rem; margin-top: 2px; }
+.col-retro .c8-count { color: #00cc6a; }
+.c8-fan { position: absolute; top: 12px; right: 10px; }
+.c8-fthumb { display: block; width: 36px; height: 48px; object-fit: cover; border-radius: 4px;
+             box-shadow: 0 2px 8px rgba(0,0,0,0.5); margin-bottom: 4px; }
+.col-retro .c8-fthumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c8-fthumb:nth-child(1) { transform: translate(-18px, 0); }
+.c8-fthumb:nth-child(2) { transform: translate(-12px, 4px); }
+.c8-fthumb:nth-child(3) { transform: translate(-6px, 8px); }
+.c8-fthumb:nth-child(4) { width: 36px; height: 48px; border-radius: 4px; transform: translate(0, 12px);
+                          background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+                          color: #fff; font-size: 0.65rem; font-weight: 700; }
+.col-retro .c8-fthumb:nth-child(4) { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+
+/* ================================================================ */
+/*  V9 — ULTRA-WIDE BANNER  (hero bg, info left, covers right)      */
+/* ================================================================ */
+.c9 { width: 400px; height: 140px; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+      display: flex; align-items: center; }
+.c9:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.col-retro .c9 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c9:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c9-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.c9-ovl { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.3) 100%); }
+.c9-content { position: relative; display: flex; align-items: center; width: 100%; padding: 0 20px; gap: 16px; }
+.c9-info { flex: 1; }
+.c9-title { color: #fff; font-size: 1.15rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+.col-retro .c9-title { color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.6); }
+.c9-count { color: rgba(255,255,255,0.7); font-size: 0.72rem; }
+.col-retro .c9-count { color: #00cc6a; }
+.c9-covers { display: flex; gap: 5px; flex-shrink: 0; }
+.c9-thumb { width: 40px; height: 53px; object-fit: cover; border-radius: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+.col-retro .c9-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c9-ovfl { width: 40px; height: 53px; border-radius: 5px; background: rgba(255,255,255,0.08);
+           display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.8rem; font-weight: 700; }
+.col-retro .c9-ovfl { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+
+/* ================================================================ */
+/*  V10 — NEON FRAME  (hero with colored frame border)              */
+/* ================================================================ */
+.c10 { width: 220px; height: 290px; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+.c10:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.c10-frame { border: 3px solid #6e6a63; border-radius: 8px; overflow: hidden; height: 100%; }
+.col-dark .c10-frame { border-color: #444; }
+.col-retro .c10 { border-radius: 0; }
+.col-retro .c10:hover { box-shadow: 0 0 15px rgba(0,255,136,0.25); }
+.col-retro .c10-frame { border-color: #00ff88; border-radius: 0; box-shadow: 0 0 10px rgba(0,255,136,0.3); }
+.c10-hero { height: 200px; background-size: cover; background-position: center; position: relative; }
+.c10-hero-ovl { position: absolute; inset: 0; background: linear-gradient(transparent 45%, rgba(0,0,0,0.7) 100%);
+                display: flex; align-items: flex-end; padding: 14px; }
+.c10-title { color: #fff; font-size: 1rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+.col-retro .c10-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }
+.c10-strip { height: auto; background: #282623; padding: 10px 14px; display: flex; gap: 6px; align-items: center; }
+.col-light .c10-strip { background: #3d3a36; }
+.col-retro .c10-strip { background: #001a0d; }
+.c10-thumb { width: 32px; height: 42px; object-fit: cover; border-radius: 3px; }
+.col-retro .c10-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c10-ovfl { width: 32px; height: 42px; border-radius: 3px; background: rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center; color: #888; font-size: 0.65rem; font-weight: 700; }
+.col-retro .c10-ovfl { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+
+/* ================================================================ */
+/*  V11 — POLAROID STACK  (tilted cards)                            */
+/* ================================================================ */
+.c11 { width: 240px; height: 300px; position: relative; cursor: pointer; transition: transform 0.2s; }
+.c11:hover { transform: translateY(-2px); }
+.c11-card { width: 180px; height: 240px; border-radius: 3px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.25); position: absolute;
+            display: flex; flex-direction: column; }
+.col-dark .c11-card { background: #2a2a2e; box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+.col-retro .c11-card { background: #000; border-radius: 0; border: 1px solid rgba(0,255,136,0.3); box-shadow: 0 0 8px rgba(0,255,136,0.1); }
+.c11-card:nth-child(1) { left: 0; top: 0; transform: rotate(-3deg); z-index: 3; }
+.c11-card:nth-child(2) { left: 16px; top: 8px; transform: rotate(2deg); z-index: 2; }
+.c11-card:nth-child(3) { left: 32px; top: 16px; transform: rotate(-1deg); z-index: 1; }
+.c11-card:nth-child(4) { left: 48px; top: 24px; transform: rotate(3deg); z-index: 0; width: 180px; height: 240px; background: rgba(0,0,0,0.5);
+                          border-radius: 3px; display: flex; align-items: center; justify-content: center;
+                          color: #fff; font-size: 0.8rem; font-weight: 700; }
+.col-dark .c11-card:nth-child(4) { background: rgba(0,0,0,0.6); }
+.col-retro .c11-card:nth-child(4) { background: rgba(0,255,136,0.08); color: #00ff88; border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.c11-img { flex: 1; background-size: cover; background-position: center; border-bottom: 1px solid #eee; }
+.col-dark .c11-img { border-bottom-color: #444; }
+.col-retro .c11-img { border-bottom-color: rgba(0,255,136,0.3); }
+.c11-label { padding: 8px; font-size: 0.7rem; font-weight: 600; color: #333; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.col-dark .c11-label { color: #ccc; }
+.col-retro .c11-label { color: #00ff88; font-family: 'Courier New', monospace; }
+.c11-info { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; }
+.c11-info-title { color: #ddd; font-size: 0.85rem; font-weight: 700; }
+.col-dark .c11-info-title { color: #fff; }
+.col-retro .c11-info-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.4); font-family: 'Courier New', monospace; }
+.c11-info-count { color: #888; font-size: 0.7rem; }
+.col-retro .c11-info-count { color: #00cc6a; }
+
+/* ================================================================ */
+/*  V12 — DOUBLE-DECKER  (top hero row, mid title, bottom covers)   */
+/* ================================================================ */
+.c12 { width: 340px; height: 200px; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+       display: flex; flex-direction: column; }
+.c12:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.col-retro .c12 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c12:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c12-hero { flex: 1; background-size: cover; background-position: center; }
+.c12-mid { background: #282623; padding: 6px 16px; display: flex; align-items: center; gap: 8px; }
+.col-light .c12-mid { background: #3d3a36; }
+.col-retro .c12-mid { background: #001a0d; border-top: 1px solid rgba(0,255,136,0.2); border-bottom: 1px solid rgba(0,255,136,0.2); }
+.c12-title { color: #fff; font-size: 0.85rem; font-weight: 700; }
+.col-retro .c12-title { color: #00ff88; text-shadow: 0 0 6px rgba(0,255,136,0.4); font-family: 'Courier New', monospace; }
+.c12-count { margin-left: auto; color: #888; font-size: 0.68rem; }
+.col-retro .c12-count { color: #00cc6a; }
+.c12-strip { background: #1e1e22; padding: 8px 16px; display: flex; gap: 5px; }
+.col-light .c12-strip { background: #3d3a36; }
+.col-retro .c12-strip { background: #001a0d; }
+.c12-thumb { width: 36px; height: 48px; object-fit: cover; border-radius: 3px; }
+.col-retro .c12-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c12-ovfl { width: 36px; height: 48px; border-radius: 3px; background: rgba(255,255,255,0.07);
+            display: flex; align-items: center; justify-content: center; color: #888; font-size: 0.7rem; font-weight: 700; }
+.col-retro .c12-ovfl { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+
+/* ================================================================ */
+/*  V13 — FILM STRIP  (perforations + marching covers)              */
+/* ================================================================ */
+.c13 { width: 420px; height: 130px; border-radius: 6px; overflow: hidden; display: flex; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+       background: #111; }
+.c13:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.col-retro .c13 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c13:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c13-hero { width: 38%; height: 130px; background-size: cover; background-position: center; position: relative; }
+.c13-frames { flex: 1; display: flex; align-items: center; padding: 0 14px; gap: 8px; position: relative; background: #1a1a1a; }
+.col-retro .c13-frames { background: #000; }
+.c13-frames::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+                      background: repeating-linear-gradient(0deg, #111 0px, #111 16px, #222 16px, #222 20px); }
+.col-retro .c13-frames::before { background: repeating-linear-gradient(0deg, #000 0px, #000 20px, rgba(0,255,136,0.2) 20px, rgba(0,255,136,0.2) 24px); }
+.c13-thumb { width: 38px; height: 51px; object-fit: cover; border-radius: 2px; }
+.col-retro .c13-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c13-ovfl { width: 38px; height: 51px; border-radius: 2px; background: rgba(255,255,255,0.06);
+            display: flex; align-items: center; justify-content: center; color: #666; font-size: 0.7rem; font-weight: 700; }
+.col-retro .c13-ovfl { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+.c13-info { position: absolute; left: 14px; bottom: 10px; display: flex; flex-direction: column; }
+.c13-title { color: #fff; font-size: 0.8rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+.col-retro .c13-title { color: #00ff88; text-shadow: 0 0 6px rgba(0,255,136,0.5); }
+.c13-count { color: rgba(255,255,255,0.7); font-size: 0.65rem; }
+.col-retro .c13-count { color: #00cc6a; }
+
+/* ================================================================ */
+/*  V14 — CORNER PEEL  (corner reveals covers underneath)           */
+/* ================================================================ */
+.c14 { width: 220px; height: 290px; position: relative; cursor: pointer; border-radius: 8px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+.c14:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.col-retro .c14 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c14:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c14-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.c14-peel { position: absolute; bottom: 0; right: 0; width: 130px; height: 80px;
+            background: #282623; clip-path: polygon(0 100%, 100% 0, 100% 100%);
+            display: flex; align-items: flex-end; justify-content: flex-end; padding: 8px; gap: 4px; }
+.col-light .c14-peel { background: #3d3a36; }
+.col-retro .c14-peel { background: #001a0d; }
+.c14-pt { width: 26px; height: 35px; object-fit: cover; border-radius: 2px; }
+.col-retro .c14-pt { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c14-title { position: absolute; bottom: 14px; left: 14px; color: #fff; font-size: 1rem; font-weight: 700;
+             text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+.col-retro .c14-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }
+
+/* ================================================================ */
+/*  V15 — SIDE STRIPE  (left dark stripe 15%, hero 85%)             */
+/* ================================================================ */
+.c15 { width: 240px; height: 300px; border-radius: 8px; overflow: hidden; display: flex; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c15:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.col-retro .c15 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c15:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c15-stripe { width: 15%; background: #282623; display: flex; flex-direction: column; align-items: center; padding-top: 16px; gap: 8px; }
+.col-light .c15-stripe { background: #3d3a36; }
+.col-retro .c15-stripe { background: #001a0d; border-right: 1px solid rgba(0,255,136,0.2); }
+.c15-dot { width: 6px; height: 6px; border-radius: 50%; background: #666; }
+.col-retro .c15-dot { background: #00ff88; border-radius: 0; box-shadow: 0 0 6px rgba(0,255,136,0.4); }
+.c15-main { width: 85%; display: flex; flex-direction: column; }
+.c15-hero { flex: 1; background-size: cover; background-position: center; position: relative; }
+.c15-hero-ovl { position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.65) 100%); }
+.c15-info { position: absolute; bottom: 10px; left: 10px; right: 10px; color: #fff; }
+.c15-title { font-size: 0.9rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+.col-retro .c15-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }
+.c15-count { font-size: 0.68rem; color: rgba(255,255,255,0.6); }
+.col-retro .c15-count { color: #00cc6a; }
+.c15-strip { background: #1e1e22; padding: 8px 10px; display: flex; gap: 5px; }
+.col-light .c15-strip { background: #3d3a36; }
+.col-retro .c15-strip-alt { background: #001a0d; }
+.c15-thumb { width: 30px; height: 40px; object-fit: cover; border-radius: 3px; }
+.col-retro .c15-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+
+/* ================================================================ */
+/*  V16 — GRADIENT FADE  (hero fades smoothly into dark bottom)     */
+/* ================================================================ */
+.c16 { width: 220px; height: 290px; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c16:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.col-retro .c16 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c16:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c16-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.c16-grad { position: absolute; inset: 0; background: linear-gradient(transparent 50%, #1e1e22 85%, #1e1e22 100%); }
+.col-retro .c16-grad { background: linear-gradient(transparent 50%, #000 85%, #000 100%); }
+.c16-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 14px; }
+.c16-title { color: #fff; font-size: 1rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+.col-retro .c16-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }
+.c16-count { color: #aaa; font-size: 0.7rem; margin-bottom: 6px; }
+.col-retro .c16-count { color: #00cc6a; }
+.c16-covers { display: flex; gap: 4px; }
+.c16-thumb { width: 34px; height: 45px; object-fit: cover; border-radius: 4px; }
+.col-retro .c16-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c16-ovfl { width: 34px; height: 45px; border-radius: 4px; background: rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center; color: #888; font-size: 0.65rem; font-weight: 700; }
+.col-retro .c16-ovfl { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+
+/* ================================================================ */
+/*  V17 — FLOATING CARD  (dark bg, centered hero, covers below)     */
+/* ================================================================ */
+.c17 { width: 240px; height: 310px; border-radius: 10px; overflow: hidden; background: #1e1e22;
+       display: flex; flex-direction: column; align-items: center; padding: 16px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c17:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+.col-light .c17 { background: #e3e0db; }
+.col-retro .c17 { border-radius: 0; background: #000; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c17:hover { box-shadow: 0 0 15px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c17-hero { width: 170px; height: 180px; background-size: cover; background-position: center; border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5); margin-bottom: 12px; }
+.col-retro .c17-hero { border-radius: 0; border: 2px solid rgba(0,255,136,0.4); box-shadow: 0 0 10px rgba(0,255,136,0.15); }
+.c17-title { color: #fff; font-size: 0.95rem; font-weight: 700; text-align: center; margin-bottom: 6px; }
+.col-light .c17-title { color: #3d3a36; }
+.col-retro .c17-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.5); font-family: 'Courier New', monospace; }
+.c17-covers { display: flex; gap: 6px; }
+.c17-thumb { width: 34px; height: 45px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+.col-retro .c17-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+
+/* ================================================================ */
+/*  V18 — COLLAGE GRID  (hero grid + title overlay)                 */
+/* ================================================================ */
+.c18 { width: 230px; height: 290px; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+       display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; }
+.c18:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.col-retro .c18 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); gap: 1px; }
+.col-retro .c18:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c18-cell { background-size: cover; background-position: center; position: relative; }
+.c18-cell::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
+.col-retro .c18-cell::after { background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px); }
+.c18-ovl { position: absolute; inset: 0; background: rgba(0,0,0,0.55);
+           display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px; }
+.col-retro .c18-ovl { background: rgba(0,0,0,0.7); }
+.c18-title { color: #fff; font-size: 1.05rem; font-weight: 700; text-align: center; text-shadow: 0 1px 6px rgba(0,0,0,0.7); }
+.col-retro .c18-title { color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.6); }
+.c18-count { color: rgba(255,255,255,0.8); font-size: 0.75rem; margin-top: 4px; }
+.col-retro .c18-count { color: #00cc6a; }
+
+/* ================================================================ */
+/*  V19 — TERMINAL BLOCK  (heavy frame, monospace labels)           */
+/* ================================================================ */
+.c19 { width: 230px; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+       background: #1a1a1a; border: 2px solid #444; }
+.c19:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.col-light .c19 { background: #f5f3f0; border-color: #b0aba3; }
+.col-dark .c19 { background: #18181b; border-color: #444; }
+.col-retro .c19 { border-radius: 0; border-color: #00ff88; background: #000; box-shadow: 0 0 12px rgba(0,255,136,0.15); }
+.col-retro .c19:hover { box-shadow: 0 0 20px rgba(0,255,136,0.3); border-color: #33ffaa; }
+.c19-hero { height: 175px; background-size: cover; background-position: center; position: relative; }
+.c19-hero::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.25); }
+.col-retro .c19-hero::after { background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 6px); }
+.c19-bar { background: #333; padding: 6px 12px; display: flex; align-items: center; gap: 6px; }
+.col-light .c19-bar { background: #3d3a36; }
+.col-retro .c19-bar { background: #001a0d; border-top: 1px solid rgba(0,255,136,0.3); }
+.c19-bar-dot { width: 7px; height: 7px; border-radius: 50%; }
+.c19-bar-dot:nth-child(1) { background: #e74c3c; }
+.c19-bar-dot:nth-child(2) { background: #f1c40f; }
+.c19-bar-dot:nth-child(3) { background: #2ecc71; }
+.col-retro .c19-bar-dot { border-radius: 0; width: 8px; height: 8px; }
+.col-retro .c19-bar-dot:nth-child(1) { background: #ff3344; }
+.col-retro .c19-bar-dot:nth-child(2) { background: #f59e0b; }
+.col-retro .c19-bar-dot:nth-child(3) { background: #00ff88; }
+.c19-label { margin-left: auto; color: #888; font-size: 0.65rem; font-family: 'Courier New', monospace; }
+.col-retro .c19-label { color: #00cc6a; }
+.c19-body { padding: 12px 14px; }
+.c19-title { color: #fff; font-size: 0.9rem; font-weight: 700; }
+.col-light .c19-title { color: #3d3a36; }
+.col-retro .c19-title { color: #00ff88; text-shadow: 0 0 6px rgba(0,255,136,0.4); font-family: 'Courier New', monospace; }
+.c19-covers { display: flex; gap: 5px; margin-top: 8px; }
+.c19-thumb { width: 32px; height: 42px; object-fit: cover; border-radius: 3px; }
+.col-retro .c19-thumb { border-radius: 0; border: 1px solid rgba(0,255,136,0.4); }
+.c19-ovfl { width: 32px; height: 42px; border-radius: 3px; background: rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center; color: #888; font-size: 0.65rem; font-weight: 700; }
+.col-retro .c19-ovfl { border-radius: 0; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+
+/* ================================================================ */
+/*  V20 — MINIMALIST BADGE  (hero 100%, tiny info, dot indicators)  */
+/* ================================================================ */
+.c20 { width: 200px; height: 260px; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.c20:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.col-retro .c20 { border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.col-retro .c20:hover { box-shadow: 0 0 12px rgba(0,255,136,0.2); border-color: #00ff88; }
+.c20-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.c20-ovl { position: absolute; inset: 0; background: linear-gradient(transparent 60%, rgba(0,0,0,0.75) 100%); }
+.c20-content { position: absolute; top: 12px; left: 12px; right: 12px; }
+.c20-title { color: #fff; font-size: 0.85rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+.col-retro .c20-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.5); }
+.c20-badge { display: inline-block; background: rgba(0,0,0,0.5); color: #fff; font-size: 0.65rem;
+             padding: 1px 8px; border-radius: 8px; margin-top: 4px; }
+.col-retro .c20-badge { background: rgba(0,255,136,0.15); color: #00ff88; border-radius: 0; border: 1px solid rgba(0,255,136,0.3); }
+.c20-dots { position: absolute; bottom: 14px; right: 14px; display: flex; gap: 5px; }
+.c20-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.5); }
+.c20-dot.active { background: #fff; }
+.col-retro .c20-dot { background: rgba(0,255,136,0.3); border-radius: 0; }
+.col-retro .c20-dot.active { background: #00ff88; box-shadow: 0 0 6px rgba(0,255,136,0.5); }
+</style>
+</head>
+<body>
+
+<h2>1 — Classic Vertical Overlay (текущий дизайн)</h2>
+<div class="row">
+  <div class="var-label"><span>V1</span> Classic<br>Vertical Overlay</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c1"><div class="c1-hero" style="background-image:url(default.jpg)"><div class="c1-ovl"><div class="c1-title">Best RPGs Ever</div><span class="c1-badge">5 games</span></div></div><div class="c1-strip"><img src="default.jpg" class="c1-thumb"><img src="default.jpg" class="c1-thumb"><img src="default.jpg" class="c1-thumb"><img src="default.jpg" class="c1-thumb"><div class="c1-overflow">+2</div></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c1"><div class="c1-hero" style="background-image:url(default.jpg)"><div class="c1-ovl"><div class="c1-title">Best RPGs Ever</div><span class="c1-badge">5 games</span></div></div><div class="c1-strip"><img src="default.jpg" class="c1-thumb"><img src="default.jpg" class="c1-thumb"><img src="default.jpg" class="c1-thumb"><img src="default.jpg" class="c1-thumb"><div class="c1-overflow">+2</div></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c1"><div class="c1-hero" style="background-image:url(default.jpg)"><div class="c1-ovl"><div class="c1-title font-mono">Best RPGs Ever</div><span class="c1-badge">5 games</span></div></div><div class="c1-strip"><img src="default.jpg" class="c1-thumb"><img src="default.jpg" class="c1-thumb"><img src="default.jpg" class="c1-thumb"><img src="default.jpg" class="c1-thumb"><div class="c1-overflow">+2</div></div></div>
+  </div>
+</div>
+
+<h2>2 — Horizontal Split (hero слева, информация справа)</h2>
+<div class="row">
+  <div class="var-label"><span>V2</span> Horizontal<br>Split</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c2"><div class="c2-hero" style="background-image:url(default.jpg)"></div><div class="c2-right"><div class="c2-title">Best RPGs</div><div class="c2-meta">8 games &bull; Public</div><div class="c2-covers"><img src="default.jpg" class="c2-thumb"><img src="default.jpg" class="c2-thumb"><img src="default.jpg" class="c2-thumb"><img src="default.jpg" class="c2-thumb"><div class="c2-overflow">+4</div></div></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c2"><div class="c2-hero" style="background-image:url(default.jpg)"></div><div class="c2-right"><div class="c2-title">Best RPGs</div><div class="c2-meta">8 games &bull; Public</div><div class="c2-covers"><img src="default.jpg" class="c2-thumb"><img src="default.jpg" class="c2-thumb"><img src="default.jpg" class="c2-thumb"><img src="default.jpg" class="c2-thumb"><div class="c2-overflow">+4</div></div></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c2"><div class="c2-hero" style="background-image:url(default.jpg)"></div><div class="c2-right"><div class="c2-title font-mono">Best RPGs</div><div class="c2-meta font-mono">8 games &bull; Public</div><div class="c2-covers"><img src="default.jpg" class="c2-thumb"><img src="default.jpg" class="c2-thumb"><img src="default.jpg" class="c2-thumb"><img src="default.jpg" class="c2-thumb"><div class="c2-overflow">+4</div></div></div></div>
+  </div>
+</div>
+
+<h2>3 — Full-Bleed Overlay (обложка во всю карточку, всё поверх)</h2>
+<div class="row">
+  <div class="var-label"><span>V3</span> Full-Bleed<br>Overlay</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c3"><div class="c3-hero" style="background-image:url(default.jpg)"></div><div class="c3-ovl"><div class="c3-title">Best RPGs</div><span class="c3-count">12 games</span><div class="c3-covers"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><div class="c3-ovfl">+7</div></div></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c3"><div class="c3-hero" style="background-image:url(default.jpg)"></div><div class="c3-ovl"><div class="c3-title">Best RPGs</div><span class="c3-count">12 games</span><div class="c3-covers"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><div class="c3-ovfl">+7</div></div></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c3"><div class="c3-hero" style="background-image:url(default.jpg)"></div><div class="c3-ovl"><div class="c3-title font-mono">Best RPGs</div><span class="c3-count">12 games</span><div class="c3-covers"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><img src="default.jpg" class="c3-thumb"><div class="c3-ovfl">+7</div></div></div></div>
+  </div>
+</div>
+
+<h2>4 — Bottom Shelf (чистая полка снизу, обложки с отступами)</h2>
+<div class="row">
+  <div class="var-label"><span>V4</span> Bottom<br>Shelf</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c4"><div class="c4-hero" style="background-image:url(default.jpg)"><div class="c4-hero-ovl"><div class="c4-title">Horror Collection</div></div></div><div class="c4-shelf"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><div class="c4-ovfl">+3</div><span class="c4-count">8 games</span></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c4"><div class="c4-hero" style="background-image:url(default.jpg)"><div class="c4-hero-ovl"><div class="c4-title">Horror Collection</div></div></div><div class="c4-shelf"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><div class="c4-ovfl">+3</div><span class="c4-count">8 games</span></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c4"><div class="c4-hero" style="background-image:url(default.jpg)"><div class="c4-hero-ovl"><div class="c4-title font-mono">Horror Collection</div></div></div><div class="c4-shelf"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><img src="default.jpg" class="c4-thumb"><div class="c4-ovfl">+3</div><span class="c4-count">8 games</span></div></div>
+  </div>
+</div>
+
+<h2>5 — Glass Panel (матовое стекло по центру, обложки внизу)</h2>
+<div class="row">
+  <div class="var-label"><span>V5</span> Glass<br>Panel</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c5"><div class="c5-bg" style="background-image:url(default.jpg)"></div><div class="c5-glass"><div class="c5-title">Indie Gems</div><span class="c5-count">15 games &bull; Private</span></div><div class="c5-covers"><img src="default.jpg" class="c5-thumb"><img src="default.jpg" class="c5-thumb"><img src="default.jpg" class="c5-thumb"><img src="default.jpg" class="c5-thumb"></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c5"><div class="c5-bg" style="background-image:url(default.jpg)"></div><div class="c5-glass"><div class="c5-title">Indie Gems</div><span class="c5-count">15 games &bull; Private</span></div><div class="c5-covers"><img src="default.jpg" class="c5-thumb"><img src="default.jpg" class="c5-thumb"><img src="default.jpg" class="c5-thumb"><img src="default.jpg" class="c5-thumb"></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c5"><div class="c5-bg" style="background-image:url(default.jpg)"></div><div class="c5-glass"><div class="c5-title font-mono">Indie Gems</div><span class="c5-count">15 games &bull; Private</span></div><div class="c5-covers"><img src="default.jpg" class="c5-thumb"><img src="default.jpg" class="c5-thumb"><img src="default.jpg" class="c5-thumb"><img src="default.jpg" class="c5-thumb"></div></div>
+  </div>
+</div>
+
+<h2>6 — Magazine Cover (заголовок сверху, обложки снизу, бейдж)</h2>
+<div class="row">
+  <div class="var-label"><span>V6</span> Magazine<br>Cover</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c6"><div class="c6-bg" style="background-image:url(default.jpg)"></div><div class="c6-badge">New</div><div class="c6-top"><div class="c6-title">TOP 10<br>of 2024</div></div><div class="c6-bot"><img src="default.jpg" class="c6-thumb"><img src="default.jpg" class="c6-thumb"><img src="default.jpg" class="c6-thumb"><img src="default.jpg" class="c6-thumb"><div class="c6-ovfl">+6</div></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c6"><div class="c6-bg" style="background-image:url(default.jpg)"></div><div class="c6-badge">New</div><div class="c6-top"><div class="c6-title">TOP 10<br>of 2024</div></div><div class="c6-bot"><img src="default.jpg" class="c6-thumb"><img src="default.jpg" class="c6-thumb"><img src="default.jpg" class="c6-thumb"><img src="default.jpg" class="c6-thumb"><div class="c6-ovfl">+6</div></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c6"><div class="c6-bg" style="background-image:url(default.jpg)"></div><div class="c6-badge font-mono">NEW</div><div class="c6-top"><div class="c6-title font-mono">TOP 10<br>of 2024</div></div><div class="c6-bot"><img src="default.jpg" class="c6-thumb"><img src="default.jpg" class="c6-thumb"><img src="default.jpg" class="c6-thumb"><img src="default.jpg" class="c6-thumb"><div class="c6-ovfl">+6</div></div></div>
+  </div>
+</div>
+
+<h2>7 — Side Tab (вертикальная вкладка слева)</h2>
+<div class="row">
+  <div class="var-label"><span>V7</span> Side<br>Tab</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c7"><div class="c7-tab"><span class="c7-tab-text">RPG</span></div><div class="c7-main"><div class="c7-hero" style="background-image:url(default.jpg)"><div class="c7-hero-ovl"></div></div><div class="c7-strip"><img src="default.jpg" class="c7-thumb"><img src="default.jpg" class="c7-thumb"><img src="default.jpg" class="c7-thumb"><img src="default.jpg" class="c7-thumb"><div class="c7-ovfl">+2</div><span class="c7-count">6 games</span></div></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c7"><div class="c7-tab"><span class="c7-tab-text">RPG</span></div><div class="c7-main"><div class="c7-hero" style="background-image:url(default.jpg)"><div class="c7-hero-ovl"></div></div><div class="c7-strip"><img src="default.jpg" class="c7-thumb"><img src="default.jpg" class="c7-thumb"><img src="default.jpg" class="c7-thumb"><img src="default.jpg" class="c7-thumb"><div class="c7-ovfl">+2</div><span class="c7-count">6 games</span></div></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c7"><div class="c7-tab"><span class="c7-tab-text font-mono">RPG</span></div><div class="c7-main"><div class="c7-hero" style="background-image:url(default.jpg)"><div class="c7-hero-ovl"></div></div><div class="c7-strip"><img src="default.jpg" class="c7-thumb"><img src="default.jpg" class="c7-thumb"><img src="default.jpg" class="c7-thumb"><img src="default.jpg" class="c7-thumb"><div class="c7-ovfl">+2</div><span class="c7-count">6 games</span></div></div></div>
+  </div>
+</div>
+
+<h2>8 — Cascade Diagonal (обложки веером из правого верхнего угла)</h2>
+<div class="row">
+  <div class="var-label"><span>V8</span> Cascade<br>Diagonal</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c8"><div class="c8-bg" style="background-image:url(default.jpg)"></div><div class="c8-fan"><img src="default.jpg" class="c8-fthumb"><img src="default.jpg" class="c8-fthumb"><img src="default.jpg" class="c8-fthumb"><div class="c8-fthumb">+4</div></div><div class="c8-info"><div class="c8-title">Fighting Games</div><span class="c8-count">7 games &bull; Shared</span></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c8"><div class="c8-bg" style="background-image:url(default.jpg)"></div><div class="c8-fan"><img src="default.jpg" class="c8-fthumb"><img src="default.jpg" class="c8-fthumb"><img src="default.jpg" class="c8-fthumb"><div class="c8-fthumb">+4</div></div><div class="c8-info"><div class="c8-title">Fighting Games</div><span class="c8-count">7 games &bull; Shared</span></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c8"><div class="c8-bg" style="background-image:url(default.jpg)"></div><div class="c8-fan"><img src="default.jpg" class="c8-fthumb"><img src="default.jpg" class="c8-fthumb"><img src="default.jpg" class="c8-fthumb"><div class="c8-fthumb font-mono">+4</div></div><div class="c8-info"><div class="c8-title font-mono">Fighting Games</div><span class="c8-count">7 games &bull; Shared</span></div></div>
+  </div>
+</div>
+
+<h2>9 — Ultra-Wide Banner (широкий баннер, инфо слева, обложки справа)</h2>
+<div class="row">
+  <div class="var-label"><span>V9</span> Ultra-Wide<br>Banner</div>
+  <div class="theme-col col-light" style="min-width:420px"><span class="theme-col-label">Light</span>
+    <div class="c9"><div class="c9-bg" style="background-image:url(default.jpg)"></div><div class="c9-ovl"></div><div class="c9-content"><div class="c9-info"><div class="c9-title">Multiplayer Mayhem</div><span class="c9-count">12 games &bull; Public collection</span></div><div class="c9-covers"><img src="default.jpg" class="c9-thumb"><img src="default.jpg" class="c9-thumb"><img src="default.jpg" class="c9-thumb"><img src="default.jpg" class="c9-thumb"><div class="c9-ovfl">+8</div></div></div></div>
+  </div>
+  <div class="theme-col col-dark" style="min-width:420px"><span class="theme-col-label">Dark</span>
+    <div class="c9"><div class="c9-bg" style="background-image:url(default.jpg)"></div><div class="c9-ovl"></div><div class="c9-content"><div class="c9-info"><div class="c9-title">Multiplayer Mayhem</div><span class="c9-count">12 games &bull; Public collection</span></div><div class="c9-covers"><img src="default.jpg" class="c9-thumb"><img src="default.jpg" class="c9-thumb"><img src="default.jpg" class="c9-thumb"><img src="default.jpg" class="c9-thumb"><div class="c9-ovfl">+8</div></div></div></div>
+  </div>
+  <div class="theme-col col-retro" style="min-width:420px"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c9"><div class="c9-bg" style="background-image:url(default.jpg)"></div><div class="c9-ovl"></div><div class="c9-content"><div class="c9-info"><div class="c9-title font-mono">Multiplayer Mayhem</div><span class="c9-count font-mono">12 games &bull; Public collection</span></div><div class="c9-covers"><img src="default.jpg" class="c9-thumb"><img src="default.jpg" class="c9-thumb"><img src="default.jpg" class="c9-thumb"><img src="default.jpg" class="c9-thumb"><div class="c9-ovfl font-mono">+8</div></div></div></div>
+  </div>
+</div>
+
+<h2>10 — Neon Frame (цветная рамка-бордер)</h2>
+<div class="row">
+  <div class="var-label"><span>V10</span> Neon<br>Frame</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c10"><div class="c10-frame"><div class="c10-hero" style="background-image:url(default.jpg)"><div class="c10-hero-ovl"><div class="c10-title">Racing Legends</div></div></div><div class="c10-strip"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><div class="c10-ovfl">+3</div></div></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c10"><div class="c10-frame"><div class="c10-hero" style="background-image:url(default.jpg)"><div class="c10-hero-ovl"><div class="c10-title">Racing Legends</div></div></div><div class="c10-strip"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><div class="c10-ovfl">+3</div></div></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c10"><div class="c10-frame"><div class="c10-hero" style="background-image:url(default.jpg)"><div class="c10-hero-ovl"><div class="c10-title font-mono">Racing Legends</div></div></div><div class="c10-strip"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><img src="default.jpg" class="c10-thumb"><div class="c10-ovfl">+3</div></div></div></div>
+  </div>
+</div>
+
+<h2>11 — Polaroid Stack (стопка наклонённых карточек)</h2>
+<div class="row">
+  <div class="var-label"><span>V11</span> Polaroid<br>Stack</div>
+  <div class="theme-col col-light" style="min-width:270px"><span class="theme-col-label">Light</span>
+    <div class="c11"><div class="c11-card"><div class="c11-img" style="background-image:url(default.jpg)"></div><div class="c11-label">The Witcher 3</div></div><div class="c11-card"><div class="c11-img" style="background-image:url(default.jpg)"></div><div class="c11-label">Cyberpunk 2077</div></div><div class="c11-card"><div class="c11-img" style="background-image:url(default.jpg)"></div><div class="c11-label">Elden Ring</div></div><div class="c11-card">+12</div><div class="c11-info"><div class="c11-info-title">CD Projekt Favorites</div><div class="c11-info-count">15 games</div></div></div>
+  </div>
+  <div class="theme-col col-dark" style="min-width:270px"><span class="theme-col-label">Dark</span>
+    <div class="c11"><div class="c11-card"><div class="c11-img" style="background-image:url(default.jpg)"></div><div class="c11-label">The Witcher 3</div></div><div class="c11-card"><div class="c11-img" style="background-image:url(default.jpg)"></div><div class="c11-label">Cyberpunk 2077</div></div><div class="c11-card"><div class="c11-img" style="background-image:url(default.jpg)"></div><div class="c11-label">Elden Ring</div></div><div class="c11-card">+12</div><div class="c11-info"><div class="c11-info-title">CD Projekt Favorites</div><div class="c11-info-count">15 games</div></div></div>
+  </div>
+  <div class="theme-col col-retro" style="min-width:270px"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c11"><div class="c11-card"><div class="c11-img" style="background-image:url(default.jpg)"></div><div class="c11-label font-mono">The Witcher 3</div></div><div class="c11-card"><div class="c11-img" style="background-image:url(default.jpg)"></div><div class="c11-label font-mono">Cyberpunk 2077</div></div><div class="c11-card"><div class="c11-img" style="background-image:url(default.jpg)"></div><div class="c11-label font-mono">Elden Ring</div></div><div class="c11-card font-mono">+12</div><div class="c11-info"><div class="c11-info-title font-mono">CD Projekt Favorites</div><div class="c11-info-count font-mono">15 games</div></div></div>
+  </div>
+</div>
+
+<h2>12 — Double-Decker (герой сверху, название в центре, обложки снизу)</h2>
+<div class="row">
+  <div class="var-label"><span>V12</span> Double<br>Decker</div>
+  <div class="theme-col col-light" style="min-width:360px"><span class="theme-col-label">Light</span>
+    <div class="c12"><div class="c12-hero" style="background-image:url(default.jpg)"></div><div class="c12-mid"><span class="c12-title">Strategy Classics</span><span class="c12-count">9 games &bull; Smart</span></div><div class="c12-strip"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><div class="c12-ovfl">+4</div></div></div>
+  </div>
+  <div class="theme-col col-dark" style="min-width:360px"><span class="theme-col-label">Dark</span>
+    <div class="c12"><div class="c12-hero" style="background-image:url(default.jpg)"></div><div class="c12-mid"><span class="c12-title">Strategy Classics</span><span class="c12-count">9 games &bull; Smart</span></div><div class="c12-strip"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><div class="c12-ovfl">+4</div></div></div>
+  </div>
+  <div class="theme-col col-retro" style="min-width:360px"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c12"><div class="c12-hero" style="background-image:url(default.jpg)"></div><div class="c12-mid"><span class="c12-title font-mono">Strategy Classics</span><span class="c12-count font-mono">9 games &bull; Smart</span></div><div class="c12-strip"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><img src="default.jpg" class="c12-thumb"><div class="c12-ovfl font-mono">+4</div></div></div>
+  </div>
+</div>
+
+<h2>13 — Film Strip (перфорация, кадры-обложки)</h2>
+<div class="row">
+  <div class="var-label"><span>V13</span> Film<br>Strip</div>
+  <div class="theme-col col-light" style="min-width:440px"><span class="theme-col-label">Light</span>
+    <div class="c13"><div class="c13-hero" style="background-image:url(default.jpg)"><div class="c13-info"><div class="c13-title">Adventure Time</div><span class="c13-count">7 games</span></div></div><div class="c13-frames"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><div class="c13-ovfl">+2</div></div></div>
+  </div>
+  <div class="theme-col col-dark" style="min-width:440px"><span class="theme-col-label">Dark</span>
+    <div class="c13"><div class="c13-hero" style="background-image:url(default.jpg)"><div class="c13-info"><div class="c13-title">Adventure Time</div><span class="c13-count">7 games</span></div></div><div class="c13-frames"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><div class="c13-ovfl">+2</div></div></div>
+  </div>
+  <div class="theme-col col-retro" style="min-width:440px"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c13"><div class="c13-hero" style="background-image:url(default.jpg)"><div class="c13-info"><div class="c13-title font-mono">Adventure Time</div><span class="c13-count font-mono">7 games</span></div></div><div class="c13-frames"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><img src="default.jpg" class="c13-thumb"><div class="c13-ovfl font-mono">+2</div></div></div>
+  </div>
+</div>
+
+<h2>14 — Corner Peel (отогнутый угол показывает обложки)</h2>
+<div class="row">
+  <div class="var-label"><span>V14</span> Corner<br>Peel</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c14"><div class="c14-bg" style="background-image:url(default.jpg)"></div><div class="c14-title">Puzzle Games</div><div class="c14-peel"><img src="default.jpg" class="c14-pt"><img src="default.jpg" class="c14-pt"><img src="default.jpg" class="c14-pt"><span class="c7-count" style="color:#fff;font-size:0.65rem;">+5</span></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c14"><div class="c14-bg" style="background-image:url(default.jpg)"></div><div class="c14-title">Puzzle Games</div><div class="c14-peel"><img src="default.jpg" class="c14-pt"><img src="default.jpg" class="c14-pt"><img src="default.jpg" class="c14-pt"><span class="c7-count" style="color:#fff;font-size:0.65rem;">+5</span></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c14"><div class="c14-bg" style="background-image:url(default.jpg)"></div><div class="c14-title font-mono">Puzzle Games</div><div class="c14-peel"><img src="default.jpg" class="c14-pt"><img src="default.jpg" class="c14-pt"><img src="default.jpg" class="c14-pt"><span style="color:#00cc6a;font-size:0.65rem;font-family:'Courier New',monospace;">+5</span></div></div>
+  </div>
+</div>
+
+<h2>15 — Side Stripe (тёмная полоса слева, обложка справа)</h2>
+<div class="row">
+  <div class="var-label"><span>V15</span> Side<br>Stripe</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c15"><div class="c15-stripe"><span class="c15-dot"></span><span class="c15-dot"></span><span class="c15-dot"></span><span class="c15-dot"></span></div><div class="c15-main"><div class="c15-hero" style="background-image:url(default.jpg)"><div class="c15-hero-ovl"></div><div class="c15-info"><div class="c15-title">Retro Classics</div><span class="c15-count">11 games</span></div></div><div class="c15-strip"><img src="default.jpg" class="c15-thumb"><img src="default.jpg" class="c15-thumb"><img src="default.jpg" class="c15-thumb"><img src="default.jpg" class="c15-thumb"><span class="c15-count">+7 more</span></div></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c15"><div class="c15-stripe"><span class="c15-dot"></span><span class="c15-dot"></span><span class="c15-dot"></span><span class="c15-dot"></span></div><div class="c15-main"><div class="c15-hero" style="background-image:url(default.jpg)"><div class="c15-hero-ovl"></div><div class="c15-info"><div class="c15-title">Retro Classics</div><span class="c15-count">11 games</span></div></div><div class="c15-strip"><img src="default.jpg" class="c15-thumb"><img src="default.jpg" class="c15-thumb"><img src="default.jpg" class="c15-thumb"><img src="default.jpg" class="c15-thumb"><span class="c15-count">+7 more</span></div></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c15"><div class="c15-stripe"><span class="c15-dot"></span><span class="c15-dot"></span><span class="c15-dot"></span><span class="c15-dot"></span></div><div class="c15-main"><div class="c15-hero" style="background-image:url(default.jpg)"><div class="c15-hero-ovl"></div><div class="c15-info"><div class="c15-title font-mono">Retro Classics</div><span class="c15-count font-mono">11 games</span></div></div><div class="c15-strip c15-strip-alt"><img src="default.jpg" class="c15-thumb"><img src="default.jpg" class="c15-thumb"><img src="default.jpg" class="c15-thumb"><img src="default.jpg" class="c15-thumb"><span class="c15-count font-mono">+7 more</span></div></div></div>
+  </div>
+</div>
+
+<h2>16 — Gradient Fade (плавное перетекание обложки в тёмный низ)</h2>
+<div class="row">
+  <div class="var-label"><span>V16</span> Gradient<br>Fade</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c16"><div class="c16-bg" style="background-image:url(default.jpg)"></div><div class="c16-grad"></div><div class="c16-content"><div class="c16-title">Zombie Survival</div><span class="c16-count">6 games &bull; Smart collection</span><div class="c16-covers"><img src="default.jpg" class="c16-thumb"><img src="default.jpg" class="c16-thumb"><img src="default.jpg" class="c16-thumb"><img src="default.jpg" class="c16-thumb"><div class="c16-ovfl">+2</div></div></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c16"><div class="c16-bg" style="background-image:url(default.jpg)"></div><div class="c16-grad"></div><div class="c16-content"><div class="c16-title">Zombie Survival</div><span class="c16-count">6 games &bull; Smart collection</span><div class="c16-covers"><img src="default.jpg" class="c16-thumb"><img src="default.jpg" class="c16-thumb"><img src="default.jpg" class="c16-thumb"><img src="default.jpg" class="c16-thumb"><div class="c16-ovfl">+2</div></div></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c16"><div class="c16-bg" style="background-image:url(default.jpg)"></div><div class="c16-grad"></div><div class="c16-content"><div class="c16-title font-mono">Zombie Survival</div><span class="c16-count font-mono">6 games &bull; Smart collection</span><div class="c16-covers"><img src="default.jpg" class="c16-thumb"><img src="default.jpg" class="c16-thumb"><img src="default.jpg" class="c16-thumb"><img src="default.jpg" class="c16-thumb"><div class="c16-ovfl font-mono">+2</div></div></div></div>
+  </div>
+</div>
+
+<h2>17 — Floating Card (тёмный фон, обложка «парит» с тенью)</h2>
+<div class="row">
+  <div class="var-label"><span>V17</span> Floating<br>Card</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c17"><div class="c17-hero" style="background-image:url(default.jpg)"></div><div class="c17-title">Japanese RPGs</div><div class="c17-covers"><img src="default.jpg" class="c17-thumb"><img src="default.jpg" class="c17-thumb"><img src="default.jpg" class="c17-thumb"><img src="default.jpg" class="c17-thumb"><span class="c4-ovfl" style="width:34px;height:45px;">+10</span></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c17"><div class="c17-hero" style="background-image:url(default.jpg)"></div><div class="c17-title">Japanese RPGs</div><div class="c17-covers"><img src="default.jpg" class="c17-thumb"><img src="default.jpg" class="c17-thumb"><img src="default.jpg" class="c17-thumb"><img src="default.jpg" class="c17-thumb"><span class="c4-ovfl" style="width:34px;height:45px;">+10</span></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c17"><div class="c17-hero" style="background-image:url(default.jpg)"></div><div class="c17-title font-mono">Japanese RPGs</div><div class="c17-covers"><img src="default.jpg" class="c17-thumb"><img src="default.jpg" class="c17-thumb"><img src="default.jpg" class="c17-thumb"><img src="default.jpg" class="c17-thumb"><div class="c16-ovfl">+10</div></div></div>
+  </div>
+</div>
+
+<h2>18 — Collage Grid (сетка из 4 обложек + заголовок поверх)</h2>
+<div class="row">
+  <div class="var-label"><span>V18</span> Collage<br>Grid</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c18"><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-ovl"><div class="c18-title">All-Time Favorites</div><span class="c18-count">4 games</span></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c18"><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-ovl"><div class="c18-title">All-Time Favorites</div><span class="c18-count">4 games</span></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c18"><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-cell" style="background-image:url(default.jpg)"></div><div class="c18-ovl"><div class="c18-title font-mono">All-Time Favorites</div><span class="c18-count font-mono">4 games</span></div></div>
+  </div>
+</div>
+
+<h2>19 — Terminal Block (рамка + dots бара + моноширинный шрифт)</h2>
+<div class="row">
+  <div class="var-label"><span>V19</span> Terminal<br>Block</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c19"><div class="c19-hero" style="background-image:url(default.jpg)"></div><div class="c19-bar"><span class="c19-bar-dot"></span><span class="c19-bar-dot"></span><span class="c19-bar-dot"></span><span class="c19-label">$ ls games/</span></div><div class="c19-body"><div class="c19-title">Cyberpunk Collection</div><div class="c19-covers"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><div class="c19-ovfl">+5</div></div></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c19"><div class="c19-hero" style="background-image:url(default.jpg)"></div><div class="c19-bar"><span class="c19-bar-dot"></span><span class="c19-bar-dot"></span><span class="c19-bar-dot"></span><span class="c19-label">$ ls games/</span></div><div class="c19-body"><div class="c19-title">Cyberpunk Collection</div><div class="c19-covers"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><div class="c19-ovfl">+5</div></div></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c19"><div class="c19-hero" style="background-image:url(default.jpg)"></div><div class="c19-bar"><span class="c19-bar-dot"></span><span class="c19-bar-dot"></span><span class="c19-bar-dot"></span><span class="c19-label font-mono">$ ls games/</span></div><div class="c19-body"><div class="c19-title font-mono">Cyberpunk Collection</div><div class="c19-covers"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><img src="default.jpg" class="c19-thumb"><div class="c19-ovfl font-mono">+5</div></div></div></div>
+  </div>
+</div>
+
+<h2>20 — Minimalist Badge (ультра-чистый, только обложка + счётчик + точки)</h2>
+<div class="row">
+  <div class="var-label"><span>V20</span> Minimalist<br>Badge</div>
+  <div class="theme-col col-light"><span class="theme-col-label">Light</span>
+    <div class="c20"><div class="c20-bg" style="background-image:url(default.jpg)"></div><div class="c20-ovl"></div><div class="c20-content"><div class="c20-title">Platformers</div><span class="c20-badge">23 games</span></div><div class="c20-dots"><span class="c20-dot active"></span><span class="c20-dot active"></span><span class="c20-dot active"></span><span class="c20-dot"></span><span class="c20-dot"></span></div></div>
+  </div>
+  <div class="theme-col col-dark"><span class="theme-col-label">Dark</span>
+    <div class="c20"><div class="c20-bg" style="background-image:url(default.jpg)"></div><div class="c20-ovl"></div><div class="c20-content"><div class="c20-title">Platformers</div><span class="c20-badge">23 games</span></div><div class="c20-dots"><span class="c20-dot active"></span><span class="c20-dot active"></span><span class="c20-dot active"></span><span class="c20-dot"></span><span class="c20-dot"></span></div></div>
+  </div>
+  <div class="theme-col col-retro"><span class="theme-col-label">Retro Terminal</span>
+    <div class="c20"><div class="c20-bg" style="background-image:url(default.jpg)"></div><div class="c20-ovl"></div><div class="c20-content"><div class="c20-title font-mono">Platformers</div><span class="c20-badge font-mono">23 games</span></div><div class="c20-dots"><span class="c20-dot active"></span><span class="c20-dot active"></span><span class="c20-dot active"></span><span class="c20-dot"></span><span class="c20-dot"></span></div></div>
+  </div>
+</div>
+
+</body>
+</html>
