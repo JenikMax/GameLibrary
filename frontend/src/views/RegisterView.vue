@@ -1,34 +1,36 @@
 <template>
-  <div class="flex align-items-center justify-content-center min-h-screen">
-    <Card class="register-card">
-      <template #title>
-        <div class="text-center">
-          <h2>{{ t('register.create_account') }}</h2>
+  <div class="auth-page" :class="{ 'auth-dark': isDarkMode }">
+    <div class="auth-card">
+      <div class="auth-header">
+        <img :src="'/game-library/img/logo.jpg'" height="56" alt="logo" class="auth-logo" />
+        <h2 class="auth-title">{{ t('register.create_account') }}</h2>
+        <p class="auth-sub">{{ t('register.subtitle') }}</p>
+      </div>
+      <Message v-if="error" severity="error" :closable="false" class="auth-msg mb-3">{{ error }}</Message>
+      <Message v-if="success" severity="success" :closable="false" class="auth-msg mb-3">{{ success }}</Message>
+      <form @submit.prevent="handleRegister">
+        <div class="field">
+          <label for="reg-username" class="field-label">{{ t('login.username') }}</label>
+          <IconField class="w-full">
+            <InputIcon><i class="pi pi-user" /></InputIcon>
+            <InputText id="reg-username" v-model="username" class="w-full auth-input" autofocus />
+          </IconField>
         </div>
-      </template>
-      <template #content>
-        <Message v-if="error" severity="error" :closable="false" class="mb-3">{{ error }}</Message>
-        <Message v-if="success" severity="success" :closable="false" class="mb-3">{{ success }}</Message>
-        <form @submit.prevent="handleRegister">
-          <div class="field">
-            <label for="username">{{ t('login.username') }}</label>
-            <InputText id="username" v-model="username" class="w-full" autofocus />
-          </div>
-          <div class="field">
-            <label for="password">{{ t('login.password') }}</label>
-            <Password id="password" v-model="password" class="w-full" toggleMask :feedback="true" />
-            <small class="text-muted">{{ t('login.password_requirements') }}</small>
-          </div>
-          <Button type="submit" :label="t('login.register')" icon="pi pi-user-plus" class="w-full mt-2" :loading="loading" />
-        </form>
-      </template>
-      <template #footer>
-        <div class="text-center">
-          <span class="text-sm">{{ t('register.already_have_account') }}</span>
-          <Button :label="t('login.signin')" link @click="$router.push('/login')" />
+        <div class="field">
+          <label for="reg-password" class="field-label">{{ t('login.password') }}</label>
+          <IconField class="w-full">
+            <InputIcon><i class="pi pi-lock" /></InputIcon>
+            <Password id="reg-password" v-model="password" class="w-full auth-password" inputClass="w-full auth-input" toggleMask :feedback="true" />
+          </IconField>
+          <small class="field-hint">{{ t('login.password_requirements') }}</small>
         </div>
-      </template>
-    </Card>
+        <Button type="submit" :label="t('login.register')" icon="pi pi-user-plus" class="w-full mt-2 auth-btn" :loading="loading" />
+      </form>
+      <div class="auth-footer">
+        <span class="footer-text">{{ t('register.already_have_account') }}</span>
+        <Button :label="t('login.signin')" link class="footer-link" @click="$router.push('/login')" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -37,8 +39,10 @@ import { ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
-import Card from 'primevue/card'
+import { useDarkMode } from '../composables/useDarkMode'
 import InputText from 'primevue/inputtext'
+import InputIcon from 'primevue/inputicon'
+import IconField from 'primevue/iconfield'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
@@ -46,6 +50,7 @@ import Message from 'primevue/message'
 const { t } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
+const { isDarkMode } = useDarkMode()
 
 const username = ref('')
 const password = ref('')
@@ -82,17 +87,6 @@ async function handleRegister() {
 }
 </script>
 
-<style scoped>
-.register-card {
-  width: 400px;
-  max-width: 90vw;
-}
-.field {
-  margin-bottom: 1rem;
-}
-.field label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
+<style>
+@import '../assets/styles/auth.css';
 </style>

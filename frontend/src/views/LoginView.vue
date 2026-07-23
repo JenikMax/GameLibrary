@@ -1,39 +1,34 @@
 <template>
-  <div class="flex align-items-center justify-content-center min-h-screen">
-    <Card class="login-card">
-      <template #title>
-        <div class="text-center">
-          <img :src="'/game-library/img/logo.jpg'" height="64" alt="logo" />
-          <h2>{{ t('login.signin') }}</h2>
+  <div class="auth-page" :class="{ 'auth-dark': isDarkMode }">
+    <div class="auth-card">
+      <div class="auth-header">
+        <img :src="'/game-library/img/logo.jpg'" height="56" alt="logo" class="auth-logo" />
+        <h2 class="auth-title">{{ t('login.signin') }}</h2>
+        <p class="auth-sub">{{ t('login.subtitle') }}</p>
+      </div>
+      <Message v-if="error" severity="error" :closable="false" class="auth-msg mb-3">{{ error }}</Message>
+      <form @submit.prevent="handleLogin">
+        <div class="field">
+          <label for="login-username" class="field-label">{{ t('login.username') }}</label>
+          <IconField class="w-full">
+            <InputIcon><i class="pi pi-user" /></InputIcon>
+            <InputText id="login-username" v-model="username" class="w-full auth-input" autofocus />
+          </IconField>
         </div>
-      </template>
-      <template #content>
-        <Message v-if="error" severity="error" :closable="false" class="mb-3">{{ error }}</Message>
-        <form @submit.prevent="handleLogin">
-          <div class="field">
-            <label for="username">{{ t('login.username') }}</label>
-            <IconField>
-              <InputIcon><i class="pi pi-user" /></InputIcon>
-              <InputText id="username" v-model="username" class="w-full" autofocus />
-            </IconField>
-          </div>
-          <div class="field">
-            <label for="password">{{ t('login.password') }}</label>
-            <IconField>
-              <InputIcon><i class="pi pi-lock" /></InputIcon>
-              <Password id="password" v-model="password" :feedback="false" class="w-full" toggleMask />
-            </IconField>
-          </div>
-          <Button type="submit" :label="t('login.signin')" icon="pi pi-sign-in" class="w-full mt-2" :loading="loading" />
-        </form>
-      </template>
-      <template #footer>
-        <div class="text-center">
-          <span class="text-sm">{{ t('login.no_account') }}</span>
-          <Button :label="t('login.register')" link @click="$router.push('/register')" />
+        <div class="field">
+          <label for="login-password" class="field-label">{{ t('login.password') }}</label>
+          <IconField class="w-full">
+            <InputIcon><i class="pi pi-lock" /></InputIcon>
+            <Password id="login-password" v-model="password" :feedback="false" class="w-full auth-password" inputClass="w-full auth-input" toggleMask />
+          </IconField>
         </div>
-      </template>
-    </Card>
+        <Button type="submit" :label="t('login.signin')" icon="pi pi-sign-in" class="w-full mt-2 auth-btn" :loading="loading" />
+      </form>
+      <div class="auth-footer">
+        <span class="footer-text">{{ t('login.no_account') }}</span>
+        <Button :label="t('login.register')" link class="footer-link" @click="$router.push('/register')" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -42,7 +37,7 @@ import { ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
-import Card from 'primevue/card'
+import { useDarkMode } from '../composables/useDarkMode'
 import InputText from 'primevue/inputtext'
 import InputIcon from 'primevue/inputicon'
 import IconField from 'primevue/iconfield'
@@ -53,6 +48,7 @@ import Message from 'primevue/message'
 const router = useRouter()
 const authStore = useAuthStore()
 const { t } = useI18n()
+const { isDarkMode } = useDarkMode()
 
 const username = ref('')
 const password = ref('')
@@ -83,17 +79,6 @@ async function handleLogin() {
 }
 </script>
 
-<style scoped>
-.login-card {
-  width: 400px;
-  max-width: 90vw;
-}
-.field {
-  margin-bottom: 1rem;
-}
-.field label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
+<style>
+@import '../assets/styles/auth.css';
 </style>
