@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Auth Redesign — 10 Variants</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f0f14;
+    color: #e5e5e5;
+    padding: 40px 20px;
+  }
+  h1.page-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #6366f1, #ec4899, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  p.page-subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 60px;
+    font-size: 1rem;
+  }
+  .variant {
+    margin-bottom: 80px;
+    padding: 30px;
+    background: #18181f;
+    border-radius: 16px;
+    border: 1px solid #2a2a35;
+  }
+  .variant-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #2a2a35;
+  }
+  .variant-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  .variant-title {
+    font-size: 1.4rem;
+    color: #fff;
+  }
+  .variant-desc {
+    font-size: 0.9rem;
+    color: #888;
+    margin-top: 4px;
+  }
+  .preview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 900px) {
+    .preview-grid { grid-template-columns: 1fr; }
+  }
+  .preview-box {
+    background: #0f0f14;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #2a2a35;
+  }
+  .preview-label {
+    padding: 10px 16px;
+    background: #1f1f2a;
+    font-size: 0.85rem;
+    color: #aaa;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ============== VARIANT 1: SPLIT SCREEN ============== */
+  .v1-wrap {
+    display: flex;
+    min-height: 480px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    color: #1f2937;
+  }
+  .v1-left {
+    flex: 1;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    padding: 48px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white;
+    position: relative;
+  }
+  .v1-left::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, transparent 50%);
+  }
+  .v1-logo {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .v1-left p {
+    position: relative;
+    font-size: 0.95rem;
+    opacity: 0.9;
+    line-height: 1.5;
+  }
+  .v1-right {
+    flex: 1;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .v1-right h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: #111827;
+  }
+  .v1-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    background: #f9fafb;
+    color: #111827;
+    transition: border 0.2s;
+  }
+  .v1-input:focus { outline: none; border-color: #6366f1; background: #fff; }
+  .v1-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .v1-link {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+  .v1-link a { color: #6366f1; text-decoration: none; font-weight: 600; }
+
+  /* ============== VARIANT 2: GLASSMORPHISM ============== */
+  .v2-wrap {
+    min-height: 480px;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+    border-radius: 8px;
+    padding: 48px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .v2-wrap::before {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: #fbbf24;
+    border-radius: 50%;
+    top: -150px; right: -100px;
+    opacity: 0.5;
+    filter: blur(60px);
+  }
+  .v2-wrap::after {
+    content: '';
+    position: absolute;
+    width: 350px; height: 350px;
+    background: #06b6d4;
+    border-radius: 50%;
+    bottom: -120px; left: -80px;
+    opacity: 0.5;
+    filter: blur(60px);
+  }
+  .v2-card {
+    width: 100%;
+    max-width: 380px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    padding: 36px 32px;
+    color: white;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  .v2-card h2 {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .v2-card .sub {
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.85;
+    margin-bottom: 28px;
+  }
+  .v2-input {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+  }
+  .v2-input::placeholder { color: rgba(255,255,255,0.7); }
+  .v2-input:focus { outline: none; background: rgba(255,255,255,0.25); }
+  .v2-btn {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: #8b5cf6;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .v2-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.85);
+  }
+  .v2-link a { color: white; font-weight: 600; text-decoration: none; }
+
+  /* ============== VARIANT 3: NEON CYBERPUNK ============== */
+  .v3-wrap {
+    min-height: 480px;
+    background: #0a0a14;
+    border-radius: 8px;
+    padding: 48px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+  }
+  .v3-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(139, 92, 246, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139, 92, 246, 0.08) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .v3-card {
+    width: 100%;
+    max-width: 380px;
+    background: rgba(10, 10, 20, 0.8);
+    border: 1px solid #8b5cf6;
+    border-radius: 12px;
+    padding: 36px 32px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.4), 0 0 60px rgba(139, 92, 246, 0.1) inset;
+  }
+  .v3-card h2 {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+    text-align: center;
+    color: #c4b5fd;
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .v3-card .sub {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #a78bfa;
+    margin-bottom: 28px;
+    letter-spacing: 0.1em;
+  }
+  .v3-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #a78bfa;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 6px;
+  }
+  .v3-input {
+    width: 100%;
+    padding: 11px 14px;
+    background: rgba(139, 92, 246, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    font-family: 'Courier New', monospace;
+  }
+  .v3-input:focus {
+    outline: none;
+    border-color: #c4b5fd;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+    background: rgba(139, 92, 246, 0.1);
+  }
+  .v3-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: #c4b5fd;
+    border: 2px solid #8b5cf6;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .v3-btn:hover {
+    background: #8b5cf6;
+    color: white;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+  }
+  .v3-link {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.85rem;
+    color: #a78bfa;
+  }
+  .v3-link a { color: #ec4899; text-decoration: none; font-weight: 600; }
+
+  /* ============== VARIANT 4: MINIMAL ============== */
+  .v4-wrap {
+    min-height: 480px;
+    background: #fafafa;
+    border-radius: 8px;
+    padding: 60px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111;
+  }
+  .v4-card {
+    width: 100%;
+    max-width: 340px;
+  }
+  .v4-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: #111;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+  }
+  .v4-card h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .v4-card .sub {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin-bottom: 32px;
+  }
+  .v4-field {
+    margin-bottom: 20px;
+  }
+  .v4-field label {
+    display: block;
+    font-size: 0.85rem;
+    color: #374151;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .v4-input {
+    width: 100%;
+    padding: 11px 0;
+    border: none;
+    border-bottom: 1.5px solid #e5e7eb;
+    font-size: 1rem;
+    background: transparent;
+    color: #111;
+  }
+  .v4-input:focus {
+    outline: none;
+    border-bottom-color: #111;
+  }
+  .v4-btn {
+    width: 100%;
+    padding: 13px;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+  }
+  .v4-link {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+  .v4-link a { color: #111; text-decoration: none; font-weight: 600; border-bottom: 1px solid #111; }
+
+  /* ============== VARIANT 5: FLOATING LABELS ============== */
+  .v5-wrap {
+    min-height: 480px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 48px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1f2937;
+  }
+  .v5-card {
+    width: 100%;
+    max-width: 380px;
+    padding: 40px 32px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .v5-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  .v5-card .sub {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+  }
+  .v5-field {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .v5-input {
+    width: 100%;
+    padding: 18px 14px 8px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: #fff;
+    color: #111;
+  }
+  .v5-input:focus { outline: none; border-color: #3b82f6; }
+  .v5-label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 0.95rem;
+    pointer-events: none;
+    transition: all 0.2s;
+    background: white;
+    padding: 0 4px;
+  }
+  .v5-input:focus + .v5-label,
+  .v5-input:not(:placeholder-shown) + .v5-label {
+    top: 0;
+    font-size: 0.75rem;
+    color: #3b82f6;
+  }
+  .v5-btn {
+    width: 100%;
+    padding: 13px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .v5-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+  .v5-link a { color: #3b82f6; text-decoration: none; font-weight: 600; }
+
+  /* ============== VARIANT 6: GAMING DARK ============== */
+  .v6-wrap {
+    min-height: 480px;
+    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-radius: 8px;
+    padding: 48px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .v6-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 85%, rgba(236, 72, 153, 0.15) 0%, transparent 40%),
+      radial-gradient(circle at 85% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 40%);
+  }
+  .v6-card {
+    width: 100%;
+    max-width: 380px;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 36px 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .v6-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+  }
+  .v6-card h2 {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .v6-card .sub {
+    text-align: center;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+  }
+  .v6-input {
+    width: 100%;
+    padding: 12px 14px 12px 40px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+  }
+  .v6-input:focus { outline: none; border-color: #ec4899; background: rgba(255,255,255,0.08); }
+  .v6-input-wrap { position: relative; }
+  .v6-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.4);
+    font-size: 1rem;
+  }
+  .v6-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .v6-link {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.6);
+  }
+  .v6-link a { color: #ec4899; text-decoration: none; font-weight: 600; }
+
+  /* ============== VARIANT 7: TABBED ============== */
+  .v7-wrap {
+    min-height: 480px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 48px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111;
+  }
+  .v7-card {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .v7-tabs {
+    display: flex;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .v7-tab {
+    flex: 1;
+    padding: 16px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #6b7280;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .v7-tab.active {
+    color: #111;
+    border-bottom-color: #111;
+    background: white;
+  }
+  .v7-body {
+    padding: 32px;
+  }
+  .v7-body h2 {
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+  }
+  .v7-body .sub {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+  }
+  .v7-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    color: #111;
+  }
+  .v7-input:focus { outline: none; border-color: #111; }
+  .v7-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #374151;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .v7-btn {
+    width: 100%;
+    padding: 12px;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .v7-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #374151;
+    margin-top: 4px;
+  }
+  .v7-forgot {
+    text-align: right;
+    font-size: 0.85rem;
+    margin-top: -8px;
+    margin-bottom: 14px;
+  }
+  .v7-forgot a { color: #111; text-decoration: none; }
+
+  /* ============== VARIANT 8: FULL BG OVERLAY ============== */
+  .v8-wrap {
+    min-height: 480px;
+    background:
+      linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.65)),
+      linear-gradient(45deg, #1e3a8a 25%, #7c3aed 50%, #db2777 75%);
+    border-radius: 8px;
+    padding: 48px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .v8-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 2px 2px, rgba(255,255,255,0.08) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+  .v8-card {
+    width: 100%;
+    max-width: 380px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 40px 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .v8-logo {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    text-align: center;
+    background: linear-gradient(90deg, #fbbf24, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .v8-card .sub {
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+  }
+  .v8-input {
+    width: 100%;
+    padding: 13px 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+  }
+  .v8-input::placeholder { color: rgba(255,255,255,0.5); }
+  .v8-input:focus { outline: none; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.12); }
+  .v8-btn {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(90deg, #fbbf24, #ec4899);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .v8-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+  }
+  .v8-divider::before, .v8-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+  }
+  .v8-social {
+    display: flex;
+    gap: 10px;
+  }
+  .v8-social-btn {
+    flex: 1;
+    padding: 10px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+  }
+  .v8-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+  }
+  .v8-link a { color: #fbbf24; text-decoration: none; font-weight: 600; }
+
+  /* ============== VARIANT 9: SLIDING PANEL ============== */
+  .v9-wrap {
+    min-height: 480px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 48px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111;
+  }
+  .v9-card {
+    width: 100%;
+    max-width: 780px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+    overflow: hidden;
+    min-height: 440px;
+  }
+  .v9-form {
+    padding: 40px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .v9-form h2 {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+  }
+  .v9-form .sub {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+  }
+  .v9-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    color: #111;
+  }
+  .v9-input:focus { outline: none; border-color: #f97316; }
+  .v9-btn-orange {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .v9-panel {
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    padding: 40px 36px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .v9-panel h3 {
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+  }
+  .v9-panel p {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .v9-panel-btn {
+    padding: 11px 28px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .v9-link {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+  .v9-link a { color: #f97316; text-decoration: none; font-weight: 600; }
+
+  /* ============== VARIANT 10: TERMINAL ============== */
+  .v10-wrap {
+    min-height: 480px;
+    background: #000;
+    border-radius: 8px;
+    padding: 0;
+    display: flex;
+    align-items: stretch;
+    color: #00ff88;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+    border: 1px solid #00ff88;
+  }
+  .v10-sidebar {
+    width: 60px;
+    background: #001a0d;
+    border-right: 1px solid #00ff88;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    gap: 16px;
+  }
+  .v10-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00ff88;
+    box-shadow: 0 0 8px #00ff88;
+  }
+  .v10-line {
+    width: 1px;
+    flex: 1;
+    background: #00ff88;
+    opacity: 0.3;
+  }
+  .v10-main {
+    flex: 1;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .v10-prompt {
+    font-size: 0.8rem;
+    color: #00ff88;
+    opacity: 0.7;
+    margin-bottom: 4px;
+  }
+  .v10-main h2 {
+    font-size: 1.3rem;
+    color: #00ff88;
+    margin-bottom: 6px;
+    text-shadow: 0 0 10px rgba(0,255,136,0.5);
+  }
+  .v10-main .sub {
+    font-size: 0.85rem;
+    color: #00cc6a;
+    margin-bottom: 28px;
+  }
+  .v10-field { margin-bottom: 16px; }
+  .v10-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #00ff88;
+    opacity: 0.8;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .v10-input {
+    width: 100%;
+    padding: 10px 14px;
+    background: transparent;
+    border: 1px solid rgba(0,255,136,0.4);
+    border-radius: 4px;
+    color: #00ff88;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+  }
+  .v10-input:focus {
+    outline: none;
+    border-color: #00ff88;
+    box-shadow: 0 0 10px rgba(0,255,136,0.3);
+  }
+  .v10-input::placeholder { color: rgba(0,255,136,0.3); }
+  .v10-btn {
+    width: 100%;
+    padding: 11px;
+    background: #00ff88;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .v10-link {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: #00cc6a;
+  }
+  .v10-link a { color: #00ff88; text-decoration: none; border-bottom: 1px dashed #00ff88; }
+  .v10-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: #00ff88;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">Auth Pages — 10 Redesign Variants</h1>
+<p class="page-subtitle">Login & Registration mockups for GameLibrary</p>
+
+<!-- ============ VARIANT 1: SPLIT SCREEN ============ -->
+<div class="variant">
+  <div class="variant-header">
+    <div class="variant-number">1</div>
+    <div>
+      <div class="variant-title">Split Screen</div>
+      <div class="variant-desc">Слева — брендинг/градиент с описанием, справа — форма. Классический корпоративный стиль.</div>
+    </div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-box">
+      <div class="preview-label">Login</div>
+      <div class="v1-wrap">
+        <div class="v1-left">
+          <div class="v1-logo">🎮 GameLibrary</div>
+          <p>Ваша коллекция игр в одном месте. Управляйте, систематизируйте и открывайте новые игры.</p>
+        </div>
+        <div class="v1-right">
+          <h2>Вход</h2>
+          <input class="v1-input" placeholder="Имя пользователя" />
+          <input class="v1-input" type="password" placeholder="Пароль" />
+          <button class="v1-btn">Войти</button>
+          <div class="v1-link">Нет аккаунта? <a href="#">Создать</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">Register</div>
+      <div class="v1-wrap">
+        <div class="v1-left">
+          <div class="v1-logo">🎮 GameLibrary</div>
+          <p>Присоединяйтесь к сообществу. Создайте аккаунт за минуту и получите доступ ко всем функциям.</p>
+        </div>
+        <div class="v1-right">
+          <h2>Регистрация</h2>
+          <input class="v1-input" placeholder="Имя пользователя" />
+          <input class="v1-input" type="password" placeholder="Пароль" />
+          <input class="v1-input" type="password" placeholder="Подтвердите пароль" />
+          <button class="v1-btn">Создать аккаунт</button>
+          <div class="v1-link">Уже есть аккаунт? <a href="#">Войти</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VARIANT 2: GLASSMORPHISM ============ -->
+<div class="variant">
+  <div class="variant-header">
+    <div class="variant-number">2</div>
+    <div>
+      <div class="variant-title">Glassmorphism</div>
+      <div class="variant-desc">Матовое стекло на ярком градиенте с размытыми цветовыми пятнами. Современный и эффектный.</div>
+    </div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-box">
+      <div class="preview-label">Login</div>
+      <div class="v2-wrap">
+        <div class="v2-card">
+          <h2>С возвращением</h2>
+          <p class="sub">Войдите в свой аккаунт</p>
+          <input class="v2-input" placeholder="Имя пользователя" />
+          <input class="v2-input" type="password" placeholder="Пароль" />
+          <button class="v2-btn">Войти</button>
+          <div class="v2-link">Нет аккаунта? <a href="#">Создать</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">Register</div>
+      <div class="v2-wrap">
+        <div class="v2-card">
+          <h2>Создать аккаунт</h2>
+          <p class="sub">Присоединяйтесь к GameLibrary</p>
+          <input class="v2-input" placeholder="Имя пользователя" />
+          <input class="v2-input" type="password" placeholder="Пароль" />
+          <input class="v2-input" type="password" placeholder="Подтвердите пароль" />
+          <button class="v2-btn">Зарегистрироваться</button>
+          <div class="v2-link">Уже есть аккаунт? <a href="#">Войти</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VARIANT 3: NEON CYBERPUNK ============ -->
+<div class="variant">
+  <div class="variant-header">
+    <div class="variant-number">3</div>
+    <div>
+      <div class="variant-title">Neon Cyberpunk</div>
+      <div class="variant-desc">Тёмный фон с сеткой и неоновым свечением. Идеально для игровой тематики.</div>
+    </div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-box">
+      <div class="preview-label">Login</div>
+      <div class="v3-wrap">
+        <div class="v3-card">
+          <h2>Enter System</h2>
+          <p class="sub">// authentication required</p>
+          <label class="v3-label">Username</label>
+          <input class="v3-input" placeholder="player_one" />
+          <label class="v3-label">Password</label>
+          <input class="v3-input" type="password" placeholder="••••••••" />
+          <button class="v3-btn">▶ Connect</button>
+          <div class="v3-link">No account? <a href="#">register.exe</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">Register</div>
+      <div class="v3-wrap">
+        <div class="v3-card">
+          <h2>New Identity</h2>
+          <p class="sub">// create new profile</p>
+          <label class="v3-label">Username</label>
+          <input class="v3-input" placeholder="choose_your_name" />
+          <label class="v3-label">Password</label>
+          <input class="v3-input" type="password" placeholder="••••••••" />
+          <label class="v3-label">Confirm</label>
+          <input class="v3-input" type="password" placeholder="••••••••" />
+          <button class="v3-btn">▶ Initialize</button>
+          <div class="v3-link">Have account? <a href="#">login.exe</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VARIANT 4: MINIMAL ============ -->
+<div class="variant">
+  <div class="variant-header">
+    <div class="variant-number">4</div>
+    <div>
+      <div class="variant-title">Minimal</div>
+      <div class="variant-desc">Много воздуха, тонкие линии, минимум визуального шума. Акцент на типографике.</div>
+    </div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-box">
+      <div class="preview-label">Login</div>
+      <div class="v4-wrap">
+        <div class="v4-card">
+          <div class="v4-logo">G</div>
+          <h2>Welcome back</h2>
+          <p class="sub">Sign in to continue</p>
+          <div class="v4-field">
+            <label>Username</label>
+            <input class="v4-input" placeholder="" />
+          </div>
+          <div class="v4-field">
+            <label>Password</label>
+            <input class="v4-input" type="password" placeholder="" />
+          </div>
+          <button class="v4-btn">Sign In</button>
+          <div class="v4-link">Don't have an account? <a href="#">Sign up</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">Register</div>
+      <div class="v4-wrap">
+        <div class="v4-card">
+          <div class="v4-logo">G</div>
+          <h2>Create account</h2>
+          <p class="sub">Join GameLibrary today</p>
+          <div class="v4-field">
+            <label>Username</label>
+            <input class="v4-input" placeholder="" />
+          </div>
+          <div class="v4-field">
+            <label>Password</label>
+            <input class="v4-input" type="password" placeholder="" />
+          </div>
+          <div class="v4-field">
+            <label>Confirm password</label>
+            <input class="v4-input" type="password" placeholder="" />
+          </div>
+          <button class="v4-btn">Create Account</button>
+          <div class="v4-link">Already have an account? <a href="#">Sign in</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VARIANT 5: FLOATING LABELS ============ -->
+<div class="variant">
+  <div class="variant-header">
+    <div class="variant-number">5</div>
+    <div>
+      <div class="variant-title">Material / Floating Labels</div>
+      <div class="variant-desc">Поля ввода с анимированными "плавающими" лейблами в стиле Material Design.</div>
+    </div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-box">
+      <div class="preview-label">Login</div>
+      <div class="v5-wrap">
+        <div class="v5-card">
+          <h2>Sign in</h2>
+          <p class="sub">Enter your credentials</p>
+          <div class="v5-field">
+            <input class="v5-input" placeholder=" " value="" />
+            <label class="v5-label">Username</label>
+          </div>
+          <div class="v5-field">
+            <input class="v5-input" type="password" placeholder=" " value="" />
+            <label class="v5-label">Password</label>
+          </div>
+          <button class="v5-btn">Sign In</button>
+          <div class="v5-link">New here? <a href="#">Create account</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">Register</div>
+      <div class="v5-wrap">
+        <div class="v5-card">
+          <h2>Get started</h2>
+          <p class="sub">Create your free account</p>
+          <div class="v5-field">
+            <input class="v5-input" placeholder=" " />
+            <label class="v5-label">Username</label>
+          </div>
+          <div class="v5-field">
+            <input class="v5-input" type="password" placeholder=" " />
+            <label class="v5-label">Password</label>
+          </div>
+          <div class="v5-field">
+            <input class="v5-input" type="password" placeholder=" " />
+            <label class="v5-label">Confirm password</label>
+          </div>
+          <button class="v5-btn">Create Account</button>
+          <div class="v5-link">Have an account? <a href="#">Sign in</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VARIANT 6: GAMING DARK ============ -->
+<div class="variant">
+  <div class="variant-header">
+    <div class="variant-number">6</div>
+    <div>
+      <div class="variant-title">Gaming Dark</div>
+      <div class="variant-desc">Тёмная тема с игровой эстетикой, градиенты фиолетово-розовые, иконка геймпада.</div>
+    </div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-box">
+      <div class="preview-label">Login</div>
+      <div class="v6-wrap">
+        <div class="v6-card">
+          <div class="v6-icon">🎮</div>
+          <h2>Welcome, Player</h2>
+          <p class="sub">Sign in to access your library</p>
+          <div class="v6-input-wrap">
+            <span class="v6-input-icon">👤</span>
+            <input class="v6-input" placeholder="Username" />
+          </div>
+          <div class="v6-input-wrap">
+            <span class="v6-input-icon">🔒</span>
+            <input class="v6-input" type="password" placeholder="Password" />
+          </div>
+          <button class="v6-btn">Start Game</button>
+          <div class="v6-link">New player? <a href="#">Register</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">Register</div>
+      <div class="v6-wrap">
+        <div class="v6-card">
+          <div class="v6-icon">🎮</div>
+          <h2>Join the Arena</h2>
+          <p class="sub">Create your gamer profile</p>
+          <div class="v6-input-wrap">
+            <span class="v6-input-icon">👤</span>
+            <input class="v6-input" placeholder="Choose username" />
+          </div>
+          <div class="v6-input-wrap">
+            <span class="v6-input-icon">🔒</span>
+            <input class="v6-input" type="password" placeholder="Create password" />
+          </div>
+          <div class="v6-input-wrap">
+            <span class="v6-input-icon">🔒</span>
+            <input class="v6-input" type="password" placeholder="Confirm password" />
+          </div>
+          <button class="v6-btn">Create Player</button>
+          <div class="v6-link">Already a player? <a href="#">Sign in</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VARIANT 7: TABBED ============ -->
+<div class="variant">
+  <div class="variant-header">
+    <div class="variant-number">7</div>
+    <div>
+      <div class="variant-title">Tabbed (Combined)</div>
+      <div class="variant-desc">Login и Register на одной карточке с переключением вкладками. Компактно.</div>
+    </div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-box">
+      <div class="preview-label">Login tab (active)</div>
+      <div class="v7-wrap">
+        <div class="v7-card">
+          <div class="v7-tabs">
+            <div class="v7-tab active">Sign In</div>
+            <div class="v7-tab">Sign Up</div>
+          </div>
+          <div class="v7-body">
+            <h2>Welcome back</h2>
+            <p class="sub">Sign in to your account</p>
+            <label class="v7-label">Username</label>
+            <input class="v7-input" placeholder="Enter username" />
+            <label class="v7-label">Password</label>
+            <input class="v7-input" type="password" placeholder="Enter password" />
+            <div class="v7-forgot"><a href="#">Forgot password?</a></div>
+            <div class="v7-checkbox"><input type="checkbox" /> Remember me</div>
+            <button class="v7-btn">Sign In</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">Register tab (active)</div>
+      <div class="v7-wrap">
+        <div class="v7-card">
+          <div class="v7-tabs">
+            <div class="v7-tab">Sign In</div>
+            <div class="v7-tab active">Sign Up</div>
+          </div>
+          <div class="v7-body">
+            <h2>Create account</h2>
+            <p class="sub">Join GameLibrary</p>
+            <label class="v7-label">Username</label>
+            <input class="v7-input" placeholder="Choose username" />
+            <label class="v7-label">Password</label>
+            <input class="v7-input" type="password" placeholder="Create password" />
+            <label class="v7-label">Confirm password</label>
+            <input class="v7-input" type="password" placeholder="Confirm password" />
+            <button class="v7-btn">Create Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VARIANT 8: FULL BG + OVERLAY ============ -->
+<div class="variant">
+  <div class="variant-header">
+    <div class="variant-number">8</div>
+    <div>
+      <div class="variant-title">Full Background + Social</div>
+      <div class="variant-desc">Фон с градиентом и паттерном. Кнопки социальных входов. Более "app-like" стиль.</div>
+    </div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-box">
+      <div class="preview-label">Login</div>
+      <div class="v8-wrap">
+        <div class="v8-card">
+          <div class="v8-logo">GameLibrary</div>
+          <p class="sub">Sign in to continue</p>
+          <input class="v8-input" placeholder="Email or username" />
+          <input class="v8-input" type="password" placeholder="Password" />
+          <button class="v8-btn">Sign In</button>
+          <div class="v8-divider">or continue with</div>
+          <div class="v8-social">
+            <button class="v8-social-btn">Google</button>
+            <button class="v8-social-btn">Steam</button>
+            <button class="v8-social-btn">GitHub</button>
+          </div>
+          <div class="v8-link">Don't have an account? <a href="#">Sign up</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">Register</div>
+      <div class="v8-wrap">
+        <div class="v8-card">
+          <div class="v8-logo">GameLibrary</div>
+          <p class="sub">Create your account</p>
+          <input class="v8-input" placeholder="Username" />
+          <input class="v8-input" type="password" placeholder="Password" />
+          <input class="v8-input" type="password" placeholder="Confirm password" />
+          <button class="v8-btn">Create Account</button>
+          <div class="v8-divider">or sign up with</div>
+          <div class="v8-social">
+            <button class="v8-social-btn">Google</button>
+            <button class="v8-social-btn">Steam</button>
+            <button class="v8-social-btn">GitHub</button>
+          </div>
+          <div class="v8-link">Have an account? <a href="#">Sign in</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VARIANT 9: SLIDING PANEL ============ -->
+<div class="variant">
+  <div class="variant-header">
+    <div class="variant-number">9</div>
+    <div>
+      <div class="variant-title">Dual Panel</div>
+      <div class="variant-desc">Форма слева, цветной промо-блок справа. Обе страницы всегда видны.</div>
+    </div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-box">
+      <div class="preview-label">Login</div>
+      <div class="v9-wrap">
+        <div class="v9-card">
+          <div class="v9-form">
+            <h2>Sign In</h2>
+            <p class="sub">Welcome back to GameLibrary</p>
+            <input class="v9-input" placeholder="Username" />
+            <input class="v9-input" type="password" placeholder="Password" />
+            <button class="v9-btn-orange">Sign In</button>
+            <div class="v9-link">Don't have an account? <a href="#">Sign up</a></div>
+          </div>
+          <div class="v9-panel">
+            <h3>Hello, Gamer!</h3>
+            <p>New to our platform? Register and start building your ultimate game library today.</p>
+            <button class="v9-panel-btn">Sign Up →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">Register</div>
+      <div class="v9-wrap">
+        <div class="v9-card">
+          <div class="v9-panel" style="order: -1;">
+            <h3>Welcome Back!</h3>
+            <p>Already have an account? Sign in and continue managing your game collection.</p>
+            <button class="v9-panel-btn">Sign In →</button>
+          </div>
+          <div class="v9-form">
+            <h2>Sign Up</h2>
+            <p class="sub">Join the GameLibrary community</p>
+            <input class="v9-input" placeholder="Username" />
+            <input class="v9-input" type="password" placeholder="Password" />
+            <input class="v9-input" type="password" placeholder="Confirm password" />
+            <button class="v9-btn-orange">Create Account</button>
+            <div class="v9-link">Have an account? <a href="#">Sign in</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VARIANT 10: TERMINAL ============ -->
+<div class="variant">
+  <div class="variant-header">
+    <div class="variant-number">10</div>
+    <div>
+      <div class="variant-title">Retro Terminal</div>
+      <div class="variant-desc">Зелёный текст на чёрном, моноширинный шрифт. Ретро-стиль старого терминала/CLI.</div>
+    </div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-box">
+      <div class="preview-label">Login</div>
+      <div class="v10-wrap">
+        <div class="v10-sidebar">
+          <div class="v10-dot"></div>
+          <div class="v10-line"></div>
+          <div class="v10-dot"></div>
+        </div>
+        <div class="v10-main">
+          <div class="v10-prompt">game-library@auth:~$</div>
+          <h2>login --user<span class="v10-cursor"></span></h2>
+          <p class="sub">// authentication required to proceed</p>
+          <div class="v10-field">
+            <label class="v10-label">username:</label>
+            <input class="v10-input" placeholder="enter_username" />
+          </div>
+          <div class="v10-field">
+            <label class="v10-label">password:</label>
+            <input class="v10-input" type="password" placeholder="••••••••" />
+          </div>
+          <button class="v10-btn">$ execute login</button>
+          <div class="v10-link">new_user? <a href="#">run register.sh</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">Register</div>
+      <div class="v10-wrap">
+        <div class="v10-sidebar">
+          <div class="v10-dot"></div>
+          <div class="v10-line"></div>
+          <div class="v10-dot"></div>
+        </div>
+        <div class="v10-main">
+          <div class="v10-prompt">game-library@auth:~$</div>
+          <h2>register --new-player<span class="v10-cursor"></span></h2>
+          <p class="sub">// create new user profile</p>
+          <div class="v10-field">
+            <label class="v10-label">username:</label>
+            <input class="v10-input" placeholder="choose_name" />
+          </div>
+          <div class="v10-field">
+            <label class="v10-label">password:</label>
+            <input class="v10-input" type="password" placeholder="••••••••" />
+          </div>
+          <div class="v10-field">
+            <label class="v10-label">confirm:</label>
+            <input class="v10-input" type="password" placeholder="••••••••" />
+          </div>
+          <button class="v10-btn">$ execute register</button>
+          <div class="v10-link">existing_user? <a href="#">run login.sh</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

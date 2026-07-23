@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GameLibrary — Retro Terminal Redesign</title>
+<style>
+/* ═══════════════════ GLOBAL RESET ═══════════════════ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background: #000;
+  color: #00ff88;
+  padding: 20px;
+  line-height: 1.5;
+}
+::selection { background: #00ff88; color: #000; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #001a0d; }
+::-webkit-scrollbar-thumb { background: #00ff88; border-radius: 0; }
+
+/* ═══════════════════ PAGE INDEX ═══════════════════ */
+.index {
+  max-width: 1400px;
+  margin: 0 auto 60px;
+  border: 1px solid #00ff88;
+  padding: 30px;
+}
+.index h1 {
+  font-size: 1.5rem;
+  text-shadow: 0 0 10px rgba(0,255,136,0.5);
+  margin-bottom: 4px;
+}
+.index .prompt { color: #00cc6a; font-size: 0.85rem; margin-bottom: 20px; }
+.index-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.index-link {
+  color: #00ff88;
+  text-decoration: none;
+  padding: 8px 12px;
+  border: 1px dashed rgba(0,255,136,0.3);
+  display: block;
+  transition: all 0.15s;
+  font-size: 0.9rem;
+}
+.index-link:hover {
+  background: rgba(0,255,136,0.1);
+  border-color: #00ff88;
+  text-shadow: 0 0 8px rgba(0,255,136,0.5);
+}
+.index-link .num { color: #00cc6a; margin-right: 8px; }
+
+/* ═══════════════════ SECTION ═══════════════════ */
+.page-section {
+  max-width: 1400px;
+  margin: 0 auto 80px;
+  border: 1px solid #00ff88;
+  position: relative;
+}
+.page-section::before {
+  content: attr(data-page);
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  background: #000;
+  padding: 0 10px;
+  font-size: 0.8rem;
+  color: #00cc6a;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+.page-section .back-link {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: #000;
+  padding: 0 10px;
+}
+.page-section .back-link a {
+  color: #00cc6a;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+.page-section .back-link a:hover { color: #00ff88; }
+
+/* scanline overlay */
+.scanlines {
+  position: relative;
+}
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* ═══════════════════ TERMINAL COMMONS ═══════════════════ */
+.t-header {
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(0,255,136,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #001a0d;
+  font-size: 0.85rem;
+}
+.t-header .title {
+  text-shadow: 0 0 8px rgba(0,255,136,0.4);
+  font-weight: bold;
+}
+.t-header .controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.t-header .controls span {
+  color: #00cc6a;
+  cursor: default;
+}
+.t-header .controls span:hover { color: #00ff88; }
+.t-body { padding: 20px; }
+.t-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid rgba(0,255,136,0.4);
+  color: #00ff88;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+.t-input:focus {
+  outline: none;
+  border-color: #00ff88;
+  box-shadow: 0 0 10px rgba(0,255,136,0.3);
+}
+.t-input::placeholder { color: rgba(0,255,136,0.25); }
+.t-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #00cc6a;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.t-btn {
+  padding: 8px 16px;
+  background: #00ff88;
+  color: #000;
+  border: none;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.t-btn:hover { box-shadow: 0 0 15px rgba(0,255,136,0.5); }
+.t-btn-outline {
+  padding: 8px 16px;
+  background: transparent;
+  color: #00ff88;
+  border: 1px solid #00ff88;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.t-btn-outline:hover { background: rgba(0,255,136,0.1); }
+.t-btn-danger {
+  padding: 8px 16px;
+  background: transparent;
+  color: #ff3344;
+  border: 1px solid #ff3344;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.t-btn-danger:hover { background: rgba(255,51,68,0.1); }
+.t-divider {
+  border: none;
+  border-top: 1px dashed rgba(0,255,136,0.3);
+  margin: 16px 0;
+}
+.t-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid rgba(0,255,136,0.5);
+  font-size: 0.75rem;
+  color: #00ff88;
+  margin: 2px;
+}
+.t-tag.warn { border-color: #f59e0b; color: #f59e0b; }
+.t-tag.info { border-color: #38bdf8; color: #38bdf8; }
+.t-tag.danger { border-color: #ff3344; color: #ff3344; }
+.t-tag.active { background: #00ff88; color: #000; }
+.t-badge {
+  display: inline-block;
+  background: #00ff88;
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+}
+.t-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: #00ff88;
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+@keyframes blink { 50% { opacity: 0; } }
+.t-progress {
+  height: 8px;
+  background: #001a0d;
+  border: 1px solid rgba(0,255,136,0.3);
+  position: relative;
+  overflow: hidden;
+}
+.t-progress-bar {
+  height: 100%;
+  background: #00ff88;
+  box-shadow: 0 0 8px rgba(0,255,136,0.5);
+}
+.t-sidebar-nav {
+  border-right: 1px solid rgba(0,255,136,0.2);
+  padding: 8px 0;
+}
+.t-sidebar-nav .nav-item {
+  display: block;
+  padding: 8px 16px;
+  color: #00cc6a;
+  text-decoration: none;
+  font-size: 0.85rem;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+.t-sidebar-nav .nav-item:hover,
+.t-sidebar-nav .nav-item.active {
+  color: #00ff88;
+  background: rgba(0,255,136,0.05);
+  border-left-color: #00ff88;
+  text-shadow: 0 0 8px rgba(0,255,136,0.3);
+}
+
+/* ═══════════════════ 1. LOGIN ═══════════════════ */
+.login-wrap {
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.login-box {
+  width: 100%;
+  max-width: 420px;
+}
+.login-box .logo-line {
+  text-align: center;
+  margin-bottom: 6px;
+}
+.login-box .logo-ascii {
+  font-size: 0.7rem;
+  color: #00ff88;
+  line-height: 1.2;
+  text-shadow: 0 0 8px rgba(0,255,136,0.5);
+  display: inline-block;
+}
+.login-box .prompt-line {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #00cc6a;
+  margin-bottom: 24px;
+}
+.login-box .field { margin-bottom: 16px; }
+
+/* ═══════════════════ 2. REGISTER ═══════════════════ */
+.register-wrap {
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* ═══════════════════ 3. LIBRARY ═══════════════════ */
+.lib-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 600px;
+}
+.lib-sidebar {
+  border-right: 1px solid rgba(0,255,136,0.2);
+  padding: 16px;
+  background: rgba(0,26,13,0.3);
+}
+.lib-sidebar .filter-title {
+  font-size: 0.75rem;
+  color: #00cc6a;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+.lib-sidebar .filter-title:first-child { margin-top: 0; }
+.lib-main { padding: 16px; }
+.lib-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.lib-toolbar h2 {
+  font-size: 1.1rem;
+  text-shadow: 0 0 8px rgba(0,255,136,0.4);
+}
+.sort-bar {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.sort-btn {
+  padding: 4px 10px;
+  background: transparent;
+  color: #00cc6a;
+  border: 1px solid rgba(0,255,136,0.2);
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.sort-btn:hover { border-color: #00ff88; color: #00ff88; }
+.sort-btn.active { background: #00ff88; color: #000; border-color: #00ff88; }
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.game-card {
+  border: 1px solid rgba(0,255,136,0.3);
+  background: rgba(0,26,13,0.3);
+  cursor: pointer;
+  transition: all 0.15s;
+  overflow: hidden;
+}
+.game-card:hover {
+  border-color: #00ff88;
+  box-shadow: 0 0 15px rgba(0,255,136,0.2);
+}
+.game-card .card-img {
+  width: 100%;
+  height: 120px;
+  background: #001a0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0,255,136,0.2);
+  font-size: 2rem;
+  border-bottom: 1px solid rgba(0,255,136,0.15);
+  overflow: hidden;
+  position: relative;
+}
+.game-card .card-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 6px);
+  pointer-events: none;
+}
+.game-card .card-body { padding: 10px; }
+.game-card .card-title {
+  font-size: 0.85rem;
+  color: #00ff88;
+  font-weight: bold;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.game-card .card-meta {
+  font-size: 0.7rem;
+  color: #00cc6a;
+}
+.game-card .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 6px;
+}
+.history-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0;
+  margin-bottom: 12px;
+  border-bottom: 1px dashed rgba(0,255,136,0.2);
+}
+.history-item {
+  flex-shrink: 0;
+  width: 60px;
+  text-align: center;
+  cursor: pointer;
+}
+.history-item .h-img {
+  width: 60px;
+  height: 80px;
+  background: #001a0d;
+  border: 1px solid rgba(0,255,136,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: rgba(0,255,136,0.2);
+}
+.history-item .h-name {
+  font-size: 0.6rem;
+  color: #00cc6a;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.paginator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 16px 0;
+  font-size: 0.8rem;
+}
+.paginator .pg-btn {
+  padding: 4px 10px;
+  background: transparent;
+  color: #00cc6a;
+  border: 1px solid rgba(0,255,136,0.2);
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.paginator .pg-btn:hover { border-color: #00ff88; color: #00ff88; }
+.paginator .pg-btn.active { background: #00ff88; color: #000; border-color: #00ff88; }
+
+/* ═══════════════════ 4. GAME DETAIL ═══════════════════ */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  padding: 20px;
+}
+.detail-poster {
+  border: 1px solid rgba(0,255,136,0.4);
+  background: #001a0d;
+  height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0,255,136,0.15);
+  font-size: 4rem;
+  position: relative;
+}
+.detail-poster::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 6px);
+  pointer-events: none;
+}
+.detail-info .game-name {
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0,255,136,0.5);
+  margin-bottom: 8px;
+}
+.detail-info .tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 10px 0;
+}
+.detail-info .rating-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+.rating-bar {
+  display: flex;
+  gap: 2px;
+}
+.rating-star {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #00ff88;
+}
+.rating-star.filled { background: #00ff88; }
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.description-block {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px dashed rgba(0,255,136,0.2);
+  font-size: 0.85rem;
+  color: #00cc6a;
+  line-height: 1.6;
+}
+.screenshots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  padding: 16px 20px;
+}
+.screenshot-thumb {
+  height: 100px;
+  background: #001a0d;
+  border: 1px solid rgba(0,255,136,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0,255,136,0.15);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.screenshot-thumb:hover {
+  border-color: #00ff88;
+  box-shadow: 0 0 10px rgba(0,255,136,0.2);
+}
+.reviews-section { padding: 16px 20px; }
+.review-item {
+  border: 1px dashed rgba(0,255,136,0.2);
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.review-item .review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.review-item .review-user {
+  font-weight: bold;
+  color: #00ff88;
+  font-size: 0.85rem;
+}
+.review-item .review-date {
+  font-size: 0.7rem;
+  color: #00cc6a;
+}
+.review-scores {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+.review-score-pill {
+  padding: 2px 8px;
+  border: 1px solid rgba(0,255,136,0.3);
+  font-size: 0.75rem;
+  color: #00cc6a;
+}
+.review-text {
+  font-size: 0.85rem;
+  color: #00cc6a;
+  line-height: 1.5;
+}
+
+/* ═══════════════════ 5. GAME EDIT ═══════════════════ */
+.edit-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  padding: 20px;
+}
+.edit-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.edit-form .form-group { margin-bottom: 12px; }
+.edit-sidebar .side-card {
+  border: 1px solid rgba(0,255,136,0.3);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.edit-sidebar .side-card h4 {
+  font-size: 0.8rem;
+  color: #00cc6a;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+.logo-preview {
+  width: 120px;
+  height: 120px;
+  background: #001a0d;
+  border: 1px dashed rgba(0,255,136,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0,255,136,0.2);
+  font-size: 2rem;
+  margin: 0 auto 10px;
+}
+.quill-mock {
+  height: 160px;
+  border: 1px solid rgba(0,255,136,0.3);
+  background: #001a0d;
+}
+.quill-toolbar-mock {
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(0,255,136,0.2);
+  display: flex;
+  gap: 4px;
+}
+.quill-toolbar-mock .tb {
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(0,255,136,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: #00cc6a;
+  cursor: default;
+}
+.quill-area {
+  padding: 8px;
+  color: rgba(0,255,136,0.3);
+  font-size: 0.8rem;
+}
+.screenshots-edit {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.screenshot-edit-item {
+  width: 100px;
+  height: 70px;
+  background: #001a0d;
+  border: 1px solid rgba(0,255,136,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0,255,136,0.15);
+  position: relative;
+}
+.screenshot-edit-item .del-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  background: #ff3344;
+  color: #000;
+  border: none;
+  font-size: 0.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.screenshot-add {
+  width: 100px;
+  height: 70px;
+  border: 1px dashed rgba(0,255,136,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00cc6a;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.scraper-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #00cc6a;
+  margin: 4px 0;
+}
+.scraper-check input { accent-color: #00ff88; }
+
+/* ═══════════════════ 6. PROFILE ═══════════════════ */
+.profile-layout {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #00ff88;
+  background: #001a0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: rgba(0,255,136,0.3);
+  box-shadow: 0 0 15px rgba(0,255,136,0.2);
+}
+.profile-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(0,255,136,0.4);
+}
+.accordion-item {
+  border: 1px solid rgba(0,255,136,0.3);
+  margin-bottom: 8px;
+}
+.accordion-header {
+  padding: 10px 14px;
+  background: rgba(0,26,13,0.5);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #00ff88;
+  border-bottom: 1px solid rgba(0,255,136,0.15);
+}
+.accordion-header:hover { background: rgba(0,255,136,0.05); }
+.accordion-body {
+  padding: 14px;
+}
+.accordion-body.collapsed { display: none; }
+
+/* ═══════════════════ 7. STATISTICS ═══════════════════ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 20px;
+}
+.stat-card {
+  border: 1px solid rgba(0,255,136,0.3);
+  padding: 16px;
+  text-align: center;
+  background: rgba(0,26,13,0.3);
+}
+.stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0,255,136,0.5);
+}
+.stat-card .stat-label {
+  font-size: 0.7rem;
+  color: #00cc6a;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+.charts-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 0 20px 20px;
+}
+.chart-box {
+  border: 1px solid rgba(0,255,136,0.3);
+  padding: 16px;
+  background: rgba(0,26,13,0.3);
+}
+.chart-box h4 {
+  font-size: 0.8rem;
+  color: #00cc6a;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 120px;
+  padding-top: 10px;
+}
+.bar {
+  flex: 1;
+  background: rgba(0,255,136,0.3);
+  border: 1px solid rgba(0,255,136,0.5);
+  position: relative;
+  min-height: 8px;
+  transition: all 0.2s;
+}
+.bar:hover {
+  background: rgba(0,255,136,0.5);
+  box-shadow: 0 0 8px rgba(0,255,136,0.3);
+}
+.bar-label {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  color: #00cc6a;
+  white-space: nowrap;
+}
+.top-list { padding: 16px; }
+.top-list h4 {
+  font-size: 0.8rem;
+  color: #00cc6a;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+.top-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(0,255,136,0.15);
+  font-size: 0.85rem;
+}
+.top-item .rank {
+  color: #00cc6a;
+  width: 24px;
+  text-align: right;
+}
+.top-item .name { flex: 1; color: #00ff88; }
+.top-item .value { color: #00cc6a; }
+
+/* ═══════════════════ 8. COLLECTIONS ═══════════════════ */
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  padding: 20px;
+}
+.collection-card {
+  border: 1px solid rgba(0,255,136,0.3);
+  padding: 16px;
+  background: rgba(0,26,13,0.3);
+  cursor: pointer;
+}
+.collection-card:hover {
+  border-color: #00ff88;
+  box-shadow: 0 0 12px rgba(0,255,136,0.2);
+}
+.collection-card .c-name {
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+.collection-card .c-meta {
+  font-size: 0.75rem;
+  color: #00cc6a;
+}
+.collection-card .c-preview {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+}
+.collection-card .c-preview .cp-img {
+  width: 40px;
+  height: 55px;
+  background: #001a0d;
+  border: 1px solid rgba(0,255,136,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: rgba(0,255,136,0.15);
+}
+.smart-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid #38bdf8;
+  color: #38bdf8;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+
+/* ═══════════════════ 9. DOWNLOADS ═══════════════════ */
+.downloads-list { padding: 20px; }
+.download-item {
+  border: 1px solid rgba(0,255,136,0.3);
+  padding: 14px;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+.download-item .d-name {
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+.download-item .d-meta {
+  font-size: 0.75rem;
+  color: #00cc6a;
+}
+.download-item .d-status {
+  text-align: right;
+}
+.d-progress { margin-top: 6px; }
+.status-seeding {
+  color: #38bdf8;
+  font-size: 0.8rem;
+}
+.status-complete {
+  color: #00ff88;
+  font-size: 0.8rem;
+}
+
+/* ═══════════════════ 10. ADMIN USERS ═══════════════════ */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.admin-table th {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0,255,136,0.4);
+  color: #00cc6a;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  background: rgba(0,26,13,0.5);
+}
+.admin-table td {
+  padding: 10px 14px;
+  border-bottom: 1px dashed rgba(0,255,136,0.15);
+}
+.admin-table tr:hover td { background: rgba(0,255,136,0.03); }
+
+/* ═══════════════════ 11. ADMIN SCRAPERS ═══════════════════ */
+.scrapers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  padding: 20px;
+}
+.scraper-card {
+  border: 1px solid rgba(0,255,136,0.3);
+  padding: 16px;
+  background: rgba(0,26,13,0.3);
+}
+.scraper-card .s-name {
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+.scraper-card .s-status {
+  font-size: 0.75rem;
+  margin-bottom: 8px;
+}
+.scraper-card .s-fields {
+  font-size: 0.75rem;
+  color: #00cc6a;
+}
+
+/* ═══════════════════ 12. 404 ═══════════════════ */
+.notfound-wrap {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+.notfound-ascii {
+  font-size: 0.8rem;
+  line-height: 1.1;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0,255,136,0.5);
+  margin-bottom: 20px;
+}
+.notfound-code {
+  font-size: 4rem;
+  font-weight: bold;
+  text-shadow: 0 0 20px rgba(0,255,136,0.6);
+  margin-bottom: 8px;
+}
+
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media (max-width: 900px) {
+  .lib-layout { grid-template-columns: 1fr; }
+  .lib-sidebar { border-right: none; border-bottom: 1px solid rgba(0,255,136,0.2); }
+  .detail-layout { grid-template-columns: 1fr; }
+  .edit-layout { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-area { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ INDEX ═══════════════════ -->
+<div class="index">
+  <h1>GAME_LIBRARY <span style="color:#00cc6a">// retro-terminal redesign</span></h1>
+  <div class="prompt">user@gamelibrary:~$ ls ./pages/<span class="t-cursor"></span></div>
+  <div class="index-grid">
+    <a class="index-link" href="#page-login"><span class="num">01</span> login_view</a>
+    <a class="index-link" href="#page-register"><span class="num">02</span> register_view</a>
+    <a class="index-link" href="#page-library"><span class="num">03</span> library_view</a>
+    <a class="index-link" href="#page-detail"><span class="num">04</span> game_detail_view</a>
+    <a class="index-link" href="#page-edit"><span class="num">05</span> game_edit_view</a>
+    <a class="index-link" href="#page-profile"><span class="num">06</span> profile_view</a>
+    <a class="index-link" href="#page-statistics"><span class="num">07</span> statistics_view</a>
+    <a class="index-link" href="#page-collections"><span class="num">08</span> collections_view</a>
+    <a class="index-link" href="#page-downloads"><span class="num">09</span> downloads_view</a>
+    <a class="index-link" href="#page-admin-users"><span class="num">10</span> admin_users_view</a>
+    <a class="index-link" href="#page-admin-scrapers"><span class="num">11</span> admin_scrapers_view</a>
+    <a class="index-link" href="#page-404"><span class="num">12</span> not_found_view</a>
+  </div>
+</div>
+
+<!-- ═══════════════════ 01. LOGIN ═══════════════════ -->
+<div class="page-section scanlines" data-page="01 — login" id="page-login">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="logo-line">
+        <pre class="logo-ascii">
+ ┌─┐┌─┐┌ ┐┌─┐┌─┐
+ │ ┌┘││││┌┘├┤ │ │
+ └─┘└─┘└└┘└ └└─┘└─┘
+        </pre>
+      </div>
+      <div class="prompt-line">game-library@auth:~$ login --user<span class="t-cursor"></span></div>
+      <div style="border:1px solid rgba(0,255,136,0.4); padding:24px;">
+        <div class="field">
+          <label class="t-label">username:</label>
+          <input class="t-input" placeholder="enter_username" />
+        </div>
+        <div class="field">
+          <label class="t-label">password:</label>
+          <input class="t-input" type="password" placeholder="••••••••" />
+        </div>
+        <div style="margin-top:8px;">
+          <button class="t-btn" style="width:100%;">$ execute login</button>
+        </div>
+        <hr class="t-divider" />
+        <div style="text-align:center; font-size:0.8rem; color:#00cc6a;">
+          no account? <a href="#" style="color:#00ff88; border-bottom:1px dashed #00ff88; text-decoration:none;">run register.sh</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 02. REGISTER ═══════════════════ -->
+<div class="page-section scanlines" data-page="02 — register" id="page-register">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <div class="register-wrap">
+    <div class="login-box">
+      <div class="prompt-line">game-library@auth:~$ register --new-player<span class="t-cursor"></span></div>
+      <div style="border:1px solid rgba(0,255,136,0.4); padding:24px;">
+        <div class="field">
+          <label class="t-label">username:</label>
+          <input class="t-input" placeholder="choose_name" />
+        </div>
+        <div class="field">
+          <label class="t-label">password:</label>
+          <input class="t-input" type="password" placeholder="••••••••" />
+        </div>
+        <div style="font-size:0.7rem; color:#00cc6a; margin-bottom:12px;">
+          └─ min 8 chars, letters + digits required
+        </div>
+        <div class="field">
+          <label class="t-label">confirm password:</label>
+          <input class="t-input" type="password" placeholder="••••••••" />
+        </div>
+        <div style="margin-top:8px;">
+          <button class="t-btn" style="width:100%;">$ execute register</button>
+        </div>
+        <hr class="t-divider" />
+        <div style="text-align:center; font-size:0.8rem; color:#00cc6a;">
+          existing user? <a href="#" style="color:#00ff88; border-bottom:1px dashed #00ff88; text-decoration:none;">run login.sh</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 03. LIBRARY ═══════════════════ -->
+<div class="page-section scanlines" data-page="03 — library" id="page-library">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <!-- Header -->
+  <div class="t-header">
+    <div style="display:flex; gap:16px; align-items:center;">
+      <span class="title" style="color:#00ff88;">&gt;_ GAME_LIBRARY</span>
+      <span style="color:#00cc6a; border-left:1px solid rgba(0,255,136,0.3); padding-left:16px;">downloads</span>
+      <span style="color:#00cc6a;">collections</span>
+      <span style="color:#00cc6a;">statistics</span>
+      <span style="color:#00cc6a;">admin ▾</span>
+    </div>
+    <div class="controls">
+      <span>🔔 <span class="t-badge">3</span></span>
+      <span>[RU|EN]</span>
+      <span>☾</span>
+      <span style="border:1px solid #00ff88; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.7rem;">U</span>
+    </div>
+  </div>
+  <!-- Body -->
+  <div class="lib-layout">
+    <!-- Sidebar Filter -->
+    <div class="lib-sidebar">
+      <div class="filter-title">> search</div>
+      <input class="t-input" placeholder="grep games..." style="margin-bottom:12px;" />
+
+      <div class="filter-title">> platforms</div>
+      <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px;">
+        <span class="t-tag active">PC</span>
+        <span class="t-tag">PS1</span>
+        <span class="t-tag">PS2</span>
+        <span class="t-tag">PSP</span>
+        <span class="t-tag">DS</span>
+        <span class="t-tag">GBA</span>
+      </div>
+
+      <div class="filter-title">> year</div>
+      <div style="display:flex; gap:6px; margin-bottom:8px;">
+        <input class="t-input" placeholder="from" style="width:80px; font-size:0.8rem;" />
+        <input class="t-input" placeholder="to" style="width:80px; font-size:0.8rem;" />
+      </div>
+
+      <div class="filter-title">> genres</div>
+      <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px;">
+        <span class="t-tag">Action</span>
+        <span class="t-tag active">RPG</span>
+        <span class="t-tag">Strategy</span>
+        <span class="t-tag">Adventure</span>
+        <span class="t-tag">Puzzle</span>
+        <span class="t-tag">Shooter</span>
+        <span class="t-tag">Racing</span>
+        <span class="t-tag">Simulation</span>
+      </div>
+
+      <div class="filter-title">> tags</div>
+      <div style="display:flex; flex-wrap:wrap; gap:4px;">
+        <span class="t-tag">multiplayer</span>
+        <span class="t-tag">open-world</span>
+        <span class="t-tag">indie</span>
+      </div>
+
+      <hr class="t-divider" />
+      <div style="font-size:0.7rem; color:#00cc6a; text-align:center;">
+        [filters auto-applied // 250ms debounce]
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="lib-main">
+      <!-- Toolbar -->
+      <div class="lib-toolbar">
+        <h2>> Game Library<span class="t-cursor"></span></h2>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="t-btn-outline" style="font-size:0.75rem; padding:4px 10px;">🎲 random</button>
+          <button class="t-btn-outline" style="font-size:0.75rem; padding:4px 10px; border-color:#f59e0b; color:#f59e0b;">↻ scan</button>
+        </div>
+      </div>
+
+      <!-- History Strip -->
+      <div class="history-strip">
+        <div class="history-item"><div class="h-img">🎮</div><div class="h-name">Witcher 3</div></div>
+        <div class="history-item"><div class="h-img">🎮</div><div class="h-name">Skyrim</div></div>
+        <div class="history-item"><div class="h-img">🎮</div><div class="h-name">Doom</div></div>
+        <div class="history-item"><div class="h-img">🎮</div><div class="h-name">Fallout</div></div>
+        <div class="history-item"><div class="h-img">🎮</div><div class="h-name">GTA V</div></div>
+        <div class="history-item"><div class="h-img">🎮</div><div class="h-name">Minecraft</div></div>
+      </div>
+
+      <!-- Sort Bar -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+        <div class="sort-bar">
+          <button class="sort-btn active">name ↓</button>
+          <button class="sort-btn">year</button>
+          <button class="sort-btn">added</button>
+          <button class="sort-btn">rating</button>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; font-size:0.75rem;">
+          <span style="color:#00cc6a;">page:</span>
+          <span class="t-tag active">12</span>
+          <span class="t-tag">24</span>
+          <span class="t-tag">48</span>
+          <span class="t-tag">≡</span>
+          <span class="t-badge">142</span>
+        </div>
+      </div>
+
+      <!-- Scan Progress (hidden by default, shown as example) -->
+      <!--
+      <div style="border:1px dashed rgba(0,255,136,0.3); padding:10px; margin-bottom:12px; font-size:0.8rem;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span>LOADING_IMAGES</span><span>45%</span>
+        </div>
+        <div class="t-progress"><div class="t-progress-bar" style="width:45%;"></div></div>
+        <div style="margin-top:4px; color:#00cc6a;">Processing: The_Witcher_3...</div>
+      </div>
+      -->
+
+      <!-- Game Grid -->
+      <div class="game-grid">
+        <div class="game-card">
+          <div class="card-img">🗡️</div>
+          <div class="card-body">
+            <div class="card-title">The Witcher 3</div>
+            <div class="card-meta">PC • 2015</div>
+            <div class="card-tags"><span class="t-tag" style="font-size:0.6rem;">RPG</span><span class="t-tag" style="font-size:0.6rem;">Action</span></div>
+          </div>
+        </div>
+        <div class="game-card">
+          <div class="card-img">🐉</div>
+          <div class="card-body">
+            <div class="card-title">Skyrim</div>
+            <div class="card-meta">PC • 2011</div>
+            <div class="card-tags"><span class="t-tag" style="font-size:0.6rem;">RPG</span></div>
+          </div>
+        </div>
+        <div class="game-card">
+          <div class="card-img">🔫</div>
+          <div class="card-body">
+            <div class="card-title">DOOM Eternal</div>
+            <div class="card-meta">PC • 2020</div>
+            <div class="card-tags"><span class="t-tag" style="font-size:0.6rem;">Shooter</span></div>
+          </div>
+        </div>
+        <div class="game-card">
+          <div class="card-img">☢️</div>
+          <div class="card-body">
+            <div class="card-title">Fallout 4</div>
+            <div class="card-meta">PC • 2015</div>
+            <div class="card-tags"><span class="t-tag" style="font-size:0.6rem;">RPG</span><span class="t-tag" style="font-size:0.6rem;">Open</span></div>
+          </div>
+        </div>
+        <div class="game-card">
+          <div class="card-img">🏎️</div>
+          <div class="card-body">
+            <div class="card-title">GTA V</div>
+            <div class="card-meta">PC • 2015</div>
+            <div class="card-tags"><span class="t-tag" style="font-size:0.6rem;">Action</span></div>
+          </div>
+        </div>
+        <div class="game-card">
+          <div class="card-img">⛏️</div>
+          <div class="card-body">
+            <div class="card-title">Minecraft</div>
+            <div class="card-meta">PC • 2011</div>
+            <div class="card-tags"><span class="t-tag" style="font-size:0.6rem;">Sandbox</span></div>
+          </div>
+        </div>
+        <div class="game-card">
+          <div class="card-img">🧟</div>
+          <div class="card-body">
+            <div class="card-title">Resident Evil 4</div>
+            <div class="card-meta">PS2 • 2005</div>
+            <div class="card-tags"><span class="t-tag" style="font-size:0.6rem;">Horror</span></div>
+          </div>
+        </div>
+        <div class="game-card">
+          <div class="card-img">🏰</div>
+          <div class="card-body">
+            <div class="card-title">Dark Souls III</div>
+            <div class="card-meta">PC • 2016</div>
+            <div class="card-tags"><span class="t-tag" style="font-size:0.6rem;">RPG</span><span class="t-tag" style="font-size:0.6rem;">Action</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paginator -->
+      <div class="paginator">
+        <button class="pg-btn">«</button>
+        <button class="pg-btn active">1</button>
+        <button class="pg-btn">2</button>
+        <button class="pg-btn">3</button>
+        <button class="pg-btn">...</button>
+        <button class="pg-btn">12</button>
+        <button class="pg-btn">»</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 04. GAME DETAIL ═══════════════════ -->
+<div class="page-section scanlines" data-page="04 — game detail" id="page-detail">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <!-- Header (same nav) -->
+  <div class="t-header">
+    <div style="display:flex; gap:16px; align-items:center;">
+      <span style="color:#00cc6a;">&gt;_ GAME_LIBRARY</span>
+      <span style="color:#00cc6a;">downloads</span>
+      <span style="color:#00cc6a;">collections</span>
+      <span style="color:#00cc6a;">statistics</span>
+    </div>
+    <div class="controls">
+      <span>🔔</span>
+      <span style="border:1px solid #00ff88; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.7rem;">U</span>
+    </div>
+  </div>
+  <div class="detail-layout">
+    <div>
+      <div class="detail-poster">🗡️</div>
+    </div>
+    <div class="detail-info">
+      <div style="margin-bottom:8px;">
+        <span style="color:#00cc6a; font-size:0.8rem;">&lt; back</span>
+      </div>
+      <div class="game-name">The Witcher 3: Wild Hunt<span class="t-cursor"></span></div>
+      <div class="tags-row">
+        <span class="t-tag info">PC</span>
+        <span class="t-tag warn">2015</span>
+        <span class="t-tag">RPG</span>
+        <span class="t-tag">Action</span>
+        <span class="t-tag">Open World</span>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:4px; margin:8px 0;">
+        <span class="t-tag" style="border-radius:10px; font-size:0.7rem;">story-rich</span>
+        <span class="t-tag" style="border-radius:10px; font-size:0.7rem;">fantasy</span>
+        <span class="t-tag" style="border-radius:10px; font-size:0.7rem;">mature</span>
+      </div>
+      <div class="rating-row">
+        <span style="color:#00cc6a; font-size:0.8rem;">avg:</span>
+        <div class="rating-bar">
+          <div class="rating-star filled"></div><div class="rating-star filled"></div>
+          <div class="rating-star filled"></div><div class="rating-star filled"></div>
+          <div class="rating-star filled"></div><div class="rating-star filled"></div>
+          <div class="rating-star filled"></div><div class="rating-star filled"></div>
+          <div class="rating-star"></div><div class="rating-star"></div>
+        </div>
+        <span style="font-size:0.9rem;">8.2</span>
+        <span style="font-size:0.75rem; color:#00cc6a;">(42 ratings)</span>
+      </div>
+      <div class="rating-row">
+        <span style="color:#00cc6a; font-size:0.8rem;">your:</span>
+        <div class="rating-bar">
+          <div class="rating-star filled"></div><div class="rating-star filled"></div>
+          <div class="rating-star filled"></div><div class="rating-star filled"></div>
+          <div class="rating-star filled"></div><div class="rating-star filled"></div>
+          <div class="rating-star filled"></div><div class="rating-star filled"></div>
+          <div class="rating-star filled"></div><div class="rating-star"></div>
+        </div>
+        <span style="font-size:0.9rem;">9</span>
+      </div>
+      <div class="detail-actions">
+        <button class="t-btn" style="font-size:0.8rem;">⬇ download</button>
+        <button class="t-btn-outline" style="font-size:0.8rem;">🌱 seed</button>
+        <button class="t-btn-outline" style="font-size:0.8rem;">📁 collection</button>
+        <button class="t-btn-outline" style="font-size:0.8rem;">♥ favorite</button>
+        <button class="t-btn-outline" style="font-size:0.8rem; border-color:#38bdf8; color:#38bdf8;">✎ edit</button>
+      </div>
+      <hr class="t-divider" />
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:0.8rem; color:#00cc6a; text-transform:uppercase; letter-spacing:0.1em;">> description</span>
+        <span style="font-size:0.75rem; color:#00cc6a;">🌐 translate</span>
+      </div>
+      <div class="description-block">
+        The Witcher 3: Wild Hunt is a story-driven, next-generation open world RPG set in a visually stunning fantasy universe full of meaningful choices and impactful consequences. In The Witcher, you play as professional monster hunter Geralt of Rivia, tasked with finding a child of prophecy who can unlock the power of the ancient elves...
+      </div>
+
+      <!-- Seed progress example -->
+      <div style="margin-top:12px; border:1px dashed rgba(0,255,136,0.2); padding:8px; font-size:0.8rem;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span style="color:#38bdf8;">🌱 seeding...</span><span>65%</span>
+        </div>
+        <div class="t-progress"><div class="t-progress-bar" style="width:65%; background:#38bdf8; box-shadow:0 0 8px rgba(56,189,248,0.5);"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screenshots -->
+  <hr class="t-divider" style="margin:0 20px;" />
+  <div style="padding:12px 20px;">
+    <span style="font-size:0.8rem; color:#00cc6a; text-transform:uppercase; letter-spacing:0.1em;">> screenshots</span>
+  </div>
+  <div class="screenshots-grid">
+    <div class="screenshot-thumb">🖼️</div>
+    <div class="screenshot-thumb">🖼️</div>
+    <div class="screenshot-thumb">🖼️</div>
+    <div class="screenshot-thumb">🖼️</div>
+    <div class="screenshot-thumb">🖼️</div>
+  </div>
+
+  <!-- Related -->
+  <hr class="t-divider" style="margin:0 20px;" />
+  <div style="padding:12px 20px;">
+    <span style="font-size:0.8rem; color:#00cc6a; text-transform:uppercase; letter-spacing:0.1em;">> related games</span>
+    <div style="display:flex; gap:8px; margin-top:10px; overflow-x:auto;">
+      <div style="flex-shrink:0; text-align:center;">
+        <div style="width:80px; height:110px; background:#001a0d; border:1px solid rgba(0,255,136,0.2); display:flex; align-items:center; justify-content:center; color:rgba(0,255,136,0.15);">🐉</div>
+        <div style="font-size:0.6rem; color:#00cc6a; margin-top:3px; width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Skyrim</div>
+      </div>
+      <div style="flex-shrink:0; text-align:center;">
+        <div style="width:80px; height:110px; background:#001a0d; border:1px solid rgba(0,255,136,0.2); display:flex; align-items:center; justify-content:center; color:rgba(0,255,136,0.15);">🏰</div>
+        <div style="font-size:0.6rem; color:#00cc6a; margin-top:3px; width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Dark Souls</div>
+      </div>
+      <div style="flex-shrink:0; text-align:center;">
+        <div style="width:80px; height:110px; background:#001a0d; border:1px solid rgba(0,255,136,0.2); display:flex; align-items:center; justify-content:center; color:rgba(0,255,136,0.15);">☢️</div>
+        <div style="font-size:0.6rem; color:#00cc6a; margin-top:3px; width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Fallout 4</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews / Comments -->
+  <hr class="t-divider" style="margin:0 20px;" />
+  <div class="reviews-section">
+    <div style="display:flex; gap:16px; margin-bottom:16px; border-bottom:1px solid rgba(0,255,136,0.2); padding-bottom:8px;">
+      <span style="font-size:0.85rem; color:#00ff88; border-bottom:2px solid #00ff88; padding-bottom:6px;">reviews <span class="t-badge">5</span></span>
+      <span style="font-size:0.85rem; color:#00cc6a;">comments <span class="t-badge" style="background:#00cc6a;">12</span></span>
+    </div>
+    <!-- Aggregated scores -->
+    <div style="margin-bottom:16px; font-size:0.8rem;">
+      <div style="color:#00cc6a; margin-bottom:8px; text-transform:uppercase; font-size:0.7rem; letter-spacing:0.1em;">avg scores:</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="color:#00cc6a; width:70px;">gameplay</span>
+          <div class="t-progress" style="flex:1;"><div class="t-progress-bar" style="width:75%;"></div></div>
+          <span style="width:30px; text-align:right;">7.5</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="color:#00cc6a; width:70px;">graphics</span>
+          <div class="t-progress" style="flex:1;"><div class="t-progress-bar" style="width:82%;"></div></div>
+          <span style="width:30px; text-align:right;">8.2</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="color:#00cc6a; width:70px;">story</span>
+          <div class="t-progress" style="flex:1;"><div class="t-progress-bar" style="width:90%;"></div></div>
+          <span style="width:30px; text-align:right;">9.0</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="color:#00cc6a; width:70px;">music</span>
+          <div class="t-progress" style="flex:1;"><div class="t-progress-bar" style="width:85%;"></div></div>
+          <span style="width:30px; text-align:right;">8.5</span>
+        </div>
+      </div>
+    </div>
+    <!-- Review items -->
+    <div class="review-item">
+      <div class="review-header">
+        <span class="review-user">[A] gamer_pro</span>
+        <span class="review-date">2 hours ago</span>
+      </div>
+      <div class="review-scores">
+        <span class="review-score-pill">🎮 8</span>
+        <span class="review-score-pill">🖼️ 9</span>
+        <span class="review-score-pill">📖 10</span>
+        <span class="review-score-pill">🎵 8</span>
+      </div>
+      <div class="review-text">
+        One of the best RPGs ever made. The story is incredibly immersive and the world feels alive.
+      </div>
+      <div style="margin-top:6px; font-size:0.8rem;">
+        <span style="color:#00ff88;">[+] </span><span style="color:#00cc6a;">Amazing story, huge world</span><br/>
+        <span style="color:#ff3344;">[-] </span><span style="color:#00cc6a;">Combat can feel clunky</span>
+      </div>
+    </div>
+    <div class="review-item">
+      <div class="review-header">
+        <span class="review-user">[B] night_crawler</span>
+        <span class="review-date">1 day ago</span>
+      </div>
+      <div class="review-scores">
+        <span class="review-score-pill">🎮 7</span>
+        <span class="review-score-pill">🖼️ 8</span>
+        <span class="review-score-pill">📖 9</span>
+        <span class="review-score-pill">🎵 7</span>
+      </div>
+      <div class="review-text">
+        Great game with tons of content. DLCs are must-play.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 05. GAME EDIT ═══════════════════ -->
+<div class="page-section scanlines" data-page="05 — game edit" id="page-edit">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <div class="t-header">
+    <div style="display:flex; gap:12px; align-items:center;">
+      <span style="color:#00cc6a; font-size:0.8rem;">&lt; back</span>
+      <span class="title">> edit: The_Witcher_3</span>
+    </div>
+  </div>
+  <div class="edit-layout">
+    <!-- Main Form -->
+    <div class="edit-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="t-label">name:</label>
+          <input class="t-input" value="The Witcher 3: Wild Hunt" />
+        </div>
+        <div class="form-group">
+          <label class="t-label">platform:</label>
+          <input class="t-input" value="PC" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="t-label">release date:</label>
+          <input class="t-input" value="2015-05-19" />
+        </div>
+        <div class="form-group">
+          <label class="t-label">directory path:</label>
+          <input class="t-input" value="/games/witcher3" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="t-label">trailer url:</label>
+        <input class="t-input" value="https://youtube.com/watch?v=..." />
+      </div>
+
+      <div class="form-group">
+        <label class="t-label">genres:</label>
+        <div style="border:1px solid rgba(0,255,136,0.3); padding:6px; display:flex; flex-wrap:wrap; gap:4px; min-height:36px;">
+          <span class="t-tag active">RPG <span style="cursor:pointer;">×</span></span>
+          <span class="t-tag active">Action <span style="cursor:pointer;">×</span></span>
+          <span class="t-tag active">Open World <span style="cursor:pointer;">×</span></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <label class="t-label" style="margin-bottom:0;">tags:</label>
+          <button class="t-btn-outline" style="font-size:0.7rem; padding:3px 8px;">✨ auto-tag</button>
+        </div>
+        <div style="border:1px solid rgba(0,255,136,0.3); padding:6px; display:flex; flex-wrap:wrap; gap:4px; min-height:36px; margin-top:4px;">
+          <span class="t-tag">story-rich <span style="cursor:pointer;">×</span></span>
+          <span class="t-tag">fantasy <span style="cursor:pointer;">×</span></span>
+          <span class="t-tag">mature <span style="cursor:pointer;">×</span></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <label class="t-label" style="margin-bottom:0;">description:</label>
+          <button class="t-btn-outline" style="font-size:0.7rem; padding:3px 8px;">🌐 translate</button>
+        </div>
+        <div class="quill-mock" style="margin-top:4px;">
+          <div class="quill-toolbar-mock">
+            <div class="tb"><b>B</b></div>
+            <div class="tb"><i>I</i></div>
+            <div class="tb"><u>U</u></div>
+            <div class="tb"><s>S</s></div>
+            <div class="tb">H1</div>
+            <div class="tb">H2</div>
+            <div class="tb">1.</div>
+            <div class="tb">•</div>
+          </div>
+          <div class="quill-area">The Witcher 3: Wild Hunt is a story-driven...</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="t-label">instruction:</label>
+        <div class="quill-mock" style="height:100px;">
+          <div class="quill-toolbar-mock">
+            <div class="tb"><b>B</b></div>
+            <div class="tb"><i>I</i></div>
+            <div class="tb">1.</div>
+            <div class="tb">•</div>
+          </div>
+          <div class="quill-area">Installation instructions...</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="t-label">screenshots:</label>
+        <div class="screenshots-edit">
+          <div class="screenshot-edit-item">🖼️<button class="del-btn">×</button></div>
+          <div class="screenshot-edit-item">🖼️<button class="del-btn">×</button></div>
+          <div class="screenshot-edit-item">🖼️<button class="del-btn">×</button></div>
+          <div class="screenshot-add">+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="edit-sidebar">
+      <div class="side-card">
+        <h4>> logo</h4>
+        <div class="logo-preview">🗡️</div>
+        <button class="t-btn-outline" style="width:100%; font-size:0.75rem;">change logo</button>
+      </div>
+      <div class="side-card">
+        <h4>> scraper</h4>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label class="t-label">source:</label>
+          <select class="t-input">
+            <option>Playground</option>
+            <option>Steam</option>
+            <option>IGDB</option>
+            <option>TheGamesDB</option>
+            <option>WorldArt</option>
+            <option>Igromania</option>
+            <option>PsxDataCenter</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label class="t-label">url:</label>
+          <input class="t-input" placeholder="game url or name..." style="font-size:0.8rem;" />
+        </div>
+        <div style="margin-bottom:8px;">
+          <div class="scraper-check"><input type="checkbox" checked /> title</div>
+          <div class="scraper-check"><input type="checkbox" checked /> poster</div>
+          <div class="scraper-check"><input type="checkbox" checked /> description</div>
+          <div class="scraper-check"><input type="checkbox" checked /> year</div>
+          <div class="scraper-check"><input type="checkbox" checked /> genres</div>
+          <div class="scraper-check"><input type="checkbox" checked /> screenshots</div>
+          <div class="scraper-check"><input type="checkbox" /> instruction</div>
+        </div>
+        <button class="t-btn" style="width:100%; font-size:0.75rem;">⚡ scrape</button>
+      </div>
+    </div>
+  </div>
+  <div style="padding:16px 20px; display:flex; justify-content:flex-end; gap:8px; border-top:1px solid rgba(0,255,136,0.2);">
+    <button class="t-btn-outline">cancel</button>
+    <button class="t-btn">✓ save</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ 06. PROFILE ═══════════════════ -->
+<div class="page-section scanlines" data-page="06 — profile" id="page-profile">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <div class="t-header">
+    <span class="title">> profile</span>
+    <div class="controls">
+      <span style="border:1px solid #00ff88; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.7rem;">U</span>
+    </div>
+  </div>
+  <div class="profile-layout">
+    <div class="profile-header">
+      <div class="profile-avatar">U</div>
+      <div>
+        <div class="profile-name">admin_user</div>
+        <span class="t-tag danger" style="margin-top:4px;">ADMIN</span>
+      </div>
+    </div>
+
+    <!-- Accordion: Avatar -->
+    <div class="accordion-item">
+      <div class="accordion-header">
+        <span>▶ change avatar</span>
+        <span style="color:#00cc6a; font-size:0.7rem;">▾</span>
+      </div>
+      <div class="accordion-body">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div class="profile-avatar" style="width:60px; height:60px; font-size:1.5rem;">U</div>
+          <div>
+            <button class="t-btn-outline" style="font-size:0.75rem;">choose file</button>
+            <div style="font-size:0.7rem; color:#00cc6a; margin-top:4px;">max 2MB, images only</div>
+          </div>
+        </div>
+        <button class="t-btn" style="margin-top:12px; font-size:0.75rem;">upload avatar</button>
+      </div>
+    </div>
+
+    <!-- Accordion: Password -->
+    <div class="accordion-item">
+      <div class="accordion-header">
+        <span>▶ change password</span>
+        <span style="color:#00cc6a; font-size:0.7rem;">▸</span>
+      </div>
+    </div>
+
+    <!-- Accordion: Admin -->
+    <div class="accordion-item">
+      <div class="accordion-header">
+        <span>▶ admin actions</span>
+        <span style="color:#00cc6a; font-size:0.7rem;">▸</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 07. STATISTICS ═══════════════════ -->
+<div class="page-section scanlines" data-page="07 — statistics" id="page-statistics">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <div class="t-header">
+    <span class="title">> statistics</span>
+    <div class="controls">
+      <button class="t-btn-outline" style="font-size:0.7rem; padding:4px 10px;">↻ refresh sizes</button>
+    </div>
+  </div>
+  <!-- Stat Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">142</div>
+      <div class="stat-label">total games</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">1.2 TB</div>
+      <div class="stat-label">total size</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">8</div>
+      <div class="stat-label">platforms</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">24</div>
+      <div class="stat-label">genres</div>
+    </div>
+  </div>
+  <!-- Charts -->
+  <div class="charts-area">
+    <div class="chart-box">
+      <h4>> games by platform</h4>
+      <div class="bar-chart">
+        <div class="bar" style="height:90%;"><div class="bar-label">PC</div></div>
+        <div class="bar" style="height:45%;"><div class="bar-label">PS2</div></div>
+        <div class="bar" style="height:30%;"><div class="bar-label">PS1</div></div>
+        <div class="bar" style="height:20%;"><div class="bar-label">PSP</div></div>
+        <div class="bar" style="height:15%;"><div class="bar-label">GBA</div></div>
+        <div class="bar" style="height:10%;"><div class="bar-label">DS</div></div>
+      </div>
+    </div>
+    <div class="chart-box">
+      <h4>> games by genre</h4>
+      <div class="bar-chart">
+        <div class="bar" style="height:80%;"><div class="bar-label">RPG</div></div>
+        <div class="bar" style="height:65%;"><div class="bar-label">Action</div></div>
+        <div class="bar" style="height:40%;"><div class="bar-label">Strategy</div></div>
+        <div class="bar" style="height:35%;"><div class="bar-label">Adventure</div></div>
+        <div class="bar" style="height:25%;"><div class="bar-label">Puzzle</div></div>
+        <div class="bar" style="height:20%;"><div class="bar-label">Shooter</div></div>
+      </div>
+    </div>
+  </div>
+  <!-- Top Lists -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:0 20px 20px;">
+    <div style="border:1px solid rgba(0,255,136,0.3); padding:16px;">
+      <h4 style="font-size:0.8rem; color:#00cc6a; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px;">> top rated</h4>
+      <div class="top-item"><span class="rank">01</span><span class="name">Witcher 3</span><span class="value">9.2</span></div>
+      <div class="top-item"><span class="rank">02</span><span class="name">Skyrim</span><span class="value">8.8</span></div>
+      <div class="top-item"><span class="rank">03</span><span class="name">Dark Souls III</span><span class="value">8.5</span></div>
+      <div class="top-item"><span class="rank">04</span><span class="name">Fallout 4</span><span class="value">8.1</span></div>
+      <div class="top-item"><span class="rank">05</span><span class="name">GTA V</span><span class="value">7.9</span></div>
+    </div>
+    <div style="border:1px solid rgba(0,255,136,0.3); padding:16px;">
+      <h4 style="font-size:0.8rem; color:#00cc6a; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px;">> recently added</h4>
+      <div class="top-item"><span class="rank">01</span><span class="name">Cyberpunk 2077</span><span class="value">today</span></div>
+      <div class="top-item"><span class="rank">02</span><span class="name">Elden Ring</span><span class="value">yesterday</span></div>
+      <div class="top-item"><span class="rank">03</span><span class="name">Baldur's Gate 3</span><span class="value">2 days ago</span></div>
+      <div class="top-item"><span class="rank">04</span><span class="name">Hades II</span><span class="value">3 days ago</span></div>
+      <div class="top-item"><span class="rank">05</span><span class="name">Hollow Knight</span><span class="value">5 days ago</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 08. COLLECTIONS ═══════════════════ -->
+<div class="page-section scanlines" data-page="08 — collections" id="page-collections">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <div class="t-header">
+    <span class="title">> collections</span>
+    <div class="controls">
+      <button class="t-btn" style="font-size:0.75rem; padding:4px 12px;">+ new</button>
+    </div>
+  </div>
+  <div class="collections-grid">
+    <div class="collection-card">
+      <div class="c-name">Favorites ♥</div>
+      <div class="c-meta">12 games • updated 2h ago</div>
+      <div class="c-preview">
+        <div class="cp-img">🗡️</div>
+        <div class="cp-img">🐉</div>
+        <div class="cp-img">🔫</div>
+        <div class="cp-img">+9</div>
+      </div>
+    </div>
+    <div class="collection-card">
+      <div class="c-name">RPG Classics</div>
+      <div class="c-meta">8 games • updated 1d ago</div>
+      <div class="c-preview">
+        <div class="cp-img">🗡️</div>
+        <div class="cp-img">🐉</div>
+        <div class="cp-img">☢️</div>
+        <div class="cp-img">+5</div>
+      </div>
+    </div>
+    <div class="collection-card">
+      <div class="c-name">PS2 Nostalgia <span class="smart-badge">smart</span></div>
+      <div class="c-meta">auto • platform=PS2</div>
+      <div class="c-preview">
+        <div class="cp-img">🧟</div>
+        <div class="cp-img">🏎️</div>
+        <div class="cp-img">⚔️</div>
+      </div>
+    </div>
+    <div class="collection-card">
+      <div class="c-name">To Play</div>
+      <div class="c-meta">5 games • updated 3d ago</div>
+      <div class="c-preview">
+        <div class="cp-img">⛏️</div>
+        <div class="cp-img">🏰</div>
+        <div class="cp-img">+3</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 09. DOWNLOADS ═══════════════════ -->
+<div class="page-section scanlines" data-page="09 — downloads" id="page-downloads">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <div class="t-header">
+    <span class="title">> downloads</span>
+    <div class="controls">
+      <span style="color:#00ff88; font-size:0.8rem;">● Transmission: connected</span>
+    </div>
+  </div>
+  <div class="downloads-list">
+    <div class="download-item">
+      <div>
+        <div class="d-name">The_Witcher_3_Wild_Hunt_GOTY</div>
+        <div class="d-meta">42.3 GB • 6 files • added 2h ago</div>
+        <div class="d-progress">
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:3px;">
+            <span style="color:#38bdf8;">🌱 seeding</span><span>ratio: 1.45</span>
+          </div>
+          <div class="t-progress"><div class="t-progress-bar" style="width:100%; background:#38bdf8; box-shadow:0 0 8px rgba(56,189,248,0.4);"></div></div>
+        </div>
+      </div>
+      <div class="d-status">
+        <span class="status-seeding">↑ 2.4 MB/s</span><br/>
+        <button class="t-btn-danger" style="font-size:0.7rem; padding:3px 8px; margin-top:4px;">■ stop</button>
+      </div>
+    </div>
+    <div class="download-item">
+      <div>
+        <div class="d-name">Skyrim_SE_Modded</div>
+        <div class="d-meta">18.7 GB • 3 files • added 5h ago</div>
+        <div class="d-progress">
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:3px;">
+            <span style="color:#00ff88;">✓ complete</span><span>ratio: 3.21</span>
+          </div>
+          <div class="t-progress"><div class="t-progress-bar" style="width:100%;"></div></div>
+        </div>
+      </div>
+      <div class="d-status">
+        <span class="status-complete">✓ done</span>
+      </div>
+    </div>
+    <div class="download-item">
+      <div>
+        <div class="d-name">DOOM_Eternal_Deluxe</div>
+        <div class="d-meta">55.1 GB • 8 files • added 1d ago</div>
+        <div class="d-progress">
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:3px;">
+            <span style="color:#f59e0b;">↓ downloading</span><span>65%</span>
+          </div>
+          <div class="t-progress"><div class="t-progress-bar" style="width:65%; background:#f59e0b; box-shadow:0 0 8px rgba(245,158,11,0.4);"></div></div>
+        </div>
+      </div>
+      <div class="d-status">
+        <span style="color:#f59e0b; font-size:0.8rem;">↓ 12.1 MB/s</span><br/>
+        <button class="t-btn-danger" style="font-size:0.7rem; padding:3px 8px; margin-top:4px;">■ stop</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 10. ADMIN USERS ═══════════════════ -->
+<div class="page-section scanlines" data-page="10 — admin users" id="page-admin-users">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <div class="t-header">
+    <span class="title">> admin / users</span>
+    <div class="controls">
+      <button class="t-btn" style="font-size:0.75rem; padding:4px 12px;">+ add user</button>
+    </div>
+  </div>
+  <div style="padding:20px;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>01</td>
+          <td style="color:#00ff88;">admin_user</td>
+          <td><span class="t-tag danger">ADMIN</span></td>
+          <td style="color:#00cc6a;">2024-01-15</td>
+          <td><button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px;">edit</button></td>
+        </tr>
+        <tr>
+          <td>02</td>
+          <td style="color:#00ff88;">gamer_pro</td>
+          <td><span class="t-tag info">USER</span></td>
+          <td style="color:#00cc6a;">2024-03-22</td>
+          <td>
+            <button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px;">edit</button>
+            <button class="t-btn-danger" style="font-size:0.7rem; padding:2px 8px;">reset</button>
+          </td>
+        </tr>
+        <tr>
+          <td>03</td>
+          <td style="color:#00ff88;">night_crawler</td>
+          <td><span class="t-tag info">USER</span></td>
+          <td style="color:#00cc6a;">2024-05-10</td>
+          <td>
+            <button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px;">edit</button>
+            <button class="t-btn-danger" style="font-size:0.7rem; padding:2px 8px;">reset</button>
+          </td>
+        </tr>
+        <tr>
+          <td>04</td>
+          <td style="color:#00ff88;">retro_fan</td>
+          <td><span class="t-tag info">USER</span></td>
+          <td style="color:#00cc6a;">2024-08-01</td>
+          <td>
+            <button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px;">edit</button>
+            <button class="t-btn-danger" style="font-size:0.7rem; padding:2px 8px;">reset</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════ 11. ADMIN SCRAPERS ═══════════════════ -->
+<div class="page-section scanlines" data-page="11 — admin scrapers" id="page-admin-scrapers">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <div class="t-header">
+    <span class="title">> admin / scrapers</span>
+  </div>
+  <div class="scrapers-grid">
+    <div class="scraper-card">
+      <div class="s-name">Playground</div>
+      <div class="s-status" style="color:#00ff88;">● active</div>
+      <div class="s-fields">CSS selectors + search API</div>
+      <button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px; margin-top:8px;">configure</button>
+    </div>
+    <div class="scraper-card">
+      <div class="s-name">Steam</div>
+      <div class="s-status" style="color:#00ff88;">● active</div>
+      <div class="s-fields">Storefront API, no key required</div>
+      <button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px; margin-top:8px;">configure</button>
+    </div>
+    <div class="scraper-card">
+      <div class="s-name">IGDB</div>
+      <div class="s-status" style="color:#00ff88;">● active</div>
+      <div class="s-fields">Twitch OAuth • key: ●●●●●●●●</div>
+      <button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px; margin-top:8px;">configure</button>
+    </div>
+    <div class="scraper-card">
+      <div class="s-name">TheGamesDB</div>
+      <div class="s-status" style="color:#f59e0b;">● key needed</div>
+      <div class="s-fields">API key required • 1000 req/month</div>
+      <button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px; margin-top:8px;">configure</button>
+    </div>
+    <div class="scraper-card">
+      <div class="s-name">WorldArt</div>
+      <div class="s-status" style="color:#00ff88;">● active</div>
+      <div class="s-fields">CSS selectors • ~220 genre mappings</div>
+      <button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px; margin-top:8px;">configure</button>
+    </div>
+    <div class="scraper-card">
+      <div class="s-name">Igromania</div>
+      <div class="s-status" style="color:#00ff88;">● active</div>
+      <div class="s-fields">JSON paths parser</div>
+      <button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px; margin-top:8px;">configure</button>
+    </div>
+    <div class="scraper-card">
+      <div class="s-name">PsxDataCenter</div>
+      <div class="s-status" style="color:#00ff88;">● active</div>
+      <div class="s-fields">JSoup • PS1/PS2 • windows-1252</div>
+      <button class="t-btn-outline" style="font-size:0.7rem; padding:2px 8px; margin-top:8px;">configure</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 12. 404 ═══════════════════ -->
+<div class="page-section scanlines" data-page="12 — 404" id="page-404">
+  <div class="back-link"><a href="#top">↑ index</a></div>
+  <div class="notfound-wrap">
+    <pre class="notfound-ascii">
+  ╔══════════════════════════════╗
+  ║  ERROR: ROUTE_NOT_FOUND     ║
+  ║  Segmentation fault (core   ║
+  ║  dumped)                    ║
+  ╚══════════════════════════════╝
+    </pre>
+    <div class="notfound-code">404</div>
+    <div style="font-size:0.9rem; color:#00cc6a; margin-bottom:20px;">
+      game-library: path not found<span class="t-cursor"></span>
+    </div>
+    <button class="t-btn">$ cd /library</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<div style="max-width:1400px; margin:40px auto; text-align:center; padding:20px; border-top:1px solid rgba(0,255,136,0.2);">
+  <div style="font-size:0.75rem; color:#00cc6a;">
+    game-library v2.0 // retro-terminal theme // all pages mockup<br/>
+    <span style="color:rgba(0,255,136,0.4);">[ end of file ]</span>
+  </div>
+</div>
+
+</body>
+</html>
