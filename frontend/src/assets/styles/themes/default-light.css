@@ -1,0 +1,19 @@
+[data-theme="default-light"] {
+  --p-surface-0: #f5f3f0;
+  --p-surface-50: #edeae6;
+  --p-surface-100: #e3e0db;
+  --p-surface-200: #d5d1cb;
+  --p-surface-300: #b0aba3;
+  --p-surface-400: #8c877e;
+  --p-surface-500: #6e6a63;
+  --p-surface-600: #534f49;
+  --p-surface-700: #3d3a36;
+  --p-surface-800: #282623;
+  --p-surface-900: #181716;
+  --p-surface-950: #0c0b0a;
+
+  --p-text-color: #534f49;
+  --p-text-hover-color: #3d3a36;
+  --p-text-muted-color: #6e6a63;
+  --p-text-hover-muted-color: #534f49;
+}

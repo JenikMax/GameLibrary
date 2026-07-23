@@ -140,7 +140,4 @@ async function toggleGame(c) {
 .collection-item:hover {
   background-color: var(--p-surface-100);
 }
-.app-dark .collection-item:hover {
-  background-color: var(--p-surface-700);
-}
 </style>

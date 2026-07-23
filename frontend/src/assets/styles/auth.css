@@ -11,7 +11,7 @@
   min-height: 100vh;
   background-color: var(--p-surface-50);
 }
-.auth-page.auth-dark {
+[data-theme="default-dark"] .auth-page {
   --auth-card-bg: rgba(24, 24, 27, 0.85);
   --auth-card-border: rgba(52, 211, 153, 0.2);
   --auth-input-border: rgba(52, 211, 153, 0.25);

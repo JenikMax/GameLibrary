@@ -60,6 +60,7 @@
             icon="pi pi-info-circle"
             :label="t('game.details')"
             severity="help"
+            class="rt-btn-details"
             size="small"
             v-tooltip.left="t('game.details_tooltip')"
             @click="goToGame"

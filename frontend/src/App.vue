@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'app-dark': isDarkMode }">
+  <div>
     <Toast />
     <ConfirmDialog />
     <LocaleSwitcher v-if="!authStore.isAuthenticated" class="lang-switcher-top" />
@@ -17,7 +17,7 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from './stores/auth'
-import { useDarkMode } from './composables/useDarkMode'
+import { useTheme } from './composables/useTheme'
 import AppHeader from './components/AppHeader.vue'
 import LocaleSwitcher from './components/LocaleSwitcher.vue'
 import Toast from 'primevue/toast'
@@ -25,7 +25,7 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import { useToast } from 'primevue/usetoast'
 
 const authStore = useAuthStore()
-const { isDarkMode } = useDarkMode()
+useTheme()
 const toast = useToast()
 
 function onApiError(e) {
@@ -51,9 +51,6 @@ onUnmounted(() => {
 .main-container {
   min-height: 100vh;
   background-color: var(--p-surface-50);
-}
-.app-dark .main-container {
-  background-color: var(--p-surface-950);
 }
 .main-container.with-header {
   min-height: calc(100vh - 60px);

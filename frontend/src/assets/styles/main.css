@@ -11,10 +11,6 @@ body {
   background-color: var(--p-surface-50);
 }
 
-.app-dark body {
-  background-color: var(--p-surface-950);
-}
-
 a {
   text-decoration: none;
   color: inherit;

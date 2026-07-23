@@ -124,9 +124,6 @@ function handleSubmit() {
   border-radius: 8px;
   padding: 1rem;
 }
-.app-dark .review-form {
-  background: var(--p-surface-800);
-}
 .review-form .field {
   margin-bottom: 0.75rem;
 }

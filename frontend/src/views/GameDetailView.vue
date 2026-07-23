@@ -63,6 +63,7 @@
             :label="t('game.seed')"
             icon="pi pi-seed-inverse"
             severity="info"
+            class="rt-btn-seed"
             @click="seedGame"
             :loading="seeding"
             v-tooltip.bottom="t('game.seed_tooltip')"
@@ -78,6 +79,7 @@
             :label="t('game.edit')"
             icon="pi pi-pencil"
             severity="help"
+            class="rt-btn-edit"
             @click="$router.push(`/game/${game.id}/edit`)"
           />
         </div>
@@ -909,9 +911,6 @@ function onViewerKeydown(e) {
   border-radius: 8px;
   padding: 0.75rem;
 }
-.app-dark .comment-item {
-  background: var(--p-surface-800);
-}
 .comment-header {
   display: flex;
   align-items: center;
@@ -937,9 +936,6 @@ function onViewerKeydown(e) {
   padding: 0.75rem;
   position: relative;
 }
-.app-dark .review-item {
-  background: var(--p-surface-800);
-}
 .review-item .comment-header {
   margin-bottom: 0.5rem;
 }
@@ -950,9 +946,6 @@ function onViewerKeydown(e) {
   background: var(--p-surface-200);
   padding: 0.15rem 0.5rem;
   border-radius: 4px;
-}
-.app-dark .review-scores span {
-  background: var(--p-surface-700);
 }
 .review-item .comment-text {
   margin-bottom: 0.5rem;
@@ -975,9 +968,6 @@ function onViewerKeydown(e) {
   background: var(--p-surface-50);
   border-radius: 8px;
   padding: 0.75rem;
-}
-.app-dark .aggregated-scores {
-  background: var(--p-surface-800);
 }
 .score-pill {
   display: flex;

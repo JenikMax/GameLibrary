@@ -14,7 +14,7 @@
         <Tag :value="game.platform" severity="info" size="small" />
         <Tag :value="game.releaseDate" severity="warn" size="small" />
         <span v-if="game.avgRating" class="row-rating">
-          <i class="pi pi-star-fill" style="font-size: 0.7rem; color: #f59e0b"></i>
+          <i class="pi pi-star-fill" style="font-size: 0.7rem;"></i>
           {{ game.avgRating }}
         </span>
       </div>
@@ -100,15 +100,9 @@ async function toggleFav() {
   transition: background 0.15s, transform 0.15s;
   border: 1px solid var(--p-surface-200, #e5e7eb);
 }
-.app-dark .game-list-row {
-  border-color: var(--p-surface-700, #374151);
-}
 .game-list-row:hover {
   background: var(--p-surface-100);
   transform: translateX(2px);
-}
-.app-dark .game-list-row:hover {
-  background: var(--p-surface-800);
 }
 .row-img-wrap {
   flex-shrink: 0;

@@ -2,6 +2,10 @@
   <div class="app-header-wrapper">
     <Menubar :model="items" class="app-header">
 
+      <template #start>
+        <span v-if="currentThemeId === 'retro-terminal'" class="terminal-title">~$<span class="t-cursor" /></span>
+      </template>
+
       <template #end>
         <div class="flex align-items-center gap-2">
           <div v-if="authStore.isAuthenticated" ref="notificationAreaRef" class="notification-area" @click="toggleNotifications">
@@ -17,13 +21,28 @@
           </div>
           <LocaleSwitcher />
           <Button
-            :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
+            :icon="currentTheme?.icon || 'pi pi-palette'"
             severity="secondary"
             text
             rounded
-            @click="toggleDarkMode"
-            v-tooltip.left="isDarkMode ? t('nav.dark') : t('nav.light')"
+            @click="toggleThemeMenu"
+            v-tooltip.left="t('nav.theme')"
           />
+          <Popover ref="themeMenuRef" :pt="{ content: { style: 'padding: 0.25rem' } }">
+            <div class="theme-list">
+              <div
+                v-for="theme in availableThemes"
+                :key="theme.id"
+                class="theme-option"
+                :class="{ active: currentThemeId === theme.id }"
+                @click="selectTheme(theme.id)"
+              >
+                <i :class="theme.icon" style="width: 1.2rem;" />
+                <span>{{ t('theme.' + theme.id) }}</span>
+                <span class="theme-dot" :style="{ background: theme.previewColor }" />
+              </div>
+            </div>
+          </Popover>
           <Avatar
             :image="authStore.avatarUrl || '/game-library/img/user.png'"
             shape="circle"
@@ -99,7 +118,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useLibraryStore } from '../stores/library'
-import { useDarkMode } from '../composables/useDarkMode'
+import { useTheme } from '../composables/useTheme'
 import { useI18n } from '../composables/useI18n'
 import { adminApi } from '../api/admin'
 import { notificationsApi } from '../api/notifications'
@@ -108,13 +127,24 @@ import Menubar from 'primevue/menubar'
 import Button from 'primevue/button'
 import Avatar from 'primevue/avatar'
 import Badge from 'primevue/badge'
+import Popover from 'primevue/popover'
 import { useToast } from 'primevue/usetoast'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const { isDarkMode, toggleDarkMode } = useDarkMode()
+const { currentThemeId, currentTheme, setTheme, availableThemes } = useTheme()
 const { t } = useI18n()
 const toast = useToast()
+const themeMenuRef = ref(null)
+
+function toggleThemeMenu(e) {
+  themeMenuRef.value?.toggle(e)
+}
+
+function selectTheme(themeId) {
+  setTheme(themeId)
+  themeMenuRef.value?.hide()
+}
 
 const showNotifications = ref(false)
 const notifications = ref([])
@@ -335,7 +365,7 @@ onUnmounted(() => {
   border-radius: var(--p-panel-border-radius, 6px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-.app-dark .notification-panel {
+[data-theme="default-dark"] .notification-panel {
   background: var(--p-surface-800);
   border-color: var(--p-surface-700);
 }
@@ -355,10 +385,62 @@ onUnmounted(() => {
 .notification-item.unread {
   background: var(--p-primary-50);
 }
-.app-dark .notification-item:hover {
+[data-theme="default-dark"] .notification-item:hover {
   background: var(--p-surface-700);
 }
-.app-dark .notification-item.unread {
+[data-theme="default-dark"] .notification-item.unread {
   background: var(--p-primary-900);
+}
+.theme-list {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: background 0.15s;
+}
+.theme-option:hover {
+  background: var(--p-surface-100);
+}
+.theme-option.active {
+  background: var(--p-primary-50);
+  font-weight: 600;
+}
+.theme-dot {
+  margin-left: auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--p-surface-300);
+}
+.terminal-title {
+  display: none;
+  color: #00cc6a;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-right: 0.75rem;
+  text-shadow: 0 0 8px rgba(0,255,136,0.4);
+}
+[data-theme="retro-terminal"] .terminal-title {
+  display: inline-flex;
+  align-items: center;
+}
+@keyframes rt-header-blink { 50% { opacity: 0; } }
+.terminal-title .t-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: #00ff88;
+  animation: rt-header-blink 1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 4px;
 }
 </style>
