@@ -35,7 +35,7 @@
         <h4 class="m-0 mb-2">{{ t('history.title') }}</h4>
         <div class="history-strip">
           <div
-            v-for="g in history.slice(0, 10)"
+            v-for="g in history.slice(0, 12)"
             :key="g.id"
             class="history-item"
             @click="router.push(`/game/${g.id}`)"
