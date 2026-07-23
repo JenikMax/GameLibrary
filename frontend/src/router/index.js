@@ -8,6 +8,7 @@ import GameEditView from '../views/GameEditView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import AdminUsersView from '../views/AdminUsersView.vue'
 import AdminScrapersView from '../views/AdminScrapersView.vue'
+import AdminView from '../views/AdminView.vue'
 import DownloadsView from '../views/DownloadsView.vue'
 import CollectionsView from '../views/CollectionsView.vue'
 import CollectionDetailView from '../views/CollectionDetailView.vue'
@@ -50,6 +51,12 @@ const routes = [
     name: 'Profile',
     component: ProfileView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: AdminView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/admin/users',

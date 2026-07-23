@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Card Mockups — 20 variants × 3 themes</title>
+<style>
+/* RESET */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #1a1a2e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px 12px; color: #ccc; }
+h1 { text-align: center; margin-bottom: 6px; font-size: 1.5rem; color: #fff; }
+h3 { text-align: center; margin-bottom: 28px; font-size: 0.82rem; color: #888; font-weight: 400; }
+.row { display: flex; gap: 14px; margin-bottom: 36px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+.label { width: 100%; text-align: center; font-size: 0.76rem; color: #777; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+.headers { display: flex; gap: 14px; justify-content: center; margin-bottom: 14px; }
+.headers span { width: 220px; text-align: center; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
+.headers span:nth-child(1) { color: #c99b1a; } .headers span:nth-child(2) { color: #818cf8; } .headers span:nth-child(3) { color: #00ff88; }
+
+/* CARD BASE */
+.card {
+  width: 220px; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden;
+  position: relative; display: flex; flex-direction: column; justify-content: flex-end;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0,0,0,0.45); }
+
+/* Background image */
+.card-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
+}
+
+/* Gradient overlay — each variant styles this */
+.card-ovl {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+}
+
+/* Text container */
+.card-body {
+  width: 100%; padding: 14px 12px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.card-fav {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 0.8rem; color: #ef4444; backdrop-filter: blur(4px);
+}
+.card-title { font-weight: 700; font-size: 0.9rem; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-meta { display: flex; gap: 5px; flex-wrap: wrap; }
+.card-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+.card-rating { display: flex; align-items: center; gap: 4px; font-size: 0.72rem; }
+.card-rating .stars { letter-spacing: 1px; }
+.card-rating .score { opacity: 0.7; font-size: 0.65rem; }
+.card-footer { display: flex; gap: 6px; margin-top: 2px; }
+.tag { font-size: 0.62rem; padding: 2px 7px; border-radius: 3px; font-weight: 600; white-space: nowrap; letter-spacing: 0.02em; }
+.tag-genre { font-size: 0.6rem; padding: 1px 7px; border-radius: 99px; font-weight: 500; }
+.btn { font-size: 0.65rem; padding: 4px 9px; border-radius: 4px; border: 1px solid; cursor: pointer; font-weight: 600; background: transparent; transition: background 0.15s; }
+.btn:hover { background: rgba(255,255,255,0.08); }
+
+/* ============================================================
+   THEMES
+   ============================================================ */
+/* Light (warm) */
+.t-l .card-title { color: #f5f0e8; }
+.t-l .tag-platform { background: rgba(245,240,232,0.18); color: #e5dece; }
+.t-l .tag-year { background: rgba(251,191,36,0.22); color: #fcd34d; }
+.t-l .tag-genre { background: rgba(200,180,140,0.15); color: #c9b48c; }
+.t-l .card-rating { color: #fbbf24; }
+.t-l .btn-details { border-color: rgba(180,160,120,0.5); color: #c9b48c; }
+.t-l .btn-download { border-color: rgba(130,180,100,0.5); color: #94b878; }
+
+/* Dark (cool) */
+.t-d .card-title { color: #e5e5e5; }
+.t-d .tag-platform { background: rgba(59,130,246,0.2); color: #60a5fa; }
+.t-d .tag-year { background: rgba(251,191,36,0.2); color: #fbbf24; }
+.t-d .tag-genre { background: rgba(148,163,184,0.12); color: #94a3b8; }
+.t-d .card-rating { color: #fbbf24; }
+.t-d .btn-details { border-color: rgba(168,85,247,0.45); color: #a78bfa; }
+.t-d .btn-download { border-color: rgba(34,197,94,0.45); color: #4ade80; }
+
+/* Retro Terminal */
+.t-r .card { border-radius: 0; border: 1px solid rgba(0,255,136,0.25); }
+.t-r .card-title { color: #00ff88; font-family: 'Courier New', Courier, monospace; font-weight: 700; letter-spacing: 0.02em; }
+.t-r .tag { font-family: 'Courier New', Courier, monospace; border-radius: 0; border: 1px solid rgba(0,255,136,0.25); background: rgba(0,255,136,0.08) !important; }
+.t-r .tag-platform, .t-r .tag-year { color: #00ff88; }
+.t-r .tag-genre { color: #00cc6a; border-radius: 0 !important; background: transparent !important; border: 1px solid rgba(0,255,136,0.15); }
+.t-r .card-rating { color: #00ff88; } .t-r .card-rating .score { color: rgba(0,255,136,0.5); }
+.t-r .card-fav { border-radius: 0; border-color: rgba(0,255,136,0.3); background: rgba(0,26,13,0.6); }
+.t-r .btn { font-family: 'Courier New', Courier, monospace; text-transform: uppercase; border-radius: 0; font-size: 0.6rem; letter-spacing: 0.04em; }
+.t-r .btn-details, .t-r .btn-download { border-color: rgba(0,255,136,0.4); color: #00ff88; }
+.t-r .card:hover { box-shadow: 0 10px 28px rgba(0,255,136,0.15); }
+
+/* ============================================================
+   VARIANTS — overlay gradient
+   ============================================================ */
+
+/* 1. Classic Bottom Fade */
+.v1 .card-ovl { background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.75) 28%, transparent 55%); }
+.t-r.v1 .card-ovl { background: linear-gradient(to top, rgba(0,10,5,0.94) 0%, rgba(0,20,10,0.78) 28%, transparent 55%); }
+.v1 .card-body { padding-top: 46%; }
+
+/* 2. Right-Side Fade */
+.v2 .card { flex-direction: row; justify-content: flex-end; align-items: flex-end; }
+.v2 .card-ovl { background: linear-gradient(to left, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.82) 32%, transparent 55%); }
+.v2 .card-body { width: 48%; height: 100%; justify-content: flex-end; text-align: right; }
+.v2 .card-meta, .v2 .card-genres, .v2 .card-footer { justify-content: flex-end; }
+
+/* 3. Diagonal 135° */
+.v3 .card-ovl { background: linear-gradient(135deg, transparent 35%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.93) 72%); }
+.v3 .card-body { padding-top: 35%; }
+
+/* 4. Radial Vignette */
+.v4 .card-ovl { background: radial-gradient(ellipse 140% 100% at 50% 0%, transparent 38%, rgba(0,0,0,0.5) 55%, rgba(0,0,0,0.92) 85%); }
+.v4 .card-body { text-align: center; padding-top: 38%; }
+.v4 .card-meta, .v4 .card-genres, .v4 .card-footer { justify-content: center; }
+
+/* 5. Hard Cut Bottom Bar */
+.v5 .card-ovl { background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 38%, transparent 38%); }
+.t-r.v5 .card { border-bottom: 3px solid #00ff88; }
+
+/* 6. Frosted Glass — blur on card-body, no overlay gradient */
+.v6 .card-ovl { background: none; }
+.v6 .card-body {
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.t-r.v6 .card-body { border-top: 1px solid rgba(0,255,136,0.2); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+/* 7. Cinematic 3-Stop */
+.v7 .card-ovl { background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.82) 22%, rgba(0,0,0,0.35) 48%, transparent 68%); }
+.v7 .card-body { padding-top: 42%; }
+
+/* 8. Right Panel */
+.v8 .card { flex-direction: row; justify-content: flex-end; align-items: flex-end; }
+.v8 .card-ovl { background: linear-gradient(to left, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.85) 38%, transparent 52%); }
+.v8 .card-body { width: 45%; height: 100%; justify-content: flex-end; }
+.v8 .card-meta, .v8 .card-genres, .v8 .card-footer { justify-content: flex-end; }
+.t-r.v8 .card-ovl { background: linear-gradient(to left, rgba(0,15,8,0.95) 0%, rgba(0,15,8,0.85) 38%, transparent 52%); }
+
+/* 9. Left Panel */
+.v9 .card { flex-direction: row; justify-content: flex-start; align-items: flex-end; }
+.v9 .card-ovl { background: linear-gradient(to right, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.85) 38%, transparent 52%); }
+.v9 .card-body { width: 45%; height: 100%; justify-content: flex-end; }
+.t-r.v9 .card-ovl { background: linear-gradient(to right, rgba(0,15,8,0.95) 0%, rgba(0,15,8,0.85) 38%, transparent 52%); }
+
+/* 10. Corner L-Shape */
+.v10 .card-ovl { background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.9) 35%, transparent 70%), linear-gradient(to left, rgba(0,0,0,0.9) 0%, transparent 40%); }
+.v10 .card-body { width: 58%; align-self: flex-end; text-align: right; }
+.v10 .card-meta, .v10 .card-genres, .v10 .card-footer { justify-content: flex-end; }
+
+/* 11. Full Frame */
+.v11 .card-ovl { background: radial-gradient(ellipse 65% 70% at 50% 35%, transparent 30%, rgba(0,0,0,0.5) 55%, rgba(0,0,0,0.92) 78%); }
+.v11 .card-body { text-align: center; padding-top: 42%; }
+.v11 .card-meta, .v11 .card-genres, .v11 .card-footer { justify-content: center; }
+
+/* 12. Spotlight Bottom */
+.v12 .card-ovl { background: radial-gradient(ellipse 85% 55% at 50% 88%, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 40%, transparent 70%); }
+.v12 .card-body { text-align: center; padding-top: 40%; }
+.v12 .card-meta, .v12 .card-genres, .v12 .card-footer { justify-content: center; }
+
+/* 13. Angled Cut */
+.v13 .card-ovl { background: linear-gradient(172deg, transparent 42%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.93) 68%); }
+.v13 .card-body { padding-top: 33%; }
+.t-r.v13 .card-body { border-top: 2px solid rgba(0,255,136,0.3); padding-top: 10px; }
+
+/* 14. Bottom-Left Wedge */
+.v14 .card-ovl { background: linear-gradient(205deg, transparent 38%, rgba(0,0,0,0.92) 65%); }
+.v14 .card-body { width: 65%; padding-top: 36%; }
+
+/* 15. Double Gradient */
+.v15 .card-ovl { background: linear-gradient(to top, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.8) 20%, rgba(0,0,0,0.25) 50%, transparent 70%); }
+.v15 .card-body { padding-top: 46%; }
+
+/* 16. Stepped Fade */
+.v16 .card-ovl { background: linear-gradient(to top, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.94) 25%, rgba(0,0,0,0.7) 25%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.35) 75%, transparent 75%); }
+.t-r.v16 .card { image-rendering: pixelated; }
+
+/* 17. Radial from Bottom-Center */
+.v17 .card-ovl { background: radial-gradient(circle 120% 50% at 50% 100%, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.7) 35%, transparent 60%); }
+.v17 .card-body { text-align: center; padding-top: 34%; }
+.v17 .card-meta, .v17 .card-genres, .v17 .card-footer { justify-content: center; }
+
+/* 18. Top+Bottom Bars */
+.v18 .card-ovl { background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.55) 8%, transparent 20%), linear-gradient(to top, rgba(0,0,0,0.93) 0%, rgba(0,0,0,0.93) 38%, transparent 60%); }
+.t-r.v18 .card { border-top: 2px solid rgba(0,255,136,0.3); }
+
+/* 19. Fade from Center */
+.v19 .card { flex-direction: column; justify-content: center; align-items: center; }
+.v19 .card-ovl { background: linear-gradient(to top, transparent 0%, transparent 20%, rgba(0,0,0,0.75) 50%, rgba(0,0,0,0.92) 65%), linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.7) 8%, transparent 15%); }
+.v19 .card-body { width: 100%; text-align: center; padding-top: 0; padding-bottom: 0; }
+.v19 .card-meta, .v19 .card-genres, .v19 .card-footer { justify-content: center; }
+.v19 .card-fav { top: auto; bottom: 14px; }
+
+/* 20. Elliptical Bottom Mask */
+.v20 .card-ovl { background: radial-gradient(ellipse 100% 70% at 50% 100%, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.8) 35%, transparent 55%); }
+.v20 .card-body { text-align: center; padding-top: 33%; }
+.v20 .card-meta, .v20 .card-genres, .v20 .card-footer { justify-content: center; }
+.t-r.v20 .card-body { border-top: 1px solid rgba(0,255,136,0.15); }
+
+@media (max-width: 760px) { .card { width: 160px; } .headers span { width: 160px; font-size: 0.6rem; } .row { gap: 8px; } }
+</style>
+</head>
+<body>
+
+<h1>Game Card Mockups — 20 variants × 3 themes</h1>
+<h3>Light (warm) &nbsp;|&nbsp; Dark (cool) &nbsp;|&nbsp; Retro Terminal (green)</h3>
+<div class="headers"><span>Light</span><span>Dark</span><span>Retro Terminal</span></div>
+
+<!-- Card template: .card.v{n}.t-{l|d|r} > img.card-bg + .card-ovl + .card-fav + .card-body > (title, meta, rating, genres, footer) -->
+
+<!-- 1 -->
+<div class="row"><div class="label">#1 — Classic Bottom Fade</div>
+<div class="card v1 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Chrono Trigger</a><div class="card-meta"><span class="tag tag-platform">SNES</span><span class="tag tag-year">1995</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.8</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">Fantasy</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v1 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Chrono Trigger</a><div class="card-meta"><span class="tag tag-platform">SNES</span><span class="tag tag-year">1995</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.8</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">Fantasy</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v1 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Chrono Trigger</a><div class="card-meta"><span class="tag tag-platform">SNES</span><span class="tag tag-year">1995</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.8</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">Fantasy</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 2 -->
+<div class="row"><div class="label">#2 — Right-Side Fade</div>
+<div class="card v2 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Final Fantasy VII</a><div class="card-meta"><span class="tag tag-platform">PS1</span><span class="tag tag-year">1997</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.5</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">Sci-Fi</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v2 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Final Fantasy VII</a><div class="card-meta"><span class="tag tag-platform">PS1</span><span class="tag tag-year">1997</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.5</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">Sci-Fi</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v2 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Final Fantasy VII</a><div class="card-meta"><span class="tag tag-platform">PS1</span><span class="tag tag-year">1997</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.5</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">Sci-Fi</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 3 -->
+<div class="row"><div class="label">#3 — Diagonal (top-left → bottom-right)</div>
+<div class="card v3 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Zelda Ocarina</a><div class="card-meta"><span class="tag tag-platform">N64</span><span class="tag tag-year">1998</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.9</span></div><div class="card-genres"><span class="tag tag-genre">Action</span><span class="tag tag-genre">Adventure</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v3 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Zelda Ocarina</a><div class="card-meta"><span class="tag tag-platform">N64</span><span class="tag tag-year">1998</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.9</span></div><div class="card-genres"><span class="tag tag-genre">Action</span><span class="tag tag-genre">Adventure</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v3 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Zelda Ocarina</a><div class="card-meta"><span class="tag tag-platform">N64</span><span class="tag tag-year">1998</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.9</span></div><div class="card-genres"><span class="tag tag-genre">Action</span><span class="tag tag-genre">Adventure</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 4 -->
+<div class="row"><div class="label">#4 — Radial Vignette</div>
+<div class="card v4 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Metroid Prime</a><div class="card-meta"><span class="tag tag-platform">GC</span><span class="tag tag-year">2002</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Adventure</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v4 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Metroid Prime</a><div class="card-meta"><span class="tag tag-platform">GC</span><span class="tag tag-year">2002</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Adventure</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v4 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Metroid Prime</a><div class="card-meta"><span class="tag tag-platform">GC</span><span class="tag tag-year">2002</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Adventure</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 5 -->
+<div class="row"><div class="label">#5 — Hard Cut Bottom Bar</div>
+<div class="card v5 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">DOOM Eternal</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2020</span></div><div class="card-rating"><span class="stars">★★★★</span><span class="score">9.2</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Action</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v5 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">DOOM Eternal</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2020</span></div><div class="card-rating"><span class="stars">★★★★</span><span class="score">9.2</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Action</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v5 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">DOOM Eternal</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2020</span></div><div class="card-rating"><span class="stars">****</span><span class="score">9.2</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Action</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 6 -->
+<div class="row"><div class="label">#6 — Frosted Glass Bottom Strip</div>
+<div class="card v6 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Portal 2</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2011</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.8</span></div><div class="card-genres"><span class="tag tag-genre">Puzzle</span><span class="tag tag-genre">FPS</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v6 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Portal 2</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2011</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.8</span></div><div class="card-genres"><span class="tag tag-genre">Puzzle</span><span class="tag tag-genre">FPS</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v6 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Portal 2</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2011</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.8</span></div><div class="card-genres"><span class="tag tag-genre">Puzzle</span><span class="tag tag-genre">FPS</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 7 -->
+<div class="row"><div class="label">#7 — Cinematic 3-Stop Gradient</div>
+<div class="card v7 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">The Witcher 3</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2015</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.8</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">Fantasy</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v7 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">The Witcher 3</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2015</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.8</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">Fantasy</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v7 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">The Witcher 3</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2015</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.8</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">Fantasy</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 8 -->
+<div class="row"><div class="label">#8 — Right Panel</div>
+<div class="card v8 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Metal Gear Solid</a><div class="card-meta"><span class="tag tag-platform">PS1</span><span class="tag tag-year">1998</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">Stealth</span><span class="tag tag-genre">Action</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v8 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Metal Gear Solid</a><div class="card-meta"><span class="tag tag-platform">PS1</span><span class="tag tag-year">1998</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">Stealth</span><span class="tag tag-genre">Action</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v8 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Metal Gear Solid</a><div class="card-meta"><span class="tag tag-platform">PS1</span><span class="tag tag-year">1998</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">Stealth</span><span class="tag tag-genre">Action</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 9 -->
+<div class="row"><div class="label">#9 — Left Panel</div>
+<div class="card v9 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Half-Life 2</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2004</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Sci-Fi</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v9 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Half-Life 2</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2004</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Sci-Fi</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v9 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Half-Life 2</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2004</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Sci-Fi</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 10 -->
+<div class="row"><div class="label">#10 — Corner L-Shape</div>
+<div class="card v10 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Deus Ex</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2000</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.5</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">FPS</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v10 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Deus Ex</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2000</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.5</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">FPS</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v10 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Deus Ex</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2000</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.5</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">FPS</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 11 -->
+<div class="row"><div class="label">#11 — Full Frame</div>
+<div class="card v11 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Super Mario 64</a><div class="card-meta"><span class="tag tag-platform">N64</span><span class="tag tag-year">1996</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.9</span></div><div class="card-genres"><span class="tag tag-genre">Platformer</span><span class="tag tag-genre">3D</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v11 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Super Mario 64</a><div class="card-meta"><span class="tag tag-platform">N64</span><span class="tag tag-year">1996</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.9</span></div><div class="card-genres"><span class="tag tag-genre">Platformer</span><span class="tag tag-genre">3D</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v11 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Super Mario 64</a><div class="card-meta"><span class="tag tag-platform">N64</span><span class="tag tag-year">1996</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.9</span></div><div class="card-genres"><span class="tag tag-genre">Platformer</span><span class="tag tag-genre">3D</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 12 -->
+<div class="row"><div class="label">#12 — Spotlight Bottom</div>
+<div class="card v12 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Hollow Knight</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2017</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.6</span></div><div class="card-genres"><span class="tag tag-genre">Metroidvania</span><span class="tag tag-genre">2D</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v12 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Hollow Knight</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2017</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.6</span></div><div class="card-genres"><span class="tag tag-genre">Metroidvania</span><span class="tag tag-genre">2D</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v12 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Hollow Knight</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2017</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.6</span></div><div class="card-genres"><span class="tag tag-genre">Metroidvania</span><span class="tag tag-genre">2D</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 13 -->
+<div class="row"><div class="label">#13 — Angled Cut</div>
+<div class="card v13 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Silent Hill 2</a><div class="card-meta"><span class="tag tag-platform">PS2</span><span class="tag tag-year">2001</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.6</span></div><div class="card-genres"><span class="tag tag-genre">Horror</span><span class="tag tag-genre">Survival</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v13 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Silent Hill 2</a><div class="card-meta"><span class="tag tag-platform">PS2</span><span class="tag tag-year">2001</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.6</span></div><div class="card-genres"><span class="tag tag-genre">Horror</span><span class="tag tag-genre">Survival</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v13 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Silent Hill 2</a><div class="card-meta"><span class="tag tag-platform">PS2</span><span class="tag tag-year">2001</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.6</span></div><div class="card-genres"><span class="tag tag-genre">Horror</span><span class="tag tag-genre">Survival</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 14 -->
+<div class="row"><div class="label">#14 — Bottom-Left Wedge</div>
+<div class="card v14 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Castlevania SOTN</a><div class="card-meta"><span class="tag tag-platform">PS1</span><span class="tag tag-year">1997</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">Metroidvania</span><span class="tag tag-genre">RPG</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v14 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Castlevania SOTN</a><div class="card-meta"><span class="tag tag-platform">PS1</span><span class="tag tag-year">1997</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">Metroidvania</span><span class="tag tag-genre">RPG</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v14 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Castlevania SOTN</a><div class="card-meta"><span class="tag tag-platform">PS1</span><span class="tag tag-year">1997</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.7</span></div><div class="card-genres"><span class="tag tag-genre">Metroidvania</span><span class="tag tag-genre">RPG</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 15 -->
+<div class="row"><div class="label">#15 — Double Gradient</div>
+<div class="card v15 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Cyberpunk 2077</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2020</span></div><div class="card-rating"><span class="stars">★★★★</span><span class="score">8.6</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">FPS</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v15 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Cyberpunk 2077</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2020</span></div><div class="card-rating"><span class="stars">★★★★</span><span class="score">8.6</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">FPS</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v15 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Cyberpunk 2077</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2020</span></div><div class="card-rating"><span class="stars">****</span><span class="score">8.6</span></div><div class="card-genres"><span class="tag tag-genre">RPG</span><span class="tag tag-genre">FPS</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 16 -->
+<div class="row"><div class="label">#16 — Stepped Fade (4 hard steps)</div>
+<div class="card v16 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Mega Man 2</a><div class="card-meta"><span class="tag tag-platform">NES</span><span class="tag tag-year">1988</span></div><div class="card-rating"><span class="stars">★★★★</span><span class="score">9.1</span></div><div class="card-genres"><span class="tag tag-genre">Action</span><span class="tag tag-genre">Platformer</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v16 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Mega Man 2</a><div class="card-meta"><span class="tag tag-platform">NES</span><span class="tag tag-year">1988</span></div><div class="card-rating"><span class="stars">★★★★</span><span class="score">9.1</span></div><div class="card-genres"><span class="tag tag-genre">Action</span><span class="tag tag-genre">Platformer</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v16 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Mega Man 2</a><div class="card-meta"><span class="tag tag-platform">NES</span><span class="tag tag-year">1988</span></div><div class="card-rating"><span class="stars">****</span><span class="score">9.1</span></div><div class="card-genres"><span class="tag tag-genre">Action</span><span class="tag tag-genre">Platformer</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 17 -->
+<div class="row"><div class="label">#17 — Radial from Bottom-Center</div>
+<div class="card v17 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Street Fighter II</a><div class="card-meta"><span class="tag tag-platform">Arcade</span><span class="tag tag-year">1991</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.3</span></div><div class="card-genres"><span class="tag tag-genre">Fighting</span><span class="tag tag-genre">2D</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v17 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Street Fighter II</a><div class="card-meta"><span class="tag tag-platform">Arcade</span><span class="tag tag-year">1991</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.3</span></div><div class="card-genres"><span class="tag tag-genre">Fighting</span><span class="tag tag-genre">2D</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v17 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Street Fighter II</a><div class="card-meta"><span class="tag tag-platform">Arcade</span><span class="tag tag-year">1991</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.3</span></div><div class="card-genres"><span class="tag tag-genre">Fighting</span><span class="tag tag-genre">2D</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 18 -->
+<div class="row"><div class="label">#18 — Top + Bottom Bars</div>
+<div class="card v18 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Batman Arkham</a><div class="card-meta"><span class="tag tag-platform">PS3</span><span class="tag tag-year">2009</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.0</span></div><div class="card-genres"><span class="tag tag-genre">Action</span><span class="tag tag-genre">Stealth</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v18 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Batman Arkham</a><div class="card-meta"><span class="tag tag-platform">PS3</span><span class="tag tag-year">2009</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.0</span></div><div class="card-genres"><span class="tag tag-genre">Action</span><span class="tag tag-genre">Stealth</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v18 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Batman Arkham</a><div class="card-meta"><span class="tag tag-platform">PS3</span><span class="tag tag-year">2009</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.0</span></div><div class="card-genres"><span class="tag tag-genre">Action</span><span class="tag tag-genre">Stealth</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 19 -->
+<div class="row"><div class="label">#19 — Fade from Center (text middle)</div>
+<div class="card v19 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Life is Strange</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2015</span></div><div class="card-rating"><span class="stars">★★★★</span><span class="score">8.7</span></div><div class="card-genres"><span class="tag tag-genre">Adventure</span><span class="tag tag-genre">Drama</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v19 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Life is Strange</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2015</span></div><div class="card-rating"><span class="stars">★★★★</span><span class="score">8.7</span></div><div class="card-genres"><span class="tag tag-genre">Adventure</span><span class="tag tag-genre">Drama</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v19 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Life is Strange</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2015</span></div><div class="card-rating"><span class="stars">****</span><span class="score">8.7</span></div><div class="card-genres"><span class="tag tag-genre">Adventure</span><span class="tag tag-genre">Drama</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+<!-- 20 -->
+<div class="row"><div class="label">#20 — Elliptical Bottom Mask</div>
+<div class="card v20 t-l"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Bioshock Infinite</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2013</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.4</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Story</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v20 t-d"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Bioshock Infinite</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2013</span></div><div class="card-rating"><span class="stars">★★★★★</span><span class="score">9.4</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Story</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+<div class="card v20 t-r"><img class="card-bg" src="./default.jpg" alt=""><div class="card-ovl"></div><div class="card-fav">♥</div><div class="card-body"><a class="card-title">Bioshock Infinite</a><div class="card-meta"><span class="tag tag-platform">PC</span><span class="tag tag-year">2013</span></div><div class="card-rating"><span class="stars">*****</span><span class="score">9.4</span></div><div class="card-genres"><span class="tag tag-genre">FPS</span><span class="tag tag-genre">Story</span></div><div class="card-footer"><button class="btn btn-details">Details</button><button class="btn btn-download">Download</button></div></div></div>
+</div>
+
+</body>
+</html>

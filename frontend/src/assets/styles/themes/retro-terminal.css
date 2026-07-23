@@ -268,7 +268,7 @@
   color: var(--rt-info);
   background: transparent;
 }
-[data-theme="retro-terminal"] .p-tag.p-tag-warning {
+[data-theme="retro-terminal"] .p-tag.p-tag-warn {
   border-color: var(--rt-warn);
   color: var(--rt-warn);
   background: transparent;
@@ -878,7 +878,7 @@
 }
 
 /* ═══════ YEAR TAG (orange/warn) ═══════ */
-[data-theme="retro-terminal"] .p-tag.p-tag-warning {
+[data-theme="retro-terminal"] .p-tag.p-tag-warn {
   border-color: #f59e0b !important;
   color: #f59e0b !important;
   background: rgba(245,158,11,0.1) !important;
@@ -905,14 +905,8 @@
   background: rgba(56,189,248,0.1) !important;
   box-shadow: 0 0 12px rgba(56,189,248,0.3) !important;
 }
-
-/* ═══════ DETAILS BUTTON (purple) ═══════ */
-[data-theme="retro-terminal"] .p-button.rt-btn-details {
-  color: #a855f7 !important;
-  border-color: #a855f7 !important;
-  background: transparent !important;
-}
-[data-theme="retro-terminal"] .p-button.rt-btn-details:hover {
-  background: rgba(168,85,247,0.1) !important;
-  box-shadow: 0 0 12px rgba(168,85,247,0.3) !important;
+/* ═══════ SQUARE FAVORITE BUTTON ═══════ */
+[data-theme="retro-terminal"] .game-card .p-button[rounded],
+[data-theme="retro-terminal"] .game-list-row .p-button[rounded] {
+  border-radius: 0 !important;
 }

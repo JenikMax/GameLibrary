@@ -74,7 +74,7 @@
           />
         </div>
         <Button
-          :icon="game.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'"
+          :icon="favIcon"
           :severity="game.favorited ? 'danger' : 'secondary'"
           size="small"
           rounded
@@ -87,9 +87,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import { useLibraryStore } from '../stores/library'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
@@ -103,8 +104,14 @@ const props = defineProps({
 
 const router = useRouter()
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const libraryStore = useLibraryStore()
 const imgLoaded = ref(false)
+
+const favIcon = computed(() => {
+  if (currentThemeId.value === 'retro-terminal') return 'pi pi-heart'
+  return props.game.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'
+})
 
 onMounted(() => {
   if (!libraryStore.filterOptions.genres?.length) {

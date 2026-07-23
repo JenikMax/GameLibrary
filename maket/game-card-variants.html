@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Card Variants — 20 Mockups × 3 Themes</title>
+<style>
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+/* Page header */
+.mockup-header {
+  background: #0d0d1a;
+  padding: 24px 32px;
+  border-bottom: 1px solid #2a2a4a;
+  position: sticky; top: 0; z-index: 100;
+}
+.mockup-header h1 { font-size: 28px; font-weight: 700; color: #e8e8f0; }
+.mockup-header p { font-size: 13px; color: #8888aa; margin-top: 4px; }
+
+/* Variant section */
+.variant-section {
+  margin: 32px;
+  border: 1px solid #2a2a4a;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #12122a;
+}
+.variant-label {
+  padding: 12px 20px;
+  background: #0d0d1a;
+  border-bottom: 1px solid #2a2a4a;
+  font-size: 14px; font-weight: 600; color: #aaaacc;
+  display: flex; align-items: center; gap: 10px;
+}
+.variant-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 6px;
+  background: #3a3a6a; color: #ccc; font-size: 12px; font-weight: 700;
+}
+.variant-name { font-size: 16px; color: #e0e0f0; }
+
+.variant-row {
+  display: flex;
+  gap: 0;
+}
+.variant-col {
+  flex: 1;
+  padding: 24px 20px;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 320px;
+  position: relative;
+}
+.variant-col + .variant-col { border-left: 1px solid #2a2a4a; }
+.theme-badge {
+  position: absolute; top: 8px; left: 8px;
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 2px 8px; border-radius: 3px;
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   THEME BACKGROUNDS
+   ========================================================================== */
+.theme-light {
+  --card-bg: #ffffff;
+  --card-border: #d5d1cb;
+  --surface-50: #edeae6;
+  --surface-100: #e3e0db;
+  --surface-200: #d5d1cb;
+  --surface-300: #b0aba3;
+  --surface-400: #8c877e;
+  --surface-500: #6e6a63;
+  --text-primary: #282623;
+  --text-secondary: #534f49;
+  --text-muted: #8c877e;
+  --primary: #10b981;
+  --primary-light: #d1fae5;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --info: #3b82f6;
+  --info-light: #dbeafe;
+  --star: #f59e0b;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  background: var(--surface-50);
+}
+
+.theme-dark {
+  --card-bg: #1c1c1c;
+  --card-border: #333333;
+  --surface-50: #18181b;
+  --surface-100: #27272a;
+  --surface-200: #3f3f46;
+  --surface-300: #52525b;
+  --surface-400: #71717a;
+  --surface-500: #a1a1aa;
+  --text-primary: #f4f4f5;
+  --text-secondary: #d4d4d8;
+  --text-muted: #71717a;
+  --primary: #10b981;
+  --primary-light: #064e3b;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --info: #3b82f6;
+  --info-light: #1e3a5f;
+  --star: #f59e0b;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  background: var(--surface-50);
+}
+
+.theme-retro {
+  --card-bg: #000d06;
+  --card-border: rgba(0,255,136,0.3);
+  --surface-50: #000a05;
+  --surface-100: #001a0d;
+  --surface-200: #002613;
+  --surface-300: #003319;
+  --surface-400: #004d26;
+  --surface-500: #006633;
+  --text-primary: #00ff88;
+  --text-secondary: #00cc6a;
+  --text-muted: #008844;
+  --primary: #00ff88;
+  --primary-light: rgba(0,255,136,0.15);
+  --danger: #ff3344;
+  --warn: #f59e0b;
+  --info: #38bdf8;
+  --info-light: rgba(56,189,248,0.15);
+  --star: #00ff88;
+  --shadow-sm: 0 0 4px rgba(0,255,136,0.15);
+  --shadow-md: 0 0 10px rgba(0,255,136,0.2);
+  --shadow-lg: 0 0 20px rgba(0,255,136,0.25);
+  --radius-sm: 0;
+  --radius: 0;
+  --radius-lg: 0;
+  background: #000a05;
+  font-family: 'Courier New', Courier, monospace;
+  position: relative;
+}
+.theme-retro::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+}
+.theme-retro .theme-badge { background: #000; border: 1px solid rgba(0,255,136,0.4); color: #00ff88; }
+
+/* ==========================================================================
+   SHARED CARD TOKENS (Dynamically inherit via theme class)
+   ========================================================================== */
+.variant-col * {
+  transition: none;
+}
+.card-bg           { background: var(--card-bg); border: 1px solid var(--card-border); }
+.card-shadow       { box-shadow: var(--shadow-md); }
+.card-rounded      { border-radius: var(--radius); }
+.card-rounded-sm   { border-radius: var(--radius-sm); }
+.card-rounded-lg   { border-radius: var(--radius-lg); }
+
+.text-primary   { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted     { color: var(--text-muted); }
+
+.tag-platform { background: var(--info-light); color: var(--info); font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.tag-year     { background: rgba(245,158,11,0.12); color: var(--warn); font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.tag-genre    { background: var(--surface-100); color: var(--text-secondary); font-size: 11px; padding: 2px 8px; border-radius: 12px; font-weight: 500; }
+.tag-tag      { background: var(--surface-100); color: var(--info); font-size: 11px; padding: 2px 8px; border-radius: 12px; }
+
+.star          { color: var(--star); font-size: 13px; }
+.star-empty    { color: var(--surface-300); }
+
+.btn-primary   { background: var(--primary); color: #fff; border: none; padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; font-weight: 600; }
+.btn-ghost     { background: transparent; color: var(--text-secondary); border: 1px solid var(--card-border); padding: 6px 14px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; }
+.btn-icon      { width: 32px; height: 32px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
+
+.heart          { color: var(--danger); }
+.heart-empty    { color: var(--text-muted); }
+
+.img-placeholder {
+  background: var(--surface-200);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted);
+  overflow: hidden;
+}
+.img-placeholder img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+/* Row label */
+.row-label {
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+  font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 1px;
+  padding: 4px 6px;
+}
+
+/* ==========================================================================
+   VARIANT 1: Standard Grid Card
+   ========================================================================== */
+.c1 { width: 200px; }
+.c1 .card-img {
+  aspect-ratio: 2 / 3; border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--surface-200);
+  position: relative; overflow: hidden;
+}
+.c1 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c1 .card-img .favorite-badge { position: absolute; top: 8px; right: 8px; }
+.c1 .card-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.c1 .card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+.c1 .card-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.c1 .card-rating { display: flex; align-items: center; gap: 2px; }
+.c1 .card-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+.c1 .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+
+/* ==========================================================================
+   VARIANT 2: Horizontal Row
+   ========================================================================== */
+.c2 { width: 460px; display: flex; gap: 14px; padding: 12px; align-items: center; }
+.c2 .card-img { width: 60px; height: 84px; border-radius: var(--radius-sm); flex-shrink: 0; overflow: hidden; }
+.c2 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c2 .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.c2 .card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c2 .card-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.c2 .card-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+.c2 .card-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+/* ==========================================================================
+   VARIANT 3: Glassmorphism Card
+   ========================================================================== */
+.c3 { width: 200px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: var(--radius-lg); overflow: hidden; }
+.c3 .card-img { aspect-ratio: 3 / 4; position: relative; overflow: hidden; }
+.c3 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c3 .card-img::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(transparent, var(--card-bg)); }
+.c3 .card-body { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 6px; position: relative; z-index: 1; margin-top: -30px; }
+.c3 .card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.c3 .card-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.c3 .card-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* ==========================================================================
+   VARIANT 4: Minimal Text Card
+   ========================================================================== */
+.c4 { width: 280px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.c4 .card-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.c4 .card-body { flex: 1; min-width: 0; }
+.c4 .card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.c4 .card-meta { font-size: 11px; color: var(--text-muted); }
+.c4 .card-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+/* ==========================================================================
+   VARIANT 5: Hero Overlay Card
+   ========================================================================== */
+.c5 { width: 260px; position: relative; border-radius: var(--radius); overflow: hidden; }
+.c5 .card-img { aspect-ratio: 16 / 10; position: relative; }
+.c5 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c5 .card-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 50%); }
+.c5 .card-body { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px; }
+.c5 .card-title { font-size: 18px; font-weight: 800; color: #fff; line-height: 1.2; }
+.c5 .card-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.c5 .card-meta .tag-platform { background: rgba(255,255,255,0.15); color: #fff; }
+.c5 .card-meta .tag-year { background: rgba(255,255,255,0.15); color: #fff; }
+.c5 .favorite-badge { position: absolute; top: 10px; right: 10px; z-index: 2; }
+
+/* ==========================================================================
+   VARIANT 6: Magazine / Editorial Card
+   ========================================================================== */
+.c6 { width: 300px; }
+.c6 .card-img { height: 140px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; }
+.c6 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c6 .card-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.c6 .card-kicker { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary); font-weight: 700; }
+.c6 .card-title { font-size: 20px; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
+.c6 .card-excerpt { font-size: 12px; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.c6 .card-meta { display: flex; gap: 8px; align-items: center; padding-top: 4px; border-top: 1px solid var(--card-border); }
+
+/* ==========================================================================
+   VARIANT 7: Compact Square Card
+   ========================================================================== */
+.c7 { width: 130px; text-align: center; }
+.c7 .card-img { width: 80px; height: 80px; border-radius: var(--radius-lg); margin: 0 auto 10px; overflow: hidden; }
+.c7 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c7 .card-badge { display: inline-block; margin-bottom: 4px; }
+.c7 .card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.3; word-break: break-word; }
+.c7 .card-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* ==========================================================================
+   VARIANT 8: Neon Card
+   ========================================================================== */
+.c8 { width: 200px; position: relative; }
+.c8 .card-img { aspect-ratio: 2 / 3; position: relative; overflow: hidden; }
+.c8 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c8 .card-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.c8 .card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); text-shadow: 0 0 8px var(--primary); }
+.c8 .card-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.c8 .card-rating { display: flex; align-items: center; gap: 2px; }
+.c8 .card-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* ==========================================================================
+   VARIANT 9: Library Catalog Card
+   ========================================================================== */
+.c9 { width: 420px; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
+.c9 .card-top { display: flex; gap: 14px; align-items: flex-start; }
+.c9 .card-img { width: 52px; height: 72px; border-radius: 3px; flex-shrink: 0; overflow: hidden; }
+.c9 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c9 .card-body { flex: 1; min-width: 0; }
+.c9 .card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.c9 .card-meta { display: flex; gap: 8px; align-items: center; margin-top: 3px; flex-wrap: wrap; }
+.c9 .card-divider { height: 1px; background: var(--card-border); margin: 2px 0; }
+.c9 .card-details { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 16px; font-size: 11px; }
+.c9 .card-details dt { color: var(--text-muted); }
+.c9 .card-details dd { color: var(--text-secondary); font-weight: 500; }
+
+/* ==========================================================================
+   VARIANT 10: Album / Vinyl Card
+   ========================================================================== */
+.c10 { width: 180px; text-align: center; }
+.c10 .card-vinyl { width: 130px; height: 130px; border-radius: 50%; margin: 0 auto 12px; position: relative; }
+.c10 .card-vinyl .vinyl-bg { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--surface-100) 0deg, var(--surface-200) 90deg, var(--surface-100) 180deg, var(--surface-200) 270deg, var(--surface-100) 360deg); }
+.c10 .card-vinyl .vinyl-img { position: absolute; width: 52px; height: 52px; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); overflow: hidden; border: 3px solid var(--card-bg); }
+.c10 .card-vinyl .vinyl-img img { width: 100%; height: 100%; object-fit: cover; }
+.c10 .card-vinyl .vinyl-hole { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: var(--card-bg); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.c10 .card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+.c10 .card-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+/* ==========================================================================
+   VARIANT 11: Poster Card (Tall Portrait)
+   ========================================================================== */
+.c11 { width: 180px; }
+.c11 .card-img { aspect-ratio: 2 / 3; position: relative; overflow: hidden; border-radius: var(--radius-sm); }
+.c11 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c11 .card-img::after { content: ''; position: absolute; inset: 0; border: 2px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); }
+.c11 .card-body { padding: 10px 4px; display: flex; flex-direction: column; gap: 4px; }
+.c11 .card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.3; text-align: center; }
+.c11 .card-meta { display: flex; justify-content: center; gap: 6px; }
+
+/* ==========================================================================
+   VARIANT 12: Retro Game Box Card
+   ========================================================================== */
+.c12 { width: 200px; position: relative; }
+.c12 .card-spine { position: absolute; left: 0; top: 0; bottom: 0; width: 12px; background: var(--primary); border-radius: 2px 0 0 2px; z-index: 1; }
+.c12 .card-img { aspect-ratio: 3 / 4; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; position: relative; overflow: hidden; margin-left: 12px; }
+.c12 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c12 .card-body { padding: 8px 4px 4px 16px; }
+.c12 .card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; }
+.c12 .card-barcode { font-size: 7px; color: var(--text-muted); letter-spacing: 2px; margin-top: 2px; }
+
+/* ==========================================================================
+   VARIANT 13: Dashboard Widget Card
+   ========================================================================== */
+.c13 { width: 240px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.c13 .card-top { display: flex; gap: 12px; align-items: center; }
+.c13 .card-img { width: 48px; height: 48px; border-radius: var(--radius); overflow: hidden; flex-shrink: 0; }
+.c13 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c13 .card-body { flex: 1; min-width: 0; }
+.c13 .card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c13 .card-subtitle { font-size: 11px; color: var(--text-muted); }
+.c13 .card-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+.c13 .stat-item { text-align: center; }
+.c13 .stat-value { font-size: 18px; font-weight: 800; color: var(--primary); }
+.c13 .stat-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.c13 .card-bar { height: 4px; border-radius: 2px; background: var(--surface-200); overflow: hidden; }
+.c13 .card-bar-fill { height: 100%; border-radius: 2px; background: var(--primary); }
+
+/* ==========================================================================
+   VARIANT 14: Floating / Elevated Card
+   ========================================================================== */
+.c14 { width: 200px; position: relative; }
+.c14 .card-img { aspect-ratio: 2 / 3; border-radius: var(--radius); position: relative; overflow: hidden; }
+.c14 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c14 .card-body { position: absolute; bottom: -20px; left: 16px; right: 16px; padding: 12px; border-radius: var(--radius-sm); }
+.c14 .card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.c14 .card-meta { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+
+/* ==========================================================================
+   VARIANT 15: Diagonal Split Card
+   ========================================================================== */
+.c15 { width: 280px; display: flex; overflow: hidden; }
+.c15 .card-img { width: 120px; flex-shrink: 0; clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); position: relative; }
+.c15 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c15 .card-body { flex: 1; padding: 16px 12px 16px 4px; display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+.c15 .card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+.c15 .card-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.c15 .card-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* ==========================================================================
+   VARIANT 16: Ribbon/Badge Card
+   ========================================================================== */
+.c16 { width: 200px; position: relative; overflow: hidden; }
+.c16 .card-ribbon { position: absolute; top: 12px; left: -28px; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 30px; transform: rotate(-45deg); z-index: 2; text-transform: uppercase; letter-spacing: 1px; }
+.c16 .card-img { aspect-ratio: 2 / 3; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; }
+.c16 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c16 .card-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.c16 .card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.c16 .card-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.c16 .card-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* ==========================================================================
+   VARIANT 17: Overlapping / Layered Card
+   ========================================================================== */
+.c17 { width: 220px; position: relative; }
+.c17 .card-bg-layer { position: absolute; inset: -8px 8px 8px -8px; border-radius: var(--radius-lg); background: var(--primary); opacity: 0.08; }
+.c17 .card-img { aspect-ratio: 16 / 10; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; position: relative; }
+.c17 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c17 .card-body { padding: 14px; position: relative; }
+.c17 .card-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.c17 .card-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.c17 .card-play-btn { position: absolute; bottom: 8px; right: 8px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.c17 .card-tag-pills { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+
+/* ==========================================================================
+   VARIANT 18: Bento Grid Card
+   ========================================================================== */
+.c18 { width: 260px; display: grid; grid-template-columns: 80px 1fr; grid-template-rows: auto auto auto; gap: 8px; padding: 12px; }
+.c18 .card-img { grid-row: 1 / -1; border-radius: var(--radius); overflow: hidden; }
+.c18 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c18 .card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); align-self: end; }
+.c18 .card-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.c18 .card-actions { display: flex; gap: 6px; align-self: end; }
+
+/* ==========================================================================
+   VARIANT 19: Inline Compact Card
+   ========================================================================== */
+.c19 { width: 300px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; }
+.c19 .card-img { width: 36px; height: 48px; border-radius: 4px; flex-shrink: 0; overflow: hidden; }
+.c19 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c19 .card-body { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; }
+.c19 .card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c19 .card-meta { font-size: 11px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+.c19 .card-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+/* ==========================================================================
+   VARIANT 20: 3D Perspective Card
+   ========================================================================== */
+.c20 { width: 200px; perspective: 600px; }
+.c20 .card-3d { transform: rotateY(-5deg) rotateX(3deg); transform-style: preserve-3d; }
+.c20 .card-img { aspect-ratio: 2 / 3; border-radius: var(--radius-sm); overflow: hidden; position: relative; }
+.c20 .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.c20 .card-body { padding: 10px 8px; display: flex; flex-direction: column; gap: 4px; }
+.c20 .card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+.c20 .card-meta { display: flex; gap: 4px; flex-wrap: wrap; }
+.c20 .card-shadow-3d { position: absolute; bottom: -8px; left: 8px; right: -8px; height: 16px; background: rgba(0,0,0,0.3); filter: blur(12px); border-radius: 50%; transform: rotateX(90deg); }
+
+/* ==========================================================================
+   RETRO-TERMINAL OVERRIDES
+   ========================================================================== */
+.theme-retro .btn-primary { background: #00ff88; color: #000; border: 1px solid #00ff88; font-family: 'Courier New', monospace; text-transform: uppercase; }
+.theme-retro .btn-ghost { border: 1px solid rgba(0,255,136,0.4); color: #00ff88; font-family: 'Courier New', monospace; text-transform: uppercase; }
+.theme-retro .btn-icon { border: 1px solid rgba(0,255,136,0.4); color: #00ff88; }
+.theme-retro .tag-platform { background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
+.theme-retro .tag-year { background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+.theme-retro .tag-genre { background: rgba(0,255,136,0.08); color: #00cc6a; border: 1px solid rgba(0,255,136,0.2); border-radius: 0; }
+.theme-retro .tag-tag { background: rgba(56,189,248,0.08); color: #38bdf8; border: 1px solid rgba(56,189,248,0.2); border-radius: 0; }
+.theme-retro .card-shadow { box-shadow: 0 0 12px rgba(0,255,136,0.15); }
+.theme-retro .c8 .card-title { text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88; }
+.theme-retro .c5 .card-img::after { background: linear-gradient(0deg, rgba(0,13,6,0.95) 0%, transparent 55%); }
+.theme-retro .c5 .card-title { color: #00ff88; }
+.theme-retro .c12 .card-spine { background: #00ff88; box-shadow: 0 0 8px rgba(0,255,136,0.5); }
+.theme-retro .c16 .card-ribbon { background: #00ff88; color: #000; }
+.theme-retro .c17 .card-bg-layer { background: #00ff88; opacity: 0.06; }
+.theme-retro .c17 .card-play-btn { background: #00ff88; color: #000; }
+.theme-retro .c13 .stat-value { color: #00ff88; }
+.theme-retro .c13 .card-bar-fill { background: #00ff88; box-shadow: 0 0 6px #00ff88; }
+.theme-retro .c6 .card-kicker { color: #00ff88; }
+.theme-retro .c8 .card-img { border: 1px solid rgba(0,255,136,0.3); }
+.theme-retro .c20 .card-3d { filter: drop-shadow(0 0 12px rgba(0,255,136,0.2)); }
+
+/* ==========================================================================
+   FALLBACK IMAGE (displayed when default.jpg is not accessible)
+   ========================================================================== */
+.img-fallback {
+  background: linear-gradient(135deg, var(--surface-200) 0%, var(--surface-300) 100%);
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-size: 36px; color: var(--text-muted);
+}
+.theme-retro .img-fallback {
+  background: linear-gradient(135deg, #002613 0%, #003319 100%);
+}
+
+/* ==========================================================================
+   GAME DATA SAMPLES (rotated through variants)
+   ========================================================================== */
+
+/* Helper: inline-flex star display */
+.stars { display: inline-flex; gap: 1px; }
+.stars .star { font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="mockup-header">
+  <h1>Game Card Variants — 20 Mockups × 3 Themes</h1>
+  <p>Light (left) &nbsp;|&nbsp; Dark (center) &nbsp;|&nbsp; Retro Terminal (right) &nbsp;—&nbsp; Image: default.jpg</p>
+</div>
+
+<!-- ============================================================================
+     MOCKUP GENERATION MACRO — each variant block is a <section class="variant-section">
+     with a .variant-row containing three .variant-col (theme-light / theme-dark / theme-retro)
+     ============================================================================ -->
+
+<!-- ============ 1. Standard Grid Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">1</span><span class="variant-name">Standard Grid Card</span> — Classic image-top, details-below layout (current style)</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c1 card-bg card-shadow card-rounded">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"><div class="favorite-badge"><span class="heart">&#x2665;</span></div></div>
+      <div class="card-body">
+        <div class="card-title">Ведьмак 3: Дикая Охота</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2015</span></div>
+        <div class="card-rating"><span class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star-empty">&#9733;</span></span></div>
+        <div class="card-genres"><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+        <div class="card-footer"><button class="btn-ghost">Details</button><button class="btn-icon">&#x21E9;</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c1 card-bg card-shadow card-rounded">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"><div class="favorite-badge"><span class="heart">&#x2665;</span></div></div>
+      <div class="card-body">
+        <div class="card-title">Ведьмак 3: Дикая Охота</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2015</span></div>
+        <div class="card-rating"><span class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star-empty">&#9733;</span></span></div>
+        <div class="card-genres"><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+        <div class="card-footer"><button class="btn-ghost">Details</button><button class="btn-icon">&#x21E9;</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c1 card-bg card-shadow card-rounded">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"><div class="favorite-badge"><span class="heart">&#x2665;</span></div></div>
+      <div class="card-body">
+        <div class="card-title">Ведьмак 3: Дикая Охота</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2015</span></div>
+        <div class="card-rating"><span class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star-empty">&#9733;</span></span></div>
+        <div class="card-genres"><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+        <div class="card-footer"><button class="btn-ghost">Details</button><button class="btn-icon">&#x21E9;</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 2. Horizontal Row ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">2</span><span class="variant-name">Horizontal Row</span> — Landscape layout, image left, info right (current list style)</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c2 card-bg card-shadow card-rounded">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Cyberpunk 2077</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></div>
+        <div class="card-genres"><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span><span class="tag-genre">Open World</span></div>
+      </div>
+      <div class="card-actions"><button class="btn-icon"><span class="heart" style="font-size:18px">&#x2665;</span></button><button class="btn-icon">&#x21E9;</button></div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c2 card-bg card-shadow card-rounded">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Cyberpunk 2077</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></div>
+        <div class="card-genres"><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span><span class="tag-genre">Open World</span></div>
+      </div>
+      <div class="card-actions"><button class="btn-icon"><span class="heart" style="font-size:18px">&#x2665;</span></button><button class="btn-icon">&#x21E9;</button></div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c2 card-bg card-shadow card-rounded">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Cyberpunk 2077</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></div>
+        <div class="card-genres"><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span><span class="tag-genre">Open World</span></div>
+      </div>
+      <div class="card-actions"><button class="btn-icon"><span class="heart" style="font-size:18px">&#x2665;</span></button><button class="btn-icon">&#x21E9;</button></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 3. Glassmorphism Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">3</span><span class="variant-name">Glassmorphism Card</span> — Frosted glass, blurred background, gradient fade over image</div>
+<div class="variant-row">
+  <div class="variant-col theme-light" style="background: linear-gradient(135deg, #edeae6 0%, #d5d1cb 50%, #b0aba3 100%);">
+    <span class="theme-badge">Light</span>
+    <div class="c3 card-bg card-shadow card-rounded-lg" style="background: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.6);">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Elden Ring</div>
+        <div class="card-meta"><span class="tag-platform">PlayStation 5</span><span class="tag-year">2022</span></div>
+        <div class="card-genres"><span class="tag-genre">Souls-like</span><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark" style="background: linear-gradient(135deg, #18181b 0%, #27272a 50%, #3f3f46 100%);">
+    <span class="theme-badge">Dark</span>
+    <div class="c3 card-bg card-shadow card-rounded-lg" style="background: rgba(28,28,28,0.55); border: 1px solid rgba(255,255,255,0.08);">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Elden Ring</div>
+        <div class="card-meta"><span class="tag-platform">PlayStation 5</span><span class="tag-year">2022</span></div>
+        <div class="card-genres"><span class="tag-genre">Souls-like</span><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro" style="background: linear-gradient(135deg, #000502 0%, #001a0d 50%, #002613 100%);">
+    <span class="theme-badge">Retro</span>
+    <div class="c3 card-bg card-shadow card-rounded-lg" style="background: rgba(0,13,6,0.55); border: 1px solid rgba(0,255,136,0.2);">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Elden Ring</div>
+        <div class="card-meta"><span class="tag-platform">PlayStation 5</span><span class="tag-year">2022</span></div>
+        <div class="card-genres"><span class="tag-genre">Souls-like</span><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 4. Minimal Text Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">4</span><span class="variant-name">Minimal Text Card</span> — Text-centric, tiny icon, ultra-clean</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c4 card-bg card-shadow card-rounded">
+      <div class="card-icon" style="background: var(--primary-light); color: var(--primary);">&#x1F3AE;</div>
+      <div class="card-body">
+        <div class="card-title">Hollow Knight</div>
+        <div class="card-meta">Windows &middot; 2017 &middot; &#9733; 9/10</div>
+      </div>
+      <div class="card-actions"><button class="btn-icon"><span style="color:var(--text-muted);font-size:14px">&#x2661;</span></button></div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c4 card-bg card-shadow card-rounded">
+      <div class="card-icon" style="background: var(--primary-light); color: var(--primary);">&#x1F3AE;</div>
+      <div class="card-body">
+        <div class="card-title">Hollow Knight</div>
+        <div class="card-meta">Windows &middot; 2017 &middot; &#9733; 9/10</div>
+      </div>
+      <div class="card-actions"><button class="btn-icon"><span style="color:var(--text-muted);font-size:14px">&#x2661;</span></button></div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c4 card-bg card-shadow card-rounded">
+      <div class="card-icon" style="background: rgba(0,255,136,0.12); color: #00ff88;">&#x1F3AE;</div>
+      <div class="card-body">
+        <div class="card-title">Hollow Knight</div>
+        <div class="card-meta">Windows &middot; 2017 &middot; &#9733; 9/10</div>
+      </div>
+      <div class="card-actions"><button class="btn-icon"><span style="color:var(--text-muted);font-size:14px">&#x2661;</span></button></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 5. Hero Overlay Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">5</span><span class="variant-name">Hero Overlay Card</span> — Big hero image, title overlaid at bottom with gradient</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c5 card-shadow">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"><div class="favorite-badge"><button class="btn-icon" style="background:rgba(0,0,0,0.4);border-color:rgba(255,255,255,0.3);color:#fff;width:28px;height:28px;font-size:14px">&#x2665;</button></div></div>
+      <div class="card-body">
+        <div class="card-title">Red Dead Redemption 2</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2018</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c5 card-shadow">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"><div class="favorite-badge"><button class="btn-icon" style="background:rgba(0,0,0,0.4);border-color:rgba(255,255,255,0.3);color:#fff;width:28px;height:28px;font-size:14px">&#x2665;</button></div></div>
+      <div class="card-body">
+        <div class="card-title">Red Dead Redemption 2</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2018</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c5 card-shadow">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"><div class="favorite-badge"><button class="btn-icon" style="background:rgba(0,0,0,0.4);border-color:rgba(0,255,136,0.3);color:#00ff88;width:28px;height:28px;font-size:14px">&#x2665;</button></div></div>
+      <div class="card-body">
+        <div class="card-title">Red Dead Redemption 2</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2018</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 6. Magazine / Editorial Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">6</span><span class="variant-name">Magazine / Editorial Card</span> — Editorial layout, large title, kicker label, excerpt</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c6 card-bg card-shadow card-rounded">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-kicker">Game of the Year</div>
+        <div class="card-title">Baldur's Gate 3</div>
+        <div class="card-excerpt">Эпическая RPG во вселенной Dungeons & Dragons с пошаговыми боями, глубокими диалогами и кооперативом до 4 игроков.</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2023</span><span style="font-size:11px;color:var(--text-muted)">&#9733; 10/10</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c6 card-bg card-shadow card-rounded">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-kicker">Game of the Year</div>
+        <div class="card-title">Baldur's Gate 3</div>
+        <div class="card-excerpt">Эпическая RPG во вселенной Dungeons & Dragons с пошаговыми боями, глубокими диалогами и кооперативом до 4 игроков.</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2023</span><span style="font-size:11px;color:var(--text-muted)">&#9733; 10/10</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c6 card-bg card-shadow card-rounded">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-kicker">Game of the Year</div>
+        <div class="card-title">Baldur's Gate 3</div>
+        <div class="card-excerpt">Эпическая RPG во вселенной Dungeons & Dragons с пошаговыми боями, глубокими диалогами и кооперативом до 4 игроков.</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2023</span><span style="font-size:11px;color:var(--text-muted)">&#9733; 10/10</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 7. Compact Square Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">7</span><span class="variant-name">Compact Square Card</span> — Small square, just icon + title + platform badge</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c7 card-bg card-shadow card-rounded-lg" style="padding:16px 12px 14px">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-badge"><span class="tag-platform">PS4</span></div>
+      <div class="card-title">God of War</div>
+      <div class="card-meta">2018 &middot; &#9733; 9/10</div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c7 card-bg card-shadow card-rounded-lg" style="padding:16px 12px 14px">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-badge"><span class="tag-platform">PS4</span></div>
+      <div class="card-title">God of War</div>
+      <div class="card-meta">2018 &middot; &#9733; 9/10</div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c7 card-bg card-shadow card-rounded-lg" style="padding:16px 12px 14px">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-badge"><span class="tag-platform">PS4</span></div>
+      <div class="card-title">God of War</div>
+      <div class="card-meta">2018 &middot; &#9733; 9/10</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 8. Neon Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">8</span><span class="variant-name">Neon Card</span> — Cyberpunk glow, luminous borders, neon-shadow text</div>
+<div class="variant-row">
+  <div class="variant-col theme-light" style="background: #1a1a2e;">
+    <span class="theme-badge">Light</span>
+    <div class="c8 card-bg card-shadow" style="background:#16213e;border-color:rgba(0,255,136,0.4);box-shadow:0 0 20px rgba(0,255,136,0.15);color:#e0e0e0;">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title" style="color:#00ff88;text-shadow:0 0 10px #00ff88;">Deus Ex</div>
+        <div class="card-meta"><span class="tag-platform" style="background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3)">Windows</span><span class="tag-year" style="background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.3)">2000</span></div>
+        <div class="card-rating"><span class="stars"><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span></span></div>
+        <div class="card-genres"><span class="tag-genre" style="background:rgba(0,255,136,0.08);color:#00cc6a;border:1px solid rgba(0,255,136,0.2)">Immersive Sim</span><span class="tag-genre" style="background:rgba(0,255,136,0.08);color:#00cc6a;border:1px solid rgba(0,255,136,0.2)">RPG</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark" style="background: #0a0a1a;">
+    <span class="theme-badge">Dark</span>
+    <div class="c8 card-bg card-shadow" style="background:#16213e;border-color:rgba(0,255,136,0.4);box-shadow:0 0 20px rgba(0,255,136,0.15);color:#e0e0e0;">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title" style="color:#00ff88;text-shadow:0 0 10px #00ff88;">Deus Ex</div>
+        <div class="card-meta"><span class="tag-platform" style="background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3)">Windows</span><span class="tag-year" style="background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.3)">2000</span></div>
+        <div class="card-rating"><span class="stars"><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span><span class="star" style="color:#00ff88">&#9733;</span></span></div>
+        <div class="card-genres"><span class="tag-genre" style="background:rgba(0,255,136,0.08);color:#00cc6a;border:1px solid rgba(0,255,136,0.2)">Immersive Sim</span><span class="tag-genre" style="background:rgba(0,255,136,0.08);color:#00cc6a;border:1px solid rgba(0,255,136,0.2)">RPG</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c8 card-bg card-shadow" style="border-color:rgba(0,255,136,0.5);box-shadow:0 0 20px rgba(0,255,136,0.2);">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Deus Ex</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2000</span></div>
+        <div class="card-rating"><span class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></span></div>
+        <div class="card-genres"><span class="tag-genre">Immersive Sim</span><span class="tag-genre">RPG</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 9. Library Catalog Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">9</span><span class="variant-name">Library Catalog Card</span> — Structured grid of metadata, old-school catalog feel</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c9 card-bg card-shadow card-rounded-sm">
+      <div class="card-top">
+        <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="card-body">
+          <div class="card-title">Heroes of Might & Magic III</div>
+          <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">1999</span></div>
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <dl class="card-details">
+        <dt>Genres:</dt><dd>Strategy, Turn-Based</dd>
+        <dt>Rating:</dt><dd>&#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; 10/10</dd>
+        <dt>Developer:</dt><dd>New World Computing</dd>
+        <dt>Path:</dt><dd style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">/games/strategy/HoMM3</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c9 card-bg card-shadow card-rounded-sm">
+      <div class="card-top">
+        <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="card-body">
+          <div class="card-title">Heroes of Might & Magic III</div>
+          <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">1999</span></div>
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <dl class="card-details">
+        <dt>Genres:</dt><dd>Strategy, Turn-Based</dd>
+        <dt>Rating:</dt><dd>&#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; 10/10</dd>
+        <dt>Developer:</dt><dd>New World Computing</dd>
+        <dt>Path:</dt><dd style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">/games/strategy/HoMM3</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c9 card-bg card-shadow card-rounded-sm">
+      <div class="card-top">
+        <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="card-body">
+          <div class="card-title">Heroes of Might & Magic III</div>
+          <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">1999</span></div>
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <dl class="card-details">
+        <dt>Genres:</dt><dd>Strategy, Turn-Based</dd>
+        <dt>Rating:</dt><dd>&#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; 10/10</dd>
+        <dt>Developer:</dt><dd>New World Computing</dd>
+        <dt>Path:</dt><dd style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">/games/strategy/HoMM3</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 10. Album / Vinyl Record Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">10</span><span class="variant-name">Album / Vinyl Record Card</span> — Circular vinyl design, artistic music-album feel</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c10 card-bg card-shadow card-rounded-lg" style="padding:20px 14px 16px">
+      <div class="card-vinyl">
+        <div class="vinyl-bg"></div>
+        <div class="vinyl-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="vinyl-hole"></div>
+      </div>
+      <div class="card-title">DOOM Eternal</div>
+      <div class="card-meta">Windows &middot; 2020 &middot; &#9733; 9/10</div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c10 card-bg card-shadow card-rounded-lg" style="padding:20px 14px 16px">
+      <div class="card-vinyl">
+        <div class="vinyl-bg"></div>
+        <div class="vinyl-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="vinyl-hole"></div>
+      </div>
+      <div class="card-title">DOOM Eternal</div>
+      <div class="card-meta">Windows &middot; 2020 &middot; &#9733; 9/10</div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c10 card-bg card-shadow card-rounded-lg" style="padding:20px 14px 16px">
+      <div class="card-vinyl">
+        <div class="vinyl-bg"></div>
+        <div class="vinyl-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="vinyl-hole"></div>
+      </div>
+      <div class="card-title">DOOM Eternal</div>
+      <div class="card-meta">Windows &middot; 2020 &middot; &#9733; 9/10</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 11. Poster Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">11</span><span class="variant-name">Poster Card</span> — Movie-poster style, tall portrait, cinematic feel</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c11">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">The Last of Us Part II</div>
+        <div class="card-meta"><span class="tag-platform">PS4</span><span class="tag-year">2020</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c11">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">The Last of Us Part II</div>
+        <div class="card-meta"><span class="tag-platform">PS4</span><span class="tag-year">2020</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c11">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">The Last of Us Part II</div>
+        <div class="card-meta"><span class="tag-platform">PS4</span><span class="tag-year">2020</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 12. Retro Game Box Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">12</span><span class="variant-name">Retro Game Box Card</span> — Physical game box feel with spine, barcode, retro aesthetic</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c12 card-bg card-shadow card-rounded-sm">
+      <div class="card-spine" style="background:linear-gradient(180deg,#e74c3c,#c0392b)"></div>
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Super Mario World</div>
+        <div class="card-barcode">|| ||| |||| || | ||| | |||| |||| || || |||| | || | |||</div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c12 card-bg card-shadow card-rounded-sm">
+      <div class="card-spine" style="background:linear-gradient(180deg,#e74c3c,#c0392b)"></div>
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Super Mario World</div>
+        <div class="card-barcode">|| ||| |||| || | ||| | |||| |||| || || |||| | || | |||</div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c12 card-bg card-shadow card-rounded-sm">
+      <div class="card-spine"></div>
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Super Mario World</div>
+        <div class="card-barcode">|| ||| |||| || | ||| | |||| |||| || || |||| | || | |||</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 13. Dashboard Widget Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">13</span><span class="variant-name">Dashboard Widget Card</span> — Stats-focused, compact metrics, mini-bar chart</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c13 card-bg card-shadow card-rounded">
+      <div class="card-top">
+        <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="card-body">
+          <div class="card-title">Minecraft</div>
+          <div class="card-subtitle">Windows &middot; 2011</div>
+        </div>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item"><div class="stat-value">9.4</div><div class="stat-label">Rating</div></div>
+        <div class="stat-item"><div class="stat-value">2.1</div><div class="stat-label">GB</div></div>
+        <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">Tags</div></div>
+      </div>
+      <div class="card-bar"><div class="card-bar-fill" style="width:94%"></div></div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c13 card-bg card-shadow card-rounded">
+      <div class="card-top">
+        <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="card-body">
+          <div class="card-title">Minecraft</div>
+          <div class="card-subtitle">Windows &middot; 2011</div>
+        </div>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item"><div class="stat-value">9.4</div><div class="stat-label">Rating</div></div>
+        <div class="stat-item"><div class="stat-value">2.1</div><div class="stat-label">GB</div></div>
+        <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">Tags</div></div>
+      </div>
+      <div class="card-bar"><div class="card-bar-fill" style="width:94%"></div></div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c13 card-bg card-shadow card-rounded">
+      <div class="card-top">
+        <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="card-body">
+          <div class="card-title">Minecraft</div>
+          <div class="card-subtitle">Windows &middot; 2011</div>
+        </div>
+      </div>
+      <div class="card-stats">
+        <div class="stat-item"><div class="stat-value">9.4</div><div class="stat-label">Rating</div></div>
+        <div class="stat-item"><div class="stat-value">2.1</div><div class="stat-label">GB</div></div>
+        <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">Tags</div></div>
+      </div>
+      <div class="card-bar"><div class="card-bar-fill" style="width:94%"></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 14. Floating / Elevated Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">14</span><span class="variant-name">Floating / Elevated Card</span> — Deep shadow, elevated info panel floating below image</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c14">
+      <div class="card-img card-shadow-lg"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body card-bg card-shadow-md" style="z-index:1">
+        <div class="card-title">Horizon Zero Dawn</div>
+        <div class="card-meta"><span class="tag-platform">PS4</span><span class="tag-year">2017</span><span style="font-size:11px;color:var(--star)">&#9733; 8/10</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c14">
+      <div class="card-img card-shadow-lg"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body card-bg card-shadow-md" style="z-index:1">
+        <div class="card-title">Horizon Zero Dawn</div>
+        <div class="card-meta"><span class="tag-platform">PS4</span><span class="tag-year">2017</span><span style="font-size:11px;color:var(--star)">&#9733; 8/10</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c14">
+      <div class="card-img card-shadow-lg"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body card-bg card-shadow-md" style="z-index:1">
+        <div class="card-title">Horizon Zero Dawn</div>
+        <div class="card-meta"><span class="tag-platform">PS4</span><span class="tag-year">2017</span><span style="font-size:11px;color:var(--star)">&#9733; 8/10</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 15. Diagonal Split Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">15</span><span class="variant-name">Diagonal Split Card</span> — Image panel with diagonal clip-path, dynamic asymmetry</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c15 card-bg card-shadow card-rounded" style="height:120px">
+      <div class="card-img" style="background:var(--surface-200)"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Half-Life: Alyx</div>
+        <div class="card-meta"><span class="tag-platform">VR</span><span class="tag-year">2020</span></div>
+        <div class="card-genres"><span class="tag-genre">FPS</span><span class="tag-genre">VR</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c15 card-bg card-shadow card-rounded" style="height:120px">
+      <div class="card-img" style="background:var(--surface-200)"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Half-Life: Alyx</div>
+        <div class="card-meta"><span class="tag-platform">VR</span><span class="tag-year">2020</span></div>
+        <div class="card-genres"><span class="tag-genre">FPS</span><span class="tag-genre">VR</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c15 card-bg card-shadow card-rounded" style="height:120px">
+      <div class="card-img" style="background:var(--surface-200)"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Half-Life: Alyx</div>
+        <div class="card-meta"><span class="tag-platform">VR</span><span class="tag-year">2020</span></div>
+        <div class="card-genres"><span class="tag-genre">FPS</span><span class="tag-genre">VR</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 16. Ribbon / Badge Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">16</span><span class="variant-name">Ribbon / Badge Card</span> — Corner ribbon for platform/year, badge accents</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c16 card-bg card-shadow card-rounded">
+      <div class="card-ribbon">NEW</div>
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Factorio</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span style="color:var(--star)">&#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733;</span></div>
+        <div class="card-badges"><span class="tag-genre">Simulation</span><span class="tag-genre">Strategy</span><span class="tag-tag">Automation</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c16 card-bg card-shadow card-rounded">
+      <div class="card-ribbon">NEW</div>
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Factorio</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span style="color:var(--star)">&#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733;</span></div>
+        <div class="card-badges"><span class="tag-genre">Simulation</span><span class="tag-genre">Strategy</span><span class="tag-tag">Automation</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c16 card-bg card-shadow card-rounded">
+      <div class="card-ribbon">NEW</div>
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Factorio</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span style="color:var(--star)">&#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733; &#9733;</span></div>
+        <div class="card-badges"><span class="tag-genre">Simulation</span><span class="tag-genre">Strategy</span><span class="tag-tag">Automation</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 17. Overlapping / Layered Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">17</span><span class="variant-name">Overlapping / Layered Card</span> — Accent background layer, play button, tag pills</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c17 card-bg card-shadow card-rounded">
+      <div class="card-bg-layer"></div>
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Stardew Valley</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2016</span></div>
+        <div class="card-tag-pills"><span class="tag-genre">Simulation</span><span class="tag-genre">RPG</span><span class="tag-tag">Farming</span></div>
+      </div>
+      <div class="card-play-btn btn-primary">&#x25B6;</div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c17 card-bg card-shadow card-rounded">
+      <div class="card-bg-layer"></div>
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Stardew Valley</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2016</span></div>
+        <div class="card-tag-pills"><span class="tag-genre">Simulation</span><span class="tag-genre">RPG</span><span class="tag-tag">Farming</span></div>
+      </div>
+      <div class="card-play-btn btn-primary">&#x25B6;</div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c17 card-bg card-shadow card-rounded">
+      <div class="card-bg-layer"></div>
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">Stardew Valley</div>
+        <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2016</span></div>
+        <div class="card-tag-pills"><span class="tag-genre">Simulation</span><span class="tag-genre">RPG</span><span class="tag-tag">Farming</span></div>
+      </div>
+      <div class="card-play-btn btn-primary">&#x25B6;</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 18. Bento Grid Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">18</span><span class="variant-name">Bento Grid Card</span> — Bento-box inspired, modular grid sections</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c18 card-bg card-shadow card-rounded-lg">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-title">Portal 2</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span><span class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></span></div>
+      <div class="card-actions"><button class="btn-ghost" style="font-size:11px;padding:4px 10px">Open</button><button class="btn-icon" style="width:28px;height:28px;font-size:13px"><span class="heart">&#x2665;</span></button></div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c18 card-bg card-shadow card-rounded-lg">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-title">Portal 2</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span><span class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></span></div>
+      <div class="card-actions"><button class="btn-ghost" style="font-size:11px;padding:4px 10px">Open</button><button class="btn-icon" style="width:28px;height:28px;font-size:13px"><span class="heart">&#x2665;</span></button></div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c18 card-bg card-shadow card-rounded-lg">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-title">Portal 2</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span><span class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></span></div>
+      <div class="card-actions"><button class="btn-ghost" style="font-size:11px;padding:4px 10px">Open</button><button class="btn-icon" style="width:28px;height:28px;font-size:13px"><span class="heart">&#x2665;</span></button></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 19. Inline Compact Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">19</span><span class="variant-name">Inline Compact Card</span> — Ultra-compact for dense grids, one-line style</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c19 card-bg card-shadow-sm card-rounded-sm">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">FTL: Faster Than Light</div>
+        <div class="card-meta">2012 &middot; &#9733; 8/10</div>
+      </div>
+      <div class="card-actions"><button class="btn-icon" style="width:26px;height:26px;font-size:12px">&#x2661;</button><button class="btn-icon" style="width:26px;height:26px;font-size:12px">&#x21E9;</button></div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c19 card-bg card-shadow-sm card-rounded-sm">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">FTL: Faster Than Light</div>
+        <div class="card-meta">2012 &middot; &#9733; 8/10</div>
+      </div>
+      <div class="card-actions"><button class="btn-icon" style="width:26px;height:26px;font-size:12px">&#x2661;</button><button class="btn-icon" style="width:26px;height:26px;font-size:12px">&#x21E9;</button></div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c19 card-bg card-shadow-sm card-rounded-sm">
+      <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+      <div class="card-body">
+        <div class="card-title">FTL: Faster Than Light</div>
+        <div class="card-meta">2012 &middot; &#9733; 8/10</div>
+      </div>
+      <div class="card-actions"><button class="btn-icon" style="width:26px;height:26px;font-size:12px">&#x2661;</button><button class="btn-icon" style="width:26px;height:26px;font-size:12px">&#x21E9;</button></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 20. 3D Perspective Card ============ -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">20</span><span class="variant-name">3D Perspective Card</span> — Isometric tilt with 3D shadow, depth effect</div>
+<div class="variant-row">
+  <div class="variant-col theme-light">
+    <span class="theme-badge">Light</span>
+    <div class="c20">
+      <div class="card-3d card-bg card-shadow-lg card-rounded-sm" style="position:relative;background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius-sm)">
+        <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="card-body">
+          <div class="card-title">Disco Elysium</div>
+          <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2019</span></div>
+        </div>
+        <div class="card-shadow-3d"></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-dark">
+    <span class="theme-badge">Dark</span>
+    <div class="c20">
+      <div class="card-3d card-bg card-shadow-lg card-rounded-sm" style="position:relative;background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius-sm)">
+        <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="card-body">
+          <div class="card-title">Disco Elysium</div>
+          <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2019</span></div>
+        </div>
+        <div class="card-shadow-3d"></div>
+      </div>
+    </div>
+  </div>
+  <div class="variant-col theme-retro">
+    <span class="theme-badge">Retro</span>
+    <div class="c20">
+      <div class="card-3d card-bg card-shadow-lg card-rounded-sm" style="position:relative;background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius-sm)">
+        <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+        <div class="card-body">
+          <div class="card-title">Disco Elysium</div>
+          <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2019</span></div>
+        </div>
+        <div class="card-shadow-3d"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Footer -->
+<div style="text-align:center;padding:32px;color:#666;font-size:12px">
+  GameLibrary — Game Card Mockups &middot; 20 variants × 3 themes (Light, Dark, Retro Terminal) &middot; Image: default.jpg
+</div>
+
+</body>
+</html>

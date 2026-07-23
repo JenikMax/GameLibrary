@@ -29,7 +29,7 @@
     </div>
     <div class="row-actions" @click.stop>
       <Button
-        :icon="game.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'"
+        :icon="favIcon"
         :severity="game.favorited ? 'danger' : 'secondary'"
         rounded
         text
@@ -50,9 +50,11 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLibraryStore } from '../stores/library'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import { gamesApi } from '../api/games'
 import { useToast } from 'primevue/usetoast'
 import Tag from 'primevue/tag'
@@ -65,7 +67,13 @@ const props = defineProps({
 const router = useRouter()
 const libraryStore = useLibraryStore()
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const toast = useToast()
+
+const favIcon = computed(() => {
+  if (currentThemeId.value === 'retro-terminal') return 'pi pi-heart'
+  return props.game.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'
+})
 
 function genreName(code) {
   return libraryStore.genreMap[code] || code

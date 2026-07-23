@@ -120,7 +120,6 @@ import { useAuthStore } from '../stores/auth'
 import { useLibraryStore } from '../stores/library'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from '../composables/useI18n'
-import { adminApi } from '../api/admin'
 import { notificationsApi } from '../api/notifications'
 import LocaleSwitcher from './LocaleSwitcher.vue'
 import Menubar from 'primevue/menubar'
@@ -201,6 +200,14 @@ const items = computed(() => {
       icon: 'pi pi-cog',
       items: [
         {
+          label: t('nav.admin_dashboard'),
+          icon: 'pi pi-home',
+          command: () => router.push('/admin')
+        },
+        {
+          separator: true
+        },
+        {
           label: t('nav.users'),
           icon: 'pi pi-users',
           command: () => router.push('/admin/users')
@@ -209,25 +216,6 @@ const items = computed(() => {
           label: t('nav.scrapers'),
           icon: 'pi pi-cloud-download',
           command: () => router.push('/admin/scrapers')
-        },
-        {
-          label: t('nav.settings'),
-          icon: 'pi pi-sliders-h',
-          items: [
-            {
-              label: t('nav.scan'),
-              icon: 'pi pi-refresh',
-              command: async () => {
-                try {
-                  await adminApi.scanLibrary()
-                  toast.add({ severity: 'success', summary: t('library.scan_start'), life: 3000 })
-                  fetchNotifications()
-                } catch {
-                  toast.add({ severity: 'error', summary: t('library.scan_failed'), life: 3000 })
-                }
-              }
-            }
-          ]
         }
       ]
     })

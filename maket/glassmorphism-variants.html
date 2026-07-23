@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glassmorphism Card Variations — 20 Mockups × 3 Themes</title>
+<style>
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+.mockup-header {
+  background: #0d0d1a;
+  padding: 24px 32px;
+  border-bottom: 1px solid #2a2a4a;
+  position: sticky; top: 0; z-index: 100;
+}
+.mockup-header h1 { font-size: 24px; font-weight: 700; color: #e8e8f0; }
+.mockup-header p { font-size: 13px; color: #8888aa; margin-top: 4px; }
+
+.variant-section {
+  margin: 32px;
+  border: 1px solid #2a2a4a;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #12122a;
+}
+.variant-label {
+  padding: 12px 20px;
+  background: #0d0d1a;
+  border-bottom: 1px solid #2a2a4a;
+  font-size: 14px; font-weight: 600; color: #aaaacc;
+  display: flex; align-items: center; gap: 10px;
+}
+.variant-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 6px;
+  background: #3a3a6a; color: #ccc; font-size: 12px; font-weight: 700;
+}
+.variant-name { font-size: 16px; color: #e0e0f0; }
+.variant-desc { font-size: 12px; color: #8888aa; font-weight: 400; margin-left: 8px; }
+
+.variant-row { display: flex; gap: 0; }
+.variant-col {
+  flex: 1;
+  padding: 32px 24px;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 360px;
+  position: relative;
+}
+.variant-col + .variant-col { border-left: 1px solid #2a2a4a; }
+.theme-badge {
+  position: absolute; top: 8px; left: 8px;
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 2px 8px; border-radius: 3px;
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   THEME HOSTS (colored backgrounds for glass to show)
+   ========================================================================== */
+.theme-light {
+  --glass-bg: rgba(255,255,255,0.55);
+  --glass-border: rgba(255,255,255,0.6);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  --glass-accent: rgba(255,255,255,0.35);
+  --glass-divider: rgba(0,0,0,0.08);
+  --text-1: #282623;
+  --text-2: #534f49;
+  --text-3: #8c877e;
+  --platform-bg: rgba(59,130,246,0.12);
+  --platform-text: #2563eb;
+  --year-bg: rgba(245,158,11,0.12);
+  --year-text: #d97706;
+  --genre-bg: rgba(0,0,0,0.06);
+  --genre-text: #534f49;
+  --tag-bg: rgba(59,130,246,0.08);
+  --tag-text: #2563eb;
+  --star: #f59e0b;
+  --star-empty: #d5d1cb;
+  --btn-ghost-bg: rgba(255,255,255,0.5);
+  --btn-ghost-border: rgba(0,0,0,0.1);
+  --btn-icon-bg: rgba(255,255,255,0.5);
+  --btn-icon-border: rgba(0,0,0,0.1);
+  --danger: #ef4444;
+  --primary: #10b981;
+  --sparkle: rgba(255,255,255,0.6);
+  --neon: rgba(16,185,129,0.5);
+  background:
+    linear-gradient(135deg, #edeae6 0%, #e3e0db 25%, #d5d1cb 50%, #edeae6 75%, #c4bfb8 100%);
+}
+
+.theme-dark {
+  --glass-bg: rgba(28,28,28,0.55);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --glass-accent: rgba(255,255,255,0.06);
+  --glass-divider: rgba(255,255,255,0.06);
+  --text-1: #f4f4f5;
+  --text-2: #d4d4d8;
+  --text-3: #71717a;
+  --platform-bg: rgba(59,130,246,0.15);
+  --platform-text: #60a5fa;
+  --year-bg: rgba(245,158,11,0.12);
+  --year-text: #fbbf24;
+  --genre-bg: rgba(255,255,255,0.06);
+  --genre-text: #d4d4d8;
+  --tag-bg: rgba(59,130,246,0.1);
+  --tag-text: #60a5fa;
+  --star: #f59e0b;
+  --star-empty: #52525b;
+  --btn-ghost-bg: rgba(255,255,255,0.06);
+  --btn-ghost-border: rgba(255,255,255,0.1);
+  --btn-icon-bg: rgba(255,255,255,0.06);
+  --btn-icon-border: rgba(255,255,255,0.1);
+  --danger: #ef4444;
+  --primary: #10b981;
+  --sparkle: rgba(255,255,255,0.15);
+  --neon: rgba(16,185,129,0.3);
+  background:
+    linear-gradient(135deg, #18181b 0%, #27272a 25%, #3f3f46 50%, #18181b 75%, #09090b 100%);
+}
+
+.theme-retro {
+  --glass-bg: rgba(0,13,6,0.55);
+  --glass-border: rgba(0,255,136,0.2);
+  --glass-shadow: 0 8px 32px rgba(0,255,136,0.08);
+  --glass-accent: rgba(0,255,136,0.06);
+  --glass-divider: rgba(0,255,136,0.12);
+  --text-1: #00ff88;
+  --text-2: #00cc6a;
+  --text-3: #008844;
+  --platform-bg: rgba(56,189,248,0.12);
+  --platform-text: #38bdf8;
+  --year-bg: rgba(245,158,11,0.1);
+  --year-text: #f59e0b;
+  --genre-bg: rgba(0,255,136,0.08);
+  --genre-text: #00cc6a;
+  --tag-bg: rgba(56,189,248,0.08);
+  --tag-text: #38bdf8;
+  --star: #00ff88;
+  --star-empty: #004d26;
+  --btn-ghost-bg: rgba(0,255,136,0.06);
+  --btn-ghost-border: rgba(0,255,136,0.2);
+  --btn-icon-bg: rgba(0,255,136,0.06);
+  --btn-icon-border: rgba(0,255,136,0.2);
+  --danger: #ff3344;
+  --primary: #00ff88;
+  --sparkle: rgba(0,255,136,0.15);
+  --neon: rgba(0,255,136,0.4);
+  font-family: 'Courier New', Courier, monospace;
+  background:
+    linear-gradient(135deg, #000502 0%, #000a05 25%, #001a0d 50%, #000502 75%, #001005 100%);
+  position: relative;
+}
+.theme-retro::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px);
+}
+.theme-retro .theme-badge { background: #000; border: 1px solid rgba(0,255,136,0.4); color: #00ff88; }
+
+/* ==========================================================================
+   SHARED TOKEN CLASSES
+   ========================================================================== */
+.tag-platform {
+  display: inline-flex; align-items: center;
+  background: var(--platform-bg); color: var(--platform-text);
+  font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+}
+.tag-year {
+  display: inline-flex; align-items: center;
+  background: var(--year-bg); color: var(--year-text);
+  font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+}
+.tag-genre {
+  display: inline-flex; align-items: center;
+  background: var(--genre-bg); color: var(--genre-text);
+  font-size: 11px; padding: 2px 8px; border-radius: 12px; font-weight: 500;
+}
+.tag-tag {
+  display: inline-flex; align-items: center;
+  background: var(--tag-bg); color: var(--tag-text);
+  font-size: 11px; padding: 2px 8px; border-radius: 12px;
+}
+
+.btn-ghost, .btn-primary, .btn-icon { cursor: pointer; font-family: inherit; }
+.btn-ghost {
+  background: var(--btn-ghost-bg); border: 1px solid var(--btn-ghost-border);
+  color: var(--text-2); padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;
+}
+.btn-icon {
+  width: 32px; height: 32px; border-radius: 6px;
+  background: var(--btn-icon-bg); border: 1px solid var(--btn-icon-border);
+  color: var(--text-2); display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.btn-primary {
+  background: var(--primary); color: #fff; border: none;
+  padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
+}
+.theme-retro .btn-primary { background: #00ff88; color: #000; text-transform: uppercase; }
+.theme-retro .btn-ghost   { text-transform: uppercase; }
+.theme-retro .btn-icon    { color: #00ff88; }
+
+.img-loader { width: 100%; height: 100%; object-fit: cover; }
+.img-fallback {
+  background: linear-gradient(135deg, rgba(0,0,0,0.1), rgba(0,0,0,0.15));
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-size: 36px; color: var(--text-3);
+}
+
+.stars { display: inline-flex; gap: 1px; }
+.stars .s-on  { color: var(--star); font-size: 12px; }
+.stars .s-off { color: var(--star-empty); font-size: 12px; }
+
+/* ==========================================================================
+   GLASS HELPERS
+   ========================================================================== */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ==========================================================================
+   VARIANT 1: Classic Glass — image top, glass panel below
+   ========================================================================== */
+.g1 { width: 220px; border-radius: 16px; overflow: hidden; }
+.g1 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g1 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g1 .glass-img::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(transparent, var(--glass-bg));
+}
+.g1 .glass-body {
+  padding: 0 14px 14px; margin-top: -28px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.g1 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); line-height: 1.3; }
+.g1 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.g1 .glass-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+.g1 .glass-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+
+/* ==========================================================================
+   VARIANT 2: Color-Tinted Glass — glass with hue from game art
+   ========================================================================== */
+.g2 { width: 220px; border-radius: 16px; overflow: hidden; position: relative; }
+.g2 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g2 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g2 .glass-body {
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 14px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.g2 .glass-title { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+.g2 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.g2 .glass-meta .tag-platform { background: rgba(255,255,255,0.2); color: #fff; }
+.g2 .glass-meta .tag-year { background: rgba(255,255,255,0.2); color: #fff; }
+.g2 .glass-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+.g2 .glass-genres .tag-genre { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* ==========================================================================
+   VARIANT 3: Gradient Glass — multi-tone gradient behind
+   ========================================================================== */
+.g3 { width: 240px; border-radius: 16px; overflow: hidden; }
+.g3 .glass-img { aspect-ratio: 16/10; position: relative; overflow: hidden; margin: 14px 14px 0; border-radius: 10px; }
+.g3 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g3 .glass-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; }
+.g3 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g3 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.g3 .glass-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* ==========================================================================
+   VARIANT 4: Frosted Glass with Neon Border
+   ========================================================================== */
+.g4 { width: 220px; border-radius: 16px; overflow: hidden; position: relative; }
+.g4 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g4 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g4 .glass-body {
+  position: absolute; bottom: 14px; left: 14px; right: 14px;
+  padding: 12px; border-radius: 12px;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.g4 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); line-height: 1.3; }
+.g4 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.g4 .glass-rating { display: flex; align-items: center; gap: 2px; }
+
+/* ==========================================================================
+   VARIANT 5: Angular Glass — geometric cut corners
+   ========================================================================== */
+.g5 { width: 230px; position: relative; }
+.g5 .glass-img {
+  aspect-ratio: 3/4; position: relative; overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 88% 100%, 0 100%);
+}
+.g5 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g5 .glass-body {
+  position: absolute; bottom: 12px; right: 12px;
+  padding: 10px 14px; border-radius: 10px;
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 90% 100%, 0 100%);
+  max-width: calc(100% - 40px);
+}
+.g5 .glass-title { font-size: 14px; font-weight: 700; color: var(--text-1); line-height: 1.3; }
+.g5 .glass-meta { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; margin-top: 2px; }
+
+/* ==========================================================================
+   VARIANT 6: Overlapping Glass Panels
+   ========================================================================== */
+.g6 { width: 240px; position: relative; }
+.g6 .glass-img { aspect-ratio: 3/4; border-radius: 16px; overflow: hidden; }
+.g6 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g6 .glass-panel-top {
+  position: absolute; top: 12px; right: 12px; padding: 4px 12px; border-radius: 20px; font-size: 11px;
+  font-weight: 700; color: var(--text-1);
+}
+.g6 .glass-panel-bottom {
+  position: absolute; bottom: 12px; left: 12px; right: 12px;
+  padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 4px;
+}
+.g6 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); line-height: 1.3; }
+.g6 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+/* ==========================================================================
+   VARIANT 7: Thick Glass — heavy blur, more opaque
+   ========================================================================== */
+.g7 { width: 220px; border-radius: 16px; overflow: hidden; }
+.g7 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g7 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g7 .glass-body {
+  padding: 0 16px 16px; margin-top: -32px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.g7 .glass-title { font-size: 16px; font-weight: 700; color: var(--text-1); line-height: 1.3; }
+.g7 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.g7 .glass-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* ==========================================================================
+   VARIANT 8: Glass with Blurred Image Background
+   ========================================================================== */
+.g8 { width: 260px; height: 180px; position: relative; border-radius: 16px; overflow: hidden; display: flex; align-items: center; }
+.g8 .glass-bg-blur { position: absolute; inset: -20px; }
+.g8 .glass-bg-blur img { width: 100%; height: 100%; object-fit: cover; filter: blur(20px) brightness(0.7); }
+.g8 .glass-content {
+  position: relative; z-index: 1; margin: 16px;
+  padding: 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 6px;
+  flex: 1;
+}
+.g8 .glass-kicker { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary); font-weight: 700; }
+.g8 .glass-title { font-size: 18px; font-weight: 800; color: var(--text-1); line-height: 1.2; }
+.g8 .glass-meta { display: flex; gap: 8px; align-items: center; margin-top: 2px; }
+.g8 .glass-actions { display: flex; gap: 6px; margin-top: 4px; }
+
+/* ==========================================================================
+   VARIANT 9: Glass with Gradient Border
+   ========================================================================== */
+.g9 { width: 220px; position: relative; border-radius: 16px; overflow: hidden; }
+.g9 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g9 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g9 .glass-img::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(transparent, var(--glass-bg));
+}
+.g9 .glass-body {
+  padding: 0 14px 14px; margin-top: -28px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.g9 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g9 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.g9 .glass-stats { display: flex; gap: 16px; margin-top: 2px; font-size: 11px; color: var(--text-3); }
+
+/* ==========================================================================
+   VARIANT 10: Glass with Inner Glow
+   ========================================================================== */
+.g10 { width: 220px; border-radius: 16px; overflow: hidden; }
+.g10 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g10 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g10 .glass-img::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(transparent, var(--glass-bg));
+}
+.g10 .glass-body {
+  padding: 0 15px 15px; margin-top: -28px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.g10 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g10 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.g10 .glass-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+
+/* ==========================================================================
+   VARIANT 11: Minimal Glass — barely there
+   ========================================================================== */
+.g11 { width: 260px; display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 12px; }
+.g11 .glass-icon { width: 48px; height: 48px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+.g11 .glass-icon img { width: 100%; height: 100%; object-fit: cover; }
+.g11 .glass-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.g11 .glass-title { font-size: 14px; font-weight: 700; color: var(--text-1); }
+.g11 .glass-meta { font-size: 11px; color: var(--text-3); }
+.g11 .glass-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+/* ==========================================================================
+   VARIANT 12: Glass with Floating Stats
+   ========================================================================== */
+.g12 { width: 240px; position: relative; }
+.g12 .glass-img {
+  aspect-ratio: 3/4; border-radius: 16px; overflow: hidden;
+}
+.g12 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g12 .glass-top-stat {
+  position: absolute; top: 14px; left: 14px; padding: 4px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 4px;
+}
+.g12 .glass-bottom-panel {
+  position: absolute; bottom: 14px; left: 14px; right: 14px;
+  padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 4px;
+}
+.g12 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g12 .glass-bar { height: 3px; border-radius: 2px; background: rgba(0,0,0,0.1); margin-top: 4px; overflow: hidden; }
+.g12 .glass-bar-fill { height: 100%; border-radius: 2px; background: var(--primary); }
+.theme-retro .g12 .glass-bar-fill { box-shadow: 0 0 6px #00ff88; }
+.theme-dark .g12 .glass-bar { background: rgba(255,255,255,0.08); }
+.theme-retro .g12 .glass-bar { background: rgba(0,255,136,0.1); }
+
+/* ==========================================================================
+   VARIANT 13: Glass with Floating Decor Elements
+   ========================================================================== */
+.g13 { width: 240px; position: relative; }
+.g13 .glass-card {
+  border-radius: 16px; overflow: hidden; padding: 14px;
+  position: relative; z-index: 1;
+}
+.g13 .glass-img { aspect-ratio: 3/4; border-radius: 10px; overflow: hidden; }
+.g13 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g13 .glass-body { padding: 10px 2px 0; display: flex; flex-direction: column; gap: 4px; }
+.g13 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g13 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.g13 .glass-orb {
+  position: absolute; border-radius: 50%; z-index: 0;
+  filter: blur(30px); opacity: 0.3;
+}
+.g13 .glass-orb-1 { width: 60px; height: 60px; top: -10px; right: -10px; background: var(--primary); }
+.g13 .glass-orb-2 { width: 40px; height: 40px; bottom: 20px; left: -8px; background: #3b82f6; }
+
+/* ==========================================================================
+   VARIANT 14: Stained Glass — color-blocked glass layers
+   ========================================================================== */
+.g14 { width: 240px; position: relative; border-radius: 16px; overflow: hidden; }
+.g14 .glass-stripes {
+  position: absolute; inset: 0; display: flex;
+}
+.g14 .glass-stripes span { flex: 1; opacity: 0.15; }
+.g14 .glass-stripes span:nth-child(1) { background: #ef4444; }
+.g14 .glass-stripes span:nth-child(2) { background: #f59e0b; }
+.g14 .glass-stripes span:nth-child(3) { background: #10b981; }
+.g14 .glass-stripes span:nth-child(4) { background: #3b82f6; }
+.g14 .glass-stripes span:nth-child(5) { background: #8b5cf6; }
+.g14 .glass-content {
+  position: relative; z-index: 1; margin: 12px; padding: 14px; border-radius: 12px;
+}
+.g14 .glass-img { width: 56px; height: 56px; border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
+.g14 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g14 .glass-title { font-size: 16px; font-weight: 700; color: var(--text-1); }
+.g14 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+
+/* ==========================================================================
+   VARIANT 15: Glass with Layered Shadows
+   ========================================================================== */
+.g15 { width: 220px; border-radius: 16px; overflow: hidden; }
+.g15 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g15 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g15 .glass-img::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60%;
+  background: linear-gradient(transparent, var(--glass-bg));
+}
+.g15 .glass-body {
+  padding: 0 16px 16px; margin-top: -40px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.g15 .glass-title { font-size: 16px; font-weight: 700; color: var(--text-1); }
+.g15 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.g15 .glass-excerpt {
+  font-size: 11px; color: var(--text-3); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   VARIANT 16: Layered Glass Stack
+   ========================================================================== */
+.g16 { width: 220px; position: relative; padding: 8px 0 0 8px; }
+.g16 .glass-stack-2 {
+  position: absolute; inset: 0 12px 12px 0; border-radius: 16px;
+  opacity: 0.4; transform: scale(0.95);
+}
+.g16 .glass-stack-1 {
+  position: absolute; inset: -4px 6px 6px -4px; border-radius: 16px;
+  opacity: 0.6; transform: scale(0.97);
+}
+.g16 .glass-card {
+  position: relative; z-index: 2; border-radius: 16px; overflow: hidden;
+}
+.g16 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g16 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g16 .glass-body {
+  padding: 0 14px 14px; margin-top: -28px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.g16 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g16 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+/* ==========================================================================
+   VARIANT 17: Glass with Accent Colored Bar
+   ========================================================================== */
+.g17 { width: 240px; border-radius: 16px; overflow: hidden; position: relative; }
+.g17 .glass-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; z-index: 3; }
+.g17 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g17 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g17 .glass-img::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(transparent, var(--glass-bg));
+}
+.g17 .glass-body {
+  padding: 0 15px 15px; margin-top: -28px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.g17 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g17 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.g17 .glass-genres { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* ==========================================================================
+   VARIANT 18: Glass with Reflection
+   ========================================================================== */
+.g18 { width: 220px; position: relative; }
+.g18 .glass-card { border-radius: 16px; overflow: hidden; }
+.g18 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g18 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g18 .glass-img::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(transparent, var(--glass-bg));
+}
+.g18 .glass-body {
+  padding: 0 14px 14px; margin-top: -28px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.g18 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g18 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.g18 .glass-reflection {
+  position: absolute; bottom: -30px; left: 10px; right: 10px; height: 40px;
+  border-radius: 0 0 16px 16px;
+  opacity: 0.3; filter: blur(8px); transform: scaleY(-0.5);
+}
+
+/* ==========================================================================
+   VARIANT 19: Glass with Radial Glow Spot
+   ========================================================================== */
+.g19 { width: 240px; border-radius: 16px; overflow: hidden; position: relative; }
+.g19 .glow-spot {
+  position: absolute; width: 120px; height: 120px; border-radius: 50%;
+  filter: blur(40px); opacity: 0.25; z-index: 0; pointer-events: none;
+}
+.g19 .glow-spot-1 { top: -20px; left: -20px; background: var(--primary); }
+.g19 .glow-spot-2 { bottom: -20px; right: -20px; background: #8b5cf6; }
+.g19 .glass-card {
+  position: relative; z-index: 1; margin: 14px; padding: 14px; border-radius: 12px;
+}
+.g19 .glass-img { aspect-ratio: 16/10; border-radius: 8px; overflow: hidden; }
+.g19 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g19 .glass-body { padding: 10px 0 0; display: flex; flex-direction: column; gap: 4px; }
+.g19 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g19 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+/* ==========================================================================
+   VARIANT 20: Animated Glass — color-hint badges, vibrant
+   ========================================================================== */
+.g20 { width: 240px; border-radius: 16px; overflow: hidden; position: relative; }
+.g20 .glass-img { aspect-ratio: 3/4; position: relative; overflow: hidden; }
+.g20 .glass-img img { width: 100%; height: 100%; object-fit: cover; }
+.g20 .glass-img::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(transparent, var(--glass-bg));
+}
+.g20 .glass-body {
+  padding: 0 14px 14px; margin-top: -28px; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.g20 .glass-title { font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g20 .glass-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.g20 .glass-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+.g20 .glass-badge { font-size: 10px; padding: 2px 10px; border-radius: 12px; font-weight: 700; }
+
+/* ==========================================================================
+   RETRO-TERMINAL OVERRIDES
+   ========================================================================== */
+.theme-retro .g2 .glass-body .glass-title { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }
+.theme-retro .g2 .glass-meta .tag-platform { background: rgba(56,189,248,0.2); color: #38bdf8; }
+.theme-retro .g2 .glass-meta .tag-year { background: rgba(245,158,11,0.2); color: #f59e0b; }
+.theme-retro .g2 .glass-genres .tag-genre { background: rgba(0,255,136,0.15); color: #00ff88; }
+.theme-retro .g4 .glass-body { box-shadow: 0 0 15px rgba(0,255,136,0.15); }
+.theme-retro .g8 .glass-kicker { color: #00ff88; }
+.theme-retro .g10 .glass-body { box-shadow: inset 0 0 12px rgba(0,255,136,0.06); }
+.theme-retro .g13 .glass-orb-1 { background: #00ff88; }
+.theme-retro .g17 .glass-accent { background: #00ff88; box-shadow: 0 0 8px rgba(0,255,136,0.4); }
+.theme-retro .g19 .glow-spot-1 { background: #00ff88; }
+.theme-retro .g20 .glass-badge { border: 1px solid var(--glass-border); }
+.theme-retro .glass-badge:nth-child(1) { background: rgba(0,255,136,0.15); color: #00ff88; }
+.theme-retro .glass-badge:nth-child(2) { background: rgba(56,189,248,0.15); color: #38bdf8; }
+.theme-retro .glass-badge:nth-child(3) { background: rgba(245,158,11,0.15); color: #f59e0b; }
+
+/* accent bar for g17 */
+.g17-glass-accent { background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981); }
+.theme-retro .g17-glass-accent { background: #00ff88; box-shadow: 0 0 8px rgba(0,255,136,0.4); }
+
+/* gradient border for g9 */
+.g9-border { background: linear-gradient(135deg, rgba(16,185,129,0.3), rgba(59,130,246,0.3), rgba(139,92,246,0.3)); padding: 1px; border-radius: 16px; }
+.theme-retro .g9-border { background: linear-gradient(135deg, rgba(0,255,136,0.3), rgba(0,255,136,0.05), rgba(0,255,136,0.3)); padding: 1px; border-radius: 16px; }
+
+/* g20 badges */
+.g20-badge-green  { background: rgba(16,185,129,0.15); color: #10b981; }
+.g20-badge-blue   { background: rgba(59,130,246,0.15); color: #3b82f6; }
+.g20-badge-purple { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+.theme-dark .g20-badge-green  { background: rgba(16,185,129,0.2); color: #34d399; }
+.theme-dark .g20-badge-blue   { background: rgba(59,130,246,0.2); color: #60a5fa; }
+.theme-dark .g20-badge-purple { background: rgba(139,92,246,0.2); color: #a78bfa; }
+</style>
+</head>
+<body>
+
+<div class="mockup-header">
+  <h1>Glassmorphism Card Variations — 20 Mockups × 3 Themes</h1>
+  <p>Light (left) &nbsp;|&nbsp; Dark (center) &nbsp;|&nbsp; Retro Terminal (right)</p>
+</div>
+
+<!-- ========================================================================= -->
+<!-- 1. CLASSIC GLASS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">1</span><span class="variant-name">Classic Glass</span><span class="variant-desc">— Image top, frosted glass info panel below with gradient fade</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g1 glass">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Ведьмак 3: Дикая Охота</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2015</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="glass-genres"><span class="tag-genre">RPG</span><span class="tag-genre">Action</span><span class="tag-genre">Open World</span></div>
+    <div class="glass-footer"><button class="btn-ghost">Details</button><button class="btn-icon">&#x2665;</button></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g1 glass">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Ведьмак 3: Дикая Охота</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2015</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="glass-genres"><span class="tag-genre">RPG</span><span class="tag-genre">Action</span><span class="tag-genre">Open World</span></div>
+    <div class="glass-footer"><button class="btn-ghost">Details</button><button class="btn-icon">&#x2665;</button></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g1 glass">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Ведьмак 3: Дикая Охота</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2015</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="glass-genres"><span class="tag-genre">RPG</span><span class="tag-genre">Action</span><span class="tag-genre">Open World</span></div>
+    <div class="glass-footer"><button class="btn-ghost">Details</button><button class="btn-icon">&#x2665;</button></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 2. COLOR-TINTED GLASS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">2</span><span class="variant-name">Color-Tinted Glass</span><span class="variant-desc">— Glass tinted with dominant color from game artwork, title on image</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g2 glass" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.25)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body" style="background:linear-gradient(transparent,rgba(16,185,129,0.4));border-radius:0 0 16px 16px">
+    <div class="glass-title">Elden Ring</div>
+    <div class="glass-meta"><span class="tag-platform">PlayStation 5</span><span class="tag-year">2022</span></div>
+    <div class="glass-genres"><span class="tag-genre">Souls-like</span><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g2 glass" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body" style="background:linear-gradient(transparent,rgba(16,185,129,0.35));border-radius:0 0 16px 16px">
+    <div class="glass-title">Elden Ring</div>
+    <div class="glass-meta"><span class="tag-platform">PlayStation 5</span><span class="tag-year">2022</span></div>
+    <div class="glass-genres"><span class="tag-genre">Souls-like</span><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g2 glass" style="background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.25)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body" style="background:linear-gradient(transparent,rgba(0,255,136,0.35));border-radius:0 0 16px 16px">
+    <div class="glass-title">Elden Ring</div>
+    <div class="glass-meta"><span class="tag-platform">PlayStation 5</span><span class="tag-year">2022</span></div>
+    <div class="glass-genres"><span class="tag-genre">Souls-like</span><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 3. GRADIENT GLASS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">3</span><span class="variant-name">Gradient Glass</span><span class="variant-desc">— Multi-tone gradient background with rounded inner image</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g3 glass" style="background:linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.3), rgba(16,185,129,0.1));">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Cyberpunk 2077</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="glass-genres"><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span><span class="tag-genre">Open World</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g3 glass" style="background:linear-gradient(135deg, rgba(28,28,28,0.7), rgba(28,28,28,0.3), rgba(16,185,129,0.08));">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Cyberpunk 2077</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="glass-genres"><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span><span class="tag-genre">Open World</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g3 glass" style="background:linear-gradient(135deg, rgba(0,13,6,0.7), rgba(0,13,6,0.3), rgba(0,255,136,0.05));">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Cyberpunk 2077</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="glass-genres"><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span><span class="tag-genre">Open World</span></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 4. FROSTED GLASS WITH NEON BORDER -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">4</span><span class="variant-name">Frosted Glass + Neon Border</span><span class="variant-desc">— Floating glass panel on image with glowing neon border</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g4 glass" style="border:1px solid rgba(16,185,129,0.3);box-shadow:0 0 15px rgba(16,185,129,0.1), 0 8px 32px rgba(0,0,0,0.1)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body glass" style="border:1px solid rgba(16,185,129,0.35);box-shadow:0 0 12px rgba(16,185,129,0.08);">
+    <div class="glass-title">Deus Ex: Mankind Divided</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2016</span></div>
+    <div class="glass-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g4 glass" style="border:1px solid rgba(16,185,129,0.25);box-shadow:0 0 15px rgba(16,185,129,0.08), 0 8px 32px rgba(0,0,0,0.3)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body glass" style="border:1px solid rgba(16,185,129,0.3);box-shadow:0 0 12px rgba(16,185,129,0.06);">
+    <div class="glass-title">Deus Ex: Mankind Divided</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2016</span></div>
+    <div class="glass-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g4 glass" style="border:1px solid rgba(0,255,136,0.3);box-shadow:0 0 15px rgba(0,255,136,0.1), 0 8px 32px rgba(0,0,0,0.3)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body glass" style="border:1px solid rgba(0,255,136,0.35);box-shadow:0 0 15px rgba(0,255,136,0.1);">
+    <div class="glass-title">Deus Ex: Mankind Divided</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2016</span></div>
+    <div class="glass-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 5. ANGULAR GLASS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">5</span><span class="variant-name">Angular Glass</span><span class="variant-desc">— Geometric clip-path cut corners, asymmetric glass panel</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g5">
+  <div class="glass-img" style="border-radius:12px"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body glass">
+    <div class="glass-title">Hollow Knight</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2017</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g5">
+  <div class="glass-img" style="border-radius:12px"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body glass">
+    <div class="glass-title">Hollow Knight</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2017</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g5">
+  <div class="glass-img" style="border-radius:12px"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body glass">
+    <div class="glass-title">Hollow Knight</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2017</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 6. OVERLAPPING GLASS PANELS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">6</span><span class="variant-name">Overlapping Glass Panels</span><span class="variant-desc">— Multiple glass panels: top rating badge + bottom info card</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g6">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-panel-top glass"><span style="color:var(--star);font-size:14px">&#9733; 9.4</span></div>
+  <div class="glass-panel-bottom glass">
+    <div class="glass-title">Red Dead Redemption 2</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2018</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g6">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-panel-top glass"><span style="color:var(--star);font-size:14px">&#9733; 9.4</span></div>
+  <div class="glass-panel-bottom glass">
+    <div class="glass-title">Red Dead Redemption 2</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2018</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g6">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-panel-top glass"><span style="color:var(--star);font-size:14px">&#9733; 9.4</span></div>
+  <div class="glass-panel-bottom glass">
+    <div class="glass-title">Red Dead Redemption 2</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2018</span></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 7. THICK FROST GLASS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">7</span><span class="variant-name">Thick Frost Glass</span><span class="variant-desc">— Heavy blur (24px), more opaque, prominent borders, pronounced depth</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g7" style="background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.7);box-shadow:0 12px 40px rgba(0,0,0,0.12);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Baldur's Gate 3</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2023</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="glass-genres"><span class="tag-genre">RPG</span><span class="tag-genre">Turn-Based</span><span class="tag-genre">D&D</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g7" style="background:rgba(28,28,28,0.7);border:1px solid rgba(255,255,255,0.12);box-shadow:0 12px 40px rgba(0,0,0,0.4);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Baldur's Gate 3</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2023</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="glass-genres"><span class="tag-genre">RPG</span><span class="tag-genre">Turn-Based</span><span class="tag-genre">D&D</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g7" style="background:rgba(0,13,6,0.7);border:1px solid rgba(0,255,136,0.25);box-shadow:0 12px 40px rgba(0,255,136,0.08);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Baldur's Gate 3</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2023</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="glass-genres"><span class="tag-genre">RPG</span><span class="tag-genre">Turn-Based</span><span class="tag-genre">D&D</span></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 8. GLASS WITH BLURRED IMAGE BACKGROUND -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">8</span><span class="variant-name">Blurred Image Background</span><span class="variant-desc">— The card background is a heavily blurred version of the game cover</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g8">
+  <div class="glass-bg-blur"><img src="../src/main/resources/static/img/default.jpg" alt=""></div>
+  <div class="glass-content glass" style="background:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.5)">
+    <div class="glass-kicker">Action RPG</div>
+    <div class="glass-title">Horizon Zero Dawn</div>
+    <div class="glass-meta"><span class="tag-platform">PS4</span><span class="tag-year">2017</span></div>
+    <div class="glass-actions"><button class="btn-primary">Play</button><button class="btn-icon">&#x2665;</button></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g8">
+  <div class="glass-bg-blur"><img src="../src/main/resources/static/img/default.jpg" alt=""></div>
+  <div class="glass-content glass" style="background:rgba(28,28,28,0.65);border:1px solid rgba(255,255,255,0.1)">
+    <div class="glass-kicker">Action RPG</div>
+    <div class="glass-title">Horizon Zero Dawn</div>
+    <div class="glass-meta"><span class="tag-platform">PS4</span><span class="tag-year">2017</span></div>
+    <div class="glass-actions"><button class="btn-primary">Play</button><button class="btn-icon">&#x2665;</button></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g8">
+  <div class="glass-bg-blur"><img src="../src/main/resources/static/img/default.jpg" alt=""></div>
+  <div class="glass-content glass" style="background:rgba(0,13,6,0.65);border:1px solid rgba(0,255,136,0.2)">
+    <div class="glass-kicker">Action RPG</div>
+    <div class="glass-title">Horizon Zero Dawn</div>
+    <div class="glass-meta"><span class="tag-platform">PS4</span><span class="tag-year">2017</span></div>
+    <div class="glass-actions"><button class="btn-primary">Play</button><button class="btn-icon">&#x2665;</button></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 9. GRADIENT BORDER GLASS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">9</span><span class="variant-name">Gradient Border Glass</span><span class="variant-desc">— Glass card wrapped in a gradient border (green→blue→purple)</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g9-border"><div class="g1 glass" style="border:none;box-shadow:none">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">DOOM Eternal</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+    <div class="glass-genres"><span class="tag-genre">FPS</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g9-border"><div class="g1 glass" style="border:none;box-shadow:none">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">DOOM Eternal</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+    <div class="glass-genres"><span class="tag-genre">FPS</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g9-border"><div class="g1 glass" style="border:none;box-shadow:none">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">DOOM Eternal</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+    <div class="glass-genres"><span class="tag-genre">FPS</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 10. GLASS WITH INNER GLOW -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">10</span><span class="variant-name">Glass with Inner Glow</span><span class="variant-desc">— Subtle inner glow/shine at the edges of the glass panel</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g10 glass" style="box-shadow:inset 0 0 12px rgba(16,185,129,0.06), 0 8px 32px rgba(0,0,0,0.08)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Portal 2</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="glass-badges"><span class="tag-genre">Puzzle</span><span class="tag-genre">FPS</span><span class="tag-tag">Co-op</span><span class="tag-tag">Physics</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g10 glass" style="box-shadow:inset 0 0 12px rgba(16,185,129,0.05), 0 8px 32px rgba(0,0,0,0.3)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Portal 2</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="glass-badges"><span class="tag-genre">Puzzle</span><span class="tag-genre">FPS</span><span class="tag-tag">Co-op</span><span class="tag-tag">Physics</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g10 glass" style="box-shadow:inset 0 0 12px rgba(0,255,136,0.06), 0 8px 32px rgba(0,255,136,0.06)">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Portal 2</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="glass-badges"><span class="tag-genre">Puzzle</span><span class="tag-genre">FPS</span><span class="tag-tag">Co-op</span><span class="tag-tag">Physics</span></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 11. MINIMAL GLASS CARD -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">11</span><span class="variant-name">Minimal Glass</span><span class="variant-desc">— Subtle glass, almost invisible, ultra-light blur, compact row</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g11 glass" style="backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.4)">
+  <div class="glass-icon"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">FTL: Faster Than Light</div>
+    <div class="glass-meta">Windows &middot; 2012 &middot; &#9733; 8/10 &middot; Strategy, Roguelike</div>
+  </div>
+  <div class="glass-actions"><button class="btn-icon" style="width:28px;height:28px;font-size:14px">&#x2665;</button></div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g11 glass" style="backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(28,28,28,0.3);border:1px solid rgba(255,255,255,0.06)">
+  <div class="glass-icon"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">FTL: Faster Than Light</div>
+    <div class="glass-meta">Windows &middot; 2012 &middot; &#9733; 8/10 &middot; Strategy, Roguelike</div>
+  </div>
+  <div class="glass-actions"><button class="btn-icon" style="width:28px;height:28px;font-size:14px">&#x2665;</button></div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g11 glass" style="backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(0,13,6,0.3);border:1px solid rgba(0,255,136,0.12)">
+  <div class="glass-icon"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">FTL: Faster Than Light</div>
+    <div class="glass-meta">Windows &middot; 2012 &middot; &#9733; 8/10 &middot; Strategy, Roguelike</div>
+  </div>
+  <div class="glass-actions"><button class="btn-icon" style="width:28px;height:28px;font-size:14px">&#x2665;</button></div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 12. GLASS WITH FLOATING STATS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">12</span><span class="variant-name">Glass + Floating Stats</span><span class="variant-desc">— Glass panel with top stat badge and bottom info + progress bar</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g12">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-top-stat glass"><span class="s-on" style="font-size:14px">&#9733;</span> 9.2</div>
+  <div class="glass-bottom-panel glass">
+    <div class="glass-title">The Last of Us Part II</div>
+    <span style="font-size:11px;color:var(--text-3)">PS4 &middot; 2020 &middot; Action, Survival</span>
+    <div class="glass-bar"><div class="glass-bar-fill" style="width:92%"></div></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g12">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-top-stat glass"><span class="s-on" style="font-size:14px">&#9733;</span> 9.2</div>
+  <div class="glass-bottom-panel glass">
+    <div class="glass-title">The Last of Us Part II</div>
+    <span style="font-size:11px;color:var(--text-3)">PS4 &middot; 2020 &middot; Action, Survival</span>
+    <div class="glass-bar"><div class="glass-bar-fill" style="width:92%"></div></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g12">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-top-stat glass"><span class="s-on" style="font-size:14px">&#9733;</span> 9.2</div>
+  <div class="glass-bottom-panel glass">
+    <div class="glass-title">The Last of Us Part II</div>
+    <span style="font-size:11px;color:var(--text-3)">PS4 &middot; 2020 &middot; Action, Survival</span>
+    <div class="glass-bar"><div class="glass-bar-fill" style="width:92%"></div></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 13. GLASS WITH FLOATING ORBS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">13</span><span class="variant-name">Glass + Floating Decor Orbs</span><span class="variant-desc">— Blurred colored orbs behind the glass card for depth</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g13">
+  <div class="glass-orb glass-orb-1"></div>
+  <div class="glass-orb glass-orb-2"></div>
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Stardew Valley</div>
+      <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2016</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g13">
+  <div class="glass-orb glass-orb-1"></div>
+  <div class="glass-orb glass-orb-2"></div>
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Stardew Valley</div>
+      <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2016</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g13">
+  <div class="glass-orb glass-orb-1"></div>
+  <div class="glass-orb glass-orb-2"></div>
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Stardew Valley</div>
+      <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2016</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 14. STAINED GLASS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">14</span><span class="variant-name">Stained Glass</span><span class="variant-desc">— Color stripes behind glass, stained-glass window aesthetic</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g14">
+  <div class="glass-stripes"><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="glass-content glass" style="background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.5)">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-title">Heroes of Might & Magic III</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">1999</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g14">
+  <div class="glass-stripes"><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="glass-content glass" style="background:rgba(28,28,28,0.7);border:1px solid rgba(255,255,255,0.1)">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-title">Heroes of Might & Magic III</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">1999</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g14">
+  <div class="glass-stripes" style="opacity:0.08"><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="glass-content glass" style="background:rgba(0,13,6,0.7);border:1px solid rgba(0,255,136,0.2)">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-title">Heroes of Might & Magic III</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">1999</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 15. GLASS WITH LAYERED SHADOW + EXCERPT -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">15</span><span class="variant-name">Glass + Layered Shadow + Excerpt</span><span class="variant-desc">— Deep gradient fade, text excerpt visible through glass</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g15 glass">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Disco Elysium</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2019</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="glass-excerpt">Детективная RPG без боёвки — диалоги, проверки навыков и внутренние голоса в голове...</div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g15 glass">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Disco Elysium</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2019</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="glass-excerpt">Детективная RPG без боёвки — диалоги, проверки навыков и внутренние голоса в голове...</div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g15 glass">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Disco Elysium</div>
+    <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2019</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="glass-excerpt">Детективная RPG без боёвки — диалоги, проверки навыков и внутренние голоса в голове...</div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 16. LAYERED GLASS STACK -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">16</span><span class="variant-name">Layered Glass Stack</span><span class="variant-desc">— Cards stacked behind the main one, depth through repetition</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g16">
+  <div class="glass-stack-2 glass" style="background:rgba(255,255,255,0.35)"></div>
+  <div class="glass-stack-1 glass" style="background:rgba(255,255,255,0.5)"></div>
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Factorio</div>
+      <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g16">
+  <div class="glass-stack-2 glass" style="background:rgba(28,28,28,0.35)"></div>
+  <div class="glass-stack-1 glass" style="background:rgba(28,28,28,0.5)"></div>
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Factorio</div>
+      <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g16">
+  <div class="glass-stack-2 glass" style="background:rgba(0,13,6,0.35)"></div>
+  <div class="glass-stack-1 glass" style="background:rgba(0,13,6,0.5)"></div>
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Factorio</div>
+      <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 17. GLASS WITH ACCENT COLOR BAR -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">17</span><span class="variant-name">Glass + Accent Color Bar</span><span class="variant-desc">— Bold colored accent stripe at top of glass card</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g17 glass">
+  <div class="glass-accent g17-glass-accent"></div>
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">God of War</div>
+    <div class="glass-meta"><span class="tag-platform">PlayStation 4</span><span class="tag-year">2018</span></div>
+    <div class="glass-genres"><span class="tag-genre">Action</span><span class="tag-genre">Adventure</span><span class="tag-genre">Hack and Slash</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g17 glass">
+  <div class="glass-accent g17-glass-accent"></div>
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">God of War</div>
+    <div class="glass-meta"><span class="tag-platform">PlayStation 4</span><span class="tag-year">2018</span></div>
+    <div class="glass-genres"><span class="tag-genre">Action</span><span class="tag-genre">Adventure</span><span class="tag-genre">Hack and Slash</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g17 glass">
+  <div class="glass-accent g17-glass-accent"></div>
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">God of War</div>
+    <div class="glass-meta"><span class="tag-platform">PlayStation 4</span><span class="tag-year">2018</span></div>
+    <div class="glass-genres"><span class="tag-genre">Action</span><span class="tag-genre">Adventure</span><span class="tag-genre">Hack and Slash</span></div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 18. GLASS WITH BOTTOM REFLECTION -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">18</span><span class="variant-name">Glass + Reflection</span><span class="variant-desc">— Ground reflection beneath the card, like a polished surface</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g18" style="padding-bottom:20px">
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Half-Life: Alyx</div>
+      <div class="glass-meta"><span class="tag-platform">VR</span><span class="tag-year">2020</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+  <div class="glass-reflection glass"></div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g18" style="padding-bottom:20px">
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Half-Life: Alyx</div>
+      <div class="glass-meta"><span class="tag-platform">VR</span><span class="tag-year">2020</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+  <div class="glass-reflection glass"></div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g18" style="padding-bottom:20px">
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Half-Life: Alyx</div>
+      <div class="glass-meta"><span class="tag-platform">VR</span><span class="tag-year">2020</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+  <div class="glass-reflection glass"></div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 19. GLASS WITH RADIAL GLOW SPOTS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">19</span><span class="variant-name">Glass + Radial Glow Spots</span><span class="variant-desc">— Two colored glow spots behind glass — top-left green, bottom-right purple</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g19">
+  <div class="glow-spot glow-spot-1"></div>
+  <div class="glow-spot glow-spot-2"></div>
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Minecraft</div>
+      <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g19">
+  <div class="glow-spot glow-spot-1"></div>
+  <div class="glow-spot glow-spot-2"></div>
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Minecraft</div>
+      <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g19">
+  <div class="glow-spot glow-spot-1"></div>
+  <div class="glow-spot glow-spot-2"></div>
+  <div class="glass-card glass">
+    <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+    <div class="glass-body">
+      <div class="glass-title">Minecraft</div>
+      <div class="glass-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- ========================================================================= -->
+<!-- 20. COLOR-HINT ANIMATED GLASS -->
+<!-- ========================================================================= -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">20</span><span class="variant-name">Color-Hint Animated Glass</span><span class="variant-desc">— Vibrant colored badges on glass, suggests interactivity/animation</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="g20 glass">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Super Mario World</div>
+    <div class="glass-meta"><span class="tag-platform">SNES</span><span class="tag-year">1990</span></div>
+    <div class="glass-badges">
+      <span class="glass-badge g20-badge-green">Platformer</span>
+      <span class="glass-badge g20-badge-blue">Retro</span>
+      <span class="glass-badge g20-badge-purple">Nintendo</span>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="g20 glass">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Super Mario World</div>
+    <div class="glass-meta"><span class="tag-platform">SNES</span><span class="tag-year">1990</span></div>
+    <div class="glass-badges">
+      <span class="glass-badge g20-badge-green">Platformer</span>
+      <span class="glass-badge g20-badge-blue">Retro</span>
+      <span class="glass-badge g20-badge-purple">Nintendo</span>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="g20 glass">
+  <div class="glass-img"><img class="img-loader" src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fallback>&#x1F3AE;</div>'"></div>
+  <div class="glass-body">
+    <div class="glass-title">Super Mario World</div>
+    <div class="glass-meta"><span class="tag-platform">SNES</span><span class="tag-year">1990</span></div>
+    <div class="glass-badges">
+      <span class="glass-badge g20-badge-green">Platformer</span>
+      <span class="glass-badge g20-badge-blue">Retro</span>
+      <span class="glass-badge g20-badge-purple">Nintendo</span>
+    </div>
+  </div>
+</div></div>
+
+</div></section>
+
+<!-- Footer -->
+<div style="text-align:center;padding:32px;color:#666;font-size:12px">
+  GameLibrary — Glassmorphism Card Variations &middot; 20 variants × 3 themes &middot; Image: default.jpg
+</div>
+
+</body>
+</html>

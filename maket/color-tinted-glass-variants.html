@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color-Tinted Glass Variations — 20 Mockups × 3 Themes</title>
+<style>
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+.mockup-header {
+  background: #0d0d1a;
+  padding: 24px 32px;
+  border-bottom: 1px solid #2a2a4a;
+  position: sticky; top: 0; z-index: 100;
+}
+.mockup-header h1 { font-size: 22px; font-weight: 700; color: #e8e8f0; }
+.mockup-header p { font-size: 13px; color: #8888aa; margin-top: 4px; }
+
+.variant-section {
+  margin: 32px;
+  border: 1px solid #2a2a4a;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #12122a;
+}
+.variant-label {
+  padding: 12px 20px;
+  background: #0d0d1a;
+  border-bottom: 1px solid #2a2a4a;
+  font-size: 14px; font-weight: 600; color: #aaaacc;
+  display: flex; align-items: center; gap: 10px;
+}
+.variant-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 6px;
+  background: #3a3a6a; color: #ccc; font-size: 12px; font-weight: 700;
+}
+.variant-name { font-size: 16px; color: #e0e0f0; }
+.variant-desc { font-size: 12px; color: #8888aa; font-weight: 400; margin-left: 8px; }
+
+.variant-row { display: flex; gap: 0; }
+.variant-col {
+  flex: 1;
+  padding: 28px 20px;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 460px;
+  position: relative;
+}
+.variant-col + .variant-col { border-left: 1px solid #2a2a4a; }
+.theme-badge {
+  position: absolute; top: 8px; left: 8px;
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 2px 8px; border-radius: 3px;
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   THEME BACKGROUNDS
+   ========================================================================== */
+.theme-light {
+  background: linear-gradient(135deg, #edeae6 0%, #e3e0db 30%, #d5d1cb 60%, #edeae6 100%);
+}
+.theme-dark {
+  background: linear-gradient(135deg, #18181b 0%, #27272a 30%, #3f3f46 60%, #18181b 100%);
+}
+.theme-retro {
+  background: linear-gradient(135deg, #000502 0%, #000a05 30%, #001a0d 60%, #000502 100%);
+  font-family: 'Courier New', Courier, monospace;
+  position: relative;
+}
+.theme-retro::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px);
+}
+.theme-retro .theme-badge { background: #000; border: 1px solid rgba(0,255,136,0.4); color: #00ff88; }
+
+/* ==========================================================================
+   BASE CARD STRUCTURE — shared by all variants
+   ========================================================================== */
+.card {
+  width: 220px;
+  aspect-ratio: 2 / 3;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+.card-img {
+  position: absolute; inset: 0;
+}
+.card-img img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+}
+.card-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 16px;
+}
+
+/* ==========================================================================
+   TEXT ELEMENTS
+   ========================================================================== */
+.card-title {
+  font-size: 17px; font-weight: 800; color: #fff;
+  line-height: 1.2;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  margin-bottom: 2px;
+}
+.card-kicker {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+  font-weight: 700; margin-bottom: 2px;
+}
+.card-meta {
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  margin-top: 4px;
+}
+.card-rating {
+  display: flex; align-items: center; gap: 2px;
+  font-size: 12px; color: #fcd34d; margin-top: 2px;
+}
+.card-tags {
+  display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px;
+}
+.card-excerpt {
+  font-size: 11px; line-height: 1.4;
+  color: rgba(255,255,255,0.8);
+  margin-top: 4px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-bar {
+  height: 3px; border-radius: 2px; background: rgba(255,255,255,0.2);
+  margin-top: 6px; overflow: hidden;
+}
+.card-bar-fill { height: 100%; border-radius: 2px; background: #fff; }
+
+.tag-platform {
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,0.2); color: #fff;
+  font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+}
+.tag-year {
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,0.18); color: #fff;
+  font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+}
+.tag-genre {
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,0.15); color: #fff;
+  font-size: 10px; padding: 2px 10px; border-radius: 10px; font-weight: 500;
+}
+.stars { display: inline-flex; gap: 1px; }
+.stars .s-on  { color: #fcd34d; font-size: 13px; }
+.stars .s-off { color: rgba(255,255,255,0.3); font-size: 13px; }
+
+.badge-status {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 12px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+  color: #fff;
+}
+
+/* ==========================================================================
+   IMG FALLBACK
+   ========================================================================== */
+.img-fb {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-size: 48px; background: #2a2a3a; color: #555;
+}
+
+/* ==========================================================================
+   RETRO-TERMINAL OVERRIDES
+   ========================================================================== */
+.theme-retro .card-title { text-shadow: 0 1px 6px rgba(0,0,0,0.8); color: #00ff88; }
+.theme-retro .card-rating { color: #00ff88; }
+.theme-retro .stars .s-on { color: #00ff88; }
+.theme-retro .stars .s-off { color: #004d26; }
+.theme-retro .card-bar { background: rgba(0,255,136,0.15); }
+.theme-retro .card-bar-fill { background: #00ff88; box-shadow: 0 0 6px #00ff88; }
+
+/* ==========================================================================
+   NON-OVERLAY THEME TOKENS (for panels outside image)
+   ========================================================================== */
+.tag-plat-out { background: rgba(59,130,246,0.12); color: #2563eb; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.tag-year-out { background: rgba(245,158,11,0.12); color: #d97706; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.tag-genre-out { background: rgba(0,0,0,0.06); color: #534f49; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+.theme-dark .tag-plat-out { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.theme-dark .tag-year-out { background: rgba(245,158,11,0.12); color: #fbbf24; }
+.theme-dark .tag-genre-out { background: rgba(255,255,255,0.06); color: #d4d4d8; }
+.theme-retro .tag-plat-out { background: rgba(56,189,248,0.12); color: #38bdf8; }
+.theme-retro .tag-year-out { background: rgba(245,158,11,0.1); color: #f59e0b; }
+.theme-retro .tag-genre-out { background: rgba(0,255,136,0.08); color: #00cc6a; border-radius: 0; }
+
+.text-out-1 { color: #282623; } .theme-dark .text-out-1 { color: #f4f4f5; } .theme-retro .text-out-1 { color: #00ff88; }
+.text-out-2 { color: #534f49; } .theme-dark .text-out-2 { color: #d4d4d8; } .theme-retro .text-out-2 { color: #00cc6a; }
+.text-out-3 { color: #8c877e; } .theme-dark .text-out-3 { color: #71717a; } .theme-retro .text-out-3 { color: #008844; }
+
+/* ==========================================================================
+   VARIANT CLASSES — tint colors + gradient styles
+   ========================================================================== */
+
+/* --- Color packs (RGB for glass overlays) --- */
+/* Emerald */
+.c-emerald { --tint-r: 16; --tint-g: 185; --tint-b: 129; }
+/* Sapphire */
+.c-sapphire { --tint-r: 37; --tint-g: 99; --tint-b: 235; }
+/* Amethyst */
+.c-amethyst { --tint-r: 139; --tint-g: 92; --tint-b: 246; }
+/* Amber */
+.c-amber { --tint-r: 245; --tint-g: 158; --tint-b: 11; }
+/* Rose */
+.c-rose { --tint-r: 244; --tint-g: 63; --tint-b: 94; }
+/* Cyan */
+.c-cyan { --tint-r: 6; --tint-g: 182; --tint-b: 212; }
+/* Teal */
+.c-teal { --tint-r: 20; --tint-g: 184; --tint-b: 166; }
+/* Indigo */
+.c-indigo { --tint-r: 99; --tint-g: 102; --tint-b: 241; }
+/* Orange */
+.c-orange { --tint-r: 249; --tint-g: 115; --tint-b: 22; }
+/* Pink */
+.c-pink { --tint-r: 236; --tint-g: 72; --tint-b: 153; }
+/* Lime */
+.c-lime { --tint-r: 132; --tint-g: 204; --tint-b: 22; }
+/* Coral */
+.c-coral { --tint-r: 251; --tint-g: 113; --tint-b: 133; }
+/* Violet */
+.c-violet { --tint-r: 139; --tint-g: 92; --tint-b: 246; }
+/* Ruby */
+.c-ruby { --tint-r: 220; --tint-g: 38; --tint-b: 38; }
+/* Azure */
+.c-azure { --tint-r: 14; --tint-g: 165; --tint-b: 233; }
+/* Gold */
+.c-gold { --tint-r: 234; --tint-g: 179; --tint-b: 8; }
+/* Slate */
+.c-slate { --tint-r: 100; --tint-g: 116; --tint-b: 139; }
+/* Mint */
+.c-mint { --tint-r: 52; --tint-g: 211; --tint-b: 153; }
+/* Sky */
+.c-sky { --tint-r: 56; --tint-g: 189; --tint-b: 248; }
+/* Plum */
+.c-plum { --tint-r: 192; --tint-g: 132; --tint-b: 252; }
+
+/* Retro override: all tints become green */
+.theme-retro .c-emerald,
+.theme-retro .c-sapphire,
+.theme-retro .c-amethyst,
+.theme-retro .c-amber,
+.theme-retro .c-rose,
+.theme-retro .c-cyan,
+.theme-retro .c-teal,
+.theme-retro .c-indigo,
+.theme-retro .c-orange,
+.theme-retro .c-pink,
+.theme-retro .c-lime,
+.theme-retro .c-coral,
+.theme-retro .c-violet,
+.theme-retro .c-ruby,
+.theme-retro .c-azure,
+.theme-retro .c-gold,
+.theme-retro .c-slate,
+.theme-retro .c-mint,
+.theme-retro .c-sky,
+.theme-retro .c-plum { --tint-r: 0; --tint-g: 255; --tint-b: 136; }
+
+/* ==========================================================================
+   OVERLAY HELPERS — use --tint-r, --tint-g, --tint-b
+   ========================================================================== */
+
+/* Gradient: bottom-heavy, color-tinted */
+.ov-bottom {
+  background: linear-gradient(to top,
+    rgba(0,0,0,0.92) 0%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.55) 40%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.15) 70%,
+    transparent 100%);
+}
+
+/* Gradient: full wash, darker at bottom */
+.ov-full {
+  background: linear-gradient(to top,
+    rgba(0,0,0,0.9) 0%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.45) 30%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.2) 60%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.08) 100%);
+}
+
+/* Gradient: diagonal bottom-left to top-right */
+.ov-diag {
+  background: linear-gradient(135deg,
+    rgba(0,0,0,0.9) 0%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.5) 40%,
+    transparent 70%);
+}
+
+/* Gradient: vignette (all edges dark) */
+.ov-vignette {
+  background: radial-gradient(ellipse at center,
+    transparent 30%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.15) 50%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.35) 70%,
+    rgba(0,0,0,0.85) 100%);
+}
+
+/* Gradient: left-to-right tinted */
+.ov-left {
+  background: linear-gradient(to right,
+    rgba(0,0,0,0.9) 0%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.5) 35%,
+    transparent 65%);
+}
+
+/* Gradient: right-to-left */
+.ov-right {
+  background: linear-gradient(to left,
+    rgba(0,0,0,0.9) 0%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.5) 35%,
+    transparent 65%);
+}
+
+/* Gradient: top+bottom both dark, middle lighter */
+.ov-dual {
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,0.8) 0%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.15) 25%,
+    transparent 45%,
+    transparent 55%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.2) 70%,
+    rgba(0,0,0,0.92) 100%);
+}
+
+/* Gradient: radial, center clear, edges tinted */
+.ov-radial {
+  background: radial-gradient(ellipse 60% 50% at 50% 40%,
+    transparent 0%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.12) 50%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.35) 70%,
+    rgba(0,0,0,0.88) 100%);
+}
+
+/* Gradient: horizontal band in middle */
+.ov-band {
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,0.75) 0%, transparent 20%,
+    transparent 40%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.3) 50%,
+    transparent 60%,
+    transparent 80%, rgba(0,0,0,0.85) 100%);
+}
+
+/* Gradient: bottom-only, very heavy */
+.ov-bottom-heavy {
+  background: linear-gradient(to top,
+    rgba(0,0,0,0.95) 0%,
+    rgba(0,0,0,0.85) 25%,
+    rgba(var(--tint-r),var(--tint-g),var(--tint-b),0.35) 50%,
+    transparent 80%);
+}
+
+/* ==========================================================================
+   OVERLAY CONTENT POSITIONING — reuses .card-overlay
+   ========================================================================== */
+
+/* Standard: content at bottom */
+.overlay-bottom { justify-content: flex-end; }
+
+/* Content centered vertically, tint covers whole card */
+.overlay-center { justify-content: center; text-align: center; align-items: center; }
+
+/* Content at top-left */
+.overlay-top-left { justify-content: flex-start; align-items: flex-start; text-align: left; }
+
+/* Content in glass panel — just the gradient, text goes in a sub-panel */
+.glass-panel {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: auto;
+}
+.glass-panel-sm {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 8px 10px;
+  align-self: flex-end;
+  max-width: 80%;
+}
+.glass-panel-full {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 10px;
+  align-self: stretch;
+}
+.glass-pill {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 10px 16px;
+  align-self: center;
+}
+
+/* For retro: glass panels get green tint */
+.theme-retro .glass-panel,
+.theme-retro .glass-panel-sm,
+.theme-retro .glass-panel-full,
+.theme-retro .glass-pill {
+  background: rgba(0,255,136,0.08);
+  border-color: rgba(0,255,136,0.2);
+}
+
+/* ==========================================================================
+   FAVORITE HEART — positioned absolute top-right on card
+   ========================================================================== */
+.fav-btn {
+  position: absolute; top: 12px; right: 12px; z-index: 5;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  color: #ef4444; font-size: 16px; cursor: pointer;
+}
+.theme-retro .fav-btn { border-color: rgba(0,255,136,0.3); }
+
+/* ==========================================================================
+   RATING BADGE — top-left
+   ========================================================================== */
+.rating-badge {
+  position: absolute; top: 12px; left: 12px; z-index: 5;
+  padding: 3px 10px; border-radius: 12px;
+  background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15);
+  font-size: 13px; font-weight: 700; color: #fcd34d;
+  display: flex; align-items: center; gap: 3px;
+}
+.theme-retro .rating-badge { color: #00ff88; border-color: rgba(0,255,136,0.25); }
+
+/* ==========================================================================
+   SPLIT-LAYOUT CARD (image + external info)
+   ========================================================================== */
+.card-split { width: 260px; display: flex; flex-direction: column; }
+.card-split .card-img-wrap {
+  aspect-ratio: 16/10; border-radius: 14px 14px 0 0; overflow: hidden; position: relative;
+}
+.card-split .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.card-split .card-info {
+  padding: 14px; border-radius: 0 0 14px 14px;
+}
+.card-split .card-title-ext { font-size: 16px; font-weight: 700; }
+
+</style>
+</head>
+<body>
+
+<div class="mockup-header">
+  <h1>Color-Tinted Glass Card Variations — 20 Mockups × 3 Themes</h1>
+  <p>Light (left) &nbsp;|&nbsp; Dark (center) &nbsp;|&nbsp; Retro Terminal (right) &nbsp;—&nbsp; Taller cards · Darker bottom gradient · Readable text</p>
+</div>
+
+<!-- ======================================================================== -->
+<!-- 1. Bottom Gradient — classic color-tinted gradient rising from bottom -->
+<!-- ======================================================================== -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">1</span><span class="variant-name">Bottom Gradient — Emerald</span><span class="variant-desc">Classic: color-tinted gradient rises from bottom, darkens toward edge</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-emerald">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Ведьмак 3: Дикая Охота</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2015</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">RPG</span><span class="tag-genre">Action</span><span class="tag-genre">Open World</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-emerald">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Ведьмак 3: Дикая Охота</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2015</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">RPG</span><span class="tag-genre">Action</span><span class="tag-genre">Open World</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-emerald">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Ведьмак 3: Дикая Охота</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2015</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">RPG</span><span class="tag-genre">Action</span><span class="tag-genre">Open World</span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 2. Full Wash — entire image under subtle tint, darkest at bottom -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">2</span><span class="variant-name">Full Wash — Sapphire</span><span class="variant-desc">Entire image under color wash, darkest at bottom for text contrast</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-sapphire">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-full">
+    <div class="rating-badge">&#9733; 9.2</div>
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Elden Ring</div>
+    <div class="card-meta"><span class="tag-platform">PlayStation 5</span><span class="tag-year">2022</span></div>
+    <div class="card-tags"><span class="tag-genre">Souls-like</span><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-sapphire">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-full">
+    <div class="rating-badge">&#9733; 9.2</div>
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Elden Ring</div>
+    <div class="card-meta"><span class="tag-platform">PlayStation 5</span><span class="tag-year">2022</span></div>
+    <div class="card-tags"><span class="tag-genre">Souls-like</span><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-sapphire">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-full">
+    <div class="rating-badge">&#9733; 9.2</div>
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Elden Ring</div>
+    <div class="card-meta"><span class="tag-platform">PlayStation 5</span><span class="tag-year">2022</span></div>
+    <div class="card-tags"><span class="tag-genre">Souls-like</span><span class="tag-genre">RPG</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 3. Diagonal Gradient — color sweeps from bottom-left -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">3</span><span class="variant-name">Diagonal Gradient — Amethyst</span><span class="variant-desc">Tinted gradient sweeps diagonally from bottom-left corner</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-amethyst">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-diag">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Cyberpunk 2077</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span><span class="tag-genre">Open World</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-amethyst">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-diag">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Cyberpunk 2077</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span><span class="tag-genre">Open World</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-amethyst">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-diag">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Cyberpunk 2077</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span><span class="tag-genre">Open World</span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 4. Vignette — all edges dark, center bright -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">4</span><span class="variant-name">Vignette — Amber</span><span class="variant-desc">All edges darkened, center stays bright — dramatic framing</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-amber">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-vignette">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Red Dead Redemption 2</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2018</span></div>
+    <div class="card-tags"><span class="tag-genre">Action</span><span class="tag-genre">Adventure</span><span class="tag-genre">Western</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-amber">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-vignette">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Red Dead Redemption 2</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2018</span></div>
+    <div class="card-tags"><span class="tag-genre">Action</span><span class="tag-genre">Adventure</span><span class="tag-genre">Western</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-amber">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-vignette">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Red Dead Redemption 2</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2018</span></div>
+    <div class="card-tags"><span class="tag-genre">Action</span><span class="tag-genre">Adventure</span><span class="tag-genre">Western</span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 5. Left Panel — glass tint on left, image visible on right -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">5</span><span class="variant-name">Left Panel — Rose</span><span class="variant-desc">Tinted glass only on left half, info aligned left</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-rose">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-top-left ov-left" style="padding:20px 12px">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Hollow Knight</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span></div>
+    <div class="card-meta"><span class="tag-year">2017</span></div>
+    <div style="margin-top:6px"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">Metroidvania</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-rose">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-top-left ov-left" style="padding:20px 12px">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Hollow Knight</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span></div>
+    <div class="card-meta"><span class="tag-year">2017</span></div>
+    <div style="margin-top:6px"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">Metroidvania</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-rose">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-top-left ov-left" style="padding:20px 12px">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Hollow Knight</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span></div>
+    <div class="card-meta"><span class="tag-year">2017</span></div>
+    <div style="margin-top:6px"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">Metroidvania</span><span class="tag-genre">Action</span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 6. Bottom Glass Panel — frosted glass strip at bottom -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">6</span><span class="variant-name">Bottom Glass Panel — Cyan</span><span class="variant-desc">Frosted glass panel at bottom with backdrop-filter blur</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-cyan">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="justify-content:flex-end;background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.2) 40%,transparent 100%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel">
+      <div class="card-title">DOOM Eternal</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+      <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-cyan">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="justify-content:flex-end;background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.2) 40%,transparent 100%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel">
+      <div class="card-title">DOOM Eternal</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+      <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-cyan">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="justify-content:flex-end;background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.2) 40%,transparent 100%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel">
+      <div class="card-title">DOOM Eternal</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+      <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 7. Dual Gradient — tint from top AND bottom -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">7</span><span class="variant-name">Dual Gradient — Teal</span><span class="variant-desc">Gradient from top and bottom, clear band in center</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-teal">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-dual">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">God of War</div>
+    <div class="card-meta"><span class="tag-platform">PlayStation 4</span><span class="tag-year">2018</span></div>
+    <div class="card-tags"><span class="tag-genre">Action</span><span class="tag-genre">Adventure</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-teal">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-dual">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">God of War</div>
+    <div class="card-meta"><span class="tag-platform">PlayStation 4</span><span class="tag-year">2018</span></div>
+    <div class="card-tags"><span class="tag-genre">Action</span><span class="tag-genre">Adventure</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-teal">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-dual">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">God of War</div>
+    <div class="card-meta"><span class="tag-platform">PlayStation 4</span><span class="tag-year">2018</span></div>
+    <div class="card-tags"><span class="tag-genre">Action</span><span class="tag-genre">Adventure</span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 8. Right Panel — glass tint on right side -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">8</span><span class="variant-name">Right Panel — Indigo</span><span class="variant-desc">Tinted glass on right half, info aligned right</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-indigo">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-right" style="align-items:flex-end;text-align:right;padding:20px 12px">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Portal 2</div>
+    <div class="card-meta" style="justify-content:flex-end"><span class="tag-platform">Windows</span><span class="tag-year">2011</span></div>
+    <div style="margin-top:6px"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="card-tags" style="justify-content:flex-end"><span class="tag-genre">Puzzle</span><span class="tag-genre">FPS</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-indigo">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-right" style="align-items:flex-end;text-align:right;padding:20px 12px">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Portal 2</div>
+    <div class="card-meta" style="justify-content:flex-end"><span class="tag-platform">Windows</span><span class="tag-year">2011</span></div>
+    <div style="margin-top:6px"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="card-tags" style="justify-content:flex-end"><span class="tag-genre">Puzzle</span><span class="tag-genre">FPS</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-indigo">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-right" style="align-items:flex-end;text-align:right;padding:20px 12px">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Portal 2</div>
+    <div class="card-meta" style="justify-content:flex-end"><span class="tag-platform">Windows</span><span class="tag-year">2011</span></div>
+    <div style="margin-top:6px"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="card-tags" style="justify-content:flex-end"><span class="tag-genre">Puzzle</span><span class="tag-genre">FPS</span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 9. Bottom-Heavy — very dark at bottom, color tint mid-section -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">9</span><span class="variant-name">Bottom-Heavy Gradient — Orange</span><span class="variant-desc">Extremely dark at bottom (95%+), color tint appears in middle band</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-orange">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom-heavy">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Baldur's Gate 3</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2023</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">RPG</span><span class="tag-genre">Turn-Based</span><span class="tag-genre">D&D</span></div>
+    <div class="card-bar"><div class="card-bar-fill" style="width:97%"></div></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-orange">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom-heavy">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Baldur's Gate 3</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2023</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">RPG</span><span class="tag-genre">Turn-Based</span><span class="tag-genre">D&D</span></div>
+    <div class="card-bar"><div class="card-bar-fill" style="width:97%"></div></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-orange">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom-heavy">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Baldur's Gate 3</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2023</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">RPG</span><span class="tag-genre">Turn-Based</span><span class="tag-genre">D&D</span></div>
+    <div class="card-bar"><div class="card-bar-fill" style="width:97%"></div></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 10. Pill Panel — rounded pill-shaped glass info box -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">10</span><span class="variant-name">Pill Panel — Pink</span><span class="variant-desc">Rounded pill-shaped glass panel centered at bottom</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-pink">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="justify-content:flex-end;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.25) 40%,transparent 70%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-pill" style="margin-bottom:8px">
+      <div class="card-title" style="text-align:center">Stardew Valley</div>
+      <div class="card-meta" style="justify-content:center"><span class="tag-platform">Windows</span><span class="tag-year">2016</span></div>
+      <div style="text-align:center;margin-top:2px"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-pink">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="justify-content:flex-end;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.25) 40%,transparent 70%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-pill" style="margin-bottom:8px">
+      <div class="card-title" style="text-align:center">Stardew Valley</div>
+      <div class="card-meta" style="justify-content:center"><span class="tag-platform">Windows</span><span class="tag-year">2016</span></div>
+      <div style="text-align:center;margin-top:2px"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-pink">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="justify-content:flex-end;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.25) 40%,transparent 70%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-pill" style="margin-bottom:8px">
+      <div class="card-title" style="text-align:center">Stardew Valley</div>
+      <div class="card-meta" style="justify-content:center"><span class="tag-platform">Windows</span><span class="tag-year">2016</span></div>
+      <div style="text-align:center;margin-top:2px"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    </div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 11. Radial — center bright, edges tinted -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">11</span><span class="variant-name">Radial Tint — Lime</span><span class="variant-desc">Circular gradient: center clear, edges tinted and darkened</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-lime">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-radial">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Factorio</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-lime">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-radial">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Factorio</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-lime">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-radial">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Factorio</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2020</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 12. Full-Panel Glass — glass panel covers entire card -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">12</span><span class="variant-name">Full-Panel Glass — Coral</span><span class="variant-desc">Frosted glass panel covers the whole card area, image visible beneath</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-coral">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay" style="justify-content:flex-end;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.2) 50%,rgba(0,0,0,0.1) 100%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel-full">
+      <div class="card-title">Heroes of Might & Magic III</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">1999</span></div>
+      <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+      <div class="card-tags"><span class="tag-genre">Strategy</span><span class="tag-genre">Turn-Based</span><span class="tag-genre">Fantasy</span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-coral">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay" style="justify-content:flex-end;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.2) 50%,rgba(0,0,0,0.1) 100%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel-full">
+      <div class="card-title">Heroes of Might & Magic III</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">1999</span></div>
+      <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+      <div class="card-tags"><span class="tag-genre">Strategy</span><span class="tag-genre">Turn-Based</span><span class="tag-genre">Fantasy</span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-coral">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay" style="justify-content:flex-end;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.2) 50%,rgba(0,0,0,0.1) 100%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel-full">
+      <div class="card-title">Heroes of Might & Magic III</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">1999</span></div>
+      <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+      <div class="card-tags"><span class="tag-genre">Strategy</span><span class="tag-genre">Turn-Based</span><span class="tag-genre">Fantasy</span></div>
+    </div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 13. Band Tint — horizontal color band in center -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">13</span><span class="variant-name">Center Band Tint — Violet</span><span class="variant-desc">Horizontal tinted band across the center of the card</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-violet">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-band">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Disco Elysium</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2019</span></div>
+    <div class="card-excerpt">Детективная RPG без боёвки — диалоги, проверки навыков и внутренние голоса...</div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-violet">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-band">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Disco Elysium</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2019</span></div>
+    <div class="card-excerpt">Детективная RPG без боёвки — диалоги, проверки навыков и внутренние голоса...</div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-violet">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-band">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Disco Elysium</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2019</span></div>
+    <div class="card-excerpt">Детективная RPG без боёвки — диалоги, проверки навыков и внутренние голоса...</div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 14. Corner Glass — tint in bottom-right corner only -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">14</span><span class="variant-name">Corner Glass — Ruby</span><span class="variant-desc">Glass tint only in bottom-right corner, rest of image clear</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-ruby">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="background:radial-gradient(circle at 100% 100%,rgba(0,0,0,0.8) 0%,rgba(var(--tint-r,220),var(--tint-g,38),var(--tint-b,38),0.35) 40%,transparent 70%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel-sm">
+      <div class="card-title">Super Mario World</div>
+      <div class="card-meta" style="margin-top:2px"><span class="tag-platform">SNES</span><span class="tag-year">1990</span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-ruby">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="background:radial-gradient(circle at 100% 100%,rgba(0,0,0,0.8) 0%,rgba(var(--tint-r,220),var(--tint-g,38),var(--tint-b,38),0.35) 40%,transparent 70%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel-sm">
+      <div class="card-title">Super Mario World</div>
+      <div class="card-meta" style="margin-top:2px"><span class="tag-platform">SNES</span><span class="tag-year">1990</span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-ruby">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="background:radial-gradient(circle at 100% 100%,rgba(0,0,0,0.8) 0%,rgba(var(--tint-r,0),var(--tint-g,255),var(--tint-b,136),0.35) 40%,transparent 70%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel-sm">
+      <div class="card-title">Super Mario World</div>
+      <div class="card-meta" style="margin-top:2px"><span class="tag-platform">SNES</span><span class="tag-year">1990</span></div>
+    </div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 15. Split Card — image on top, colored glass info panel below -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">15</span><span class="variant-name">Split Card — Azure</span><span class="variant-desc">Image top half + colored glass info panel bottom half (not overlaid)</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card-split">
+  <div class="card-img-wrap c-azure" style="position:relative">
+    <img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'">
+    <div class="fav-btn" style="position:absolute;top:10px;right:10px;z-index:2">&#x2665;</div>
+    <div style="position:absolute;bottom:0;left:0;right:0;height:30%;background:linear-gradient(transparent,rgba(var(--tint-r,14),var(--tint-g,165),var(--tint-b,233),0.3))"></div>
+  </div>
+  <div class="card-info" style="background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
+    <div class="card-title-ext text-out-1">Horizon Zero Dawn</div>
+    <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;align-items:center">
+      <span class="tag-plat-out">PlayStation 4</span><span class="tag-year-out">2017</span>
+    </div>
+    <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">
+      <span class="tag-genre-out">Action RPG</span><span class="tag-genre-out">Open World</span><span class="tag-genre-out">Sci-Fi</span>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card-split">
+  <div class="card-img-wrap c-azure" style="position:relative">
+    <img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'">
+    <div class="fav-btn" style="position:absolute;top:10px;right:10px;z-index:2">&#x2665;</div>
+    <div style="position:absolute;bottom:0;left:0;right:0;height:30%;background:linear-gradient(transparent,rgba(var(--tint-r,14),var(--tint-g,165),var(--tint-b,233),0.3))"></div>
+  </div>
+  <div class="card-info" style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
+    <div class="card-title-ext text-out-1">Horizon Zero Dawn</div>
+    <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;align-items:center">
+      <span class="tag-plat-out">PlayStation 4</span><span class="tag-year-out">2017</span>
+    </div>
+    <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">
+      <span class="tag-genre-out">Action RPG</span><span class="tag-genre-out">Open World</span><span class="tag-genre-out">Sci-Fi</span>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card-split">
+  <div class="card-img-wrap c-azure" style="position:relative">
+    <img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'">
+    <div class="fav-btn" style="position:absolute;top:10px;right:10px;z-index:2">&#x2665;</div>
+    <div style="position:absolute;bottom:0;left:0;right:0;height:30%;background:linear-gradient(transparent,rgba(0,255,136,0.3))"></div>
+  </div>
+  <div class="card-info" style="background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
+    <div class="card-title-ext text-out-1">Horizon Zero Dawn</div>
+    <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;align-items:center">
+      <span class="tag-plat-out">PlayStation 4</span><span class="tag-year-out">2017</span>
+    </div>
+    <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">
+      <span class="tag-genre-out">Action RPG</span><span class="tag-genre-out">Open World</span><span class="tag-genre-out">Sci-Fi</span>
+    </div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 16. Status Badge — color tint with status badges -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">16</span><span class="variant-name">Status Badge Overlay — Gold</span><span class="variant-desc">Color tint + prominent status badges (rating, completion, etc.)</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-gold">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom-heavy">
+    <div class="fav-btn">&#x2665;</div>
+    <div style="display:flex;gap:6px;margin-bottom:auto">
+      <span class="badge-status" style="background:rgba(16,185,129,0.7)">100%</span>
+      <span class="badge-status" style="background:rgba(245,158,11,0.7)">4K</span>
+    </div>
+    <div class="card-title">The Last of Us Part II</div>
+    <div class="card-meta"><span class="tag-platform">PlayStation 4</span><span class="tag-year">2020</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-gold">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom-heavy">
+    <div class="fav-btn">&#x2665;</div>
+    <div style="display:flex;gap:6px;margin-bottom:auto">
+      <span class="badge-status" style="background:rgba(16,185,129,0.7)">100%</span>
+      <span class="badge-status" style="background:rgba(245,158,11,0.7)">4K</span>
+    </div>
+    <div class="card-title">The Last of Us Part II</div>
+    <div class="card-meta"><span class="tag-platform">PlayStation 4</span><span class="tag-year">2020</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-gold">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom-heavy">
+    <div class="fav-btn">&#x2665;</div>
+    <div style="display:flex;gap:6px;margin-bottom:auto">
+      <span class="badge-status" style="background:rgba(0,255,136,0.6);color:#000">100%</span>
+      <span class="badge-status" style="background:rgba(0,255,136,0.6);color:#000">4K</span>
+    </div>
+    <div class="card-title">The Last of Us Part II</div>
+    <div class="card-meta"><span class="tag-platform">PlayStation 4</span><span class="tag-year">2020</span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 17. Kicker Line — editorial kicker above title -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">17</span><span class="variant-name">Kicker Line — Slate</span><span class="variant-desc">Small editorial kicker label above the title on tinted glass</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-slate">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-kicker" style="color:rgba(255,255,255,0.7)">Game of the Year 2024</div>
+    <div class="card-title">Half-Life: Alyx</div>
+    <div class="card-meta"><span class="tag-platform">VR</span><span class="tag-year">2020</span></div>
+    <div class="card-excerpt">Революционная VR-игра от Valve, приквел к Half-Life 2 с полным погружением...</div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-slate">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-kicker" style="color:rgba(255,255,255,0.7)">Game of the Year 2024</div>
+    <div class="card-title">Half-Life: Alyx</div>
+    <div class="card-meta"><span class="tag-platform">VR</span><span class="tag-year">2020</span></div>
+    <div class="card-excerpt">Революционная VR-игра от Valve, приквел к Half-Life 2 с полным погружением...</div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-slate">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-kicker" style="color:rgba(0,255,136,0.7)">Game of the Year 2024</div>
+    <div class="card-title">Half-Life: Alyx</div>
+    <div class="card-meta"><span class="tag-platform">VR</span><span class="tag-year">2020</span></div>
+    <div class="card-excerpt">Революционная VR-игра от Valve, приквел к Half-Life 2 с полным погружением...</div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 18. Bottom Stripe — narrow tinted stripe at very bottom -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">18</span><span class="variant-name">Bottom Stripe — Mint</span><span class="variant-desc">Narrow colored stripe at absolute bottom, info sits just above</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-mint">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:6px;background:rgba(var(--tint-r,52),var(--tint-g,211),var(--tint-b,153),1);z-index:3;box-shadow:0 0 8px rgba(var(--tint-r,52),var(--tint-g,211),var(--tint-b,153),0.5)"></div>
+  <div class="card-overlay overlay-bottom" style="background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 35%,transparent 70%);padding-bottom:22px">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">FTL: Faster Than Light</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2012</span></div>
+    <div class="card-tags"><span class="tag-genre">Strategy</span><span class="tag-genre">Roguelike</span><span class="tag-genre">Space</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-mint">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:6px;background:rgba(var(--tint-r,52),var(--tint-g,211),var(--tint-b,153),1);z-index:3;box-shadow:0 0 8px rgba(var(--tint-r,52),var(--tint-g,211),var(--tint-b,153),0.5)"></div>
+  <div class="card-overlay overlay-bottom" style="background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 35%,transparent 70%);padding-bottom:22px">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">FTL: Faster Than Light</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2012</span></div>
+    <div class="card-tags"><span class="tag-genre">Strategy</span><span class="tag-genre">Roguelike</span><span class="tag-genre">Space</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-mint">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:6px;background:#00ff88;z-index:3;box-shadow:0 0 8px rgba(0,255,136,0.5)"></div>
+  <div class="card-overlay overlay-bottom" style="background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 35%,transparent 70%);padding-bottom:22px">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">FTL: Faster Than Light</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2012</span></div>
+    <div class="card-tags"><span class="tag-genre">Strategy</span><span class="tag-genre">Roguelike</span><span class="tag-genre">Space</span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 19. Multi-Tint — two colors overlapping -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">19</span><span class="variant-name">Dual-Tone Blend — Sky + Plum</span><span class="variant-desc">Two different color tints blending together in the gradient</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card" style="--tint-r1:56;--tint-g1:189;--tint-b1:248;--tint-r2:192;--tint-g2:132;--tint-b2:252">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="background:linear-gradient(to top,
+    rgba(0,0,0,0.92) 0%,
+    rgba(56,189,248,0.4) 30%,
+    rgba(192,132,252,0.25) 55%,
+    transparent 100%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Minecraft</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">Sandbox</span><span class="tag-genre">Survival</span><span class="tag-genre">Creative</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card" style="--tint-r1:56;--tint-g1:189;--tint-b1:248;--tint-r2:192;--tint-g2:132;--tint-b2:252">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="background:linear-gradient(to top,
+    rgba(0,0,0,0.92) 0%,
+    rgba(56,189,248,0.4) 30%,
+    rgba(192,132,252,0.25) 55%,
+    transparent 100%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Minecraft</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">Sandbox</span><span class="tag-genre">Survival</span><span class="tag-genre">Creative</span></div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card" style="--tint-r1:0;--tint-g1:255;--tint-b1:136;--tint-r2:0;--tint-g2:255;--tint-b2:136">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom" style="background:linear-gradient(to top,
+    rgba(0,0,0,0.92) 0%,
+    rgba(0,255,136,0.4) 30%,
+    rgba(0,255,136,0.25) 55%,
+    transparent 100%)">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="card-title">Minecraft</div>
+    <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2011</span></div>
+    <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-off">&#9733;</span></span></div>
+    <div class="card-tags"><span class="tag-genre">Sandbox</span><span class="tag-genre">Survival</span><span class="tag-genre">Creative</span></div>
+  </div>
+</div></div>
+</div></section>
+
+<!-- 20. Double Layer — gradient tint + frosted panel -->
+<section class="variant-section">
+<div class="variant-label"><span class="variant-num">20</span><span class="variant-name">Double Layer — Emerald + Glass</span><span class="variant-desc">Color gradient + a second frosted glass panel layered on top</span></div>
+<div class="variant-row">
+
+<div class="variant-col theme-light"><span class="theme-badge">Light</span>
+<div class="card c-emerald">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.2)">
+      <div class="card-title">Deus Ex</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2000</span></div>
+      <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+      <div class="card-tags"><span class="tag-genre">Immersive Sim</span><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-dark"><span class="theme-badge">Dark</span>
+<div class="card c-emerald">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel" style="background:rgba(0,0,0,0.2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.12)">
+      <div class="card-title">Deus Ex</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2000</span></div>
+      <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+      <div class="card-tags"><span class="tag-genre">Immersive Sim</span><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="variant-col theme-retro"><span class="theme-badge">Retro</span>
+<div class="card c-emerald">
+  <div class="card-img"><img src="../src/main/resources/static/img/default.jpg" alt="" onerror="this.outerHTML='<div class=img-fb>&#x1F3AE;</div>'"></div>
+  <div class="card-overlay overlay-bottom ov-bottom">
+    <div class="fav-btn">&#x2665;</div>
+    <div class="glass-panel" style="background:rgba(0,255,136,0.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(0,255,136,0.2)">
+      <div class="card-title">Deus Ex</div>
+      <div class="card-meta"><span class="tag-platform">Windows</span><span class="tag-year">2000</span></div>
+      <div class="card-rating"><span class="stars"><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span><span class="s-on">&#9733;</span></span></div>
+      <div class="card-tags"><span class="tag-genre">Immersive Sim</span><span class="tag-genre">RPG</span><span class="tag-genre">FPS</span></div>
+    </div>
+  </div>
+</div></div>
+</div></section>
+
+<div style="text-align:center;padding:32px;color:#666;font-size:12px">
+  GameLibrary — Color-Tinted Glass Variations &middot; 20 variants × 3 themes &middot; Image: default.jpg
+</div>
+
+</body>
+</html>
