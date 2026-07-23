@@ -5,12 +5,11 @@
   --auth-input-bg: rgba(255, 255, 255, 0.6);
   --auth-input-color: var(--p-text-color, #334155);
   --auth-input-placeholder: var(--p-text-muted-color, #94a3b8);
-  --auth-gradient-mid: #d1fae5;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--p-surface-50), var(--auth-gradient-mid), var(--p-surface-50));
+  background-color: var(--p-surface-50);
 }
 .auth-page.auth-dark {
   --auth-card-bg: rgba(24, 24, 27, 0.85);
@@ -19,8 +18,7 @@
   --auth-input-bg: rgba(9, 9, 11, 0.6);
   --auth-input-color: #fafafa;
   --auth-input-placeholder: #a1a1aa;
-  --auth-gradient-mid: #022c22;
-  background: linear-gradient(135deg, var(--p-surface-950), var(--auth-gradient-mid), var(--p-surface-950));
+  background-color: var(--p-surface-950);
 }
 
 .auth-card {
