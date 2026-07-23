@@ -38,3 +38,10 @@
 [data-theme="default-dark"] .game-list-row:hover {
   background: var(--p-surface-800);
 }
+[data-theme="default-dark"] .theme-option:hover {
+  background: var(--p-surface-700);
+}
+[data-theme="default-dark"] .theme-option.active {
+  background: var(--p-surface-800);
+  color: var(--p-text-color);
+}
