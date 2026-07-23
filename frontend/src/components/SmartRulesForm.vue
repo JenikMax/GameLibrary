@@ -2,24 +2,24 @@
   <div v-if="readonly" class="smart-rules-display">
     <div v-if="isEmpty" class="text-color-secondary text-sm">{{ t('collections.smart_rules_empty') }}</div>
     <div v-else class="flex flex-column gap-1">
-      <div v-if="rules.platforms?.length">
-        <strong>{{ t('collections.smart_rules_platforms') }}:</strong> {{ rules.platforms.join(', ') }}
+      <div v-if="localRules.platforms?.length">
+        <strong>{{ t('collections.smart_rules_platforms') }}:</strong> {{ localRules.platforms.join(', ') }}
       </div>
-      <div v-if="rules.genres?.length">
+      <div v-if="localRules.genres?.length">
         <strong>{{ t('collections.smart_rules_genres') }}:</strong> {{ genreNames }}
       </div>
-      <div v-if="rules.yearFrom || rules.yearTo">
+      <div v-if="localRules.yearFrom || localRules.yearTo">
         <strong>{{ t('collections.smart_rules_year_from') }}:</strong>
-        {{ rules.yearFrom || '—' }} — {{ rules.yearTo || '—' }}
+        {{ localRules.yearFrom || '—' }} — {{ localRules.yearTo || '—' }}
       </div>
-      <div v-if="rules.minRating">
-        <strong>{{ t('collections.smart_rules_min_rating') }}:</strong> {{ rules.minRating }}
+      <div v-if="localRules.minRating">
+        <strong>{{ t('collections.smart_rules_min_rating') }}:</strong> {{ localRules.minRating }}
       </div>
-      <div v-if="rules.tags?.length">
+      <div v-if="localRules.tags?.length">
         <strong>{{ t('collections.smart_rules_tags') }}:</strong> {{ tagNames }}
       </div>
-      <div v-if="rules.nameContains">
-        <strong>{{ t('collections.smart_rules_name') }}:</strong> {{ rules.nameContains }}
+      <div v-if="localRules.nameContains">
+        <strong>{{ t('collections.smart_rules_name') }}:</strong> {{ localRules.nameContains }}
       </div>
     </div>
   </div>
