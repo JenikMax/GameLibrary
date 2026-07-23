@@ -1,3 +1,9 @@
+[data-theme="default-dark"] body {
+  background-color: var(--p-surface-950);
+}
+[data-theme="default-dark"] .main-container {
+  background-color: var(--p-surface-950);
+}
 [data-theme="default-dark"] .comment-item {
   background: var(--p-surface-800);
 }
