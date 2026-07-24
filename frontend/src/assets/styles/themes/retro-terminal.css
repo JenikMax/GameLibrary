@@ -1,5 +1,5 @@
 /* ═══════ PRIMEVUE TOKEN OVERRIDES ═══════ */
-[data-theme="retro-terminal"] {
+:root[data-theme="retro-terminal"] {
   --p-surface-0: #00ff88;
   --p-surface-50: #00ee88;
   --p-surface-100: #00dd77;
@@ -44,6 +44,18 @@
 
   --p-menubar-background: #000000;
   --p-menubar-border-color: rgba(0,255,136,0.3);
+  --p-menubar-border-radius: 0;
+  --p-menubar-base-item-border-radius: 0;
+  --p-menubar-item-border-radius: 0;
+  --p-menubar-submenu-border-radius: 0;
+  --p-menubar-item-icon-color: #00cc6a;
+  --p-menubar-item-icon-focus-color: #00ff88;
+  --p-menubar-item-icon-active-color: #00ff88;
+
+  --p-selectbutton-border-radius: 0;
+  --p-togglebutton-border-radius: 0;
+  --p-togglebutton-content-border-radius: 0;
+
   --p-panel-background: rgba(0,26,13,0.3);
   --p-panel-border-color: rgba(0,255,136,0.3);
   --p-panel-border-radius: 0px;
@@ -145,6 +157,9 @@
 }
 [data-theme="retro-terminal"] .p-menubar-item-label {
   color: inherit !important;
+}
+[data-theme="retro-terminal"] .p-menubar .p-menubar-item-content {
+  border-radius: 0;
 }
 
 /* ═══════ BUTTONS (outlined glowing-border style) ═══════ */
@@ -911,6 +926,10 @@
 }
 [data-theme="retro-terminal"] .sort-btn--active .sort-arrow {
   color: #000 !important;
+}
+[data-theme="retro-terminal"] .sort-btn:first-child,
+[data-theme="retro-terminal"] .sort-btn:last-child {
+  border-radius: 0;
 }
 
 /* ═══════ RATING (square blocks like preview) ═══════ */
