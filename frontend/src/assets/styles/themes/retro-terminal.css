@@ -195,14 +195,32 @@
   box-shadow: 0 0 15px rgba(255,51,68,0.3);
 }
 [data-theme="retro-terminal"] .p-button.p-button-secondary {
-  color: #00cc6a !important;
-  border-color: #00cc6a !important;
+  color: var(--rt-danger) !important;
+  border-color: var(--rt-danger) !important;
   background: transparent !important;
 }
 [data-theme="retro-terminal"] .p-button.p-button-secondary:hover {
-  color: #00ff88 !important;
+  background: rgba(255,51,68,0.1) !important;
+  box-shadow: 0 0 15px rgba(255,51,68,0.3);
+}
+[data-theme="retro-terminal"] .p-button.p-button-success {
+  background: #00ff88 !important;
+  color: #000 !important;
   border-color: #00ff88 !important;
-  background: rgba(0,255,136,0.05) !important;
+  font-weight: bold;
+}
+[data-theme="retro-terminal"] .p-button.p-button-success:hover {
+  background: #33ffaa !important;
+  box-shadow: 0 0 15px rgba(0,255,136,0.5);
+}
+[data-theme="retro-terminal"] .p-button:not(.p-button-secondary):not(.p-button-success):not(.p-button-danger):not(.p-button-info):not(.p-button-help):not(.p-button-text):not(.p-button-outlined) {
+  background: transparent !important;
+  color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+}
+[data-theme="retro-terminal"] .p-button:not(.p-button-secondary):not(.p-button-success):not(.p-button-danger):not(.p-button-info):not(.p-button-help):not(.p-button-text):not(.p-button-outlined):hover {
+  background: rgba(56,189,248,0.1) !important;
+  box-shadow: 0 0 15px rgba(56,189,248,0.3);
 }
 
 /* ═══════ INPUTS ═══════ */
@@ -889,13 +907,36 @@
   color: #000 !important;
 }
 
-/* ═══════ RATING (same green as paginator selected) ═══════ */
-[data-theme="retro-terminal"] .p-rating .p-rating-icon {
-  color: #00ff88 !important;
+/* ═══════ RATING (square blocks like preview) ═══════ */
+[data-theme="retro-terminal"] .p-rating {
+  display: inline-flex;
+  gap: 2px;
 }
-[data-theme="retro-terminal"] .p-rating .p-rating-icon.p-rating-icon-active {
-  color: #00ff88 !important;
-  text-shadow: 0 0 6px rgba(0,255,136,0.5);
+[data-theme="retro-terminal"] .p-rating .p-rating-item {
+  margin: 0;
+}
+[data-theme="retro-terminal"] .p-rating .p-rating-icon {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #00ff88;
+  border-radius: 0;
+  background: transparent;
+  color: transparent !important;
+  margin: 0;
+  font-size: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+[data-theme="retro-terminal"] .p-rating .p-rating-icon::before {
+  content: '' !important;
+}
+[data-theme="retro-terminal"] .p-rating .p-rating-item-active .p-rating-icon {
+  background: #00ff88;
+  border-color: #00ff88;
+}
+[data-theme="retro-terminal"] .p-rating .p-rating-icon.pi-star-fill {
+  color: transparent !important;
 }
 [data-theme="retro-terminal"] .row-rating {
   color: #00ff88 !important;
@@ -932,8 +973,121 @@
   background: rgba(56,189,248,0.1) !important;
   box-shadow: 0 0 12px rgba(56,189,248,0.3) !important;
 }
-/* ═══════ SQUARE FAVORITE BUTTON ═══════ */
-[data-theme="retro-terminal"] .game-card .p-button[rounded],
-[data-theme="retro-terminal"] .game-list-row .p-button[rounded] {
+/* ═══════ ADMIN USERS — styled buttons ═══════ */
+[data-theme="retro-terminal"] .rt-admin-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  padding: 4px 10px !important;
+  border: 1px solid;
+  background: transparent !important;
+  cursor: pointer;
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+[data-theme="retro-terminal"] .rt-admin-btn.rt-admin {
+  color: var(--rt-danger) !important;
+  border-color: var(--rt-danger) !important;
+}
+[data-theme="retro-terminal"] .rt-admin-btn.rt-user {
+  color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+}
+[data-theme="retro-terminal"] .rt-admin-btn.rt-active {
+  color: #00ff88 !important;
+  border-color: #00ff88 !important;
+}
+[data-theme="retro-terminal"] .rt-admin-btn.rt-inactive {
+  color: #666 !important;
+  border-color: #555 !important;
+}
+[data-theme="retro-terminal"] .rt-admin-btn.rt-reset {
+  color: var(--rt-danger) !important;
+  border-color: var(--rt-danger) !important;
+}
+[data-theme="retro-terminal"] .rt-admin-btn:hover {
+  box-shadow: 0 0 12px rgba(0,255,136,0.3);
+  opacity: 0.85;
+}
+
+/* ═══════ HEADER ACTION BUTTONS — no frame, green ═══════ */
+[data-theme="retro-terminal"] .app-header .p-button.p-button-text {
+  border: none !important;
+  background: transparent !important;
   border-radius: 0 !important;
+  padding: 0.25rem !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  color: #00ff88 !important;
+}
+[data-theme="retro-terminal"] .app-header .p-button.p-button-text:hover {
+  background: transparent !important;
+  text-shadow: 0 0 8px rgba(0,255,136,0.5);
+}
+[data-theme="retro-terminal"] .app-header .p-button.p-button-secondary,
+[data-theme="retro-terminal"] .app-header .p-button.p-button-danger {
+  color: #00ff88 !important;
+  border-color: transparent !important;
+}
+
+/* ═══════ FAVORITE BUTTON — no frame, just heart ═══════ */
+[data-theme="retro-terminal"] .favorite-btn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border-radius: 0 !important;
+}
+[data-theme="retro-terminal"] .favorite-btn:hover {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-shadow: 0 0 8px rgba(0,255,136,0.5);
+}
+[data-theme="retro-terminal"] .favorite-btn .p-button-label {
+  display: none;
+}
+[data-theme="retro-terminal"] .favorite-btn .p-button-icon {
+  font-size: 1.1rem;
+}
+[data-theme="retro-terminal"] .favorite-btn.p-button.p-button-secondary {
+  color: #00ff88 !important;
+}
+[data-theme="retro-terminal"] .favorite-btn.p-button.p-button-danger {
+  color: var(--rt-danger) !important;
+}
+
+/* ═══════ UTILITY BUTTON CLASSES ═══════ */
+[data-theme="retro-terminal"] .p-button.rt-btn-success-outline {
+  color: #00ff88 !important;
+  border-color: #00ff88 !important;
+  background: transparent !important;
+}
+[data-theme="retro-terminal"] .p-button.rt-btn-success-outline:hover {
+  background: rgba(0,255,136,0.1) !important;
+  box-shadow: 0 0 12px rgba(0,255,136,0.3) !important;
+}
+[data-theme="retro-terminal"] .p-button.rt-btn-muted {
+  color: #00cc6a !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  opacity: 0.7;
+}
+[data-theme="retro-terminal"] .p-button.rt-btn-muted:hover {
+  opacity: 1;
+  background: rgba(0,255,136,0.05) !important;
+}
+[data-theme="retro-terminal"] .p-button.rt-btn-admin-link {
+  color: #00ff88 !important;
+  border-color: #00ff88 !important;
+  background: transparent !important;
+}
+[data-theme="retro-terminal"] .p-button.rt-btn-admin-link:hover {
+  background: rgba(0,255,136,0.1) !important;
+  box-shadow: 0 0 12px rgba(0,255,136,0.3) !important;
 }

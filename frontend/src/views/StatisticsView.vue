@@ -1,6 +1,9 @@
 <template>
   <div class="statistics-page">
-    <h2 class="mb-3">{{ t('statistics.title') }}</h2>
+    <h2 class="mb-3">
+      <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('statistics.title').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+      <span v-else>{{ t('statistics.title') }}</span>
+    </h2>
 
     <div class="flex justify-content-end mb-3">
       <Button v-if="authStore.isAdmin" :label="t('statistics.refresh_sizes')" icon="pi pi-refresh" severity="secondary" size="small"
@@ -120,6 +123,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import { statisticsApi } from '../api/statistics'
 import Button from 'primevue/button'
 import { Bar, Pie } from 'vue-chartjs'
@@ -137,6 +141,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend)
 
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const router = useRouter()
 const authStore = useAuthStore()
 

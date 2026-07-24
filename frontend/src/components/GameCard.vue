@@ -77,7 +77,8 @@
           :icon="favIcon"
           :severity="game.favorited ? 'danger' : 'secondary'"
           size="small"
-          rounded
+          :rounded="currentThemeId !== 'retro-terminal'"
+          class="favorite-btn"
           @click.stop="toggleFav"
           v-tooltip.left="t('filter.favorites_off')"
         />
@@ -109,7 +110,6 @@ const libraryStore = useLibraryStore()
 const imgLoaded = ref(false)
 
 const favIcon = computed(() => {
-  if (currentThemeId.value === 'retro-terminal') return 'pi pi-heart'
   return props.game.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'
 })
 

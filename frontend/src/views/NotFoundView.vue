@@ -1,7 +1,10 @@
 <template>
   <div class="not-found">
     <i class="pi pi-exclamation-triangle not-found-icon"></i>
-    <h1 class="not-found-code">404</h1>
+    <h1 class="not-found-code">
+      <span v-if="currentThemeId === 'retro-terminal'">&gt; 404_Not_Found<span class="t-cursor" /></span>
+      <span v-else>404</span>
+    </h1>
     <p class="not-found-message">{{ t('not_found.message') }}</p>
     <router-link to="/">
       <Button :label="t('not_found.back')" icon="pi pi-arrow-left" />
@@ -12,7 +15,9 @@
 <script setup>
 import Button from 'primevue/button'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 </script>
 
 <style scoped>

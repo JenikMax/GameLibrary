@@ -1,7 +1,10 @@
 <template>
   <div class="admin-scrapers-container">
     <div class="flex align-items-center justify-content-between mb-3">
-      <h2>{{ t('admin.scrapers.title') }}</h2>
+      <h2>
+        <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('admin.scrapers.title').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+        <span v-else>{{ t('admin.scrapers.title') }}</span>
+      </h2>
       <Button :label="t('admin.scrapers.reload')" icon="pi pi-refresh" severity="help" @click="handleReload" :loading="reloading" />
     </div>
 
@@ -125,8 +128,10 @@ import Sidebar from 'primevue/sidebar'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import Chip from 'primevue/chip'
+import { useTheme } from '../composables/useTheme'
 
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const toast = useToast()
 
 const scrapers = ref([])

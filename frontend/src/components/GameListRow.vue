@@ -31,9 +31,10 @@
       <Button
         :icon="favIcon"
         :severity="game.favorited ? 'danger' : 'secondary'"
-        rounded
+        :rounded="currentThemeId !== 'retro-terminal'"
         text
         size="small"
+        class="favorite-btn"
         @click="toggleFav"
         v-tooltip="game.favorited ? t('filter.favorites_on') : t('filter.favorites_off')"
       />
@@ -71,7 +72,6 @@ const { currentThemeId } = useTheme()
 const toast = useToast()
 
 const favIcon = computed(() => {
-  if (currentThemeId.value === 'retro-terminal') return 'pi pi-heart'
   return props.game.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'
 })
 

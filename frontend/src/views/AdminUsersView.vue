@@ -1,6 +1,9 @@
 <template>
   <div class="admin-users-container">
-    <h2>{{ t('admin.users.title') }}</h2>
+    <h2>
+      <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('admin.users.title').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+      <span v-else>{{ t('admin.users.title') }}</span>
+    </h2>
 
     <DataTable :value="users" stripedRows paginator :rows="10" sortField="name" :sortOrder="1">
       <Column field="id" :header="t('admin.users.id')" sortable style="width:80px" />
@@ -12,7 +15,15 @@
       </Column>
       <Column field="admin" :header="t('admin.users.admin')" sortable style="width:100px">
         <template #body="slotProps">
-          <ToggleSwitch
+          <span v-if="currentThemeId === 'retro-terminal'">
+            <Button
+              :label="slotProps.data.admin ? 'ADMIN' : 'USER'"
+              :class="slotProps.data.admin ? 'rt-admin-btn rt-admin' : 'rt-admin-btn rt-user'"
+              size="small"
+              @click="toggleAdmin(slotProps.data.id, !slotProps.data.admin)"
+            />
+          </span>
+          <ToggleSwitch v-else
             :modelValue="slotProps.data.admin"
             @update:modelValue="(val) => toggleAdmin(slotProps.data.id, val)"
           />
@@ -20,7 +31,15 @@
       </Column>
       <Column field="active" :header="t('admin.users.active')" sortable style="width:100px">
         <template #body="slotProps">
-          <ToggleSwitch
+          <span v-if="currentThemeId === 'retro-terminal'">
+            <Button
+              :label="slotProps.data.active ? 'ACTIVE' : 'INACTIVE'"
+              :class="slotProps.data.active ? 'rt-admin-btn rt-active' : 'rt-admin-btn rt-inactive'"
+              size="small"
+              @click="toggleActive(slotProps.data.id, !slotProps.data.active)"
+            />
+          </span>
+          <ToggleSwitch v-else
             :modelValue="slotProps.data.active"
             @update:modelValue="(val) => toggleActive(slotProps.data.id, val)"
           />
@@ -28,7 +47,15 @@
       </Column>
       <Column :header="t('admin.users.actions')" style="width:150px">
         <template #body="slotProps">
-          <Button
+          <span v-if="currentThemeId === 'retro-terminal'">
+            <Button
+              label="RESET"
+              class="rt-admin-btn rt-reset"
+              size="small"
+              @click="resetPassword(slotProps.data.id, slotProps.data.name)"
+            />
+          </span>
+          <Button v-else
             icon="pi pi-refresh"
             severity="warn"
             text
@@ -56,6 +83,7 @@
 import { ref, onMounted } from 'vue'
 import { adminApi } from '../api/admin'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Avatar from 'primevue/avatar'
@@ -66,6 +94,7 @@ import InputText from 'primevue/inputtext'
 import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 
 const users = ref([])
 const toast = useToast()

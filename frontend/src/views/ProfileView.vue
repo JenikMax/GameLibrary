@@ -5,7 +5,10 @@
         <div class="flex align-items-center gap-3">
           <Avatar :image="authStore.avatarUrl" size="xlarge" shape="circle" />
           <div>
-            <h2 class="m-0">{{ authStore.username }}</h2>
+            <h2 class="m-0">
+              <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
+              <span v-else>{{ authStore.username }}</span>
+            </h2>
             <Tag
               :value="authStore.isAdmin ? t('profile.role_admin') : t('profile.role_user')"
               :severity="authStore.isAdmin ? 'danger' : 'info'"
@@ -52,9 +55,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import { profileApi } from '../api/profile'
 import Card from 'primevue/card'
 import Avatar from 'primevue/avatar'
@@ -68,8 +72,11 @@ import Message from 'primevue/message'
 import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const authStore = useAuthStore()
 const toast = useToast()
+
+const terminalTitle = computed(() => authStore.username.replace(/ /g, '_'))
 
 const newPassword = ref('')
 const passError = ref('')

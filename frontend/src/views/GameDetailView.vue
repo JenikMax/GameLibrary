@@ -26,13 +26,17 @@
       <div class="game-info">
         <div class="flex align-items-center gap-2 mb-2">
           <Button icon="pi pi-arrow-left" text @click="$router.push('/')" />
-          <h1 class="m-0">{{ game.name }}</h1>
+          <h1 class="m-0">
+            <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
+            <span v-else>{{ game.name }}</span>
+          </h1>
           <Button
             v-if="authStore.isAuthenticated"
-            :icon="game.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'"
+            :icon="favIcon"
             :severity="game.favorited ? 'danger' : 'secondary'"
-            rounded
+            :rounded="currentThemeId !== 'retro-terminal'"
             text
+            class="favorite-btn"
             @click="toggleFav"
           />
         </div>
@@ -72,6 +76,7 @@
             :label="t('collections.add_to')"
             icon="pi pi-folder"
             severity="secondary"
+            class="rt-btn-success-outline"
             @click="showCollectionPicker = true"
           />
           <Button
@@ -102,6 +107,7 @@
             size="small"
             severity="secondary"
             text
+            class="rt-btn-muted"
             :loading="translating"
             :disabled="translating"
             @click="toggleTranslation"
@@ -341,6 +347,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useLibraryStore } from '../stores/library'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import { useViewHistory } from '../composables/useViewHistory'
 import { gamesApi } from '../api/games'
 import CollectionPicker from '../components/CollectionPicker.vue'
@@ -366,6 +373,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const libraryStore = useLibraryStore()
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const showCollectionPicker = ref(false)
 const { addToHistory } = useViewHistory()
 
@@ -441,6 +449,15 @@ const screenshotHeader = computed(() => {
 
 watch(viewerVisible, (val) => {
   if (val) nextTick(() => viewerRef.value?.focus())
+})
+
+const favIcon = computed(() => {
+  return game.value?.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'
+})
+
+const terminalTitle = computed(() => {
+  if (!game.value) return ''
+  return game.value.name.replace(/ /g, '_')
 })
 
 const trailerEmbedUrl = computed(() => {

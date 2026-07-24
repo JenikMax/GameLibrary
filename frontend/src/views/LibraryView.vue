@@ -10,7 +10,10 @@
     </aside>
     <main class="library-main">
       <div class="flex align-items-center justify-content-between mb-3">
-        <h2 class="m-0">{{ t('library.title') }}</h2>
+        <h2 class="m-0">
+          <span v-if="currentThemeId === 'retro-terminal'">&gt; Game_Library<span class="t-cursor" /></span>
+          <span v-else>{{ t('library.title') }}</span>
+        </h2>
         <div class="flex gap-2 align-items-center">
           <Button
             :label="t('library.random')"
@@ -141,6 +144,7 @@ import { useRouter } from 'vue-router'
 import { useLibraryStore } from '../stores/library'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import { useViewHistory } from '../composables/useViewHistory'
 import { adminApi } from '../api/admin'
 import { gamesApi } from '../api/games'
@@ -177,6 +181,7 @@ function saveStateToSession() {
 const store = useLibraryStore()
 const authStore = useAuthStore()
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const { history } = useViewHistory()
 const router = useRouter()
 const toast = useToast()

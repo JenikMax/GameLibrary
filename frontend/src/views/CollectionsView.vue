@@ -1,7 +1,10 @@
 <template>
   <div class="collections-page">
     <div class="flex align-items-center justify-content-between mb-3">
-      <h2 class="m-0">{{ t('collections.title') }}</h2>
+      <h2 class="m-0">
+        <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('collections.title').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+        <span v-else>{{ t('collections.title') }}</span>
+      </h2>
       <Button :label="t('collections.create')" icon="pi pi-plus" severity="success" @click="showCreateDialog = true" />
     </div>
 
@@ -62,6 +65,7 @@
 <script setup>
 import { ref, computed, onMounted, onActivated } from 'vue'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import { collectionsApi } from '../api/collections'
 import { useLibraryStore } from '../stores/library'
 import { useToast } from 'primevue/usetoast'
@@ -75,6 +79,7 @@ import CollectionCard from '../components/CollectionCard.vue'
 import SmartRulesForm from '../components/SmartRulesForm.vue'
 
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const toast = useToast()
 const store = useLibraryStore()
 

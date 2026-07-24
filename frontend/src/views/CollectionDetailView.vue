@@ -5,7 +5,10 @@
         <Button icon="pi pi-arrow-left" text rounded @click="router.push('/collections')" />
         <div>
           <div class="flex align-items-center gap-2">
-            <h2 class="m-0">{{ collection.name }}</h2>
+            <h2 class="m-0">
+              <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
+              <span v-else>{{ collection.name }}</span>
+            </h2>
             <Tag v-if="collection.isSmart" :value="t('collections.smart')" severity="info" size="small" rounded />
           </div>
           <p v-if="collection.description" class="m-0 text-sm text-color-secondary">{{ collection.description }}</p>
@@ -99,6 +102,7 @@
 import { ref, onActivated, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import { useAuthStore } from '../stores/auth'
 import { useLibraryStore } from '../stores/library'
 import { collectionsApi } from '../api/collections'
@@ -114,6 +118,7 @@ import GameCard from '../components/GameCard.vue'
 import SmartRulesForm from '../components/SmartRulesForm.vue'
 
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
@@ -131,6 +136,8 @@ const editIsPublic = ref(false)
 const editIsSmart = ref(false)
 const editSmartRulesObj = ref({})
 const updating = ref(false)
+
+const terminalTitle = computed(() => collection.value ? collection.value.name.replace(/ /g, '_') : '')
 
 const parsedRules = computed(() => {
   if (!collection.value?.smartRules) return {}

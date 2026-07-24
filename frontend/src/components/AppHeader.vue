@@ -3,7 +3,6 @@
     <Menubar :model="items" class="app-header">
 
       <template #start>
-        <span v-if="currentThemeId === 'retro-terminal'" class="terminal-title">~$<span class="t-cursor" /></span>
       </template>
 
       <template #end>
@@ -408,27 +407,5 @@ onUnmounted(() => {
   border-radius: 50%;
   border: 1px solid var(--p-surface-300);
 }
-.terminal-title {
-  display: none;
-  color: #00cc6a;
-  font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
-  font-weight: bold;
-  margin-right: 0.75rem;
-  text-shadow: 0 0 8px rgba(0,255,136,0.4);
-}
-[data-theme="retro-terminal"] .terminal-title {
-  display: inline-flex;
-  align-items: center;
-}
-@keyframes rt-header-blink { 50% { opacity: 0; } }
-.terminal-title .t-cursor {
-  display: inline-block;
-  width: 8px;
-  height: 14px;
-  background: #00ff88;
-  animation: rt-header-blink 1s step-end infinite;
-  vertical-align: middle;
-  margin-left: 4px;
-}
+
 </style>

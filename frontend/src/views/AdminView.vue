@@ -1,6 +1,9 @@
 <template>
   <div class="admin-dashboard">
-    <h2 class="mb-3">{{ t('admin.dashboard') }}</h2>
+    <h2 class="mb-3">
+      <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('admin.dashboard').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+      <span v-else>{{ t('admin.dashboard') }}</span>
+    </h2>
 
     <div class="admin-grid">
       <Card>
@@ -83,15 +86,15 @@
               :label="t('nav.users')"
               icon="pi pi-users"
               severity="secondary"
+              class="rt-btn-admin-link w-full"
               @click="$router.push('/admin/users')"
-              class="w-full"
             />
             <Button
               :label="t('nav.scrapers')"
               icon="pi pi-cloud-download"
               severity="secondary"
+              class="rt-btn-admin-link w-full"
               @click="$router.push('/admin/scrapers')"
-              class="w-full"
             />
           </div>
         </template>
@@ -108,8 +111,10 @@ import Card from 'primevue/card'
 import Button from 'primevue/button'
 import ProgressBar from 'primevue/progressbar'
 import { useToast } from 'primevue/usetoast'
+import { useTheme } from '../composables/useTheme'
 
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const toast = useToast()
 
 const scanning = ref(false)

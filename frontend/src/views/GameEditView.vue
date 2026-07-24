@@ -5,7 +5,10 @@
   <div v-else-if="game" class="edit-container">
     <div class="flex align-items-center gap-3 mb-3">
       <Button icon="pi pi-arrow-left" text @click="$router.push(`/game/${game.id}`)" />
-      <h2 class="m-0">{{ t('game.edit_title') }} {{ game.name }}</h2>
+      <h2 class="m-0">
+        <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
+        <span v-else>{{ t('game.edit_title') }} {{ game.name }}</span>
+      </h2>
     </div>
 
     <Message v-if="error" severity="error" :closable="false" class="mb-3">{{ error }}</Message>
@@ -84,6 +87,7 @@
                     size="small"
                     severity="help"
                     text
+                    class="rt-btn-muted"
                     :loading="translatingDesc"
                     @click="translateDescription"
                   />
@@ -142,7 +146,7 @@
                    @load="logoLoaded = true"
                    @error="logoLoaded = true" />
               <Button :label="t('game.change_logo')" icon="pi pi-image" severity="secondary" size="small"
-                @click="$refs.logoInput.click()" />
+                class="rt-btn-muted" @click="$refs.logoInput.click()" />
               <input ref="logoInput" type="file" accept="image/*" class="hidden-input" @change="handleLogoUpload" />
             </div>
           </template>
@@ -216,9 +220,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import { gamesApi } from '../api/games'
 import { useLocaleStore } from '../stores/locale'
 import { useLibraryStore } from '../stores/library'
@@ -238,11 +243,17 @@ import 'quill/dist/quill.snow.css'
 import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const route = useRoute()
 const router = useRouter()
 const localeStore = useLocaleStore()
 const libraryStore = useLibraryStore()
 const toast = useToast()
+
+const terminalTitle = computed(() => {
+  if (!game.value) return ''
+  return 'Edit:_' + game.value.name.replace(/ /g, '_')
+})
 
 const game = ref(null)
 const loading = ref(true)

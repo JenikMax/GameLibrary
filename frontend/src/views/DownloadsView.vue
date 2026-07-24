@@ -2,8 +2,11 @@
   <div class="downloads-container">
     <div class="flex align-items-center justify-content-between mb-3">
       <div class="flex align-items-center gap-2">
-        <i class="pi pi-download text-2xl"></i>
-        <h2 class="m-0">{{ t('nav.downloads') }}</h2>
+        <i v-if="currentThemeId !== 'retro-terminal'" class="pi pi-download text-2xl"></i>
+        <h2 class="m-0">
+          <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('nav.downloads').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+          <span v-else>{{ t('nav.downloads') }}</span>
+        </h2>
       </div>
       <div class="flex gap-2 align-items-center">
         <Tag v-if="globalStat" :value="'⬆ ' + formatSpeed(globalStat.uploadSpeed)" severity="info" />
@@ -122,6 +125,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from '../composables/useI18n'
+import { useTheme } from '../composables/useTheme'
 import { downloadsApi } from '../api/downloads'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -134,6 +138,7 @@ import TabPanel from 'primevue/tabpanel'
 import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
+const { currentThemeId } = useTheme()
 const toast = useToast()
 const activeDownloads = ref([])
 const waitingDownloads = ref([])
