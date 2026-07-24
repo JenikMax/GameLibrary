@@ -38,6 +38,7 @@
             text
             class="favorite-btn"
             @click="toggleFav"
+            v-tooltip.bottom="game.favorited ? t('game.fav_remove') : t('game.fav_add')"
           />
         </div>
         <div class="flex gap-2 flex-wrap mb-3">

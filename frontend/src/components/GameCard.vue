@@ -80,7 +80,7 @@
           :rounded="currentThemeId !== 'retro-terminal'"
           class="favorite-btn"
           @click.stop="toggleFav"
-          v-tooltip.left="t('filter.favorites_off')"
+          v-tooltip.left="game.favorited ? t('game.fav_remove') : t('game.fav_add')"
         />
       </div>
     </template>

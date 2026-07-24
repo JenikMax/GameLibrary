@@ -36,7 +36,7 @@
         size="small"
         class="favorite-btn"
         @click="toggleFav"
-        v-tooltip="game.favorited ? t('filter.favorites_on') : t('filter.favorites_off')"
+        v-tooltip="game.favorited ? t('game.fav_remove') : t('game.fav_add')"
       />
       <a
         :href="getDownloadUrl(game.id)"
