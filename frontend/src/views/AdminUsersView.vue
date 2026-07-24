@@ -115,6 +115,8 @@ onMounted(async () => {
 async function toggleAdmin(id, value) {
   try {
     await adminApi.toggleAdmin(id, value)
+    const user = users.value.find(u => u.id === id)
+    if (user) user.admin = value
     toast.add({ severity: 'success', summary: t('admin.users.update_success'), life: 3000 })
   } catch {
     toast.add({ severity: 'error', summary: t('admin.users.update_failed'), life: 3000 })
@@ -124,6 +126,8 @@ async function toggleAdmin(id, value) {
 async function toggleActive(id, value) {
   try {
     await adminApi.toggleActive(id, value)
+    const user = users.value.find(u => u.id === id)
+    if (user) user.active = value
     toast.add({ severity: 'success', summary: t('admin.users.update_success'), life: 3000 })
   } catch {
     toast.add({ severity: 'error', summary: t('admin.users.update_failed'), life: 3000 })

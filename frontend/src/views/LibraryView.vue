@@ -83,6 +83,7 @@
           text
           rounded
           size="small"
+          class="rt-btn-green"
           @click="store.setViewMode(store.viewMode === 'grid' ? 'list' : 'grid')"
           v-tooltip="store.viewMode === 'grid' ? t('view.list') : t('view.grid')"
         />

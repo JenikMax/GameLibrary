@@ -148,8 +148,14 @@
 }
 
 /* ═══════ BUTTONS (outlined glowing-border style) ═══════ */
+[data-theme="retro-terminal"] .p-button,
+[data-theme="retro-terminal"] .p-button::after,
+[data-theme="retro-terminal"] .p-button:focus,
+[data-theme="retro-terminal"] .p-button:focus-visible {
+  border-radius: 0 !important;
+  outline: none !important;
+}
 [data-theme="retro-terminal"] .p-button {
-  border-radius: 0;
   font-family: 'Courier New', monospace;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -912,7 +918,7 @@
   display: inline-flex;
   gap: 2px;
 }
-[data-theme="retro-terminal"] .p-rating .p-rating-item {
+[data-theme="retro-terminal"] .p-rating .p-rating-option {
   margin: 0;
 }
 [data-theme="retro-terminal"] .p-rating .p-rating-icon {
@@ -924,19 +930,13 @@
   color: transparent !important;
   margin: 0;
   font-size: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 [data-theme="retro-terminal"] .p-rating .p-rating-icon::before {
   content: '' !important;
 }
-[data-theme="retro-terminal"] .p-rating .p-rating-item-active .p-rating-icon {
+[data-theme="retro-terminal"] .p-rating .p-rating-option[data-p-active="true"] .p-rating-icon {
   background: #00ff88;
   border-color: #00ff88;
-}
-[data-theme="retro-terminal"] .p-rating .p-rating-icon.pi-star-fill {
-  color: transparent !important;
 }
 [data-theme="retro-terminal"] .row-rating {
   color: #00ff88 !important;
@@ -998,8 +998,8 @@
   border-color: #00ff88 !important;
 }
 [data-theme="retro-terminal"] .rt-admin-btn.rt-inactive {
-  color: #666 !important;
-  border-color: #555 !important;
+  color: var(--rt-danger) !important;
+  border-color: var(--rt-danger) !important;
 }
 [data-theme="retro-terminal"] .rt-admin-btn.rt-reset {
   color: var(--rt-danger) !important;
@@ -1060,6 +1060,16 @@
 }
 [data-theme="retro-terminal"] .favorite-btn.p-button.p-button-danger {
   color: var(--rt-danger) !important;
+}
+
+/* ═══════ GREEN TEXT BUTTON (library view toggle, etc.) ═══════ */
+[data-theme="retro-terminal"] .p-button.rt-btn-green {
+  color: #00ff88 !important;
+  border-color: transparent !important;
+}
+[data-theme="retro-terminal"] .p-button.rt-btn-green:hover {
+  background: transparent !important;
+  text-shadow: 0 0 8px rgba(0,255,136,0.5);
 }
 
 /* ═══════ UTILITY BUTTON CLASSES ═══════ */
