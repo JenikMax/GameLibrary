@@ -95,7 +95,7 @@ function onImgError(e) {
   left: 0;
   right: 0;
   z-index: 2;
-  padding: 14px;
+  padding: 16px;
 }
 
 .fade-title {
@@ -116,12 +116,12 @@ function onImgError(e) {
 
 .fade-covers {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 
 .fade-thumb {
-  width: 34px;
-  height: 45px;
+  width: 56px;
+  height: 76px;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -133,12 +133,12 @@ function onImgError(e) {
 }
 
 .fade-ovfl {
-  width: 34px;
-  height: 45px;
+  width: 56px;
+  height: 76px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 
@@ -151,7 +151,7 @@ function onImgError(e) {
 </style>
 
 <style>
-/* ===== LIGHT / DARK DEFAULT ===== */
+/* ===== LIGHT / DARK / RETRO DEFAULT ===== */
 .fade-grad {
   background: linear-gradient(transparent 50%, #1e1e22 85%, #1e1e22 100%);
 }
@@ -171,14 +171,40 @@ function onImgError(e) {
 }
 
 .fade-thumb {
-  background: var(--p-surface-700);
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .fade-ovfl {
-  background: rgba(255, 255, 255, 0.08);
-  color: #888;
   border-radius: 4px;
+}
+
+[data-theme="default-light"] .fade-thumb {
+  background: var(--p-surface-200);
+}
+
+[data-theme="default-dark"] .fade-thumb {
+  background: var(--p-surface-700);
+}
+
+[data-theme="default-light"] .fade-ovfl {
+  background: var(--p-surface-700);
+  color: #fff;
+}
+
+[data-theme="default-dark"] .fade-ovfl {
+  background: var(--p-surface-700);
+  color: #fff;
+}
+
+[data-theme="retro-terminal"] .fade-thumb {
+  background: #0a0a0a;
+  border: 1px solid #00ff88;
+  box-shadow: 0 0 6px rgba(0, 255, 136, 0.2);
+}
+
+[data-theme="retro-terminal"] .fade-ovfl {
+  background: rgba(0, 255, 136, 0.08);
+  color: #00ff88;
 }
 </style>
