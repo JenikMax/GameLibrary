@@ -16,6 +16,8 @@ public interface GameReviewRepository extends JpaRepository<GameReview, Long> {
 
     long countByGameId(Long gameId);
 
+    long countByUserId(Long userId);
+
     @Query("SELECT AVG(r.gameplayScore) FROM GameReview r WHERE r.game.id = :gameId AND r.gameplayScore IS NOT NULL")
     Double findAvgGameplayScore(@Param("gameId") Long gameId);
 

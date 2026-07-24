@@ -10,4 +10,6 @@ public interface GameCommentRepository extends JpaRepository<GameComment, Long> 
     List<GameComment> findByGameIdOrderByCreatedAtDesc(Long gameId);
 
     long countByGameId(Long gameId);
+
+    long countByUserId(Long userId);
 }

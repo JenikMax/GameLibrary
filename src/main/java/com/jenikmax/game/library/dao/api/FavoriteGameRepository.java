@@ -18,4 +18,6 @@ public interface FavoriteGameRepository extends JpaRepository<FavoriteGame, Long
     boolean existsByUserIdAndGameId(Long userId, Long gameId);
 
     long countByGameId(Long gameId);
+
+    long countByUserId(Long userId);
 }

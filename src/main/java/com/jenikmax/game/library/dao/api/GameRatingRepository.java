@@ -23,4 +23,6 @@ public interface GameRatingRepository extends JpaRepository<GameRating, Long> {
 
     @Query("SELECT r.game.id, AVG(r.rating), COUNT(r) FROM GameRating r WHERE r.game.id IN :ids GROUP BY r.game.id")
     List<Object[]> findAvgRatingByGameIds(@Param("ids") List<Long> gameIds);
+
+    long countByUserId(Long userId);
 }

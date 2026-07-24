@@ -1,20 +1,25 @@
 package com.jenikmax.game.library.controller.api;
 
+import com.jenikmax.game.library.dao.api.*;
 import com.jenikmax.game.library.model.dto.ShortUser;
 import com.jenikmax.game.library.model.dto.UserDto;
 import com.jenikmax.game.library.model.dto.api.ApiResponse;
 import com.jenikmax.game.library.model.dto.api.PasswordChangeRequest;
 import com.jenikmax.game.library.model.dto.api.ProfileUpdateRequest;
 import com.jenikmax.game.library.model.dto.api.UserProfileResponse;
+import com.jenikmax.game.library.model.entity.User;
 import com.jenikmax.game.library.service.data.UserDataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -24,9 +29,30 @@ public class ProfileController {
     private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);
 
     private final UserDataService userService;
+    private final UserRepository userRepository;
+    private final GameRatingRepository gameRatingRepository;
+    private final GameReviewRepository gameReviewRepository;
+    private final GameCommentRepository gameCommentRepository;
+    private final FavoriteGameRepository favoriteGameRepository;
+    private final GameCollectionRepository gameCollectionRepository;
+    private final JdbcTemplate jdbcTemplate;
 
-    public ProfileController(UserDataService userService) {
+    public ProfileController(UserDataService userService,
+                             UserRepository userRepository,
+                             GameRatingRepository gameRatingRepository,
+                             GameReviewRepository gameReviewRepository,
+                             GameCommentRepository gameCommentRepository,
+                             FavoriteGameRepository favoriteGameRepository,
+                             GameCollectionRepository gameCollectionRepository,
+                             JdbcTemplate jdbcTemplate) {
         this.userService = userService;
+        this.userRepository = userRepository;
+        this.gameRatingRepository = gameRatingRepository;
+        this.gameReviewRepository = gameReviewRepository;
+        this.gameCommentRepository = gameCommentRepository;
+        this.favoriteGameRepository = favoriteGameRepository;
+        this.gameCollectionRepository = gameCollectionRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @GetMapping
@@ -81,6 +107,31 @@ public class ProfileController {
         profile.setAdmin(shortUser.isAdmin());
         profile.setActive(shortUser.isActive());
         profile.setAvatarUrl(avatarUrl(shortUser));
+
+        Long userId = shortUser.getId();
+
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null && user.getCreateTs() != null) {
+            LocalDate created = user.getCreateTs().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            profile.setMemberSince(String.valueOf(created.getYear()));
+        } else {
+            profile.setMemberSince(null);
+        }
+
+        try {
+            Long totalGames = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM library.game_data", Long.class);
+            profile.setGamesCount(totalGames != null ? totalGames : 0);
+        } catch (Exception e) {
+            profile.setGamesCount(0);
+        }
+
+        profile.setRatingsCount(gameRatingRepository.countByUserId(userId));
+        profile.setCollectionsCount(gameCollectionRepository.countByUserId(userId));
+        profile.setReviewsCount(gameReviewRepository.countByUserId(userId));
+        profile.setCommentsCount(gameCommentRepository.countByUserId(userId));
+        profile.setFavoritesCount(favoriteGameRepository.countByUserId(userId));
+
         return profile;
     }
 
