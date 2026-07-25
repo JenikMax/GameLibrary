@@ -938,7 +938,8 @@ public class ScraperConfigService {
         map.put("snowboarding", Arrays.asList("sport"));
         map.put("soccer", Arrays.asList("sport"));
         map.put("gun", Arrays.asList("shooter"));
-        map.put("survival horror", Arrays.asList("horror"));
+        map.put("survival horror", Arrays.asList("survival", "horror"));
+        map.put("survivalhorror", Arrays.asList("survival", "horror"));
         map.put("tactical rpg", Arrays.asList("tactics", "rpg"));
         map.put("gambling", Arrays.asList("card"));
         map.put("compilation", Arrays.asList("other"));

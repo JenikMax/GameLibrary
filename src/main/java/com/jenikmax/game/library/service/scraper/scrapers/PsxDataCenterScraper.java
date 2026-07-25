@@ -20,6 +20,8 @@ public class PsxDataCenterScraper implements Scraper {
 
     private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;
 
+    private static final Pattern SERIAL_PATTERN = Pattern.compile("^[A-Za-z]{3,5}-\\d{4,5}$");
+
     private static final List<SearchSource> SEARCH_SOURCES = Arrays.asList(
         new SearchSource("PS1", "ntsc-u", "https://psxdatacenter.com/ulist.html"),
         new SearchSource("PS1", "pal",    "https://psxdatacenter.com/plist.html"),
@@ -48,7 +50,8 @@ public class PsxDataCenterScraper implements Scraper {
     public GameDto scrap(GameDto gameDto) {
         if (gameDto.getName() == null || gameDto.getName().isEmpty()) return gameDto;
         try {
-            String url = searchByName(gameDto.getName());
+            String name = gameDto.getName().trim();
+            String url = isSerialNumber(name) ? searchBySerial(name) : searchByName(name);
             if (url != null) return scrap(gameDto, url);
         } catch (Exception e) {
             // search failed
@@ -107,10 +110,29 @@ public class PsxDataCenterScraper implements Scraper {
         String url = scrapInfo.getUrl();
         if (url != null && !url.isEmpty()) {
             if (url.startsWith("http://") || url.startsWith("https://")) return url;
-            return searchByName(url);
+            String trimmed = url.trim();
+            return isSerialNumber(trimmed) ? searchBySerial(trimmed) : searchByName(trimmed);
         }
         String name = gameDto.getName();
-        if (name != null && !name.isEmpty()) return searchByName(name);
+        if (name != null && !name.isEmpty()) {
+            String trimmed = name.trim();
+            return isSerialNumber(trimmed) ? searchBySerial(trimmed) : searchByName(trimmed);
+        }
+        return null;
+    }
+
+    private boolean isSerialNumber(String input) {
+        return input != null && SERIAL_PATTERN.matcher(input.trim().toUpperCase(Locale.ROOT)).matches();
+    }
+
+    private String searchBySerial(String serial) throws IOException {
+        if (serial == null || serial.isEmpty()) return null;
+        String query = serial.toUpperCase(Locale.ROOT).trim();
+        for (SearchSource ss : SEARCH_SOURCES) {
+            Document doc = jsoupHelper.fetchDocument(ss.listUrl, config);
+            String url = findInListBySerial(doc, query);
+            if (url != null) return url;
+        }
         return null;
     }
 
@@ -151,12 +173,33 @@ public class PsxDataCenterScraper implements Scraper {
         return null;
     }
 
+    private String findInListBySerial(Document doc, String serial) {
+        Elements infoLinks = doc.select("a[href]:matchesOwn((?i)^INFO$)");
+        for (Element link : infoLinks) {
+            Element serialCell = findSerialCell(link);
+            if (serialCell == null) continue;
+            String cellText = serialCell.text().replace((char)0xA0, ' ').trim();
+            if (cellText.contains(serial)) {
+                return link.absUrl("href");
+            }
+        }
+        return null;
+    }
+
     private Element findTitleCell(Element infoLink) {
         Element row = infoLink.closest("tr");
         if (row == null) return null;
         Elements cells = row.children();
         if (cells.size() < 3) return null;
         return cells.get(2);
+    }
+
+    private Element findSerialCell(Element infoLink) {
+        Element row = infoLink.closest("tr");
+        if (row == null) return null;
+        Elements cells = row.children();
+        if (cells.size() < 3) return null;
+        return cells.get(1);
     }
 
     private Map<String, Object> scrapeGameCard(String url) throws IOException {
