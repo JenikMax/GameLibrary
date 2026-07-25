@@ -166,8 +166,9 @@
               />
             </div>
             <div class="field">
-              <label for="scrapeUrl">{{ t('game.scraper.url') }}</label>
-              <InputText id="scrapeUrl" v-model="scrape.url" class="w-full" />
+              <label for="scrapeUrl">{{ scrapeUrlLabel }}</label>
+              <InputText id="scrapeUrl" v-model="scrape.url" :placeholder="currentScraperHint" class="w-full" />
+              <small class="text-color-secondary">{{ t('game.scraper.url_empty_hint') }}</small>
             </div>
             <div class="field flex flex-column gap-2">
               <label>{{ t('game.scraper.fields') }}</label>
@@ -347,6 +348,21 @@ const scrape = ref({
   instruction: true
 })
 
+const currentScraperHint = computed(() => {
+  const s = scrapeSources.value.find(s => s.value === scrape.value.source)
+  if (!s) return ''
+  return localeStore.locale === 'en' ? (s.inputHintEn || '') : (s.inputHintRu || '')
+})
+
+const scrapeUrlLabel = computed(() => {
+  const type = scrape.value.source
+  if (type === 'psxdatacenter') return t('game.scraper.name_serial_or_url')
+  if (['igdb', 'thegamesdb'].includes(type)) return t('game.scraper.game_name')
+  if (type === 'steam') return t('game.scraper.app_id_or_url')
+  if (type === 'playground') return t('game.scraper.name_or_url')
+  return t('game.scraper.url')
+})
+
 const editorOptions = {
   modules: {
     toolbar: [
@@ -391,7 +407,7 @@ onMounted(async () => {
     newScreenshotPreviews.value = []
     allGenres.value = filterRes.data.data.genres || []
     allTags.value = filterRes.data.data.tags || []
-    const sources = (scraperRes.data.data || []).map(s => ({ label: s.displayName || s.type, value: s.type }))
+    const sources = (scraperRes.data.data || []).map(s => ({ label: s.displayName || s.type, value: s.type, inputHintRu: s.inputHintRu || '', inputHintEn: s.inputHintEn || '' }))
     scrapeSources.value = sources
     if (sources.length > 0 && !scrape.value.source) {
       scrape.value.source = sources[0].value

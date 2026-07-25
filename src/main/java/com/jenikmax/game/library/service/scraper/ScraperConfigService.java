@@ -213,6 +213,8 @@ public class ScraperConfigService {
         playground.setType("playground");
         playground.setEnabled(true);
         playground.setDisplayName("Playground");
+        playground.setInputHintRu("Название игры или URL на playground.ru");
+        playground.setInputHintEn("Game name or playground.ru URL");
         playground.setBaseUrl("https://playground.ru");
         playground.setSslProtocol("TLSv1.2");
         playground.setCssSelectors(new LinkedHashMap<>());
@@ -234,6 +236,8 @@ public class ScraperConfigService {
         igromania.setType("igromania");
         igromania.setEnabled(true);
         igromania.setDisplayName("Igromania");
+        igromania.setInputHintRu("URL на igromania.ru");
+        igromania.setInputHintEn("igromania.ru URL");
         igromania.setBaseUrl("https://www.igromania.ru");
         igromania.setSslProtocol("TLSv1.2");
         igromania.setJsonPaths(new LinkedHashMap<>());
@@ -250,6 +254,8 @@ public class ScraperConfigService {
         steam.setType("steam");
         steam.setEnabled(true);
         steam.setDisplayName("Steam");
+        steam.setInputHintRu("app/ID или URL магазина (пример: app/730)");
+        steam.setInputHintEn("app/ID or store URL (e.g. app/730)");
         steam.setApiUrl("https://store.steampowered.com/api/appdetails");
         steam.setTimeoutMs(10000);
         steam.setMaxScreenshots(20);
@@ -260,6 +266,8 @@ public class ScraperConfigService {
         igdb.setType("igdb");
         igdb.setEnabled(true);
         igdb.setDisplayName("IGDB");
+        igdb.setInputHintRu("Название игры");
+        igdb.setInputHintEn("Game name");
         igdb.setApiUrl("https://api.igdb.com/v4/games");
         igdb.setAuthScheme("Bearer");
         igdb.setHeaders(new LinkedHashMap<>());
@@ -271,6 +279,8 @@ public class ScraperConfigService {
         thegamesdb.setType("thegamesdb");
         thegamesdb.setEnabled(true);
         thegamesdb.setDisplayName("TheGamesDB");
+        thegamesdb.setInputHintRu("Название игры");
+        thegamesdb.setInputHintEn("Game name");
         thegamesdb.setApiUrl("https://api.thegamesdb.net/v1/Games/ByGameName");
         thegamesdb.setGenreMappings(buildTheGameDBGenreMappings());
         list.add(thegamesdb);
@@ -279,6 +289,8 @@ public class ScraperConfigService {
         worldart.setType("worldart");
         worldart.setEnabled(true);
         worldart.setDisplayName("World-Art");
+        worldart.setInputHintRu("URL с ?id= или оставить пустым");
+        worldart.setInputHintEn("URL with ?id= or leave empty");
         worldart.setBaseUrl("http://www.world-art.ru");
         worldart.setSslProtocol("TLSv1.2");
         worldart.setGenreMappings(buildWorldArtGenreMappings());
@@ -288,6 +300,8 @@ public class ScraperConfigService {
         psxdc.setType("psxdatacenter");
         psxdc.setEnabled(true);
         psxdc.setDisplayName("PSX DataCenter");
+        psxdc.setInputHintRu("Название игры, серийный № или URL");
+        psxdc.setInputHintEn("Game name, serial # or URL");
         psxdc.setBaseUrl("https://psxdatacenter.com");
         psxdc.setMaxScreenshots(10);
         psxdc.setGenreMappings(buildPsxDataCenterGenreMappings());

@@ -77,7 +77,7 @@ public class LibraryController {
     @GetMapping("/scrapers")
     public ResponseEntity<ApiResponse<List<ScraperInfoResponse>>> getScraperSources() {
         List<ScraperInfoResponse> items = scraperConfigService.getEnabledConfigs().stream()
-                .map(c -> new ScraperInfoResponse(c.getType(), c.getDisplayName()))
+                .map(c -> new ScraperInfoResponse(c.getType(), c.getDisplayName(), c.getInputHintRu(), c.getInputHintEn()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.ok(items));
     }

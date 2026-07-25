@@ -22,6 +22,8 @@ public class ScraperConfig {
     private String authScheme;
     private Map<String, String> headers;
 
+    private String inputHintRu;
+    private String inputHintEn;
     private String sslProtocol = "TLSv1.2";
     private boolean trustAllCerts;
 
@@ -53,6 +55,10 @@ public class ScraperConfig {
     public void setAuthScheme(String authScheme) { this.authScheme = authScheme; }
     public Map<String, String> getHeaders() { return headers; }
     public void setHeaders(Map<String, String> headers) { this.headers = headers; }
+    public String getInputHintRu() { return inputHintRu; }
+    public void setInputHintRu(String inputHintRu) { this.inputHintRu = inputHintRu; }
+    public String getInputHintEn() { return inputHintEn; }
+    public void setInputHintEn(String inputHintEn) { this.inputHintEn = inputHintEn; }
     public String getSslProtocol() { return sslProtocol; }
     public void setSslProtocol(String sslProtocol) { this.sslProtocol = sslProtocol; }
     public boolean isTrustAllCerts() { return trustAllCerts; }
