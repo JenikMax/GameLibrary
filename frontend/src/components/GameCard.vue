@@ -1,7 +1,7 @@
 <template>
   <Card class="game-card">
     <template #header>
-      <div class="game-card-img-wrapper" @click="goToGame">
+      <div class="game-card-img-wrapper glitch-trigger" @click="goToGame">
         <img
           :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
           :alt="game.name"
@@ -11,6 +11,7 @@
           @load="imgLoaded = true"
           @error="imgLoaded = true"
         />
+        <div class="glitch-overlay" :style="{ backgroundImage: `url(${game.logo || game.logoUrl || '/game-library/img/default.jpg'})` }"></div>
       </div>
     </template>
     <template #title>

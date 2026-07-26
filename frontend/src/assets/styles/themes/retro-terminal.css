@@ -1141,3 +1141,45 @@
   0% { background-position: 0 0; }
   100% { background-position: 0 -4px; }
 }
+
+/* ═══════ GLITCH TEAR EFFECT (variant #9, no shift) ═══════ */
+@keyframes glitch-tear {
+  0%, 87% { clip-path: inset(0); filter: none; }
+  88% { clip-path: inset(0 0 70% 0); filter: hue-rotate(90deg) brightness(1.5); }
+  89% { clip-path: inset(70% 0 0 0); filter: hue-rotate(-90deg) brightness(1.5); }
+  90% { clip-path: inset(30% 0 40% 0); }
+  91% { clip-path: inset(30% 0 40% 0); }
+  92%, 100% { clip-path: inset(0); filter: none; }
+}
+
+[data-theme="retro-terminal"] .glitch-trigger {
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="retro-terminal"] .glitch-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+}
+
+[data-theme="retro-terminal"] .glitch-trigger:hover .glitch-overlay {
+  opacity: 1;
+  animation: glitch-tear 4s ease-in-out infinite;
+}
+
+[data-theme="retro-terminal"] .screenshot-wrap {
+  overflow: hidden;
+}
+
+[data-theme="retro-terminal"] .related-img-wrapper,
+[data-theme="retro-terminal"] .history-img-wrapper {
+  overflow: hidden;
+  border-radius: inherit;
+}

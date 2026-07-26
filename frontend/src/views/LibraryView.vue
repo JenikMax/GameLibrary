@@ -43,12 +43,15 @@
             class="history-item"
             @click="router.push(`/game/${g.id}`)"
           >
-            <img
-              :src="g.logoUrl || '/game-library/api/images/games/' + g.id + '/logo'"
-              :alt="g.name"
-              class="history-img"
-              @error="$event.target.src = '/game-library/img/default.jpg'"
-            />
+            <div class="history-img-wrapper glitch-trigger">
+              <img
+                :src="g.logoUrl || '/game-library/api/images/games/' + g.id + '/logo'"
+                :alt="g.name"
+                class="history-img"
+                @error="$event.target.src = '/game-library/img/default.jpg'"
+              />
+              <div class="glitch-overlay" :style="{ backgroundImage: `url(${g.logoUrl || '/game-library/api/images/games/' + g.id + '/logo'})` }"></div>
+            </div>
             <span class="history-name">{{ g.name }}</span>
           </div>
         </div>

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Terminal — 20 Glitch Animations</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0a0a0a;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.2rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    padding: 20px 0 8px;
+    border-bottom: 1px solid #0f03;
+    margin-bottom: 20px;
+    color: #0c0;
+  }
+  h1 small { font-size: .65rem; opacity: .5; display: block; margin-top: 4px; letter-spacing: normal; text-transform: none; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .controls button {
+    font: inherit;
+    font-size: .65rem;
+    background: #111;
+    color: #0f0;
+    border: 1px solid #0f04;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: .15s;
+  }
+  .controls button:hover,
+  .controls button.active {
+    background: #0f01;
+    border-color: #0f0;
+    box-shadow: 0 0 6px #0f06;
+  }
+  .controls button .idx { opacity: .35; margin-right: 4px; }
+
+  .card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .card {
+    position: relative;
+    width: 220px;
+    background: #111;
+    border: 1px solid #0f03;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color .3s;
+  }
+  .card:hover { border-color: #0f0; }
+
+  .card-preview {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: #0a0a0a;
+    background-image: url('default.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .card-preview .label {
+    position: relative;
+    z-index: 2;
+    font-size: .55rem;
+    text-align: center;
+    line-height: 1.4;
+    color: #0f0;
+    pointer-events: none;
+    padding: 10px;
+    background: rgba(0,0,0,.7);
+    border: 1px solid #0f03;
+    border-radius: 2px;
+    max-width: 90%;
+  }
+  .card-preview .label strong {
+    display: block;
+    font-size: .7rem;
+    color: #0f0;
+    margin-bottom: 4px;
+  }
+
+  .card-info {
+    padding: 8px 10px;
+    border-top: 1px solid #0f03;
+    font-size: .6rem;
+    color: #0f08;
+  }
+  .card-info span { color: #0f0; }
+
+  /* ============== 20 glitch animations ============== */
+
+  /* 1 — Classic RGB split */
+  @keyframes g1-rgb-split {
+    0%, 94% { transform: translate(0); filter: none; }
+    95% { transform: translate(-2px, 0); filter: drop-shadow(2px 0 #f00) drop-shadow(-2px 0 #0ff); }
+    96% { transform: translate(2px, 1px); filter: drop-shadow(-2px 0 #f00) drop-shadow(2px 0 #0ff); }
+    97% { transform: translate(-1px, -1px); filter: drop-shadow(1px 0 #f00) drop-shadow(-1px 0 #0ff); }
+    98%, 100% { transform: translate(0); filter: none; }
+  }
+  .g1:hover .card-preview .glitch-layer { animation: g1-rgb-split 3s ease-in-out infinite; }
+
+  /* 2 — Horizontal bar tear */
+  @keyframes g2-tear {
+    0%, 92% { clip-path: inset(0); }
+    93% { clip-path: inset(45% 0 45% 0); transform: translateX(4px); }
+    94% { clip-path: inset(45% 0 45% 0); transform: translateX(-4px); }
+    95% { clip-path: inset(60% 0 30% 0); transform: translateX(2px); }
+    96% { clip-path: inset(20% 0 70% 0); transform: translateX(-3px); }
+    97%, 100% { clip-path: inset(0); transform: translateX(0); }
+  }
+  .g2:hover .card-preview .glitch-layer { animation: g2-tear 3.5s ease-in-out infinite; }
+
+  /* 3 — TV static noise */
+  @keyframes g3-static {
+    0%, 90% { opacity: 0; }
+    91% { opacity: 1; }
+    92% { opacity: 0; }
+    93% { opacity: 1; }
+    94% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+  .g3:hover .card-preview .glitch-layer {
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI2MCI+PGcgb3BhY2l0eT0iLjM1Ij48cmVjdCB3PSI0IiBoPSI0IiB4PSIwIiB5PSIwIiBmaWxsPSIjMGYwIi8+PHJlY3QgdD0iNCIgdz0iNCIgaD0iNCIgeD0iMTIiIHk9IjgiIGZpbGw9IiMwZjAiLz48cmVjdCB3PSI0IiBoPSI0IiB4PSIyOCIgeT0iNCIgZmlsbD0iIzBmMCIvPjxyZWN0IHc9IjQiIGg9IjQiIHg9IjQwIiB5PSIxMiIgZmlsbD0iIzBmMCIvPjxyZWN0IHc9IjQiIGg9IjQiIHg9IjYiIHk9IjI0IiBmaWxsPSIjMGYwIi8+PHJlY3Qgdz0iNCIgaD0iNCIgeD0iNTIiIHk9IjgiIGZpbGw9IiMwZjAiLz48cmVjdCB3PSI0IiBoPSI0IiB4PSI2NCIgeT0iMjAiIGZpbGw9IiMwZjAiLz48cmVjdCB3PSI0IiBoPSI0IiB4PSI3MiIgeT0iNDAiIGZpbGw9IiMwZjAiLz48cmVjdCB3PSI0IiBoPSI0IiB4PSIyMCIgeT0iNDgiIGZpbGw9IiMwZjAiLz48L2c+PC9zdmc+');
+    background-repeat: repeat;
+    opacity: 0;
+    animation: g3-static 2.8s ease-in-out infinite;
+  }
+
+  /* 4 — Scanline flicker */
+  @keyframes g4-scanflicker {
+    0%, 85%, 100% { opacity: 0; }
+    86% { opacity: .6; }
+    87% { opacity: 0; }
+    88% { opacity: .4; }
+    89% { opacity: 0; }
+  }
+  .g4:hover .card-preview .glitch-layer {
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, #0f0 2px, #0f0 4px);
+    background-size: 100% 4px;
+    opacity: 0;
+    animation: g4-scanflicker 4s step-end infinite;
+  }
+
+  /* 5 — Rolling bars (vertical) */
+  @keyframes g5-roll {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .g5:hover .card-preview .glitch-layer {
+    background: repeating-linear-gradient(90deg,
+      transparent 0px, transparent 20px,
+      rgba(0,255,0,.08) 20px, rgba(0,255,0,.08) 22px,
+      transparent 22px, transparent 40px);
+    animation: g5-roll 4s linear infinite;
+  }
+
+  /* 6 — Random pixel blocks */
+  @keyframes g6-blocks {
+    0%, 90% { clip-path: none; background: transparent; }
+    91% { clip-path: polygon(10% 20%, 30% 20%, 30% 40%, 10% 40%); background: #0f01; }
+    92% { clip-path: polygon(50% 60%, 80% 60%, 80% 80%, 50% 80%); background: #0f02; }
+    93% { clip-path: polygon(0% 0%, 15% 0%, 15% 15%, 0% 15%); background: #0f01; }
+    94% { clip-path: polygon(70% 10%, 95% 10%, 95% 35%, 70% 35%); background: #0f02; }
+    95%, 100% { clip-path: none; background: transparent; }
+  }
+  .g6:hover .card-preview .glitch-layer { animation: g6-blocks 3s step-start infinite; }
+
+  /* 7 — Matrix rain columns */
+  @keyframes g7-rain {
+    0% { transform: translateY(-100%); opacity: .4; }
+    100% { transform: translateY(100%); opacity: 0; }
+  }
+  .g7:hover .card-preview .glitch-layer {
+    background: repeating-linear-gradient(180deg,
+      transparent 0px, transparent 14px,
+      #0f0 14px, #0f0 15px,
+      transparent 15px, transparent 20px);
+    background-size: 100% 20px;
+    opacity: 0;
+    animation: g7-rain 3s linear infinite;
+  }
+
+  /* 8 — Horizontal shake */
+  @keyframes g8-shake {
+    0%, 88%, 100% { transform: translateX(0); }
+    89% { transform: translateX(-3px); }
+    90% { transform: translateX(3px); }
+    91% { transform: translateX(-2px); }
+    92% { transform: translateX(2px); }
+    93% { transform: translateX(-1px); }
+    94%, 100% { transform: translateX(0); }
+  }
+  .g8:hover .card-preview .glitch-layer { animation: g8-shake 3.2s ease-in-out infinite; }
+
+  /* 9 — Screen tear + color shift */
+  @keyframes g9-tearcolor {
+    0%, 87% { clip-path: inset(0); filter: none; }
+    88% { clip-path: inset(0 0 70% 0); filter: hue-rotate(90deg) brightness(1.5); }
+    89% { clip-path: inset(70% 0 0 0); filter: hue-rotate(-90deg) brightness(1.5); }
+    90% { clip-path: inset(30% 0 40% 0); filter: none; transform: translateX(3px); }
+    91% { clip-path: inset(30% 0 40% 0); filter: none; transform: translateX(-3px); }
+    92%, 100% { clip-path: inset(0); filter: none; transform: translateX(0); }
+  }
+  .g9:hover .card-preview .glitch-layer { animation: g9-tearcolor 4s ease-in-out infinite; }
+
+  /* 10 — Power off collapse */
+  @keyframes g10-poweroff {
+    0%, 80% { transform: scaleY(1); opacity: 1; filter: none; }
+    81% { transform: scaleY(1) scaleX(1.02); filter: brightness(2); }
+    82% { transform: scaleY(.3); filter: brightness(3); opacity: .8; }
+    83% { transform: scaleY(.1); filter: brightness(5); opacity: .4; }
+    84% { transform: scaleY(0); filter: brightness(10); opacity: 0; }
+    85%, 100% { transform: scaleY(1); opacity: 1; filter: none; }
+  }
+  .g10:hover .card-preview .glitch-layer {
+    transform-origin: center bottom;
+    animation: g10-poweroff 5s ease-in-out infinite;
+  }
+
+  /* 11 — CRT scanline shimmer */
+  @keyframes g11-shimmer {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+  }
+  .g11:hover .card-preview .glitch-layer {
+    background: repeating-linear-gradient(0deg,
+      transparent 0px, transparent 1px,
+      rgba(0,255,0,.15) 1px, rgba(0,255,0,.15) 2px);
+    background-size: 100% 2px;
+    opacity: .5;
+    animation: g11-shimmer .15s linear infinite;
+  }
+
+  /* 12 — Chromatic aberration + shift */
+  @keyframes g12-chroma {
+    0%, 80% { filter: none; transform: translate(0); }
+    81% { filter: drop-shadow(3px 0 #f00) drop-shadow(-3px 0 #0ff); transform: translateX(-1px); }
+    82% { filter: drop-shadow(-3px 0 #f00) drop-shadow(3px 0 #0ff); transform: translateX(1px); }
+    83% { filter: drop-shadow(2px 0 #f00) drop-shadow(-2px 0 #0ff); transform: translateX(0); }
+    84%, 100% { filter: none; transform: translate(0); }
+  }
+  .g12:hover .card-preview .glitch-layer { animation: g12-chroma 4.5s ease-in-out infinite; }
+
+  /* 13 — Interference lines (angled) */
+  @keyframes g13-interfere {
+    0% { transform: translateX(-50%) rotate(-15deg); opacity: .3; }
+    100% { transform: translateX(50%) rotate(-15deg); opacity: 0; }
+  }
+  .g13:hover .card-preview .glitch-layer {
+    background: repeating-linear-gradient(-15deg,
+      transparent 0px, transparent 12px,
+      rgba(0,255,0,.12) 12px, rgba(0,255,0,.12) 13px,
+      transparent 13px, transparent 25px);
+    background-size: 200% 100%;
+    animation: g13-interfere 2.5s linear infinite;
+  }
+
+  /* 14 — Glitch blocks flying */
+  @keyframes g14-flying {
+    0% { opacity: 0; }
+    5% { opacity: 1; box-shadow: 0 0 0 0 #0f0; }
+    10% { opacity: 1; box-shadow: 0 0 10px 2px #0f0; transform: scale(1.1); }
+    15% { opacity: 1; transform: scale(.95); }
+    20% { opacity: 1; box-shadow: 0 0 20px 4px #0f0; }
+    25% { opacity: 1; transform: scale(1.05); }
+    30% { opacity: 0; transform: scale(1); box-shadow: none; }
+    100% { opacity: 0; }
+  }
+  .g14:hover .card-preview .glitch-layer {
+    background: rgba(0,255,0,.25);
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: g14-flying 4s ease-in-out infinite;
+  }
+
+  /* 15 — Burn-in ghosting */
+  @keyframes g15-ghost {
+    0%, 75% { opacity: 0; filter: blur(0); }
+    76% { opacity: .5; filter: blur(1px); }
+    78% { opacity: .3; filter: blur(2px); }
+    80% { opacity: .1; filter: blur(4px); }
+    82%, 100% { opacity: 0; filter: blur(0); }
+  }
+  .g15:hover .card-preview .glitch-layer {
+    background: rgba(0,255,0,.4);
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: g15-ghost 5s ease-in-out infinite;
+  }
+
+  /* 16 — Horizontal bar scanner */
+  @keyframes g16-scanner {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+  .g16:hover .card-preview .glitch-layer {
+    height: 4px;
+    background: #0f0;
+    box-shadow: 0 0 12px #0f0, 0 0 24px #0f04;
+    width: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    animation: g16-scanner 3s linear infinite;
+  }
+
+  /* 17 — Vertical hold roll */
+  @keyframes g17-vroll {
+    0% { transform: translateY(0); }
+    20% { transform: translateY(20px); }
+    40% { transform: translateY(-15px); }
+    60% { transform: translateY(10px); }
+    80% { transform: translateY(-5px); }
+    100% { transform: translateY(0); }
+  }
+  .g17:hover .card-preview .glitch-layer {
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(0deg, transparent, transparent 8px, #0f0 8px, #0f0 9px);
+    opacity: .15;
+    animation: g17-vroll .3s linear infinite;
+  }
+
+  /* 18 — Pixel sorting glitch (horizontal displacement) */
+  @keyframes g18-pixelsort {
+    0%, 88% { clip-path: none; transform: translateX(0); }
+    89% { clip-path: inset(10% 0 80% 0); transform: translateX(8px); }
+    90% { clip-path: inset(20% 0 60% 0); transform: translateX(-6px); }
+    91% { clip-path: inset(50% 0 30% 0); transform: translateX(5px); }
+    92% { clip-path: inset(70% 0 10% 0); transform: translateX(-7px); }
+    93% { clip-path: inset(40% 0 50% 0); transform: translateX(3px); }
+    94%, 100% { clip-path: none; transform: translateX(0); }
+  }
+  .g18:hover .card-preview .glitch-layer { animation: g18-pixelsort 3.8s step-start infinite; }
+
+  /* 19 — Typewriter static burst */
+  @keyframes g19-typewriter {
+    0%, 93% { opacity: 0; }
+    94% { opacity: .7; filter: blur(0); }
+    95% { opacity: .3; filter: blur(2px); }
+    96% { opacity: .6; filter: blur(0); }
+    97% { opacity: .2; filter: blur(1px); }
+    98% { opacity: .5; filter: blur(0); }
+    99%, 100% { opacity: 0; filter: blur(0); }
+  }
+  .g19:hover .card-preview .glitch-layer {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at 30% 40%, #0f0 0%, transparent 60%);
+    opacity: 0;
+    animation: g19-typewriter 4.2s step-start infinite;
+  }
+
+  /* 20 — Multi-layer glitch (3 layers RGB) */
+  .g20:hover .card-preview {
+    filter: none;
+  }
+  @keyframes g20-r {
+    0%, 92% { transform: translate(0); opacity: 0; }
+    93% { transform: translate(-3px, 1px); opacity: .6; }
+    94% { transform: translate(-2px, -1px); opacity: .4; }
+    95% { transform: translate(-4px, 0); opacity: .5; }
+    96%, 100% { transform: translate(0); opacity: 0; }
+  }
+  @keyframes g20-g {
+    0%, 89% { transform: translate(0); opacity: 0; }
+    90% { transform: translate(0, 2px); opacity: .5; }
+    91% { transform: translate(0, -2px); opacity: .4; }
+    92% { transform: translate(1px, 1px); opacity: .5; }
+    93%, 100% { transform: translate(0); opacity: 0; }
+  }
+  @keyframes g20-b {
+    0%, 94% { transform: translate(0); opacity: 0; }
+    95% { transform: translate(2px, -1px); opacity: .6; }
+    96% { transform: translate(3px, 1px); opacity: .4; }
+    97% { transform: translate(1px, -1px); opacity: .5; }
+    98%, 100% { transform: translate(0); opacity: 0; }
+  }
+  .g20 .glitch-layer-r,
+  .g20 .glitch-layer-g,
+  .g20 .glitch-layer-b {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0;
+  }
+  .g20 .glitch-layer-r { background: rgba(255,0,0,.25); }
+  .g20 .glitch-layer-g { background: rgba(0,255,0,.25); }
+  .g20 .glitch-layer-b { background: rgba(0,0,255,.25); }
+  .g20:hover .glitch-layer-r { animation: g20-r 3s step-start infinite; }
+  .g20:hover .glitch-layer-g { animation: g20-g 3s step-start infinite; }
+  .g20:hover .glitch-layer-b { animation: g20-b 3s step-start infinite; }
+
+  /* shared */
+  .card-preview { position: relative; }
+  .glitch-layer,
+  .glitch-layer-r,
+  .glitch-layer-g,
+  .glitch-layer-b {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* effects that manipulate the image itself — share the bg */
+  .g1 .glitch-layer,
+  .g2 .glitch-layer,
+  .g8 .glitch-layer,
+  .g9 .glitch-layer,
+  .g10 .glitch-layer,
+  .g12 .glitch-layer,
+  .g18 .glitch-layer {
+    background-image: url('default.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+  }
+  .g1:hover .glitch-layer,
+  .g2:hover .glitch-layer,
+  .g8:hover .glitch-layer,
+  .g9:hover .glitch-layer,
+  .g10:hover .glitch-layer,
+  .g12:hover .glitch-layer,
+  .g18:hover .glitch-layer { opacity: 1; }
+
+  /* mark active card */
+  .card.active-g { border-color: #0f0; box-shadow: 0 0 12px #0f06; }
+</style>
+</head>
+<body>
+
+<h1>
+  ⚡ 20 Glitch / Interference Animations
+  <small>Hover any card → effect plays every 3-5s. Click a button to preview on the featured card.</small>
+</h1>
+
+<div class="controls" id="controls"></div>
+
+<div class="card-grid" id="grid"></div>
+
+<script>
+  const effects = [
+    { id: 'g1',  name: 'RGB Split',         desc: 'Classic colour-channel shift glitch' },
+    { id: 'g2',  name: 'Horizontal Tear',   desc: 'Clip-path tear with X displacement' },
+    { id: 'g3',  name: 'TV Static',          desc: 'Faux noise overlay flicker' },
+    { id: 'g4',  name: 'Scanline Flicker',   desc: 'CRT scanlines strobe' },
+    { id: 'g5',  name: 'Rolling Bars',       desc: 'Vertical interference bars scroll' },
+    { id: 'g6',  name: 'Pixel Blocks',       desc: 'Random clip-path rectangles flash' },
+    { id: 'g7',  name: 'Matrix Rain',        desc: 'Digital rain columns fall' },
+    { id: 'g8',  name: 'Horizontal Shake',   desc: 'Rapid X-axis jitter' },
+    { id: 'g9',  name: 'Tear + Hue Shift',   desc: 'Screen tear with hue-rotate' },
+    { id: 'g10', name: 'Power Collapse',     desc: 'Vertical collapse + brightness spike' },
+    { id: 'g11', name: 'CRT Shimmer',        desc: 'Scanline shimmer moving down' },
+    { id: 'g12', name: 'Chromatic Aberration', desc: 'RGB drop-shadow displacement' },
+    { id: 'g13', name: 'Angled Interference', desc: 'Diagonal lines sweep' },
+    { id: 'g14', name: 'Flying Blocks',      desc: 'Glow block pulses with scale' },
+    { id: 'g15', name: 'Burn-in Ghost',      desc: 'Phosphor persistence decay' },
+    { id: 'g16', name: 'Horizontal Scanner', desc: 'Bright line scans top→bottom' },
+    { id: 'g17', name: 'Vertical Hold Roll', desc: 'Rolling sync loss flicker' },
+    { id: 'g18', name: 'Pixel Sort Glitch',  desc: 'Multi-row disjointed displacement' },
+    { id: 'g19', name: 'Static Burst',       desc: 'Radial flash like typewriter interference' },
+    { id: 'g20', name: '3-Layer RGB',        desc: 'R/G/B layers animate independently' },
+  ];
+
+  const grid = document.getElementById('grid');
+  const controls = document.getElementById('controls');
+
+  // buttons
+  effects.forEach((e, i) => {
+    const btn = document.createElement('button');
+    btn.dataset.id = e.id;
+    btn.innerHTML = `<span class="idx">${String(i+1).padStart(2,'0')}</span> ${e.name}`;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.card.active-g').forEach(c => c.classList.remove('active-g'));
+      const card = document.querySelector(`.card.${e.id}`);
+      if (card) card.classList.add('active-g');
+      document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    controls.appendChild(btn);
+  });
+
+  // cards
+  effects.forEach((e, i) => {
+    const multi = e.id === 'g20';
+    const layerExtra = multi
+      ? '<div class="glitch-layer-r"></div><div class="glitch-layer-g"></div><div class="glitch-layer-b"></div>'
+      : '<div class="glitch-layer"></div>';
+
+    const card = document.createElement('div');
+    card.className = `card ${e.id}`;
+    card.innerHTML = `
+      <div class="card-preview">
+        <div class="label">
+          <strong>#${String(i+1).padStart(2,'0')} — ${e.name}</strong>
+          ${e.desc}
+        </div>
+        ${layerExtra}
+      </div>
+      <div class="card-info">hover to trigger &middot; every 3-5s</div>
+    `;
+    grid.appendChild(card);
+  });
+</script>
+
+</body>
+</html>

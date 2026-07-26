@@ -15,13 +15,14 @@
   </div>
   <div v-else-if="game" class="game-detail-container">
     <div class="game-main">
-      <div class="game-poster poster-fade">
+      <div class="game-poster poster-fade glitch-trigger">
         <Image
           :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
           :alt="game.name"
           width="300"
           preview
         />
+        <div class="glitch-overlay" :style="{ backgroundImage: `url(${game.logo || game.logoUrl || '/game-library/img/default.jpg'})` }"></div>
       </div>
       <div class="game-info">
         <div class="flex align-items-center gap-2 mb-2">
@@ -131,18 +132,19 @@
     <div v-if="game.screenshotUrls?.length" class="screenshots-section">
       <h3>{{ t('game.screenshots') }}</h3>
       <div class="screenshot-grid">
-        <img
-          v-for="(url, i) in game.screenshotUrls"
-          :key="i"
-          :src="url"
-          alt="screenshot"
-          class="screenshot-thumb img-fade"
-          :class="{ loaded: screenshotLoaded[i] }"
-          loading="lazy"
-          @click="openGallery(i)"
-          @load="screenshotLoaded[i] = true"
-          @error="screenshotLoaded[i] = true"
-        />
+        <div v-for="(url, i) in game.screenshotUrls" :key="i" class="screenshot-wrap glitch-trigger">
+          <img
+            :src="url"
+            alt="screenshot"
+            class="screenshot-thumb img-fade"
+            :class="{ loaded: screenshotLoaded[i] }"
+            loading="lazy"
+            @click="openGallery(i)"
+            @load="screenshotLoaded[i] = true"
+            @error="screenshotLoaded[i] = true"
+          />
+          <div class="glitch-overlay" :style="{ backgroundImage: `url(${url})` }"></div>
+        </div>
       </div>
     </div>
 
@@ -153,7 +155,10 @@
           <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_genre') }}</h4>
           <div class="related-strip">
             <div v-for="g in related.sameGenre" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
-              <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" loading="lazy" @error="$event.target.src = '/game-library/img/default.jpg'" />
+              <div class="related-img-wrapper glitch-trigger">
+                <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" loading="lazy" @error="$event.target.src = '/game-library/img/default.jpg'" />
+                <div class="glitch-overlay" :style="{ backgroundImage: `url(/game-library/api/images/games/${g.id}/logo)` }"></div>
+              </div>
               <span class="related-name">{{ g.name }}</span>
             </div>
           </div>
@@ -162,7 +167,10 @@
           <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_series') }}</h4>
           <div class="related-strip">
             <div v-for="g in related.sameSeries" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
-              <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" loading="lazy" @error="$event.target.src = '/game-library/img/default.jpg'" />
+              <div class="related-img-wrapper glitch-trigger">
+                <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" loading="lazy" @error="$event.target.src = '/game-library/img/default.jpg'" />
+                <div class="glitch-overlay" :style="{ backgroundImage: `url(/game-library/api/images/games/${g.id}/logo)` }"></div>
+              </div>
               <span class="related-name">{{ g.name }}</span>
             </div>
           </div>
