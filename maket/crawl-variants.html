@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scanline Crawl — 15 variations</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 14px; }
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background: #000;
+  color: #00cc6a;
+  padding: 2rem;
+}
+h1 {
+  text-align: center;
+  margin-bottom: 0.25rem;
+  font-size: 1.3rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0,255,136,0.3);
+}
+.sub {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #00aa55;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.card {
+  border: 1px solid rgba(0,255,136,0.15);
+  background: rgba(0,26,13,0.5);
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.card:hover {
+  box-shadow: 0 0 20px rgba(0,255,136,0.08);
+  border-color: rgba(0,255,136,0.3);
+}
+.card-header {
+  padding: 0.4rem 0.75rem;
+  background: rgba(0,20,10,0.6);
+  border-bottom: 1px solid rgba(0,255,136,0.1);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-transform: uppercase;
+}
+.card-header .num {
+  display: inline-block;
+  background: rgba(0,255,136,0.15);
+  color: #00ff88;
+  padding: 0 5px;
+  font-size: 0.55rem;
+  font-weight: bold;
+}
+.card-header .name {
+  color: #00cc6a;
+}
+.crt-preview {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.crt-preview .sample-text {
+  position: relative;
+  z-index: 5;
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  text-align: center;
+  padding: 0 0.5rem;
+  line-height: 1.6;
+  pointer-events: none;
+  text-shadow: 0 0 6px currentColor;
+}
+.crt-preview .sample-text .prompt { opacity: 0.6; font-size: 0.55rem; }
+.crt-preview .sample-text .cursor {
+  display: inline-block; width: 0.4em; height: 0.75em;
+  background: currentColor; margin-left: 2px;
+  animation: blink 1s step-end infinite; vertical-align: text-bottom;
+}
+@keyframes blink { 50% { opacity: 0; } }
+.layer { position: absolute; inset: 0; pointer-events: none; }
+.z1 { z-index: 1; }
+.z2 { z-index: 2; }
+.z3 { z-index: 3; }
+.z4 { z-index: 4; }
+</style>
+</head>
+<body>
+<h1>Scanline Crawl — Speed & Direction</h1>
+<p class="sub">15 вариаций на основе варианта #2 (Scanline Crawl Slow) • фон #000 • текст неподвижен</p>
+<div class="grid" id="app"></div>
+<script>
+const KFS = [], ADD = [];
+
+function addKf(name, css) { KFS.push(css); }
+
+addKf('crawlFurious', `@keyframes crawlFurious { 0% { background-position: 0 0; } 100% { background-position: 0 -4px; } }`);
+addKf('crawlFast',     `@keyframes crawlFast     { 0% { background-position: 0 0; } 100% { background-position: 0 -4px; } }`);
+addKf('crawlBrisk',    `@keyframes crawlBrisk    { 0% { background-position: 0 0; } 100% { background-position: 0 -4px; } }`);
+addKf('crawlSlow',     `@keyframes crawlSlow     { 0% { background-position: 0 0; } 100% { background-position: 0 -4px; } }`);
+addKf('crawlLazy',     `@keyframes crawlLazy     { 0% { background-position: 0 0; } 100% { background-position: 0 -4px; } }`);
+addKf('crawlSloth',    `@keyframes crawlSloth    { 0% { background-position: 0 0; } 100% { background-position: 0 -4px; } }`);
+addKf('crawlReverse',  `@keyframes crawlReverse  { 0% { background-position: 0 -4px; } 100% { background-position: 0 0; } }`);
+addKf('crawlHoriz',    `@keyframes crawlHoriz    { 0% { background-position: 0 0; } 100% { background-position: 4px 0; } }`);
+addKf('crawlDiag',     `@keyframes crawlDiag     { 0% { background-position: 0 0; } 100% { background-position: 4px -4px; } }`);
+addKf('crawlPingPong', `@keyframes crawlPingPong { 0%, 100% { background-position: 0 0; } 50% { background-position: 0 -4px; } }`);
+addKf('crawlAccel',    `@keyframes crawlAccel    { 0% { background-position: 0 0; } 60% { background-position: 0 -4px; } 100% { background-position: 0 -4px; } }`);
+addKf('crawlDecel',    `@keyframes crawlDecel    { 0% { background-position: 0 0; } 40% { background-position: 0 -4px; } 100% { background-position: 0 -4px; } }`);
+addKf('crawlThick',    `@keyframes crawlThick    { 0% { background-position: 0 0; } 100% { background-position: 0 -5px; } }`);
+addKf('crawlDouble',   `@keyframes crawlDouble   { 0% { background-position: 0 0; } 100% { background-position: 0 -6px; } }`);
+addKf('crawlBounce',   `@keyframes crawlBounce   { 0% { background-position: 0 0; } 40% { background-position: 0 -4px; } 60% { background-position: 0 -4px; } 100% { background-position: 0 0; } }`);
+
+const VARIANTS = [
+  { id: 1,  name: 'Furious 0.03s',    period: 'crawlFurious 0.03s linear infinite' },
+  { id: 2,  name: 'Fast 0.07s',       period: 'crawlFast 0.07s linear infinite' },
+  { id: 3,  name: 'Brisk 0.15s',      period: 'crawlBrisk 0.15s linear infinite' },
+  { id: 4,  name: 'Original 0.3s',    period: 'crawlSlow 0.3s linear infinite' },
+  { id: 5,  name: 'Slow 0.6s',        period: 'crawlSlow 0.6s linear infinite' },
+  { id: 6,  name: 'Lazy 1.2s',        period: 'crawlLazy 1.2s linear infinite' },
+  { id: 7,  name: 'Sloth 3s',         period: 'crawlSloth 3s linear infinite' },
+  { id: 8,  name: 'Reverse',          period: 'crawlReverse 0.3s linear infinite' },
+  { id: 9,  name: 'Horizontal',       period: 'crawlHoriz 0.3s linear infinite' },
+  { id: 10, name: 'Diagonal',         period: 'crawlDiag 0.4s linear infinite' },
+  { id: 11, name: 'Ping-Pong',        period: 'crawlPingPong 0.8s ease-in-out infinite' },
+  { id: 12, name: 'Accelerating',     period: 'crawlAccel 0.5s ease-out infinite' },
+  { id: 13, name: 'Decelerating',     period: 'crawlDecel 0.5s ease-in infinite' },
+  { id: 14, name: 'Thick Scanlines',  period: 'crawlThick 0.35s linear infinite', thick: true },
+  { id: 15, name: 'Bounce',           period: 'crawlBounce 1s ease-in-out infinite' },
+];
+
+function buildPreview(v) {
+  const p = document.createElement('div');
+  p.className = 'crt-preview';
+  p.style.background = '#000';
+
+  const gl = document.createElement('div');
+  gl.className = 'layer z1';
+  gl.style.background = 'radial-gradient(ellipse at center, rgba(0,255,136,0.07) 0%, transparent 55%)';
+  gl.style.boxShadow = '0 0 40px rgba(0,255,136,0.1)';
+  p.appendChild(gl);
+
+  const thickStep = v.thick ? 'transparent 0px, transparent 3px, rgba(0,255,136,0.06) 3px, rgba(0,255,136,0.06) 5px' : 'transparent 0px, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px';
+
+  const sc = document.createElement('div');
+  sc.className = 'layer z2';
+  sc.style.background = 'repeating-linear-gradient(0deg, ' + thickStep + ')';
+  sc.style.animation = v.period;
+  p.appendChild(sc);
+
+  const nz = document.createElement('div');
+  nz.className = 'layer z3';
+  nz.style.cssText = "background-image: url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E\"); background-size: 128px 128px;";
+  p.appendChild(nz);
+
+  const vg = document.createElement('div');
+  vg.className = 'layer z4';
+  vg.style.background = 'radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.6) 100%)';
+  p.appendChild(vg);
+
+  const txt = document.createElement('div');
+  txt.className = 'sample-text';
+  txt.style.color = '#00ff88';
+  txt.innerHTML = `
+    <div style="font-size:0.8rem;font-weight:bold;letter-spacing:0.12em">GAME-LIBRARY</div>
+    <div class="prompt" style="margin-top:4px">root@crt:~$ <span style="opacity:0.8">crawl --speed</span></div>
+    <div class="prompt" style="opacity:0.4">${v.name}</div>
+    <div class="prompt" style="opacity:0.6">&gt; <span class="cursor"></span></div>
+  `;
+  p.appendChild(txt);
+
+  return p;
+}
+
+const grid = document.getElementById('app');
+VARIANTS.forEach(v => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  const hdr = document.createElement('div');
+  hdr.className = 'card-header';
+  hdr.innerHTML = '<span class="num">#' + String(v.id).padStart(2,'0') + '</span><span class="name">' + v.name + '</span>';
+  card.appendChild(hdr);
+  card.appendChild(buildPreview(v));
+  grid.appendChild(card);
+});
+
+const style = document.createElement('style');
+style.textContent = KFS.join('\n');
+document.head.appendChild(style);
+</script>
+</body>
+</html>

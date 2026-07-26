@@ -75,14 +75,29 @@
   --rt-warn: #f59e0b;
 }
 
-/* ═══════ SCANLINE OVERLAY ═══════ */
+/* ═══════ CRT BACKGROUND LAYERS ═══════ */
+/* glow + vignette + noise (behind content) */
+[data-theme="retro-terminal"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, rgba(0,255,136,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.6) 100%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 128px 128px;
+  pointer-events: none;
+  z-index: -1;
+}
+/* scanlines (above content) */
 [data-theme="retro-terminal"] body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px);
   pointer-events: none;
   z-index: 9999;
+  animation: crtScanCrawl 0.6s linear infinite;
 }
 
 /* ═══════ GLOBAL OVERRIDES ═══════ */
@@ -1119,4 +1134,10 @@
 [data-theme="retro-terminal"] .p-button.rt-btn-admin-link:hover {
   background: rgba(0,255,136,0.1) !important;
   box-shadow: 0 0 12px rgba(0,255,136,0.3) !important;
+}
+
+/* ═══════ CRT SCANLINE ANIMATION ═══════ */
+@keyframes crtScanCrawl {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 -4px; }
 }

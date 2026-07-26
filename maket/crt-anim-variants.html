@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRT Background Animation — 20 variants</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 14px; }
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background: #000;
+  color: #00cc6a;
+  padding: 2rem;
+}
+h1 {
+  text-align: center;
+  margin-bottom: 0.25rem;
+  font-size: 1.3rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0,255,136,0.3);
+}
+.sub {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #00aa55;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+.card {
+  border: 1px solid rgba(0,255,136,0.15);
+  background: rgba(0,26,13,0.5);
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.card:hover {
+  box-shadow: 0 0 20px rgba(0,255,136,0.08);
+  border-color: rgba(0,255,136,0.3);
+}
+.card-header {
+  padding: 0.5rem 0.75rem;
+  background: rgba(0,20,10,0.6);
+  border-bottom: 1px solid rgba(0,255,136,0.1);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-transform: uppercase;
+}
+.card-header .num {
+  display: inline-block;
+  background: rgba(0,255,136,0.15);
+  color: #00ff88;
+  padding: 0 6px;
+  font-size: 0.6rem;
+  font-weight: bold;
+}
+.card-header .name {
+  color: #00cc6a;
+}
+
+.crt-preview {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.crt-preview .sample-text {
+  position: relative;
+  z-index: 5;
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  text-align: center;
+  padding: 0 0.5rem;
+  line-height: 1.6;
+  pointer-events: none;
+  text-shadow: 0 0 6px currentColor;
+  animation: none !important;
+}
+.crt-preview .sample-text .prompt {
+  opacity: 0.6;
+  font-size: 0.6rem;
+}
+.crt-preview .sample-text .cursor {
+  display: inline-block;
+  width: 0.4em;
+  height: 0.75em;
+  background: currentColor;
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.layer { position: absolute; inset: 0; pointer-events: none; }
+.z1 { z-index: 1; }
+.z2 { z-index: 2; }
+.z3 { z-index: 3; }
+.z4 { z-index: 4; }
+</style>
+</head>
+<body>
+<h1>CRT Background Animation</h1>
+<p class="sub">20 анимаций фона • текст неподвижен • базовый вариант #40 (Full Retro Terminal)</p>
+<div class="grid" id="app"></div>
+<script>
+// ===== keyframes =====
+const KFS = [];
+
+function addKf(name, css) { KFS.push({ name, css }); }
+
+addKf('scanCrawl', `
+@keyframes scanCrawl {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 -4px; }
+}`);
+addKf('scanCrawlSlow', `
+@keyframes scanCrawlSlow {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 -4px; }
+}`);
+addKf('scanWave', `
+@keyframes scanWave {
+  0% { background-size: 100% 4px; }
+  50% { background-size: 100% 8px; }
+  100% { background-size: 100% 4px; }
+}`);
+addKf('scanThrob', `
+@keyframes scanThrob {
+  0%, 100% { background-size: 100% 4px; opacity: 0.5; }
+  50% { background-size: 100% 10px; opacity: 1; }
+}`);
+addKf('scanDouble', `
+@keyframes scanDouble {
+  0%, 100% { background-image: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px); }
+  50% { background-image: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0,255,136,0.05) 1px, rgba(0,255,136,0.05) 3px, transparent 3px, transparent 4px, rgba(0,255,136,0.03) 4px, rgba(0,255,136,0.03) 6px); }
+}`);
+addKf('scan45', `
+@keyframes scan45 {
+  0% { background-image: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px); }
+  50% { background-image: repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(0,255,136,0.04) 2px, rgba(0,255,136,0.04) 4px); }
+  100% { background-image: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px); }
+}`);
+addKf('vignettePulse', `
+@keyframes vignettePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}`);
+addKf('vignetteShift', `
+@keyframes vignetteShift {
+  0% { background: radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(0,0,0,0.6) 100%); }
+  25% { background: radial-gradient(ellipse at 45% 55%, transparent 40%, rgba(0,0,0,0.65) 100%); }
+  50% { background: radial-gradient(ellipse at 55% 45%, transparent 42%, rgba(0,0,0,0.6) 100%); }
+  75% { background: radial-gradient(ellipse at 48% 52%, transparent 38%, rgba(0,0,0,0.7) 100%); }
+  100% { background: radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(0,0,0,0.6) 100%); }
+}`);
+addKf('glowPulse', `
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}`);
+addKf('glowExpand', `
+@keyframes glowExpand {
+  0%, 100% { background-size: 100% 100%; }
+  50% { background-size: 150% 150%; background-position: 50% 50%; }
+}`);
+addKf('glowShift', `
+@keyframes glowShift {
+  0% { background: radial-gradient(ellipse at 50% 50%, rgba(0,255,136,0.07) 0%, transparent 55%); }
+  25% { background: radial-gradient(ellipse at 60% 40%, rgba(0,255,136,0.09) 0%, transparent 55%); }
+  50% { background: radial-gradient(ellipse at 40% 60%, rgba(0,255,136,0.06) 0%, transparent 55%); }
+  75% { background: radial-gradient(ellipse at 55% 45%, rgba(0,255,136,0.08) 0%, transparent 55%); }
+  100% { background: radial-gradient(ellipse at 50% 50%, rgba(0,255,136,0.07) 0%, transparent 55%); }
+}`);
+addKf('hScanSweep', `
+@keyframes hScanSweep {
+  0% { background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px); }
+  10% { background: #000; }
+  12% { background: repeating-linear-gradient(0deg, #000 0px, #000 20px, rgba(0,255,136,0.04) 20px, rgba(0,255,136,0.04) 22px, #000 22px, #000 100%); }
+  20% { background-position: 0 0; }
+  25% { background-position: 0 40px; }
+  30% { background-position: 0 80px; }
+  35% { background-position: 0 120px; }
+  40% { background-position: 0 160px; }
+  45% { background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px); background-position: 0 0; }
+  100% { background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px); background-position: 0 0; }
+}`);
+addKf('noiseIntensity', `
+@keyframes noiseIntensity {
+  0%, 100% { opacity: 0.03; }
+  20% { opacity: 0.08; }
+  40% { opacity: 0.02; }
+  60% { opacity: 0.07; }
+  80% { opacity: 0.04; }
+}`);
+addKf('noiseDrift', `
+@keyframes noiseDrift {
+  0% { background-position: 0 0; }
+  100% { background-position: 50px 50px; }
+}`);
+addKf('rgbShiftBg', `
+@keyframes rgbShiftBg {
+  0%, 100% { filter: hue-rotate(0deg); }
+  25% { filter: hue-rotate(5deg); }
+  50% { filter: hue-rotate(-3deg); }
+  75% { filter: hue-rotate(8deg); }
+}`);
+addKf('brightCycle', `
+@keyframes brightCycle {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(0.8); }
+}`);
+addKf('scanSplit', `
+@keyframes scanSplit {
+  0%, 100% { background-image: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px); }
+  30% { background-image: repeating-linear-gradient(0deg, transparent 2px, transparent 4px, rgba(0,255,136,0.05) 0px, rgba(0,255,136,0.05) 2px); }
+  60% { background-image: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px); }
+}`);
+addKf('compositeWave', `
+@keyframes compositeWave {
+  0% { background-image: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px); }
+  25% { background-image: repeating-linear-gradient(10deg, transparent 0px, transparent 2px, rgba(0,255,136,0.04) 2px, rgba(0,255,136,0.04) 4px); }
+  50% { background-image: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,255,136,0.06) 3px, rgba(0,255,136,0.06) 6px); }
+  75% { background-image: repeating-linear-gradient(-10deg, transparent 0px, transparent 2px, rgba(0,255,136,0.04) 2px, rgba(0,255,136,0.04) 4px); }
+  100% { background-image: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px); }
+}`);
+addKf('rasterBend', `
+@keyframes rasterBend {
+  0%, 100% { transform: scaleX(1) scaleY(1); }
+  25% { transform: scaleX(1.02) scaleY(0.98); }
+  50% { transform: scaleX(0.98) scaleY(1.02); }
+  75% { transform: scaleX(1.01) scaleY(0.99); }
+}`);
+addKf('barSweep', `
+@keyframes barSweep {
+  0% { background: linear-gradient(90deg, transparent 0%, transparent 99%, rgba(0,255,136,0.1) 99%, rgba(0,255,136,0.1) 100%); background-size: 100% 100%; }
+  100% { background: linear-gradient(90deg, transparent 0%, transparent 99%, rgba(0,255,136,0.1) 99%, rgba(0,255,136,0.1) 100%); background-size: 200% 100%; background-position: 100% 0; }
+}`);
+addKf('scanFade', `
+@keyframes scanFade {
+  0%, 100% { opacity: 1; }
+  10% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  85% { opacity: 0; }
+  95% { opacity: 1; }
+}`);
+
+const VARIANTS = [
+  { id: 1,  name: 'Scanline Crawl',        type: 'scan',     anim: 'scanCrawl 0.1s linear infinite' },
+  { id: 2,  name: 'Scanline Crawl Slow',   type: 'scan',     anim: 'scanCrawlSlow 0.3s linear infinite' },
+  { id: 3,  name: 'Scanline Wave',         type: 'scan',     anim: 'scanWave 2s ease-in-out infinite' },
+  { id: 4,  name: 'Scanline Throb',        type: 'scan',     anim: 'scanThrob 1.5s ease-in-out infinite' },
+  { id: 5,  name: 'Scanline Double',       type: 'scan',     anim: 'scanDouble 2s step-end infinite' },
+  { id: 6,  name: 'Scanline 45° Tilt',     type: 'scan',     anim: 'scan45 3s ease-in-out infinite' },
+  { id: 7,  name: 'Scanline Sweep',        type: 'scan',     anim: 'hScanSweep 4s ease-in-out infinite' },
+  { id: 8,  name: 'Scanline Fade',         type: 'scan',     anim: 'scanFade 3s step-end infinite' },
+  { id: 9,  name: 'Scanline Split-Phase',  type: 'scan',     anim: 'scanSplit 2s step-end infinite' },
+  { id: 10, name: 'Scanline Composite',    type: 'scan',     anim: 'compositeWave 3s ease-in-out infinite' },
+  { id: 11, name: 'Vignette Pulse',        type: 'vignette', anim: 'vignettePulse 3s ease-in-out infinite' },
+  { id: 12, name: 'Vignette Shift',        type: 'vignette', anim: 'vignetteShift 4s ease-in-out infinite' },
+  { id: 13, name: 'Glow Pulse',            type: 'glow',     anim: 'glowPulse 2s ease-in-out infinite' },
+  { id: 14, name: 'Glow Expand',           type: 'glow',     anim: 'glowExpand 3s ease-in-out infinite' },
+  { id: 15, name: 'Glow Shift',            type: 'glow',     anim: 'glowShift 4s ease-in-out infinite' },
+  { id: 16, name: 'Noise Intensity',       type: 'noise',    anim: 'noiseIntensity 5s ease-in-out infinite' },
+  { id: 17, name: 'Noise Drift',           type: 'noise',    anim: 'noiseDrift 2s linear infinite' },
+  { id: 18, name: 'Raster Bend',           type: 'raster',   anim: 'rasterBend 3s ease-in-out infinite' },
+  { id: 19, name: 'Brightness Cycle',      type: 'bright',   anim: 'brightCycle 4s ease-in-out infinite' },
+  { id: 20, name: 'Bar Sweep',             type: 'bar',      anim: 'barSweep 2s linear infinite' },
+];
+
+function buildPreview(v) {
+  const p = document.createElement('div');
+  p.className = 'crt-preview';
+  p.style.background = '#000';
+
+  // --- GLOW layer (z1) ---
+  const gl = document.createElement('div');
+  gl.className = 'layer z1';
+  gl.style.background = 'radial-gradient(ellipse at center, rgba(0,255,136,0.07) 0%, transparent 55%)';
+  gl.style.boxShadow = '0 0 40px rgba(0,255,136,0.1)';
+  if (v.type === 'glow') gl.style.animation = v.anim;
+  p.appendChild(gl);
+
+  // --- SCANLINES layer (z2) ---
+  const sc = document.createElement('div');
+  sc.className = 'layer z2';
+  sc.style.background = 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,255,136,0.05) 2px, rgba(0,255,136,0.05) 4px)';
+  if (v.type === 'scan') sc.style.animation = v.anim;
+  p.appendChild(sc);
+
+  // --- NOISE layer (z3) ---
+  const nz = document.createElement('div');
+  nz.className = 'layer z3';
+  nz.style.cssText = "background-image: url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E\"); background-size: 128px 128px;";
+  if (v.type === 'noise') nz.style.animation = v.anim;
+  p.appendChild(nz);
+
+  // --- VIGNETTE layer (z4) ---
+  const vg = document.createElement('div');
+  vg.className = 'layer z4';
+  vg.style.background = 'radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.6) 100%)';
+  if (v.type === 'vignette') vg.style.animation = v.anim;
+  p.appendChild(vg);
+
+  // --- RASTER animation on wrapper (z0) ---
+  if (v.type === 'raster') p.style.animation = v.anim;
+
+  // --- BRIGHTNESS animation on glow + scanlines (wrap in a brightness layer) ---
+  if (v.type === 'bright') {
+    const br = document.createElement('div');
+    br.className = 'layer z4';
+    br.style.background = 'transparent';
+    br.style.backdropFilter = 'brightness(1)';
+    br.style.animation = v.anim;
+    p.appendChild(br);
+  }
+
+  // --- BAR SWEEP ---
+  if (v.type === 'bar') {
+    const bar = document.createElement('div');
+    bar.className = 'layer z4';
+    bar.style.background = 'linear-gradient(90deg, transparent 0%, transparent 99%, rgba(0,255,136,0.08) 99%, rgba(0,255,136,0.08) 100%)';
+    bar.style.backgroundSize = '200% 100%';
+    bar.style.animation = v.anim;
+    p.appendChild(bar);
+  }
+
+  // --- TEXT (static, no animation) ---
+  const txt = document.createElement('div');
+  txt.className = 'sample-text';
+  txt.style.color = '#00ff88';
+  txt.innerHTML = `
+    <div style="font-size:0.8rem;font-weight:bold;letter-spacing:0.12em">GAME-LIBRARY</div>
+    <div class="prompt" style="margin-top:4px">root@crt:~$ <span style="opacity:0.8">cat /dev/bg-anim</span></div>
+    <div class="prompt" style="opacity:0.4">background anim v${v.id}...</div>
+    <div class="prompt" style="opacity:0.6">&gt; <span class="cursor"></span></div>
+  `;
+  p.appendChild(txt);
+
+  return p;
+}
+
+const grid = document.getElementById('app');
+VARIANTS.forEach(v => {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const hdr = document.createElement('div');
+  hdr.className = 'card-header';
+  hdr.innerHTML = '<span class="num">#' + String(v.id).padStart(2,'0') + '</span><span class="name">' + v.name + '</span>';
+  card.appendChild(hdr);
+
+  const preview = buildPreview(v);
+  card.appendChild(preview);
+
+  grid.appendChild(card);
+});
+
+// inject keyframes
+const style = document.createElement('style');
+style.textContent = KFS.map(k => k.css).join('\n');
+document.head.appendChild(style);
+</script>
+</body>
+</html>
