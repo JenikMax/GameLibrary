@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Terminal — 20 вариантов ASCII-иконок</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0b;
+    color: #e4e4e7;
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+    padding: 2rem;
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.4rem;
+    color: #00ff88;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 12px rgba(0,255,136,0.4);
+  }
+  .subtitle {
+    text-align: center;
+    color: #71717a;
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 1rem;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .card {
+    background: rgba(24, 24, 27, 0.9);
+    border: 1px solid rgba(0, 255, 136, 0.12);
+    border-radius: 8px;
+    padding: 1.25rem;
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .card:hover {
+    border-color: rgba(0, 255, 136, 0.35);
+  }
+  .card .label {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.75rem;
+    font-size: 0.65rem;
+    color: #52525b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .card .num {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.75rem;
+    font-size: 0.6rem;
+    color: #3f3f46;
+    font-weight: 700;
+  }
+  .logo-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .prompt {
+    font-size: 0.75rem;
+    color: #00cc6a;
+    margin-top: 0.3rem;
+  }
+  .cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1em;
+    background: #00cc6a;
+    margin-left: 0.15em;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* theme overrides */
+  .card.amber { background: rgba(24, 16, 0, 0.95); border-color: rgba(255, 136, 0, 0.2); }
+  .card.amber pre { color: #ff8800; text-shadow: 0 0 12px rgba(255,136,0,0.4); }
+  .card.amber .prompt { color: #ff8800; }
+  .card.amber .cursor { background: #ff8800; }
+
+  .card.pink { background: rgba(16, 0, 32, 0.9); border-color: rgba(255, 0, 128, 0.25); }
+  .card.pink pre { color: #ff0080; text-shadow: 0 0 12px rgba(255,0,128,0.5); }
+  .card.pink .prompt { color: #00ffff; }
+  .card.pink .cursor { background: #00ffff; }
+
+  .card.blue { background: rgba(0, 8, 32, 0.9); border-color: rgba(68, 136, 255, 0.2); }
+  .card.blue pre { color: #4488ff; text-shadow: 0 0 10px rgba(68,136,255,0.4); }
+  .card.blue .prompt { color: #4488ff; }
+  .card.blue .cursor { background: #4488ff; }
+
+  .card.c64 { background: rgba(48, 48, 96, 0.85); border-color: rgba(107, 140, 255, 0.25); }
+  .card.c64 pre { color: #6b8cff; text-shadow: 0 0 8px rgba(107,140,255,0.4); }
+  .card.c64 .prompt { color: #ffff44; }
+  .card.c64 .cursor { background: #ffff44; }
+
+  .card.msdos { background: rgba(0, 0, 0, 0.9); border-color: rgba(170, 170, 170, 0.3); }
+  .card.msdos pre { color: #aaaaaa; text-shadow: none; }
+  .card.msdos .prompt { color: #aaaaaa; }
+  .card.msdos .cursor { background: #aaaaaa; }
+  .card.msdos .scanlines {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.25) 2px, rgba(0,0,0,0.25) 4px);
+    pointer-events: none;
+  }
+
+  .card.green { background: rgba(8, 24, 8, 0.95); border-color: rgba(0, 255, 68, 0.2); }
+  .card.green pre { color: #33ff44; text-shadow: 0 0 16px rgba(51,255,68,0.6), 0 0 32px rgba(51,255,68,0.2); }
+  .card.green .prompt { color: #33ff44; text-shadow: 0 0 10px rgba(51,255,68,0.4); }
+  .card.green .cursor { background: #33ff44; box-shadow: 0 0 8px #33ff44; }
+
+  .card.gold { background: linear-gradient(135deg, #1a0f00, #0d0800); border-color: rgba(255, 215, 0, 0.25); }
+  .card.gold pre { color: #ffd700; text-shadow: 1px 1px 0 #8b00ff, 0 0 16px rgba(255,215,0,0.3); }
+  .card.gold .prompt { color: #ff8800; }
+  .card.gold .cursor { background: #ffd700; }
+
+  .card.cyan { background: rgba(0, 24, 32, 0.9); border-color: rgba(0, 200, 255, 0.2); }
+  .card.cyan pre { color: #00ccff; text-shadow: 0 0 12px rgba(0,200,255,0.4); }
+  .card.cyan .prompt { color: #00ccff; }
+  .card.cyan .cursor { background: #00ccff; }
+
+  .card.white { background: #0d0d0d; border-color: rgba(255,255,255,0.1); }
+  .card.white pre { color: #eeeeee; text-shadow: none; }
+  .card.white .prompt { color: #999999; }
+  .card.white .cursor { background: #eeeeee; }
+
+  .card.sepia { background: rgba(20, 18, 12, 0.92); border-color: rgba(200, 180, 140, 0.2); }
+  .card.sepia pre { color: #c8b48c; text-shadow: none; }
+  .card.sepia .prompt { color: #a09070; font-style: italic; }
+  .card.sepia .cursor { background: #c8b48c; }
+
+  .card.crt { background: rgba(0, 20, 0, 0.92); border-color: rgba(0, 255, 136, 0.15); }
+  .card.crt pre { color: #00ff88; text-shadow: 0 0 6px rgba(0,255,136,0.4); filter: blur(0.3px); }
+  .card.crt .prompt { color: #00cc6a; filter: blur(0.3px); }
+  .card.crt .crt-overlay {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+    pointer-events: none;
+  }
+  .card.crt .crt-glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+  }
+
+  .card.violet { background: rgba(24, 0, 48, 0.9); border-color: rgba(180, 100, 255, 0.2); }
+  .card.violet pre { color: #b464ff; text-shadow: 0 0 12px rgba(180,100,255,0.4); }
+  .card.violet .prompt { color: #b464ff; }
+  .card.violet .cursor { background: #b464ff; }
+</style>
+</head>
+<body>
+<h1>⌨ Retro Terminal — 20 ASCII-иконок для страницы авторизации</h1>
+<p class="subtitle">Геймпад, компьютер, консоль, персонаж, меч и магия и другое</p>
+
+<div class="grid">
+
+  <!-- 1. Gamepad -->
+  <div class="card">
+    <span class="label">Gamepad</span><span class="num">01</span>
+    <div class="logo-area">
+      <pre>
+    ╔══════════╗
+    ║  ┌──┐┌──┐ ║
+    ║  │╲╱││╲╱│ ║
+    ║  └──┘└──┘ ║
+    ╚══════════╝
+   ╱│          │╲
+  ╱ │  ╔════╗  │ ╲
+  │ │  ║ ╲╱ ║  │  │
+  │ │  ╚════╝  │  │
+  │ │          │  │
+   ╲│          │╱
+    ╚══════════╝
+      </pre>
+      <div class="prompt">game-library@auth:~$ connect controller<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 2. Computer / PC -->
+  <div class="card green">
+    <span class="label">Computer</span><span class="num">02</span>
+    <div class="logo-area">
+      <pre>
+   ╔═══════════════╗
+   ║  ┌─────────┐  ║
+   ║  │ ███ ███  │  ║
+   ║  │ █ █ █ █  │  ║
+   ║  │ ███ ███  │  ║
+   ║  │ █   █ █  │  ║
+   ║  │ █   ███  │  ║
+   ║  └─────────┘  ║
+   ╚═══════════════╝
+        ║       ║
+   ╔════╩═══════╩════╗
+   ║  [▒▒▒▒▒▒▒▒▒▒]  ║
+   ╚═════════════════╝
+      </pre>
+      <div class="prompt">root@game-library:~# login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 3. Console (NES-style) -->
+  <div class="card c64">
+    <span class="label">Console</span><span class="num">03</span>
+    <div class="logo-area">
+      <pre>
+   ╔═══════════════════╗
+   ║  ╔═══╗      ╔═══╗ ║
+   ║  ║ P ║      ║ P ║ ║
+   ║  ╚═══╝      ╚═══╝ ║
+   ║     ╔════════╗     ║
+   ║     ║ RESET  ║     ║
+   ║     ╚════════╝     ║
+   ║  ┌──┐          ┌──┐║
+   ║  │A │  ┌────┐  │B │║
+   ║  └──┘  │||||│  └──┘║
+   ║        └────┘      ║
+   ╚═══════════════════╝
+      </pre>
+      <div class="prompt"><span style="color:#ffff44">READY.</span> <span style="color:#6b8cff">LOAD"GAME",8,1</span><span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 4. Game character / adventurer -->
+  <div class="card gold">
+    <span class="label">Adventurer</span><span class="num">04</span>
+    <div class="logo-area">
+      <pre>
+        ▄▄▄
+       ▐▌ ▌
+       ╱ ╲
+      │ ○ ○ │
+      │  ◡  │
+       ╲ ─ ╱
+      ┌┤  ├┐
+      ││  ││
+      ╱│  │╲
+     ╱ │  │ ╲
+        ╲╱
+       ╱  ╲
+      ╱    ╲
+      </pre>
+      <div class="prompt">Hero@game-library:~$ login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 5. Sword & Magic -->
+  <div class="card violet">
+    <span class="label">Sword &amp; Magic</span><span class="num">05</span>
+    <div class="logo-area">
+      <pre>
+        ╔══╗
+       ╔╝  ╚╗
+       ║    ║
+      ╱ ║  ║ ╲
+     ╱  ║  ║  ╲
+    │   ║  ║   │
+    │   ╚══╝   │
+    │    ╔╗   │     ✦
+    │   ╔╝╚╗  │    ✦ ✦
+    ╲  ╔╝  ╚╗ ╱   ✦ ✦ ✦
+     ╲ ║    ║╱
+      ╲║    ║
+       ║    ║
+       ╚════╝
+      </pre>
+      <div class="prompt">mage@game-library:~$ cast login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 6. Arcade joystick -->
+  <div class="card msdos">
+    <span class="label">Joystick</span><span class="num">06</span>
+    <div class="scanlines"></div>
+    <div class="logo-area">
+      <pre>
+         ███
+        █████
+        █████
+         ███
+          █
+          █
+          █
+        ┌─┴─┐
+        │   │
+        │ o │
+        │   │
+        └───┘
+      ╔═══════════╗
+      ║ ╔═╗   ╔═╗ ║
+      ║ ╚═╝   ╚═╝ ║
+      ╚═══════════╝
+      </pre>
+      <div class="prompt">C:\GAMES&gt; joy login.exe<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 7. Keyboard -->
+  <div class="card">
+    <span class="label">Keyboard</span><span class="num">07</span>
+    <div class="logo-area">
+      <pre>
+   ╔═══════════════════════╗
+   ║ ┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐ ║
+   ║ │Q││W││E││R││T││Y││U│ ║
+   ║ └─┘└─┘└─┘└─┘└─┘└─┘└─┘ ║
+   ║  ┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐  ║
+   ║  │A││S││D││F││G││H│  ║
+   ║  └─┘└─┘└─┘└─┘└─┘└─┘  ║
+   ║   ┌─┐┌─┐┌─┐┌─┐┌─┐   ║
+   ║   │Z││X││C││V││B│   ║
+   ║   └─┘└─┘└─┘└─┘└─┘   ║
+   ║      ┌────────┐      ║
+   ║      │  SPACE │      ║
+   ║      └────────┘      ║
+   ╚═══════════════════════╝
+      </pre>
+      <div class="prompt">game-library@auth:~$ type password<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 8. Shield + crossed swords -->
+  <div class="card gold">
+    <span class="label">Shield &amp; Swords</span><span class="num">08</span>
+    <div class="logo-area">
+      <pre>
+         ╔══════╗
+       ╱╱        ╲╲
+      ╱╱   ╔══╗   ╲╲
+     ╱╱    ║  ║    ╲╲
+    ╱╱  ╱  ║  ║  ╲  ╲╲
+   ╱   ╱   ║  ║   ╲   ╲
+   │   │   ║  ║   │   │
+   │   │   ╚══╝   │   │
+   ╲   ╲   ╔╗╔╗   ╱   ╱
+    ╲╲  ╲ ╔╝║║╚╗ ╱  ╱╱
+     ╲╲   ║ ║║ ║   ╱╱
+      ╲╲  ║ ║║ ║  ╱╱
+       ╲╲ ║ ║║ ║ ╱╱
+         ╚═╝╚╝╚═╝
+      </pre>
+      <div class="prompt">guardian@game-library:~$ login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 9. Castle / tower -->
+  <div class="card sepia">
+    <span class="label">Castle</span><span class="num">09</span>
+    <div class="logo-area">
+      <pre>
+      ║     ║     ║
+    ╔═╝     ╝     ╚═╗
+    ║  ╔══╗ ╔══╗  ║
+    ║  ║  ║ ║  ║  ║
+    ║  ║  ║ ║  ║  ║
+    ║  ║  ║ ║  ║  ║
+    ║  ╚══╝ ╚══╝  ║
+    ║ ╔═══════════╗ ║
+    ║ ║ ┌───────┐ ║ ║
+    ║ ║ │ █ █ █ │ ║ ║
+    ║ ║ │ █ █ █ │ ║ ║
+    ║ ║ │ █ █ █ │ ║ ║
+    ║ ║ └───────┘ ║ ║
+    ║ ╚═══════════╝ ║
+    ╚═══════════════╝
+      </pre>
+      <div class="prompt">kingdom@game-library:~$ enter <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 10. Dragon -->
+  <div class="card pink">
+    <span class="label">Dragon</span><span class="num">10</span>
+    <div class="logo-area">
+      <pre>
+         ╱◥◣
+       ╱╱  ╲◥◣
+      ╱ ╱   ╲◥◣╲
+     ╱ ■ ■ ╲
+    ╱  ───  ╲
+   │  ╱═══╲  │
+   │ ╱  ╲ ╱ ╲ │
+   ││ ╲_╱ ╲_╱││
+   ╲│  ╔═══╗ │╱
+    ╲╲ ║   ║ ╱╱
+     ╲╲║   ║╱╱
+       ╚═══╝
+      ╱│     │╲
+     ╱ ╲   ╱ ╲
+    ╱   ╲_╱   ╲
+      </pre>
+      <div class="prompt">drake@game-library:~$ login --fire <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 11. Pixel heart / life -->
+  <div class="card crt">
+    <span class="label">Heart / Life</span><span class="num">11</span>
+    <div class="crt-overlay"></div>
+    <div class="crt-glow"></div>
+    <div class="logo-area">
+      <pre>
+    ██  ██
+   ████ ████
+   █████████
+    ███████
+     █████
+      ███
+       █
+   ╔═══════════╗
+   ║ HP ██████ ║
+   ║ MP ████   ║
+   ╚═══════════╝
+      </pre>
+      <div class="prompt">[LOGIN] HP restored<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 12. Star / Sparkle -->
+  <div class="card amber">
+    <span class="label">Star</span><span class="num">12</span>
+    <div class="logo-area">
+      <pre>
+         *
+        * *
+       *   *
+      *  ★  *
+       *   *
+        * *
+         *
+      ★  ★  ★
+    ★  ★  ★  ★
+      ★  ★  ★
+   ╔═══════════╗
+   ║ ✦ GAME ✦ ║
+   ╚═══════════╝
+      </pre>
+      <div class="prompt">&gt; login ★ <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 13. Hourglass / Time -->
+  <div class="card cyan">
+    <span class="label">Hourglass</span><span class="num">13</span>
+    <div class="logo-area">
+      <pre>
+   ╔═══════════╗
+   ║  ███████  ║
+   ║   █████   ║
+   ║    ███    ║
+   ║     █     ║
+   ║    ███    ║
+   ║   █████   ║
+   ║  ███████  ║
+   ║ █████████ ║
+   ║  ███████  ║
+   ║   █████   ║
+   ║    ███    ║
+   ║     █     ║
+   ╚═══════════╝
+      </pre>
+      <div class="prompt">time@game-library:~$ login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 14. Crown -->
+  <div class="card gold">
+    <span class="label">Crown</span><span class="num">14</span>
+    <div class="logo-area">
+      <pre>
+      ▄▄▄▄▄▄▄▄▄
+    ▄▟█▄ █ █ ▄█▙▄
+   █ ███ ███ ███ █
+   █ █ █ ███ █ █ █
+   █ █ ███████ █ █
+   █ █ ███████ █ █
+   █▄█ ███████ █▄█
+    █  ███████  █
+   ╔╩═══════════╩╗
+   ║ 👑  KING  👑║
+   ╚══════════════╝
+      </pre>
+      <div class="prompt">king@game-library:~$ login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 15. Key -->
+  <div class="card">
+    <span class="label">Key</span><span class="num">15</span>
+    <div class="logo-area">
+      <pre>
+      ╔════╗
+      ║ ██ ║
+      ║ ██ ║
+      ║ ██ ║
+      ║ ██ ║
+      ║ ██ ║
+      ╚════╝
+        ║║
+       ╱╲╱╲
+      ╱  ╲ ╲
+     ╱  ╱╲ ╲
+    ╱  ╱  ╲ ╲
+   ╱  ╱    ╲ ╲
+      </pre>
+      <div class="prompt">game-library@auth:~$ unlock <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 16. Tome / Book -->
+  <div class="card sepia">
+    <span class="label">Tome / Book</span><span class="num">16</span>
+    <div class="logo-area">
+      <pre>
+    ╔═══════════════╗
+    ║ ╔═══════════╗ ║
+    ║ ║ ▄▄▄▄▄▄▄▄▄ ║ ║
+    ║ ║ █ LIBRARY █ ║ ║
+    ║ ║ █   OF    █ ║ ║
+    ║ ║ █  GAMES  █ ║ ║
+    ║ ║ ▀▀▀▀▀▀▀▀▀ ║ ║
+    ║ ╚═══════════╝ ║
+    ║  ═══════════  ║
+    ╚═══════════════╝
+      </pre>
+      <div class="prompt">&gt; read tome of login<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 17. Treasure chest -->
+  <div class="card gold">
+    <span class="label">Chest</span><span class="num">17</span>
+    <div class="logo-area">
+      <pre>
+   ╔═══════════════╗
+   ║  ╔═╗  ╔═╗  ╔═╗ ║
+   ║  ╚═╝  ╚═╝  ╚═╝ ║
+   ║    ╔═══════╗   ║
+   ║    ║  ╔╗   ║   ║
+   ║    ║  ╚╝   ║   ║
+   ║    ╚═══════╝   ║
+   ╚═══════════════╝
+    ╔═══════════════╗
+    ║ █████████████ ║
+    ║ █████████████ ║
+    ╚═══════════════╝
+      </pre>
+      <div class="prompt">> open chest --login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 18. Spaceship / Rocket -->
+  <div class="card cyan">
+    <span class="label">Spaceship</span><span class="num">18</span>
+    <div class="logo-area">
+      <pre>
+         ███
+        █████
+       ███████
+      █████████
+      ██╔═══╗██
+      │║ ███ ║│
+      │║ ███ ║│
+      │╚═════╝│
+      │  ╔═╗  │
+      │  ╚═╝  │
+     ╱│       │╲
+    ╱ │       │ ╲
+   ╱  │       │  ╲
+       ╲     ╱
+        ╲   ╱
+         ╲ ╱
+          V
+      </pre>
+      <div class="prompt">pilot@game-library:~$ launch <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 19. Headphones / Music -->
+  <div class="card pink">
+    <span class="label">Music / Headphones</span><span class="num">19</span>
+    <div class="logo-area">
+      <pre>
+      ∩∩
+     (■■)
+     (■■)
+      ──
+     ╱  ╲
+    │    │
+    │ ♪♫ │
+    │ ♪♫ │
+    │ ♪♫ │
+    ╲    ╱
+     ╲  ╱
+      ╲╱
+   ╔═══════════╗
+   ║ ██ ██ ██  ║
+   ╚═══════════╝
+      </pre>
+      <div class="prompt">dj@game-library:~$ login --music <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 20. Trophy / Cup -->
+  <div class="card gold">
+    <span class="label">Trophy</span><span class="num">20</span>
+    <div class="logo-area">
+      <pre>
+       ▄▄▄▄▄
+      █▀▀▀▀▀█
+     █▄▄▄▄▄▄▄█
+     █ ╔═══╗ █
+     █ ║ ★ ║ █
+     █ ╚═══╝ █
+     █  ███  █
+     █  ███  █
+     █ █████ █
+      █ ███ █
+      ╲▐▌▐▌╱
+       ╲▐▌╱
+        ╲╱
+      ┌────┐
+      │    │
+      └────┘
+      </pre>
+      <div class="prompt">champion@game-library:~$ login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

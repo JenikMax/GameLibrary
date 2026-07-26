@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Terminal — 20 вариантов ASCII геймпадов PS / Xbox</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0b;
+    color: #e4e4e7;
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+    padding: 2rem;
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.4rem;
+    color: #00ff88;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 12px rgba(0,255,136,0.4);
+  }
+  .subtitle {
+    text-align: center;
+    color: #71717a;
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1rem;
+    max-width: 1700px;
+    margin: 0 auto;
+  }
+  .card {
+    background: rgba(24, 24, 27, 0.9);
+    border: 1px solid rgba(0, 255, 136, 0.12);
+    border-radius: 8px;
+    padding: 1.25rem;
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0, 255, 136, 0.35); }
+  .card .label {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.75rem;
+    font-size: 0.65rem;
+    color: #52525b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .card .num {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.75rem;
+    font-size: 0.6rem;
+    color: #3f3f46;
+    font-weight: 700;
+  }
+  .logo-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .prompt {
+    font-size: 0.75rem;
+    color: #00cc6a;
+    margin-top: 0.3rem;
+  }
+  .cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1em;
+    background: #00cc6a;
+    margin-left: 0.15em;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* themes */
+  .t-green pre { color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.5); }
+  .t-green .prompt { color: #00cc6a; }
+  .t-green .cursor { background: #00cc6a; }
+
+  .t-amber { background: rgba(24, 16, 0, 0.95); border-color: rgba(255, 136, 0, 0.2); }
+  .t-amber pre { color: #ff8800; text-shadow: 0 0 12px rgba(255,136,0,0.4); }
+  .t-amber .prompt { color: #ff8800; }
+  .t-amber .cursor { background: #ff8800; }
+
+  .t-pink { background: rgba(16, 0, 32, 0.9); border-color: rgba(255, 0, 128, 0.25); }
+  .t-pink pre { color: #ff0080; text-shadow: 0 0 12px rgba(255,0,128,0.5); }
+  .t-pink .prompt { color: #00ffff; }
+  .t-pink .cursor { background: #00ffff; }
+
+  .t-blue { background: rgba(0, 8, 32, 0.9); border-color: rgba(68, 136, 255, 0.2); }
+  .t-blue pre { color: #4488ff; text-shadow: 0 0 10px rgba(68,136,255,0.4); }
+  .t-blue .prompt { color: #4488ff; }
+  .t-blue .cursor { background: #4488ff; }
+
+  .t-c64 { background: rgba(48, 48, 96, 0.85); border-color: rgba(107, 140, 255, 0.25); }
+  .t-c64 pre { color: #6b8cff; text-shadow: 0 0 8px rgba(107,140,255,0.4); }
+  .t-c64 .prompt { color: #ffff44; }
+  .t-c64 .cursor { background: #ffff44; }
+
+  .t-dos { background: rgba(0, 0, 0, 0.9); border-color: rgba(170, 170, 170, 0.3); }
+  .t-dos pre { color: #aaaaaa; text-shadow: none; }
+  .t-dos .prompt { color: #aaaaaa; }
+  .t-dos .cursor { background: #aaaaaa; }
+
+  .t-phosphor { background: rgba(8, 24, 8, 0.95); border-color: rgba(0, 255, 68, 0.2); }
+  .t-phosphor pre { color: #33ff44; text-shadow: 0 0 16px rgba(51,255,68,0.6), 0 0 32px rgba(51,255,68,0.2); }
+  .t-phosphor .prompt { color: #33ff44; }
+  .t-phosphor .cursor { background: #33ff44; box-shadow: 0 0 8px #33ff44; }
+
+  .t-gold { background: linear-gradient(135deg, #1a0f00, #0d0800); border-color: rgba(255, 215, 0, 0.25); }
+  .t-gold pre { color: #ffd700; text-shadow: 1px 1px 0 #8b00ff, 0 0 16px rgba(255,215,0,0.3); }
+  .t-gold .prompt { color: #ff8800; }
+  .t-gold .cursor { background: #ffd700; }
+
+  .t-cyan { background: rgba(0, 24, 32, 0.9); border-color: rgba(0, 200, 255, 0.2); }
+  .t-cyan pre { color: #00ccff; text-shadow: 0 0 12px rgba(0,200,255,0.4); }
+  .t-cyan .prompt { color: #00ccff; }
+  .t-cyan .cursor { background: #00ccff; }
+
+  .t-sepia { background: rgba(20, 18, 12, 0.92); border-color: rgba(200, 180, 140, 0.2); }
+  .t-sepia pre { color: #c8b48c; text-shadow: none; }
+  .t-sepia .prompt { color: #a09070; font-style: italic; }
+  .t-sepia .cursor { background: #c8b48c; }
+
+  .t-crt { background: rgba(0, 20, 0, 0.92); border-color: rgba(0, 255, 136, 0.15); }
+  .t-crt pre { color: #00ff88; text-shadow: 0 0 6px rgba(0,255,136,0.4); filter: blur(0.3px); }
+  .t-crt .prompt { color: #00cc6a; filter: blur(0.3px); }
+
+  .t-violet { background: rgba(24, 0, 48, 0.9); border-color: rgba(180, 100, 255, 0.2); }
+  .t-violet pre { color: #b464ff; text-shadow: 0 0 12px rgba(180,100,255,0.4); }
+  .t-violet .prompt { color: #b464ff; }
+  .t-violet .cursor { background: #b464ff; }
+
+  .t-white { background: #0d0d0d; border-color: rgba(255,255,255,0.1); }
+  .t-white pre { color: #eeeeee; text-shadow: none; }
+  .t-white .prompt { color: #999999; }
+  .t-white .cursor { background: #eeeeee; }
+
+  .t-red { background: rgba(32, 0, 0, 0.9); border-color: rgba(255, 50, 50, 0.2); }
+  .t-red pre { color: #ff4444; text-shadow: 0 0 12px rgba(255,68,68,0.4); }
+  .t-red .prompt { color: #ff6666; }
+  .t-red .cursor { background: #ff4444; }
+
+  .t-green2 { background: rgba(0, 24, 8, 0.92); border-color: rgba(0, 200, 100, 0.2); }
+  .t-green2 pre { color: #00cc66; text-shadow: 0 0 10px rgba(0,204,102,0.4); }
+  .t-green2 .prompt { color: #00cc66; }
+  .t-green2 .cursor { background: #00cc66; }
+
+  .t-orange { background: rgba(24, 12, 0, 0.92); border-color: rgba(255, 140, 0, 0.2); }
+  .t-orange pre { color: #ff7700; text-shadow: 0 0 12px rgba(255,119,0,0.4); }
+  .t-orange .prompt { color: #ff7700; }
+  .t-orange .cursor { background: #ff7700; }
+
+  .t-scanlines { background: rgba(0, 0, 0, 0.92); border-color: rgba(0, 255, 136, 0.1); }
+  .t-scanlines pre { color: #00ff88; text-shadow: 0 0 4px rgba(0,255,136,0.3); }
+  .t-scanlines .prompt { color: #00aa55; }
+  .t-scanlines .cursor { background: #00ff88; }
+  .t-scanlines .sl {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<h1>⌨ Retro Terminal — 20 ASCII геймпадов PlayStation и Xbox</h1>
+<p class="subtitle">Стилизованные контроллеры для страницы авторизации в ретро-терминальном стиле</p>
+
+<div class="grid">
+
+  <!-- 1. PS — зелёный классика -->
+  <div class="card t-green">
+    <span class="label">PlayStation Classic</span><span class="num">01</span>
+    <div class="logo-area">
+      <pre>
+          ╔═══════════════╗
+       ╔══╝               ╚══╗
+    ╔══╝   ┌──┐      ┌──┐   ╚══╗
+    ║      │ ╲╱ │      │ ╲╱ │      ║
+    ║      └──┘      └──┘      ║
+    ║     ╔═══════════════╗     ║
+    ║  ╔══╝  △  ○  ✕  □  ╚══╗  ║
+    ║  ║     ◁ ■ ■ ▷      ║  ║
+    ║  ╚═══════════════════╝  ║
+    ║         ╔════╗         ║
+    ║         ║ PS ║         ║
+    ║         ╚════╝         ║
+    ╚═══════════════════════════╝
+      </pre>
+      <div class="prompt">ps@game-library:~$ login --dualshock<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 2. Xbox — янтарный -->
+  <div class="card t-amber">
+    <span class="label">Xbox Amber</span><span class="num">02</span>
+    <div class="logo-area">
+      <pre>
+       ╔══════════════════╗
+    ╔══╝                  ╚══╗
+    ║    ┌──┐       ┌──┐    ║
+    ║    │ ╲╱ │       │ ╲╱ │    ║
+    ║    └──┘       └──┘    ║
+    ║  ╔══════════════════╗  ║
+    ║  ║   X  Y          ║  ║
+    ║  ║  A  B   [XBOX] ║  ║
+    ║  ╚══════════════════╝  ║
+    ║       ╔════════╗       ║
+    ║       ║  XBOX  ║       ║
+    ║       ╚════════╝       ║
+    ╚══════════════════════════╝
+      </pre>
+      <div class="prompt">xbox@game-library:~$ login --controller<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 3. PS — розовый неон -->
+  <div class="card t-pink">
+    <span class="label">PlayStation Neon</span><span class="num">03</span>
+    <div class="logo-area">
+      <pre>
+      ╔══════════════════╗
+    ╔═╝                  ╚═╗
+    ║   ┌──┐      ┌──┐   ║
+    ║   │ ╲╱ │      │ ╲╱ │   ║
+    ║   └──┘      └──┘   ║
+    ║  ┌────────────────┐ ║
+    ║  │  △  ○  ✕  □    │ ║
+    ║  │  ◁ ■ ■ ▷    │ ║
+    ║  └────────────────┘ ║
+    ║       ╔════╗        ║
+    ║       ║ PS ║        ║
+    ║       ╚════╝        ║
+    ╚══════════════════════╝
+      </pre>
+      <div class="prompt">neon@game-library:~$ connect dualshock<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 4. Xbox — синий -->
+  <div class="card t-blue">
+    <span class="label">Xbox Blue</span><span class="num">04</span>
+    <div class="logo-area">
+      <pre>
+    ╔═══════════════════════╗
+    ║  ┌──┐         ┌──┐  ║
+    ║  │ ╲╱ │         │ ╲╱ │  ║
+    ║  └──┘         └──┘  ║
+    ║  ╔═════════════════╗ ║
+    ║  ║  ╔══╗ ╔══╗     ║ ║
+    ║  ║  ║X ║ ║Y ║     ║ ║
+    ║  ║  ╚══╝ ╚══╝     ║ ║
+    ║  ║  ╔══╗ ╔══╗     ║ ║
+    ║  ║  ║A ║ ║B ║  ◎ ║ ║
+    ║  ║  ╚══╝ ╚══╝     ║ ║
+    ║  ╚═════════════════╝ ║
+    ║       ╔══════╗       ║
+    ║       ║ XBOX ║       ║
+    ║       ╚══════╝       ║
+    ╚═══════════════════════╝
+      </pre>
+      <div class="prompt">xbox@game-library:~$ login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 5. PS — Commodore 64 -->
+  <div class="card t-c64">
+    <span class="label">PlayStation C64</span><span class="num">05</span>
+    <div class="logo-area">
+      <pre>
+     ╔═══════════════════╗
+   ╔═╝                   ╚═╗
+   ║   ┌──┐       ┌──┐   ║
+   ║   │ ╲╱ │       │ ╲╱ │   ║
+   ║   └──┘       └──┘   ║
+   ║   ╔═══════════════╗   ║
+   ║   ║ █ █ █ █ █ █ █ ║   ║
+   ║   ║ █  △  ○  █  █ ║   ║
+   ║   ║ █  ✕  □  █  █ ║   ║
+   ║   ║ █ █ █ █ █ █ █ ║   ║
+   ║   ╚═══════════════╝   ║
+   ║        ╔════╗         ║
+   ║        ║ PS ║         ║
+   ║        ╚════╝         ║
+   ╚═══════════════════════╝
+      </pre>
+      <div class="prompt"><span style="color:#ffff44">READY.</span> LOAD"DUALSHOCK",8,1<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 6. Xbox — MS-DOS -->
+  <div class="card t-dos">
+    <span class="label">Xbox MS-DOS</span><span class="num">06</span>
+    <div class="logo-area">
+      <pre>
+    ╔══════════════════════╗
+    ║  ┌─┐         ┌─┐   ║
+    ║  │\│         │\│   ║
+    ║  │/│         │/│   ║
+    ║  └─┘         └─┘   ║
+    ║  ╔════════════════╗ ║
+    ║  ║ [X] [Y]       ║ ║
+    ║  ║ [A] [B] [O]   ║ ║
+    ║  ╚════════════════╝ ║
+    ║     ╔═════════╗     ║
+    ║     ║  XBOX   ║     ║
+    ║     ╚═════════╝     ║
+    ╚══════════════════════╝
+      </pre>
+      <div class="prompt">C:\GAMES&gt; xbox login.exe<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 7. PS — зелёный фосфор -->
+  <div class="card t-phosphor">
+    <span class="label">PlayStation Phosphor</span><span class="num">07</span>
+    <div class="logo-area">
+      <pre>
+      ╔══════════════════╗
+    ╔═╝                  ╚═╗
+    ║   ╔══╗    ╔══╗    ║
+    ║   ║██║    ║██║    ║
+    ║   ╚══╝    ╚══╝    ║
+    ║  ┌──────────────┐ ║
+    ║  │  △  ○  ✕  □  │ ║
+    ║  │  ◁ ■ ■ ▷   │ ║
+    ║  └──────────────┘ ║
+    ║       ╔════╗      ║
+    ║       ║ PS ║      ║
+    ║       ╚════╝      ║
+    ╚══════════════════════╝
+      </pre>
+      <div class="prompt">> connect --ps <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 8. Xbox — золото -->
+  <div class="card t-gold">
+    <span class="label">Xbox Gold</span><span class="num">08</span>
+    <div class="logo-area">
+      <pre>
+    ╔═══════════════════════╗
+    ║   ╔═══╗    ╔═══╗    ║
+    ║   ║ \ ║    ║ / ║    ║
+    ║   ╚═══╝    ╚═══╝    ║
+    ║  ┌─────────────────┐ ║
+    ║  │  ╔══╗ ╔══╗      │ ║
+    ║  │  ║X ║ ║Y ║      │ ║
+    ║  │  ╚══╝ ╚══╝      │ ║
+    ║  │  ╔══╗ ╔══╗      │ ║
+    ║  │  ║A ║ ║B ║  ✦  │ ║
+    ║  │  ╚══╝ ╚══╝      │ ║
+    ║  └─────────────────┘ ║
+    ║       ╔══════╗       ║
+    ║       ║ XBOX ║       ║
+    ║       ╚══════╝       ║
+    ╚═══════════════════════╝
+      </pre>
+      <div class="prompt">xbox@game-library:~$ login --gold <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 9. PS — циан -->
+  <div class="card t-cyan">
+    <span class="label">PlayStation Cyan</span><span class="num">09</span>
+    <div class="logo-area">
+      <pre>
+     ╔══════════════════╗
+   ╔═╝                  ╚═╗
+   ║  ┌──┐      ┌──┐   ║
+   ║  │ ╲╱ │      │ ╲╱ │   ║
+   ║  └──┘      └──┘   ║
+   ║  ┌──────────────┐  ║
+   ║  │ △ ○ ✕ □     │  ║
+   ║  │ ◁ ■ ■ ▷     │  ║
+   ║  └──────────────┘  ║
+   ║      ╔══════╗      ║
+   ║      ║ PS5  ║      ║
+   ║      ╚══════╝      ║
+   ╚══════════════════════╝
+      </pre>
+      <div class="prompt">ps5@game-library:~$ login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 10. Xbox — сепия (ретро) -->
+  <div class="card t-sepia">
+    <span class="label">Xbox Vintage</span><span class="num">10</span>
+    <div class="logo-area">
+      <pre>
+    ╔══════════════════════╗
+    ║   ┌───┐    ┌───┐   ║
+    ║   │ ╲ │    │ ╱ │   ║
+    ║   └───┘    └───┘   ║
+    ║  ╔════════════════╗ ║
+    ║  ║  ╔═╗ ╔═╗      ║ ║
+    ║  ║  ║X║ ║Y║      ║ ║
+    ║  ║  ╚═╝ ╚═╝      ║ ║
+    ║  ║  ╔═╗ ╔═╗      ║ ║
+    ║  ║  ║A║ ║B║  ◉  ║ ║
+    ║  ║  ╚═╝ ╚═╝      ║ ║
+    ║  ╚════════════════╝ ║
+    ║      ╔══════╗       ║
+    ║      ║ XBOX ║       ║
+    ║      ╚══════╝       ║
+    ╚══════════════════════╝
+      </pre>
+      <div class="prompt">&gt; type xbox login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 11. PS — CRT -->
+  <div class="card t-crt">
+    <span class="label">PlayStation CRT</span><span class="num">11</span>
+    <div class="logo-area">
+      <pre>
+    ╔═══════════════════╗
+    ║  ┌────┐ ┌────┐  ║
+    ║  │ ╲╱ │ │ ╲╱ │  ║
+    ║  └────┘ └────┘  ║
+    ║  ┌─────────────┐ ║
+    ║  │ △ ○ ✕ □    │ ║
+    ║  │ ◁ ■ ■ ▷    │ ║
+    ║  └─────────────┘ ║
+    ║      ╔════╗      ║
+    ║      ║ PS ║      ║
+    ║      ╚════╝      ║
+    ╚═══════════════════╝
+      </pre>
+      <div class="prompt">[LOGIN] dualshock connected<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 12. Xbox — фиолетовый -->
+  <div class="card t-violet">
+    <span class="label">Xbox Violet</span><span class="num">12</span>
+    <div class="logo-area">
+      <pre>
+    ╔═══════════════════════╗
+    ║   ┌──┐      ┌──┐    ║
+    ║   │ ╲╱ │      │ ╲╱ │    ║
+    ║   └──┘      └──┘    ║
+    ║  ╔══════════════════╗ ║
+    ║  ║ ▪ X ▪ Y ▪       ║ ║
+    ║  ║ ▪ A ▪ B ▪  ⬤   ║ ║
+    ║  ╚══════════════════╝ ║
+    ║       ╔══════╗        ║
+    ║       ║ XBOX ║        ║
+    ║       ╚══════╝        ║
+    ╚═══════════════════════╝
+      </pre>
+      <div class="prompt">xbox@game-library:~$ login --elite<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 13. PS — белый (PS2) -->
+  <div class="card t-white">
+    <span class="label">PlayStation White</span><span class="num">13</span>
+    <div class="logo-area">
+      <pre>
+    ╔═══════════════════╗
+    ║  ┌──┐     ┌──┐  ║
+    ║  │ ╲╱ │     │ ╲╱ │  ║
+    ║  └──┘     └──┘  ║
+    ║  ┌─────────────┐ ║
+    ║  │ ▄ △ ▄ ○ ▄  │ ║
+    ║  │ ▄ ✕ ▄ □ ▄  │ ║
+    ║  │ ▄ ◁ ▄ ▷ ▄  │ ║
+    ║  └─────────────┘ ║
+    ║      ╔════╗      ║
+    ║      ║ PS2║      ║
+    ║      ╚════╝      ║
+    ╚═══════════════════╝
+      </pre>
+      <div class="prompt">ps2@game-library:~$ login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 14. Xbox — красный -->
+  <div class="card t-red">
+    <span class="label">Xbox Red</span><span class="num">14</span>
+    <div class="logo-area">
+      <pre>
+    ╔══════════════════════╗
+    ║   ┌──┐     ┌──┐    ║
+    ║   │ ╲╱ │     │ ╲╱ │    ║
+    ║   └──┘     └──┘    ║
+    ║  ┌────────────────┐ ║
+    ║  │  █ X █ Y █    │ ║
+    ║  │  █ A █ B █ ●  │ ║
+    ║  └────────────────┘ ║
+    ║      ╔══════╗       ║
+    ║      ║ XBOX ║       ║
+    ║      ╚══════╝       ║
+    ╚══════════════════════╝
+      </pre>
+      <div class="prompt">xbox@game-library:~$ login --series <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 15. PS — зелёный 2 -->
+  <div class="card t-green2">
+    <span class="label">PlayStation Green</span><span class="num">15</span>
+    <div class="logo-area">
+      <pre>
+      ╔═══════════════════╗
+    ╔═╝                   ╚═╗
+    ║   ┌──┐      ┌──┐    ║
+    ║   │ ╲╱ │      │ ╲╱ │    ║
+    ║   └──┘      └──┘    ║
+    ║  ┌─────────────────┐ ║
+    ║  │  ╔══╗ ╔══╗      │ ║
+    ║  │  ║△ ║ ║○ ║      │ ║
+    ║  │  ╚══╝ ╚══╝      │ ║
+    ║  │  ╔══╗ ╔══╗      │ ║
+    ║  │  ║✕ ║ ║□ ║      │ ║
+    ║  │  ╚══╝ ╚══╝      │ ║
+    ║  └─────────────────┘ ║
+    ║       ╔════╗         ║
+    ║       ║ PS ║         ║
+    ║       ╚════╝         ║
+    ╚═══════════════════════╝
+      </pre>
+      <div class="prompt">game-library@auth:~$ connect ps <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 16. Xbox — оранжевый -->
+  <div class="card t-orange">
+    <span class="label">Xbox Orange</span><span class="num">16</span>
+    <div class="logo-area">
+      <pre>
+    ╔═══════════════════════╗
+    ║  ┌──┐        ┌──┐   ║
+    ║  │ ╲╱ │        │ ╲╱ │   ║
+    ║  └──┘        └──┘   ║
+    ║  ┌──────────────────┐║
+    ║  │  X  Y           │║
+    ║  │  A  B    ⬤      │║
+    ║  └──────────────────┘║
+    ║     ╔══════════╗     ║
+    ║     ║  XBOX 360║     ║
+    ║     ╚══════════╝     ║
+    ╚═══════════════════════╝
+      </pre>
+      <div class="prompt">xbox360@game-library:~$ login <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 17. PS — scanlines -->
+  <div class="card t-scanlines">
+    <span class="label">PlayStation Scanlines</span><span class="num">17</span>
+    <div class="sl"></div>
+    <div class="logo-area">
+      <pre>
+     ╔══════════════════╗
+   ╔═╝                  ╚═╗
+   ║   ┌──┐    ┌──┐    ║
+   ║   │ ╲╱ │    │ ╲╱ │    ║
+   ║   └──┘    └──┘    ║
+   ║  ┌──────────────┐  ║
+   ║  │ ╔═╗╔═╗╔═╗╔═╗│  ║
+   ║  │ ║△║║○║║✕║║□║│  ║
+   ║  │ ╚═╝╚═╝╚═╝╚═╝│  ║
+   ║  └──────────────┘  ║
+   ║      ╔══════╗      ║
+   ║      ║ PS1  ║      ║
+   ║      ╚══════╝      ║
+   ╚══════════════════════╝
+      </pre>
+      <div class="prompt">[SCAN] dualshock detected<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- 18. Xbox — глитч-эффект -->
+  <div class="card t-pink" style="background:rgba(8,0,16,0.95);border-color:rgba(0,255,200,0.2);">
+    <span class="label">Xbox Glitch</span><span class="num">18</span>
+    <div class="logo-area">
+      <pre style="color:#00ffc8;text-shadow:0 0 8px rgba(0,255,200,0.4);">
+    ╔══════════════════════╗
+    ║  ┌─/\─┐   ┌─/\─┐  ║
+    ║  │ \/  │   │ \/  │  ║
+    ║  └────┘   └────┘  ║
+    ║  ┌────────────────┐ ║
+    ║  │ █ X █ Y █     │ ║
+    ║  │ █ A █ B █ ◉  │ ║
+    ║  └────────────────┘ ║
+    ║     ╔════════╗      ║
+    ║     ║ XBOX S║      ║
+    ║     ╚════════╝      ║
+    ╚══════════════════════╝
+      </pre>
+      <div class="prompt" style="color:#ff0080;">$ xbox --glitch <span class="cursor" style="background:#ff0080;"></span></div>
+    </div>
+  </div>
+
+  <!-- 19. PS — минимал -->
+  <div class="card" style="background:rgba(12,12,12,0.95);border-color:rgba(0,100,200,0.2);">
+    <span class="label">PlayStation Minimal</span><span class="num">19</span>
+    <div class="logo-area">
+      <pre style="color:#4488cc;text-shadow:0 0 10px rgba(68,136,204,0.4);">
+   ┌──────┐
+   │ ╲╱ ╲╱ │
+   └──────┘
+   ┌────────┐
+   │ △ ○   │
+   │ ✕ □   │
+   └────────┘
+     ╔══╗
+     ║PS║
+     ╚══╝
+      </pre>
+      <div class="prompt" style="color:#4488cc;">ps@glib:~$ login<span class="cursor" style="background:#4488cc;"></span></div>
+    </div>
+  </div>
+
+  <!-- 20. Xbox — вселенная (широкий) -->
+  <div class="card t-gold" style="background:linear-gradient(135deg,#0a0015,#150520);border-color:rgba(0,255,200,0.15);">
+    <span class="label">Xbox Universe</span><span class="num">20</span>
+    <div class="logo-area">
+      <pre style="color:#00ffc8;text-shadow:0 0 12px rgba(0,255,200,0.4),0 0 24px rgba(0,100,255,0.2);">
+  ╔═══════════════════════════════╗
+  ║  ┌────────┐  ┌────────┐     ║
+  ║  │ ╱╲ ╱╲ │  │ ╱╲ ╱╲ │     ║
+  ║  │ ╲╱ ╲╱ │  │ ╲╱ ╲╱ │     ║
+  ║  └────────┘  └────────┘     ║
+  ║   ┌─────────────────────┐   ║
+  ║   │ ╔════╗ ╔════╗      │   ║
+  ║   │ ║  X ║ ║  Y ║  ⦿  │   ║
+  ║   │ ╚════╝ ╚════╝      │   ║
+  ║   │ ╔════╗ ╔════╗      │   ║
+  ║   │ ║  A ║ ║  B ║     │   ║
+  ║   │ ╚════╝ ╚════╝      │   ║
+  ║   └─────────────────────┘   ║
+  ║        ╔══════════╗         ║
+  ║        ║  XBOX SX ║         ║
+  ║        ╚══════════╝         ║
+  ╚═══════════════════════════════╝
+      </pre>
+      <div class="prompt" style="color:#ffd700;">xbox@game-library:~$ login --series-x<span class="cursor" style="background:#ffd700;"></span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

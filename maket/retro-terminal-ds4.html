@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Terminal — DualShock 4</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+  }
+  .card {
+    background: #0a0a0a;
+    border: 1px solid rgba(0, 255, 136, 0.15);
+    border-radius: 12px;
+    padding: 2rem 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 0 40px rgba(0,255,136,0.03);
+  }
+  .card svg { display: block; }
+  .prompt {
+    font-size: 0.85rem;
+    color: #00cc6a;
+    text-align: center;
+  }
+  .cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1em;
+    background: #00cc6a;
+    margin-left: 0.15em;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <svg width="520" height="300" viewBox="0 0 520 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- ===== BODY ===== -->
+    <path d="M85 75 Q85 15 145 15 L375 15 Q435 15 435 75 L435 150 Q435 225 375 240 L345 270 Q330 295 315 295 L300 295 Q285 295 270 270 L240 240 Q195 232 165 218 Q85 190 85 150 Z"
+      fill="none" stroke="#00ff88" stroke-width="1.8" stroke-linejoin="round"/>
+
+    <!-- ===== LEFT GRIP ===== -->
+    <path d="M85 75 Q70 90 58 118 Q30 175 36 225 Q40 248 55 258"
+      fill="none" stroke="#00ff88" stroke-width="1.8"/>
+    <path d="M85 130 Q65 145 50 178 Q35 210 42 245 Q48 262 55 258"
+      fill="none" stroke="#00ff88" stroke-width="1.8"/>
+    <!-- grip texture lines -->
+    <line x1="82" y1="170" x2="48" y2="195" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <line x1="80" y1="180" x2="44" y2="205" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <line x1="78" y1="190" x2="42" y2="215" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <line x1="76" y1="200" x2="40" y2="225" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <line x1="74" y1="210" x2="42" y2="235" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+
+    <!-- ===== RIGHT GRIP ===== -->
+    <path d="M435 75 Q450 90 462 118 Q490 175 484 225 Q480 248 465 258"
+      fill="none" stroke="#00ff88" stroke-width="1.8"/>
+    <path d="M435 130 Q455 145 470 178 Q485 210 478 245 Q472 262 465 258"
+      fill="none" stroke="#00ff88" stroke-width="1.8"/>
+    <!-- grip texture lines -->
+    <line x1="438" y1="170" x2="472" y2="195" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <line x1="440" y1="180" x2="476" y2="205" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <line x1="442" y1="190" x2="478" y2="215" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <line x1="444" y1="200" x2="480" y2="225" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <line x1="446" y1="210" x2="478" y2="235" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+
+    <!-- ===== D-PAD ===== -->
+    <rect x="128" y="125" width="40" height="10" rx="3" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="143" y="110" width="10" height="40" rx="3" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <!-- d-pad center dot -->
+    <circle cx="148" cy="130" r="1.5" fill="#00ff88" opacity="0.4"/>
+    <!-- d-pad arrows -->
+    <polygon points="148,114 144,120 152,120" fill="none" stroke="#00ff88" stroke-width="0.6" opacity="0.4"/>
+    <polygon points="148,146 144,140 152,140" fill="none" stroke="#00ff88" stroke-width="0.6" opacity="0.4"/>
+    <polygon points="132,130 138,126 138,134" fill="none" stroke="#00ff88" stroke-width="0.6" opacity="0.4"/>
+    <polygon points="164,130 158,126 158,134" fill="none" stroke="#00ff88" stroke-width="0.6" opacity="0.4"/>
+
+    <!-- ===== LEFT STICK ===== -->
+    <circle cx="175" cy="178" r="20" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <circle cx="175" cy="178" r="14" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.3"/>
+    <circle cx="175" cy="178" r="8" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="175" cy="178" r="3" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <!-- stick grip texture -->
+    <circle cx="175" cy="178" r="11" fill="none" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+
+    <!-- ===== RIGHT STICK ===== -->
+    <circle cx="348" cy="178" r="20" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <circle cx="348" cy="178" r="14" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.3"/>
+    <circle cx="348" cy="178" r="8" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="348" cy="178" r="3" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <circle cx="348" cy="178" r="11" fill="none" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+
+    <!-- ===== FACE BUTTONS ===== -->
+    <!-- △ -->
+    <circle cx="394" cy="118" r="10" fill="none" stroke="#00ff88" stroke-width="1.4"/>
+    <text x="394" y="123" text-anchor="middle" fill="#00ff88" font-size="13" font-family="monospace">△</text>
+    <!-- ○ -->
+    <circle cx="415" cy="133" r="10" fill="none" stroke="#00ff88" stroke-width="1.4"/>
+    <text x="415" y="138" text-anchor="middle" fill="#00ff88" font-size="13" font-family="monospace">○</text>
+    <!-- ✕ -->
+    <circle cx="373" cy="133" r="10" fill="none" stroke="#00ff88" stroke-width="1.4"/>
+    <text x="373" y="138" text-anchor="middle" fill="#00ff88" font-size="13" font-family="monospace">✕</text>
+    <!-- □ -->
+    <circle cx="394" cy="148" r="10" fill="none" stroke="#00ff88" stroke-width="1.4"/>
+    <text x="394" y="153" text-anchor="middle" fill="#00ff88" font-size="13" font-family="monospace">□</text>
+
+    <!-- ===== PS BUTTON ===== -->
+    <circle cx="260" cy="90" r="8" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="260" y="94" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace" font-weight="bold">PS</text>
+
+    <!-- ===== SHARE / OPTIONS ===== -->
+    <rect x="208" y="115" width="28" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="222" y="119" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">SHARE</text>
+    <rect x="284" y="115" width="28" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="298" y="119" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">OPTIONS</text>
+
+    <!-- ===== TOUCHPAD ===== -->
+    <rect x="215" y="100" width="90" height="48" rx="8" fill="none" stroke="#00ff88" stroke-width="0.9" opacity="0.5"/>
+    <!-- touchpad surface lines -->
+    <line x1="225" y1="110" x2="295" y2="110" stroke="#00ff88" stroke-width="0.2" opacity="0.15"/>
+    <line x1="225" y1="120" x2="295" y2="120" stroke="#00ff88" stroke-width="0.2" opacity="0.15"/>
+    <line x1="225" y1="130" x2="295" y2="130" stroke="#00ff88" stroke-width="0.2" opacity="0.15"/>
+    <line x1="225" y1="140" x2="295" y2="140" stroke="#00ff88" stroke-width="0.2" opacity="0.15"/>
+    <line x1="235" y1="105" x2="235" y2="145" stroke="#00ff88" stroke-width="0.2" opacity="0.15"/>
+    <line x1="255" y1="105" x2="255" y2="145" stroke="#00ff88" stroke-width="0.2" opacity="0.15"/>
+    <line x1="275" y1="105" x2="275" y2="145" stroke="#00ff88" stroke-width="0.2" opacity="0.15"/>
+    <line x1="295" y1="105" x2="295" y2="145" stroke="#00ff88" stroke-width="0.2" opacity="0.15"/>
+    <!-- touchpad center line -->
+    <line x1="260" y1="100" x2="260" y2="148" stroke="#00ff88" stroke-width="0.4" opacity="0.2"/>
+    <text x="260" y="128" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.3">TOUCH</text>
+
+    <!-- ===== LIGHT BAR ===== -->
+    <rect x="240" y="15" width="40" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.8" opacity="0.6"/>
+    <rect x="245" y="17" width="30" height="1" fill="#00ff88" opacity="0.15"/>
+
+    <!-- ===== SPEAKER GRILLE ===== -->
+    <circle cx="238" cy="92" r="1.2" fill="none" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <circle cx="243" cy="92" r="1.2" fill="none" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <circle cx="248" cy="92" r="1.2" fill="none" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+    <circle cx="253" cy="92" r="1.2" fill="none" stroke="#00ff88" stroke-width="0.4" opacity="0.3"/>
+
+    <!-- ===== EXT PORT ===== -->
+    <rect x="255" y="80" width="10" height="6" rx="2" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.3"/>
+
+    <!-- ===== SHOULDER BUTTONS ===== -->
+    <!-- L1 -->
+    <path d="M125 18 Q145 10 190 12" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="155" y="15" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">L1</text>
+    <!-- R1 -->
+    <path d="M395 12 Q340 10 330 18" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="365" y="15" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">R1</text>
+    <!-- L2 trigger -->
+    <path d="M115 18 Q105 5 120 -2 Q135 -8 150 0" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="130" y="0" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">L2</text>
+    <!-- R2 trigger -->
+    <path d="M405 18 Q415 5 400 -2 Q385 -8 370 0" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="390" y="0" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">R2</text>
+
+    <!-- ===== MODEL LABEL ===== -->
+    <text x="260" y="230" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace" opacity="0.35">DUALSHOCK 4</text>
+    <text x="260" y="240" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.25">CUH-ZCT2</text>
+
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect dualshock4 --ready<span class="cursor"></span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Terminal — 20 разных PS геймпадов</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0b;
+    color: #e4e4e7;
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+    padding: 2rem;
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.4rem;
+    color: #00ff88;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 12px rgba(0,255,136,0.4);
+  }
+  .subtitle {
+    text-align: center;
+    color: #71717a;
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 1rem;
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #0a0a0a;
+    border: 1px solid rgba(0, 255, 136, 0.12);
+    border-radius: 8px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0, 255, 136, 0.35); }
+  .card .label {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.75rem;
+    font-size: 0.65rem;
+    color: #52525b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 2;
+  }
+  .card .num {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.75rem;
+    font-size: 0.6rem;
+    color: #3f3f46;
+    font-weight: 700;
+    z-index: 2;
+  }
+  .card .prompt {
+    font-size: 0.75rem;
+    color: #00cc6a;
+    margin-top: 0.5rem;
+    z-index: 1;
+  }
+  .cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1em;
+    background: #00cc6a;
+    margin-left: 0.15em;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .card svg { display: block; z-index: 1; }
+</style>
+</head>
+<body>
+
+<h1>⌨ Retro Terminal — 20 разных моделей PlayStation геймпадов</h1>
+<p class="subtitle">Каждый вариант — другой контроллер или ракурс</p>
+
+<div class="grid">
+
+<!-- 1. PS1 original (no analog sticks) -->
+<div class="card">
+  <span class="label">PS1 Original (no sticks)</span><span class="num">01</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M60 50 Q60 10 100 10 L240 10 Q280 10 280 50 L280 90 Q280 130 250 140 L230 160 Q220 175 210 175 L200 175 Q190 175 180 160 L160 140 Q130 135 115 125 Q60 110 60 90 Z" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M60 50 Q50 60 40 80 Q25 110 28 140 Q30 155 38 160" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M60 80 Q48 90 40 115 Q32 135 38 160" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M280 50 Q290 60 300 80 Q315 110 312 140 Q310 155 302 160" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M280 80 Q292 90 300 115 Q308 135 302 160" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="90" y="72" width="28" height="7" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <rect x="101" y="62" width="7" height="28" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="255" cy="67" r="6" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="255" y="70" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">△</text>
+    <circle cx="270" cy="77" r="6" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="270" y="80" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">○</text>
+    <circle cx="240" cy="77" r="6" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="240" y="80" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">✕</text>
+    <circle cx="255" cy="87" r="6" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="255" y="90" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">□</text>
+    <circle cx="170" cy="55" r="5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="170" y="58" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">PS</text>
+    <rect x="90" y="15" width="55" height="6" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="117" y="20" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">L1 L2</text>
+    <rect x="195" y="15" width="55" height="6" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="222" y="20" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">R1 R2</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect ps1 <span class="cursor"></span></div>
+</div>
+
+<!-- 2. PS1 DualShock (first analog) -->
+<div class="card">
+  <span class="label">PS1 DualShock</span><span class="num">02</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M60 50 Q60 10 100 10 L240 10 Q280 10 280 50 L280 100 Q280 150 240 160 L220 180 Q210 195 200 195 L190 195 Q180 195 170 180 L150 160 Q120 155 100 140 Q60 120 60 100 Z" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M60 50 Q50 60 40 80 Q20 120 25 155 Q28 170 35 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M60 90 Q45 100 35 125 Q25 150 35 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M280 50 Q290 60 300 80 Q320 120 315 155 Q312 170 305 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M280 90 Q295 100 305 125 Q315 150 305 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="85" y="82" width="28" height="8" rx="2" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <rect x="96" y="72" width="8" height="28" rx="2" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <circle cx="112" cy="115" r="14" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <circle cx="112" cy="115" r="6" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <circle cx="228" cy="115" r="14" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <circle cx="228" cy="115" r="6" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <circle cx="260" cy="77" r="7" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="260" y="80" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">△</text>
+    <circle cx="275" cy="88" r="7" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="275" y="91" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">○</text>
+    <circle cx="245" cy="88" r="7" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="245" y="91" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">✕</text>
+    <circle cx="260" cy="99" r="7" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="260" y="102" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">□</text>
+    <circle cx="170" cy="60" r="5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="170" y="63" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">PS</text>
+    <rect x="80" y="12" width="60" height="6" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="110" y="17" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">L1 L2</text>
+    <rect x="200" y="12" width="60" height="6" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="230" y="17" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">R1 R2</text>
+    <!-- analog mode LED -->
+    <circle cx="170" cy="40" r="2" fill="#00ff88" opacity="0.7"/>
+    <text x="170" y="44" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">ANALOG</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect dualshock1 <span class="cursor"></span></div>
+</div>
+
+<!-- 3. PS2 DualShock 2 -->
+<div class="card">
+  <span class="label">PS2 DualShock 2</span><span class="num">03</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M60 50 Q60 10 100 10 L240 10 Q280 10 280 50 L280 100 Q280 150 240 160 L220 180 Q210 195 200 195 L190 195 Q180 195 170 180 L150 160 Q120 155 100 140 Q60 120 60 100 Z" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M60 50 Q50 60 40 80 Q20 120 25 155 Q28 170 35 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M60 90 Q45 100 35 125 Q25 150 35 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M280 50 Q290 60 300 80 Q320 120 315 155 Q312 170 305 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M280 90 Q295 100 305 125 Q315 150 305 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="85" y="82" width="28" height="8" rx="2" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <rect x="96" y="72" width="8" height="28" rx="2" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <circle cx="112" cy="115" r="14" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <circle cx="112" cy="115" r="6" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <circle cx="228" cy="115" r="14" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <circle cx="228" cy="115" r="6" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <circle cx="260" cy="77" r="7" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="260" y="80" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">△</text>
+    <circle cx="275" cy="88" r="7" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="275" y="91" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">○</text>
+    <circle cx="245" cy="88" r="7" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="245" y="91" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">✕</text>
+    <circle cx="260" cy="99" r="7" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <text x="260" y="102" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">□</text>
+    <circle cx="170" cy="60" r="5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="170" y="63" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">PS2</text>
+    <rect x="80" y="12" width="60" height="6" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="110" y="17" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">L1 L2</text>
+    <rect x="200" y="12" width="60" height="6" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="230" y="17" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">R1 R2</text>
+    <!-- pressure labels -->
+    <text x="170" y="42" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">PRESSURE</text>
+    <circle cx="170" cy="37" r="1.5" fill="#00ff88" opacity="0.5"/>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect dualshock2 <span class="cursor"></span></div>
+</div>
+
+<!-- 4. PS3 Sixaxis -->
+<div class="card">
+  <span class="label">PS3 Sixaxis</span><span class="num">04</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Sixaxis has more rounded, smoother body -->
+    <path d="M65 50 Q65 15 100 15 L240 15 Q275 15 275 50 L275 95 Q275 140 240 155 L220 175 Q210 190 200 190 L190 190 Q180 190 170 175 L150 155 Q125 150 105 140 Q65 120 65 95 Z" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M65 50 Q55 60 45 80 Q28 115 30 145 Q32 160 40 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M65 85 Q52 95 42 118 Q33 138 40 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M275 50 Q285 60 295 80 Q312 115 310 145 Q308 160 300 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M275 85 Q288 95 298 118 Q307 138 300 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="85" y="80" width="26" height="7" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <rect x="95" y="70" width="7" height="26" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <ellipse cx="112" cy="112" rx="13" ry="13" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <ellipse cx="112" cy="112" rx="5" ry="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <ellipse cx="228" cy="112" rx="13" ry="13" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <ellipse cx="228" cy="112" rx="5" ry="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="258" cy="75" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="258" y="78" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">△</text>
+    <circle cx="272" cy="85" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="272" y="88" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">○</text>
+    <circle cx="244" cy="85" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="244" y="88" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">✕</text>
+    <circle cx="258" cy="95" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="258" y="98" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">□</text>
+    <circle cx="170" cy="60" r="5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="170" y="63" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">PS3</text>
+    <rect x="85" y="18" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="112" y="22" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">L1 L2</text>
+    <rect x="200" y="18" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="227" y="22" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">R1 R2</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect sixaxis <span class="cursor"></span></div>
+</div>
+
+<!-- 5. PS4 DualShock 4 -->
+<div class="card">
+  <span class="label">PS4 DualShock 4</span><span class="num">05</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M60 50 Q60 15 100 15 L240 15 Q280 15 280 50 L280 100 Q280 145 240 155 L220 175 Q210 190 200 190 L190 190 Q180 190 170 175 L150 155 Q125 150 105 140 Q60 120 60 100 Z" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M60 50 Q50 60 42 78 Q28 112 30 142 Q32 157 40 162" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M60 85 Q48 95 40 115 Q32 135 40 162" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M280 50 Q290 60 298 78 Q312 112 310 142 Q308 157 300 162" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M280 85 Q292 95 300 115 Q308 135 300 162" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="85" y="82" width="26" height="7" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <rect x="95" y="72" width="7" height="26" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="112" cy="115" r="13" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="112" cy="115" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="228" cy="115" r="13" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="228" cy="115" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="260" cy="77" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="260" y="80" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">△</text>
+    <circle cx="274" cy="87" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="274" y="90" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">○</text>
+    <circle cx="246" cy="87" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="246" y="90" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">✕</text>
+    <circle cx="260" cy="97" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="260" y="100" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">□</text>
+    <circle cx="170" cy="55" r="4.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="170" y="58" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">PS</text>
+    <!-- touchpad -->
+    <rect x="145" y="70" width="50" height="28" rx="4" fill="none" stroke="#00ff88" stroke-width="0.8" opacity="0.5"/>
+    <text x="170" y="86" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.5">TOUCH</text>
+    <!-- light bar -->
+    <rect x="160" y="15" width="20" height="3" rx="1" fill="none" stroke="#00ff88" stroke-width="0.6" opacity="0.5"/>
+    <rect x="85" y="18" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="112" y="22" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">L1 L2</text>
+    <rect x="200" y="18" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="227" y="22" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">R1 R2</text>
+    <!-- speaker grille -->
+    <circle cx="158" cy="58" r="1" fill="none" stroke="#00ff88" stroke-width="0.4"/>
+    <circle cx="163" cy="58" r="1" fill="none" stroke="#00ff88" stroke-width="0.4"/>
+    <circle cx="168" cy="58" r="1" fill="none" stroke="#00ff88" stroke-width="0.4"/>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect dualshock4 <span class="cursor"></span></div>
+</div>
+
+<!-- 6. PS5 DualSense -->
+<div class="card">
+  <span class="label">PS5 DualSense</span><span class="num">06</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M55 50 Q55 10 95 10 L245 10 Q285 10 285 50 L285 100 Q285 150 245 160 L225 180 Q215 195 205 195 L195 195 Q185 195 175 180 L155 160 Q125 155 105 145 Q55 125 55 100 Z" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M55 50 Q45 60 38 78 Q22 112 25 145 Q27 160 35 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M55 85 Q42 95 35 118 Q27 138 35 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M285 50 Q295 60 302 78 Q318 112 315 145 Q313 160 305 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M285 85 Q298 95 305 118 Q313 138 305 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="80" y="82" width="26" height="7" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <rect x="90" y="72" width="7" height="26" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="108" cy="115" r="13" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="108" cy="115" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="232" cy="115" r="13" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="232" cy="115" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="262" cy="75" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="262" y="78" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">△</text>
+    <circle cx="276" cy="84" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="276" y="87" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">○</text>
+    <circle cx="248" cy="84" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="248" y="87" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">✕</text>
+    <circle cx="262" cy="93" r="6.5" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="262" y="96" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">□</text>
+    <!-- DualSense shape: more pronounced grips -->
+    <circle cx="170" cy="55" r="4.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="170" y="58" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">PS</text>
+    <!-- touchpad -->
+    <rect x="138" y="68" width="64" height="30" rx="5" fill="none" stroke="#00ff88" stroke-width="0.8" opacity="0.5"/>
+    <text x="170" y="86" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">TOUCH</text>
+    <rect x="85" y="13" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="112" y="17" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">L1 L2</text>
+    <rect x="200" y="13" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="227" y="17" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">R1 R2</text>
+    <!-- create button -->
+    <text x="138" y="53" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">CREATE</text>
+    <text x="202" y="53" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">OPTIONS</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect dualsense <span class="cursor"></span></div>
+</div>
+
+<!-- 7. PS5 DualSense Edge (pro) -->
+<div class="card">
+  <span class="label">DualSense Edge</span><span class="num">07</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M55 50 Q55 10 95 10 L245 10 Q285 10 285 50 L285 100 Q285 150 245 160 L225 180 Q215 195 205 195 L195 195 Q185 195 175 180 L155 160 Q125 155 105 145 Q55 125 55 100 Z" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M55 50 Q45 60 38 78 Q22 112 25 145 Q27 160 35 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M55 85 Q42 95 35 118 Q27 138 35 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M285 50 Q295 60 302 78 Q318 112 315 145 Q313 160 305 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M285 85 Q298 95 305 118 Q313 138 305 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="80" y="82" width="26" height="7" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <rect x="90" y="72" width="7" height="26" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="108" cy="115" r="13" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="108" cy="115" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="232" cy="115" r="13" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="232" cy="115" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="262" cy="75" r="7" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="262" y="78" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">△</text>
+    <circle cx="276" cy="84" r="7" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="276" y="87" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">○</text>
+    <circle cx="248" cy="84" r="7" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="248" y="87" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">✕</text>
+    <circle cx="262" cy="93" r="7" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="262" y="96" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">□</text>
+    <circle cx="170" cy="52" r="4.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="170" y="55" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">PS</text>
+    <rect x="138" y="65" width="64" height="32" rx="5" fill="none" stroke="#00ff88" stroke-width="0.8" opacity="0.5"/>
+    <text x="170" y="84" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.6">TOUCH</text>
+    <!-- Edge back paddles -->
+    <path d="M120 165 Q130 180 150 185" fill="none" stroke="#00ff88" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.5"/>
+    <path d="M220 165 Q210 180 190 185" fill="none" stroke="#00ff88" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.5"/>
+    <text x="170" y="170" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.5">PADDLE</text>
+    <rect x="85" y="13" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="112" y="17" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">L1 L2</text>
+    <rect x="200" y="13" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="227" y="17" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">R1 R2</text>
+    <text x="138" y="50" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">FN</text>
+    <text x="202" y="50" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">FN</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect edge --pro<span class="cursor"></span></div>
+</div>
+
+<!-- 8. PS Move -->
+<div class="card">
+  <span class="label">PS Move</span><span class="num">08</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Move wand -->
+    <rect x="155" y="80" width="30" height="70" rx="12" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="160" y="135" width="20" height="30" rx="6" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <!-- sphere -->
+    <circle cx="170" cy="55" r="28" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <ellipse cx="170" cy="45" rx="12" ry="8" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.3"/>
+    <ellipse cx="160" cy="50" rx="5" ry="3" fill="none" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <!-- buttons -->
+    <circle cx="170" cy="90" r="4" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="170" y="93" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">T</text>
+    <circle cx="170" cy="103" r="3.5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="170" y="105" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">S</text>
+    <rect x="160" y="110" width="20" height="6" rx="2" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="170" y="115" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">MOVE</text>
+    <!-- bottom connector -->
+    <rect x="163" y="165" width="14" height="15" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <!-- charging dots -->
+    <circle cx="170" cy="185" r="2" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+    <circle cx="170" cy="192" r="2" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+    <!-- glow rings -->
+    <circle cx="170" cy="55" r="24" fill="none" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <circle cx="170" cy="55" r="20" fill="none" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect move --wand <span class="cursor"></span></div>
+</div>
+
+<!-- 9. PS VR2 controller -->
+<div class="card">
+  <span class="label">PS VR2 Controller</span><span class="num">09</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- VR orb shape -->
+    <circle cx="170" cy="85" r="32" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <ellipse cx="170" cy="85" rx="32" ry="20" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.3"/>
+    <!-- grip below -->
+    <path d="M150 112 Q145 130 148 155 Q150 170 160 180 L180 180 Q190 170 192 155 Q195 130 190 112" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <!-- trigger -->
+    <path d="M142 75 Q125 70 120 80 Q118 88 130 90" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <path d="M198 75 Q215 70 220 80 Q222 88 210 90" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <!-- buttons -->
+    <circle cx="180" cy="75" r="4" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="180" y="78" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">△</text>
+    <circle cx="190" cy="83" r="4" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="190" y="86" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">○</text>
+    <circle cx="170" cy="83" r="4" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="170" y="86" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">✕</text>
+    <circle cx="180" cy="91" r="4" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="180" y="94" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">□</text>
+    <!-- analog -->
+    <circle cx="155" cy="82" r="8" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <circle cx="155" cy="82" r="3.5" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+    <!-- tracking ring -->
+    <ellipse cx="170" cy="85" rx="42" ry="28" fill="none" stroke="#00ff88" stroke-width="0.4" stroke-dasharray="6 4" opacity="0.4"/>
+    <circle cx="170" cy="55" r="4" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <circle cx="170" cy="115" r="4" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <circle cx="136" cy="82" r="4" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <circle cx="204" cy="82" r="4" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <!-- strap -->
+    <path d="M140 105 Q110 120 80 110 Q60 100 65 85" fill="none" stroke="#00ff88" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.4"/>
+    <path d="M200 105 Q230 120 260 110 Q280 100 275 85" fill="none" stroke="#00ff88" stroke-width="0.6" stroke-dasharray="4 3" opacity="0.4"/>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect vr2 <span class="cursor"></span></div>
+</div>
+
+<!-- 10. PSP -->
+<div class="card">
+  <span class="label">PSP</span><span class="num">10</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="60" y="30" width="220" height="140" rx="18" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <!-- screen -->
+    <rect x="75" y="42" width="110" height="70" rx="4" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="130" y="80" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace" opacity="0.4">GAME</text>
+    <text x="130" y="92" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.3">LIBRARY</text>
+    <!-- d-pad -->
+    <rect x="200" y="48" width="22" height="6" rx="1.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <rect x="208" y="40" width="6" height="22" rx="1.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <!-- analog nub -->
+    <circle cx="218" cy="80" r="8" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <circle cx="218" cy="80" r="3.5" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+    <!-- buttons -->
+    <circle cx="250" cy="52" r="5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="250" y="55" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">△</text>
+    <circle cx="263" cy="60" r="5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="263" y="63" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">○</text>
+    <circle cx="237" cy="60" r="5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="237" y="63" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">✕</text>
+    <circle cx="250" cy="68" r="5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="250" y="71" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">□</text>
+    <!-- start/select -->
+    <rect x="195" y="95" width="16" height="3" rx="1" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <rect x="215" y="95" width="16" height="3" rx="1" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <text x="203" y="101" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">SELECT</text>
+    <text x="223" y="101" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">START</text>
+    <!-- speaker -->
+    <circle cx="82" cy="130" r="2" fill="none" stroke="#00ff88" stroke-width="0.4"/>
+    <circle cx="88" cy="130" r="2" fill="none" stroke="#00ff88" stroke-width="0.4"/>
+    <circle cx="94" cy="130" r="2" fill="none" stroke="#00ff88" stroke-width="0.4"/>
+    <!-- logo -->
+    <text x="130" y="130" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.4">PSP</text>
+    <!-- shoulder -->
+    <rect x="80" y="28" width="40" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <text x="100" y="32" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">L</text>
+    <rect x="220" y="28" width="40" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <text x="240" y="32" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">R</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect psp --go <span class="cursor"></span></div>
+</div>
+
+<!-- 11. PS Vita -->
+<div class="card">
+  <span class="label">PS Vita</span><span class="num">11</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="55" y="25" width="230" height="150" rx="22" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <!-- screen -->
+    <rect x="68" y="35" width="124" height="80" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="130" y="70" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace" opacity="0.4">VITA</text>
+    <text x="130" y="85" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.3">GAME LIBRARY</text>
+    <!-- left stick -->
+    <circle cx="205" cy="48" r="10" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <circle cx="205" cy="48" r="4" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+    <!-- right stick -->
+    <circle cx="270" cy="70" r="10" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <circle cx="270" cy="70" r="4" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+    <!-- d-pad -->
+    <rect x="205" y="74" width="20" height="5" rx="1.5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <rect x="212" y="67" width="5" height="20" rx="1.5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <!-- buttons -->
+    <circle cx="252" cy="50" r="5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="252" y="53" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">△</text>
+    <circle cx="264" cy="57" r="5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="264" y="60" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">○</text>
+    <circle cx="240" cy="57" r="5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="240" y="60" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">✕</text>
+    <circle cx="252" cy="64" r="5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="252" y="67" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">□</text>
+    <!-- start/select -->
+    <rect x="198" y="100" width="14" height="3" rx="1" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+    <rect x="215" y="100" width="14" height="3" rx="1" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+    <!-- PS button -->
+    <circle cx="205" cy="112" r="4" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="205" y="114" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">PS</text>
+    <!-- camera -->
+    <circle cx="130" cy="28" r="3" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+    <circle cx="130" cy="28" r="1" fill="none" stroke="#00ff88" stroke-width="0.3"/>
+    <!-- speaker -->
+    <circle cx="75" cy="130" r="1.5" fill="none" stroke="#00ff88" stroke-width="0.3"/>
+    <circle cx="80" cy="130" r="1.5" fill="none" stroke="#00ff88" stroke-width="0.3"/>
+    <circle cx="85" cy="130" r="1.5" fill="none" stroke="#00ff88" stroke-width="0.3"/>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect vita <span class="cursor"></span></div>
+</div>
+
+<!-- 12. PS3 boomerang prototype -->
+<div class="card">
+  <span class="label">PS3 Boomerang (proto)</span><span class="num">12</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- boomerang body -->
+    <path d="M60 40 Q80 15 120 15 L160 15 L200 15 Q250 15 280 40 Q300 60 310 90 Q315 110 310 130 Q300 155 280 165 L260 170 L240 165 Q220 155 210 140 L200 120 L190 130 Q180 145 170 150 L160 155 L150 150 Q140 145 130 130 L120 120 L110 140 Q100 155 80 165 L60 170 Q40 165 30 130 Q25 110 30 90 Q40 60 60 40 Z" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <!-- left grip -->
+    <path d="M60 40 Q50 55 45 75 Q35 110 38 135" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <!-- right grip -->
+    <path d="M280 40 Q290 55 295 75 Q305 110 302 135" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <!-- d-pad -->
+    <rect x="100" y="65" width="24" height="6" rx="2" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <rect x="109" y="56" width="6" height="24" rx="2" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <!-- buttons -->
+    <circle cx="225" cy="62" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="225" y="65" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">△</text>
+    <circle cx="238" cy="70" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="238" y="73" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">○</text>
+    <circle cx="212" cy="70" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="212" y="73" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">✕</text>
+    <circle cx="225" cy="78" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="225" y="81" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">□</text>
+    <!-- sticks -->
+    <circle cx="150" cy="95" r="11" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <circle cx="150" cy="95" r="4.5" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <circle cx="210" cy="100" r="11" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <circle cx="210" cy="100" r="4.5" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <!-- PS -->
+    <circle cx="180" cy="55" r="4" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="180" y="57" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">PS</text>
+    <!-- shoulder -->
+    <rect x="95" y="18" width="50" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <text x="120" y="22" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">L1 L2</text>
+    <rect x="195" y="18" width="50" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <text x="220" y="22" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">R1 R2</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect boomerang <span class="cursor"></span></div>
+</div>
+
+<!-- 13. PSone (small compact) -->
+<div class="card">
+  <span class="label">PSone (compact)</span><span class="num">13</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M70 55 Q70 25 100 25 L240 25 Q270 25 270 55 L270 90 Q270 120 245 130 L230 148 Q222 158 215 158 L208 158 Q200 158 192 148 L175 130 Q150 126 135 118 Q70 105 70 90 Z" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <path d="M70 55 Q62 63 55 78 Q42 105 45 128 Q47 140 52 144" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <path d="M70 82 Q58 90 52 108 Q45 125 52 144" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <path d="M270 55 Q278 63 285 78 Q298 105 295 128 Q293 140 288 144" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <path d="M270 82 Q282 90 288 108 Q295 125 288 144" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <rect x="95" y="72" width="22" height="6" rx="1.5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <rect x="103" y="64" width="6" height="22" rx="1.5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <circle cx="250" cy="70" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="250" y="73" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">△</text>
+    <circle cx="262" cy="78" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="262" y="81" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">○</text>
+    <circle cx="238" cy="78" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="238" y="81" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">✕</text>
+    <circle cx="250" cy="86" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="250" y="89" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">□</text>
+    <circle cx="170" cy="60" r="4" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="170" y="62" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">PS</text>
+    <rect x="95" y="28" width="50" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <text x="120" y="32" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">L1 L2</text>
+    <rect x="195" y="28" width="50" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <text x="220" y="32" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">R1 R2</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect psone <span class="cursor"></span></div>
+</div>
+
+<!-- 14. Side view profile -->
+<div class="card">
+  <span class="label">Side Profile</span><span class="num">14</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- side view of DualShock -->
+    <path d="M50 70 Q50 60 80 55 L130 50 L180 48 L220 50 Q250 52 260 58 L270 65 Q275 75 275 90 Q275 105 270 115 L260 125 Q250 132 220 135 L180 137 L130 138 L80 135 Q55 132 50 120 Q45 108 45 95 Q45 80 50 70 Z" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <!-- top grip -->
+    <path d="M50 70 Q40 65 35 75 Q28 90 30 110 Q32 125 38 130 Q42 133 50 130" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <!-- bottom grip -->
+    <path d="M260 115 Q270 118 278 125 Q285 135 280 148 Q275 158 265 155" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <!-- shoulder buttons visible from side -->
+    <rect x="75" y="52" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="100" y="56" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">L1</text>
+    <rect x="155" y="48" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="180" y="52" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">R1</text>
+    <!-- triggers -->
+    <path d="M80 52 Q75 42 85 38 Q95 36 100 42" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="90" y="40" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">L2</text>
+    <path d="M165 48 Q160 38 170 34 Q180 32 185 38" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="175" y="36" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">R2</text>
+    <!-- analog stick bump -->
+    <ellipse cx="180" cy="75" rx="8" ry="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <ellipse cx="180" cy="75" rx="3" ry="2" fill="none" stroke="#00ff88" stroke-width="0.4"/>
+    <!-- d-pad bump -->
+    <ellipse cx="120" cy="80" rx="6" ry="4" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <!-- button bump -->
+    <ellipse cx="220" cy="75" rx="4" ry="3" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+    <!-- label -->
+    <text x="170" y="95" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.4">SIDE VIEW</text>
+    <!-- dimension -->
+    <line x1="45" y1="165" x2="275" y2="165" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <line x1="45" y1="160" x2="45" y2="170" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <line x1="275" y1="160" x2="275" y2="170" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <text x="160" y="165" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.3">160mm</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect --profile <span class="cursor"></span></div>
+</div>
+
+<!-- 15. 3/4 perspective -->
+<div class="card">
+  <span class="label">Three-Quarter View</span><span class="num">15</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M90 40 Q90 15 120 15 L230 15 Q260 15 260 40 L260 85 Q260 120 235 130 L220 148 Q212 160 205 160 L198 160 Q190 160 182 148 L168 130 Q145 126 132 118 Q90 105 90 85 Z" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <!-- left grip skewed -->
+    <path d="M90 40 Q78 48 72 65 Q60 95 65 120 Q68 135 75 140" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <path d="M90 70 Q76 80 68 100 Q60 122 68 140" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <!-- right grip -->
+    <path d="M260 40 Q270 48 275 65 Q285 95 280 120 Q277 135 270 140" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <path d="M260 70 Q274 80 282 100 Q290 122 282 140" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+    <!-- d-pad (skewed) -->
+    <rect x="112" y="70" width="22" height="6" rx="1.5" fill="none" stroke="#00ff88" stroke-width="1" transform="skewY(-5)"/>
+    <rect x="119" y="62" width="6" height="22" rx="1.5" fill="none" stroke="#00ff88" stroke-width="1" transform="skewY(-5)"/>
+    <!-- sticks (perspective) -->
+    <ellipse cx="140" cy="100" rx="12" ry="12" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <ellipse cx="140" cy="100" rx="5" ry="5" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <ellipse cx="220" cy="100" rx="12" ry="12" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <ellipse cx="220" cy="100" rx="5" ry="5" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+    <!-- buttons (skewed) -->
+    <ellipse cx="248" cy="68" rx="5.5" ry="5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="248" y="71" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">△</text>
+    <ellipse cx="260" cy="76" rx="5.5" ry="5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="260" y="79" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">○</text>
+    <ellipse cx="236" cy="76" rx="5.5" ry="5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="236" y="79" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">✕</text>
+    <ellipse cx="248" cy="84" rx="5.5" ry="5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="248" y="87" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">□</text>
+    <!-- PS button -->
+    <ellipse cx="175" cy="55" rx="5" ry="4" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="175" y="57" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">PS</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect --perspective <span class="cursor"></span></div>
+</div>
+
+<!-- 16. Top view with button labels -->
+<div class="card">
+  <span class="label">Top View (labeled)</span><span class="num">16</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M60 60 Q60 20 100 20 L240 20 Q280 20 280 60 L280 100 Q280 140 245 150 L225 170 Q215 185 205 185 L195 185 Q185 185 175 170 L155 150 Q125 145 108 135 Q60 120 60 100 Z" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <path d="M60 60 Q50 70 42 88 Q28 118 30 145 Q32 158 40 162" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <path d="M60 92 Q48 102 40 120 Q32 138 40 162" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <path d="M280 60 Q290 70 298 88 Q312 118 310 145 Q308 158 300 162" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <path d="M280 92 Q292 102 300 120 Q308 138 300 162" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <rect x="85" y="82" width="26" height="7" rx="1.5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="98" y="80" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">D-PAD</text>
+    <rect x="95" y="72" width="7" height="26" rx="1.5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <circle cx="112" cy="115" r="12" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="112" y="117" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">L</text>
+    <circle cx="228" cy="115" r="12" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="228" y="117" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">R</text>
+    <circle cx="260" cy="77" r="5.5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="260" y="72" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">△</text>
+    <circle cx="273" cy="85" r="5.5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="273" y="88" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">○</text>
+    <circle cx="247" cy="85" r="5.5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="247" y="88" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">✕</text>
+    <circle cx="260" cy="93" r="5.5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="260" y="96" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">□</text>
+    <circle cx="170" cy="58" r="4.5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="170" y="55" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">HOME</text>
+    <!-- direction labels -->
+    <text x="98" y="70" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.5">UP</text>
+    <text x="98" y="93" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.5">DOWN</text>
+    <text x="84" y="87" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.5">L</text>
+    <text x="112" y="87" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.5">R</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect --labels <span class="cursor"></span></div>
+</div>
+
+<!-- 17. Back view (shoulder buttons visible) -->
+<div class="card">
+  <span class="label">Back View</span><span class="num">17</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M60 50 Q60 10 100 10 L240 10 Q280 10 280 50 L280 100 Q280 150 240 160 L220 180 Q210 195 200 195 L190 195 Q180 195 170 180 L150 160 Q120 155 100 140 Q60 120 60 100 Z" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M60 50 Q50 60 40 80 Q20 120 25 155 Q28 170 35 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M60 90 Q45 100 35 125 Q25 150 35 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M280 50 Q290 60 300 80 Q320 120 315 155 Q312 170 305 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M280 90 Q295 100 305 125 Q315 150 305 175" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <!-- shoulder buttons back view -->
+    <rect x="80" y="8" width="60" height="8" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="110" y="15" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">L1</text>
+    <rect x="200" y="8" width="60" height="8" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="230" y="15" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">R1</text>
+    <!-- triggers extending back -->
+    <path d="M90 8 Q85 -5 95 -10 Q105 -12 110 -5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="100" y="-6" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">L2</text>
+    <path d="M230 8 Q235 -5 225 -10 Q215 -12 210 -5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+    <text x="220" y="-6" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">R2</text>
+    <!-- back label -->
+    <text x="170" y="105" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace" opacity="0.3">BACK</text>
+    <!-- screw holes -->
+    <circle cx="75" cy="35" r="2" fill="none" stroke="#00ff88" stroke-width="0.4" opacity="0.4"/>
+    <circle cx="265" cy="35" r="2" fill="none" stroke="#00ff88" stroke-width="0.4" opacity="0.4"/>
+    <circle cx="75" cy="140" r="2" fill="none" stroke="#00ff88" stroke-width="0.4" opacity="0.4"/>
+    <circle cx="265" cy="140" r="2" fill="none" stroke="#00ff88" stroke-width="0.4" opacity="0.4"/>
+    <!-- model -->
+    <text x="170" y="130" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.3">DUALSHOCK 4</text>
+    <text x="170" y="138" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.25">CUH-ZCT2</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect --back <span class="cursor"></span></div>
+</div>
+
+<!-- 18. Exploded schematic view -->
+<div class="card" style="background:#0a0c0a;">
+  <span class="label">Exploded Schematic</span><span class="num">18</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- top shell -->
+    <path d="M90 25 Q90 5 115 5 L225 5 Q250 5 250 25 L250 50 Q250 75 235 80 L220 95 Q212 105 205 105 L198 105 Q190 105 182 95 L168 80 Q145 76 132 70 Q90 60 90 50 Z" fill="none" stroke="#00ff88" stroke-width="1" opacity="0.5"/>
+    <text x="170" y="55" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.4">TOP SHELL</text>
+    <!-- bottom shell -->
+    <path d="M90 90 Q90 70 115 70 L225 70 Q250 70 250 90 L250 115 Q250 140 235 145 L220 160 Q212 170 205 170 L198 170 Q190 170 182 160 L168 145 Q145 140 132 135 Q90 125 90 115 Z" fill="none" stroke="#00ff88" stroke-width="1" opacity="0.5"/>
+    <text x="170" y="120" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.4">BOTTOM SHELL</text>
+    <!-- motherboard -->
+    <rect x="115" y="55" width="110" height="22" rx="3" fill="none" stroke="#00ff88" stroke-width="0.8" opacity="0.4"/>
+    <text x="170" y="69" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.4">PCB</text>
+    <!-- battery -->
+    <rect x="145" y="80" width="50" height="15" rx="4" fill="none" stroke="#00ff88" stroke-width="0.6" opacity="0.3"/>
+    <text x="170" y="90" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.3">BATTERY</text>
+    <!-- analog module -->
+    <circle cx="135" cy="100" r="8" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.3"/>
+    <text x="135" y="103" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.3">L</text>
+    <circle cx="205" cy="100" r="8" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.3"/>
+    <text x="205" y="103" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.3">R</text>
+    <!-- connector lines -->
+    <line x1="140" y1="60" x2="140" y2="77" stroke="#00ff88" stroke-width="0.3" stroke-dasharray="2 2" opacity="0.2"/>
+    <line x1="200" y1="60" x2="200" y2="77" stroke="#00ff88" stroke-width="0.3" stroke-dasharray="2 2" opacity="0.2"/>
+    <!-- dots matrix -->
+    <circle cx="120" cy="60" r="1" fill="#00ff88" opacity="0.15"/>
+    <circle cx="130" cy="60" r="1" fill="#00ff88" opacity="0.15"/>
+    <circle cx="140" cy="60" r="1" fill="#00ff88" opacity="0.15"/>
+    <circle cx="150" cy="60" r="1" fill="#00ff88" opacity="0.15"/>
+    <circle cx="160" cy="60" r="1" fill="#00ff88" opacity="0.15"/>
+  </svg>
+  <div class="prompt">game-library@auth:~$ assemble --exploded <span class="cursor"></span></div>
+</div>
+
+<!-- 19. Minimal geometric -->
+<div class="card">
+  <span class="label">Geometric Minimal</span><span class="num">19</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="70" y="30" width="200" height="110" rx="20" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="70" y="140" width="55" height="40" rx="10" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <rect x="215" y="140" width="55" height="40" rx="10" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <circle cx="100" cy="70" r="10" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="100" cy="70" r="4" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="240" cy="70" r="10" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="240" cy="70" r="4" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="270" cy="55" r="6" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="270" y="58" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">△</text>
+    <circle cx="280" cy="65" r="6" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="280" y="68" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">○</text>
+    <circle cx="260" cy="65" r="6" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="260" y="68" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">✕</text>
+    <circle cx="270" cy="75" r="6" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="270" y="78" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">□</text>
+    <rect x="95" y="62" width="40" height="7" rx="2" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <rect x="107" y="52" width="7" height="28" rx="2" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <circle cx="170" cy="52" r="5" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+    <text x="170" y="55" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">PS</text>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect --geometric <span class="cursor"></span></div>
+</div>
+
+<!-- 20. Ultra-detailed DualSense -->
+<div class="card">
+  <span class="label">Ultra-Detailed DualSense</span><span class="num">20</span>
+  <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M55 50 Q55 10 95 10 L245 10 Q285 10 285 50 L285 100 Q285 150 245 160 L225 180 Q215 195 205 195 L195 195 Q185 195 175 180 L155 160 Q125 155 105 145 Q55 125 55 100 Z" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M55 50 Q45 60 38 78 Q22 112 25 145 Q27 160 35 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M55 85 Q42 95 35 118 Q27 138 35 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M285 50 Q295 60 302 78 Q318 112 315 145 Q313 160 305 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M285 85 Q298 95 305 118 Q313 138 305 165" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <!-- textured grip lines -->
+    <line x1="58" y1="110" x2="38" y2="125" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <line x1="58" y1="115" x2="36" y2="130" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <line x1="58" y1="120" x2="34" y2="135" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <line x1="282" y1="110" x2="302" y2="125" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <line x1="282" y1="115" x2="304" y2="130" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <line x1="282" y1="120" x2="306" y2="135" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+    <rect x="80" y="82" width="26" height="7" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <rect x="90" y="72" width="7" height="26" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="108" cy="115" r="13" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="108" cy="115" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="232" cy="115" r="13" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+    <circle cx="232" cy="115" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <circle cx="262" cy="75" r="7" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="262" y="78" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">△</text>
+    <circle cx="276" cy="84" r="7" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="276" y="87" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">○</text>
+    <circle cx="248" cy="84" r="7" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="248" y="87" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">✕</text>
+    <circle cx="262" cy="93" r="7" fill="none" stroke="#00ff88" stroke-width="1.1"/>
+    <text x="262" y="96" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">□</text>
+    <circle cx="170" cy="52" r="5" fill="none" stroke="#00ff88" stroke-width="1"/>
+    <text x="170" y="55" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">PS</text>
+    <rect x="138" y="65" width="64" height="32" rx="6" fill="none" stroke="#00ff88" stroke-width="0.8" opacity="0.5"/>
+    <text x="170" y="78" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.5">TOUCHPAD</text>
+    <text x="170" y="86" text-anchor="middle" fill="#00ff88" font-size="3.5" font-family="monospace" opacity="0.3">multi-touch</text>
+    <!-- micro USB -->
+    <rect x="162" y="58" width="16" height="4" rx="1.5" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.4"/>
+    <rect x="85" y="13" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="112" y="17" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">L1 L2</text>
+    <rect x="200" y="13" width="55" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+    <text x="227" y="17" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">R1 R2</text>
+    <!-- speaker grille -->
+    <circle cx="155" cy="56" r="1" fill="none" stroke="#00ff88" stroke-width="0.3"/>
+    <circle cx="160" cy="56" r="1" fill="none" stroke="#00ff88" stroke-width="0.3"/>
+    <circle cx="165" cy="56" r="1" fill="none" stroke="#00ff88" stroke-width="0.3"/>
+    <!-- create/options -->
+    <text x="138" y="48" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">CREATE</text>
+    <text x="202" y="48" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">OPTIONS</text>
+    <!-- light bar -->
+    <rect x="160" y="8" width="20" height="3" rx="1" fill="#00ff88" opacity="0.15"/>
+  </svg>
+  <div class="prompt">game-library@auth:~$ connect dualsense --detail <span class="cursor"></span></div>
+</div>
+
+</div>
+</body>
+</html>

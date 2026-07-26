@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Terminal — 40 DualShock 4</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0b;
+    color: #e4e4e7;
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+    padding: 1.5rem;
+  }
+  h1 { text-align:center; font-size:1.3rem; color:#00ff88; margin-bottom:0.3rem; text-shadow:0 0 12px rgba(0,255,136,0.4); }
+  .subtitle { text-align:center; color:#52525b; font-size:0.8rem; margin-bottom:1.5rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 0.8rem;
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #0a0a0a;
+    border: 1px solid rgba(0,255,136,0.1);
+    border-radius: 6px;
+    padding: 0.8rem 0.8rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 230px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0,255,136,0.3); }
+  .card .label {
+    position: absolute; top: 0.35rem; left: 0.5rem;
+    font-size: 0.55rem; color: #3f3f46;
+    text-transform: uppercase; letter-spacing: 0.04em; z-index: 2;
+  }
+  .card .num {
+    position: absolute; top: 0.3rem; right: 0.5rem;
+    font-size: 0.55rem; color: #3f3f46; font-weight: 700; z-index: 2;
+  }
+  .card .prompt {
+    font-size: 0.65rem; color: #00cc6a;
+    margin-top: 0.25rem; z-index: 1;
+  }
+  .cursor {
+    display: inline-block; width: 0.5em; height: 0.9em;
+    background: #00cc6a; margin-left: 0.12em;
+    animation: blink 1s step-end infinite; vertical-align: text-bottom;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .card svg { display:block; z-index:1; width:100%; height:auto; }
+  .sl { position:absolute; inset:0; background:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px); pointer-events:none; z-index:2; }
+  .vignette { position:absolute; inset:0; background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.6) 100%); pointer-events:none; z-index:2; }
+</style>
+</head>
+<body>
+<h1>⌨ 40 DualShock 4 — стилей прорисовки</h1>
+<p class="subtitle">Одна модель контроллера, 40 визуальных техник</p>
+<div class="grid">
+
+<svg id="ds4" width="0" height="0" style="position:absolute">
+  <defs>
+    <g id="body">
+      <path d="M70 50 Q70 10 110 10 L310 10 Q350 10 350 50 L350 110 Q350 170 310 180 L285 205 Q275 220 265 220 L255 220 Q245 220 235 205 L210 180 Q170 175 145 163 Q70 140 70 110 Z"/>
+      <path d="M70 50 Q58 65 48 90 Q25 140 30 185 Q33 205 45 213"/>
+      <path d="M70 100 Q52 115 40 145 Q27 175 35 208 Q40 220 45 213"/>
+      <path d="M350 50 Q362 65 372 90 Q395 140 390 185 Q387 205 375 213"/>
+      <path d="M350 100 Q368 115 380 145 Q393 175 385 208 Q380 220 375 213"/>
+    </g>
+    <g id="grip-lines">
+      <line x1="67" y1="145" x2="38" y2="165" stroke-width="0.3" opacity="0.25"/>
+      <line x1="65" y1="155" x2="35" y2="175" stroke-width="0.3" opacity="0.25"/>
+      <line x1="63" y1="165" x2="33" y2="185" stroke-width="0.3" opacity="0.25"/>
+      <line x1="61" y1="175" x2="32" y2="195" stroke-width="0.3" opacity="0.25"/>
+      <line x1="353" y1="145" x2="382" y2="165" stroke-width="0.3" opacity="0.25"/>
+      <line x1="355" y1="155" x2="385" y2="175" stroke-width="0.3" opacity="0.25"/>
+      <line x1="357" y1="165" x2="387" y2="185" stroke-width="0.3" opacity="0.25"/>
+      <line x1="359" y1="175" x2="388" y2="195" stroke-width="0.3" opacity="0.25"/>
+    </g>
+    <g id="dpad">
+      <rect x="100" y="92" width="30" height="7" rx="2"/>
+      <rect x="112" y="80" width="7" height="30" rx="2"/>
+    </g>
+    <g id="left-stick">
+      <circle cx="140" cy="135" r="15"/>
+      <circle cx="140" cy="135" r="6"/>
+    </g>
+    <g id="right-stick">
+      <circle cx="282" cy="135" r="15"/>
+      <circle cx="282" cy="135" r="6"/>
+    </g>
+    <g id="buttons">
+      <circle cx="317" cy="88" r="8"/>
+      <text x="317" y="92" text-anchor="middle" font-size="10" font-family="monospace">△</text>
+      <circle cx="334" cy="100" r="8"/>
+      <text x="334" y="104" text-anchor="middle" font-size="10" font-family="monospace">○</text>
+      <circle cx="300" cy="100" r="8"/>
+      <text x="300" y="104" text-anchor="middle" font-size="10" font-family="monospace">✕</text>
+      <circle cx="317" cy="112" r="8"/>
+      <text x="317" y="116" text-anchor="middle" font-size="10" font-family="monospace">□</text>
+    </g>
+    <g id="psbtn">
+      <circle cx="210" cy="68" r="6"/>
+      <text x="210" y="71" text-anchor="middle" font-size="5" font-family="monospace">PS</text>
+    </g>
+    <g id="touchpad">
+      <rect x="172" y="76" width="76" height="36" rx="6"/>
+    </g>
+    <g id="shoulders">
+      <rect x="100" y="12" width="50" height="5" rx="2"/>
+      <text x="125" y="16" text-anchor="middle" font-size="5" font-family="monospace">L1 L2</text>
+      <rect x="270" y="12" width="50" height="5" rx="2"/>
+      <text x="295" y="16" text-anchor="middle" font-size="5" font-family="monospace">R1 R2</text>
+    </g>
+    <g id="share-options">
+      <rect x="168" y="88" width="22" height="4" rx="1.5"/>
+      <text x="179" y="91" text-anchor="middle" font-size="4" font-family="monospace">SHARE</text>
+      <rect x="230" y="88" width="22" height="4" rx="1.5"/>
+      <text x="241" y="91" text-anchor="middle" font-size="4" font-family="monospace">OPT</text>
+    </g>
+    <g id="lightbar">
+      <rect x="195" y="12" width="30" height="3" rx="1.5"/>
+    </g>
+  </defs>
+</svg>
+
+<!-- ===================== 1 ===================== -->
+<div class="card"><span class="label">CLASSIC OUTLINE</span><span class="num">01</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg"><use href="#body" stroke="#00ff88" stroke-width="1.5"/><use href="#grip-lines" stroke="#00ff88"/><use href="#dpad" stroke="#00ff88" stroke-width="1.2"/><use href="#left-stick" stroke="#00ff88" stroke-width="1.2"/><use href="#right-stick" stroke="#00ff88" stroke-width="1.2"/><use href="#buttons" stroke="#00ff88" stroke-width="1.1" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="1" fill="none"/><use href="#psbtn" fill="#00ff88"/><use href="#touchpad" stroke="#00ff88" stroke-width="0.7" opacity="0.4"/><use href="#shoulders" stroke="#00ff88" stroke-width="0.7"/><use href="#shoulders" fill="#00ff88"/><use href="#share-options" stroke="#00ff88" stroke-width="0.6"/><use href="#share-options" fill="#00ff88"/><use href="#lightbar" stroke="#00ff88" stroke-width="0.6" opacity="0.5"/></svg>
+<div class="prompt">ds4@glib:~$ connect<span class="cursor"></span></div></div>
+
+<!-- ===================== 2 ===================== -->
+<div class="card"><span class="label">HAIRLINE</span><span class="num">02</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg"><use href="#body" stroke="#00ff88" stroke-width="0.4"/><use href="#dpad" stroke="#00ff88" stroke-width="0.4"/><use href="#left-stick" stroke="#00ff88" stroke-width="0.4"/><use href="#right-stick" stroke="#00ff88" stroke-width="0.4"/><use href="#buttons" stroke="#00ff88" stroke-width="0.4" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="0.4" fill="none"/><use href="#psbtn" fill="#00ff88"/><use href="#touchpad" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/><use href="#lightbar" stroke="#00ff88" stroke-width="0.3" opacity="0.4"/></svg>
+<div class="prompt">ds4@glib:~$ connect --thin<span class="cursor"></span></div></div>
+
+<!-- ===================== 3 ===================== -->
+<div class="card"><span class="label">BOLD</span><span class="num">03</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg"><use href="#body" stroke="#00ff88" stroke-width="3.5"/><use href="#body" stroke="#00ff88" stroke-width="2" opacity="0.4" transform="translate(0,-1)"/><use href="#dpad" stroke="#00ff88" stroke-width="3"/><use href="#left-stick" stroke="#00ff88" stroke-width="3"/><use href="#left-stick" fill="none" stroke="#00ff88" stroke-width="1"/><use href="#right-stick" stroke="#00ff88" stroke-width="3"/><use href="#right-stick" fill="none" stroke="#00ff88" stroke-width="1"/><use href="#buttons" stroke="#00ff88" stroke-width="2.5" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="2" fill="none"/><use href="#psbtn" fill="#00ff88"/><use href="#shoulders" stroke="#00ff88" stroke-width="1.5"/><use href="#shoulders" fill="#00ff88"/></svg>
+<div class="prompt">ds4@glib:~$ connect --bold<span class="cursor"></span></div></div>
+
+<!-- ===================== 4 ===================== -->
+<div class="card"><span class="label">DASHED</span><span class="num">04</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg"><use href="#body" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="8 5"/><use href="#grip-lines" stroke="#00ff88" stroke-dasharray="4 3"/><use href="#dpad" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="5 3"/><use href="#left-stick" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="5 3"/><use href="#right-stick" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="5 3"/><use href="#buttons" stroke="#00ff88" stroke-width="1.1" stroke-dasharray="3 2" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="1" stroke-dasharray="3 2" fill="none"/><use href="#psbtn" fill="#00ff88"/><use href="#touchpad" stroke="#00ff88" stroke-width="0.6" stroke-dasharray="3 2" opacity="0.4"/></svg>
+<div class="prompt">ds4@glib:~$ connect --dashed<span class="cursor"></span></div></div>
+
+<!-- ===================== 5 ===================== -->
+<div class="card"><span class="label">DOTTED</span><span class="num">05</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round"><use href="#body" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="1 5"/><use href="#dpad" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="1 4"/><use href="#left-stick" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="1 4"/><use href="#right-stick" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="1 4"/><use href="#buttons" stroke="#00ff88" stroke-width="1.1" stroke-dasharray="1 3" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="1" stroke-dasharray="1 3" fill="none"/><use href="#psbtn" fill="#00ff88"/></svg>
+<div class="prompt">ds4@glib:~$ connect --dotted<span class="cursor"></span></div></div>
+
+<!-- ===================== 6 ===================== -->
+<div class="card"><span class="label">DASH-DOT</span><span class="num">06</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg"><use href="#body" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="10 3 2 3"/><use href="#dpad" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="6 2 1 2"/><use href="#left-stick" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="6 2 1 2"/><use href="#right-stick" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="6 2 1 2"/><use href="#buttons" stroke="#00ff88" stroke-width="1.1" stroke-dasharray="4 2 1 2" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="1" stroke-dasharray="3 2 1 2" fill="none"/><use href="#psbtn" fill="#00ff88"/></svg>
+<div class="prompt">ds4@glib:~$ connect --dashdot<span class="cursor"></span></div></div>
+
+<!-- ===================== 7 ===================== -->
+<div class="card"><span class="label">DOUBLE LINE</span><span class="num">07</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#00ff88" stroke-width="3" opacity="0.25"/>
+<use href="#body" stroke="#00ff88" stroke-width="1"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="2.5" opacity="0.25"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="0.8"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="2.5" opacity="0.25"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="0.8"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="2.5" opacity="0.25"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="0.8"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="2" opacity="0.25" fill="none"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="0.8" fill="none"/>
+<use href="#buttons" fill="#00ff88"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="2" opacity="0.25" fill="none"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="0.7" fill="none"/>
+<use href="#psbtn" fill="#00ff88"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --double<span class="cursor"></span></div></div>
+
+<!-- ===================== 8 ===================== -->
+<div class="card"><span class="label">FILLED</span><span class="num">08</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" fill="rgba(0,255,136,0.06)" stroke="#00ff88" stroke-width="1.5"/>
+<use href="#grip-lines" stroke="#00ff88"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="1.2"/>
+<use href="#left-stick" fill="rgba(0,255,136,0.08)" stroke="#00ff88" stroke-width="1.2"/>
+<use href="#right-stick" fill="rgba(0,255,136,0.08)" stroke="#00ff88" stroke-width="1.2"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="1.1" fill="none"/>
+<use href="#buttons" fill="#00ff88"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="1" fill="none"/>
+<use href="#psbtn" fill="#00ff88"/>
+<use href="#touchpad" fill="rgba(0,255,136,0.04)" stroke="#00ff88" stroke-width="0.6" opacity="0.5"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --fill<span class="cursor"></span></div></div>
+
+<!-- ===================== 9 ===================== -->
+<div class="card" style="background:#081408"><span class="label">NEON GLOW</span><span class="num">09</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="g9"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#g9)"><use href="#body" stroke="#33ff44" stroke-width="1.5"/><use href="#grip-lines" stroke="#33ff44"/><use href="#dpad" stroke="#33ff44" stroke-width="1.2"/><use href="#left-stick" stroke="#33ff44" stroke-width="1.2"/><use href="#right-stick" stroke="#33ff44" stroke-width="1.2"/><use href="#buttons" stroke="#33ff44" stroke-width="1.1" fill="none"/><use href="#buttons" fill="#33ff44"/><use href="#psbtn" stroke="#33ff44" stroke-width="1" fill="none"/><use href="#psbtn" fill="#33ff44"/></g></svg>
+<div class="prompt" style="color:#33ff44;text-shadow:0 0 8px #33ff44;">ds4@glib:~$ connect --glow<span class="cursor" style="background:#33ff44;box-shadow:0 0 8px #33ff44;"></span></div></div>
+
+<!-- ===================== 10 ===================== -->
+<div class="card" style="background:#081408"><div class="vignette"></div><span class="label">OSCILLOSCOPE</span><span class="num">10</span>
+<style>@keyframes dr{from{stroke-dashoffset:1800}to{stroke-dashoffset:0}}.osc{stroke-dasharray:1800;animation:dr 4s linear infinite}</style>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="g10"><feGaussianBlur stdDeviation="1"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#g10)" class="osc"><use href="#body" stroke="#33ff44" stroke-width="1"/><use href="#dpad" stroke="#33ff44" stroke-width="0.8"/><use href="#left-stick" stroke="#33ff44" stroke-width="0.8"/><use href="#right-stick" stroke="#33ff44" stroke-width="0.8"/><use href="#buttons" stroke="#33ff44" stroke-width="0.8" fill="none"/><use href="#buttons" fill="#33ff44"/><use href="#psbtn" stroke="#33ff44" stroke-width="0.7" fill="none"/><use href="#psbtn" fill="#33ff44"/></g></svg>
+<div class="prompt" style="color:#33ff44;text-shadow:0 0 6px #33ff44;">ds4@glib:~$ connect --oscilloscope<span class="cursor" style="background:#33ff44;box-shadow:0 0 6px #33ff44;"></span></div></div>
+
+<!-- ===================== 11 ===================== -->
+<div class="card" style="background:#081408"><div class="vignette"></div><span class="label">RADAR SWEEP</span><span class="num">11</span>
+<style>@keyframes sw{from{transform:rotate(-45deg)}to{transform:rotate(315deg)}}.sw{animation:sw 3s linear infinite;transform-origin:210px 120px}</style>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="210" cy="120" r="100" stroke="#33ff44" stroke-width="0.3" opacity="0.12"/>
+<circle cx="210" cy="120" r="75" stroke="#33ff44" stroke-width="0.3" opacity="0.12"/>
+<circle cx="210" cy="120" r="50" stroke="#33ff44" stroke-width="0.3" opacity="0.1"/>
+<circle cx="210" cy="120" r="25" stroke="#33ff44" stroke-width="0.2" opacity="0.08"/>
+<g class="sw"><line x1="210" y1="120" x2="310" y2="120" stroke="#33ff44" stroke-width="0.6" opacity="0.5"/><path d="M210 120 L260 70 L310 120 Z" fill="rgba(51,255,68,0.03)"/></g>
+<use href="#body" stroke="#33ff44" stroke-width="0.7" opacity="0.45"/>
+<use href="#dpad" stroke="#33ff44" stroke-width="0.5" opacity="0.35"/>
+<use href="#left-stick" stroke="#33ff44" stroke-width="0.5" opacity="0.35"/>
+<use href="#right-stick" stroke="#33ff44" stroke-width="0.5" opacity="0.35"/>
+<use href="#buttons" stroke="#33ff44" stroke-width="0.5" opacity="0.35" fill="none"/>
+<use href="#buttons" fill="#33ff44" opacity="0.35"/>
+<use href="#psbtn" stroke="#33ff44" stroke-width="0.5" opacity="0.35" fill="none"/>
+<use href="#psbtn" fill="#33ff44" opacity="0.35"/>
+<circle cx="130" cy="80" r="2" fill="#33ff44" opacity="0.6"/>
+<circle cx="300" cy="140" r="1.5" fill="#33ff44" opacity="0.4"/>
+<circle cx="180" cy="170" r="1" fill="#33ff44" opacity="0.3"/>
+</svg>
+<div class="prompt" style="color:#33ff44;">ds4@glib:~$ scan --radar<span class="cursor" style="background:#33ff44;"></span></div></div>
+
+<!-- ===================== 12 ===================== -->
+<div class="card"><span class="label">WIREFRAME</span><span class="num">12</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#00ff88" stroke-width="0.7"/>
+<line x1="210" y1="10" x2="210" y2="220" stroke="#00ff88" stroke-width="0.3" stroke-dasharray="4 4" opacity="0.3"/>
+<line x1="30" y1="115" x2="390" y2="115" stroke="#00ff88" stroke-width="0.3" stroke-dasharray="4 4" opacity="0.3"/>
+<circle cx="210" cy="115" r="40" stroke="#00ff88" stroke-width="0.2" opacity="0.2"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="0.7"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="0.7"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="0.7"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="0.7" fill="none"/>
+<use href="#buttons" fill="#00ff88"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="0.6" fill="none"/>
+<use href="#psbtn" fill="#00ff88"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --wire<span class="cursor"></span></div></div>
+
+<!-- ===================== 13 ===================== -->
+<div class="card"><span class="label">BLUEPRINT</span><span class="num">13</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<pattern id="g13" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M8 0L0 0 0 8" fill="none" stroke="#00ff88" stroke-width="0.12" opacity="0.15"/></pattern>
+<rect width="420" height="240" fill="url(#g13)" opacity="0.5"/>
+<use href="#body" stroke="#00ff88" stroke-width="0.9"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="0.7"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="0.7"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="0.7"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="0.7" fill="none"/>
+<use href="#buttons" fill="#00ff88"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="0.6" fill="none"/>
+<use href="#psbtn" fill="#00ff88"/>
+<line x1="70" y1="8" x2="350" y2="8" stroke="#00ff88" stroke-width="0.3" opacity="0.4"/>
+<line x1="70" y1="5" x2="70" y2="11" stroke="#00ff88" stroke-width="0.3" opacity="0.4"/>
+<line x1="350" y1="5" x2="350" y2="11" stroke="#00ff88" stroke-width="0.3" opacity="0.4"/>
+<text x="210" y="7" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.5">280mm</text>
+<circle cx="210" cy="115" r="6" stroke="#00ff88" stroke-width="0.3" opacity="0.4"/>
+<line x1="200" y1="115" x2="220" y2="115" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+<line x1="210" y1="105" x2="210" y2="125" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --blueprint<span class="cursor"></span></div></div>
+
+<!-- ===================== 14 ===================== -->
+<div class="card"><span class="label">X-RAY</span><span class="num">14</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#00ff88" stroke-width="0.8" opacity="0.35"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="0.6" opacity="0.3"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="0.6" opacity="0.3"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="0.6" opacity="0.3"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="0.6" fill="none" opacity="0.3"/>
+<use href="#buttons" fill="#00ff88" opacity="0.3"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="0.5" fill="none" opacity="0.3"/>
+<use href="#psbtn" fill="#00ff88" opacity="0.3"/>
+<rect x="180" y="150" width="60" height="22" rx="6" stroke="#00ff88" stroke-width="0.5" opacity="0.25"/>
+<text x="210" y="163" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.3">BATTERY</text>
+<rect x="190" y="175" width="40" height="15" rx="4" stroke="#00ff88" stroke-width="0.4" opacity="0.2"/>
+<text x="210" y="185" text-anchor="middle" fill="#00ff88" font-size="3.5" font-family="monospace" opacity="0.2">PCB</text>
+<line x1="140" y1="155" x2="175" y2="158" stroke="#00ff88" stroke-width="0.3" stroke-dasharray="3 3" opacity="0.2"/>
+<line x1="280" y1="155" x2="245" y2="158" stroke="#00ff88" stroke-width="0.3" stroke-dasharray="3 3" opacity="0.2"/>
+</svg>
+<div class="prompt">ds4@glib:~$ scan --xray<span class="cursor"></span></div></div>
+
+<!-- ===================== 15 ===================== -->
+<div class="card" style="background:#0a0c0a"><span class="label">CONTOUR</span><span class="num">15</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g opacity="0.15"><use href="#body" stroke="#00ff88" stroke-width="0.4" transform="translate(0,-6)"/><use href="#body" stroke="#00ff88" stroke-width="0.4" transform="translate(0,-4)"/><use href="#body" stroke="#00ff88" stroke-width="0.4" transform="translate(0,-2)"/><use href="#body" stroke="#00ff88" stroke-width="0.4" transform="translate(0,2)"/><use href="#body" stroke="#00ff88" stroke-width="0.4" transform="translate(0,4)"/><use href="#body" stroke="#00ff88" stroke-width="0.4" transform="translate(0,6)"/></g>
+<use href="#body" stroke="#00ff88" stroke-width="1.2"/><use href="#dpad" stroke="#00ff88" stroke-width="1"/><use href="#left-stick" stroke="#00ff88" stroke-width="1"/><use href="#right-stick" stroke="#00ff88" stroke-width="1"/><use href="#buttons" stroke="#00ff88" stroke-width="1" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="0.8" fill="none"/><use href="#psbtn" fill="#00ff88"/></svg>
+<div class="prompt">ds4@glib:~$ connect --contour<span class="cursor"></span></div></div>
+
+<!-- ===================== 16 ===================== -->
+<div class="card"><span class="label">PIXELATED</span><span class="num">16</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+<use href="#body" stroke="#00ff88" stroke-width="3"/><use href="#dpad" stroke="#00ff88" stroke-width="2.5"/><use href="#left-stick" stroke="#00ff88" stroke-width="2.5"/><use href="#right-stick" stroke="#00ff88" stroke-width="2.5"/><use href="#buttons" stroke="#00ff88" stroke-width="2.5" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="2" fill="none"/><use href="#psbtn" fill="#00ff88"/></svg>
+<div class="prompt">ds4@glib:~$ connect --8bit<span class="cursor"></span></div></div>
+
+<!-- ===================== 17 ===================== -->
+<div class="card"><span class="label">ASCII BLOCK</span><span class="num">17</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M55 12 L365 12 L365 200 Q345 215 330 215 L300 215 Q290 200 270 185 L210 175 Q170 170 145 158 Q55 135 55 105 Z" fill="none" stroke="#00ff88" stroke-width="1.3"/>
+<path d="M55 12 L55 95 Q42 110 35 135 L25 170 L35 195"/>
+<path d="M55 80 Q42 95 35 120 L30 160 L35 195"/>
+<path d="M365 12 L365 95 Q378 110 385 135 L395 170 L385 195"/>
+<path d="M365 80 Q378 95 385 120 L390 160 L385 195"/>
+<rect x="92" y="80" width="26" height="6" rx="1" fill="none" stroke="#00ff88" stroke-width="1"/>
+<rect x="102" y="70" width="6" height="26" rx="1" fill="none" stroke="#00ff88" stroke-width="1"/>
+<circle cx="128" cy="118" r="13" fill="none" stroke="#00ff88" stroke-width="1"/>
+<circle cx="128" cy="118" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+<circle cx="250" cy="118" r="13" fill="none" stroke="#00ff88" stroke-width="1"/>
+<circle cx="250" cy="118" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+<circle cx="278" cy="78" r="7" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+<text x="278" y="81" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">△</text>
+<circle cx="293" cy="88" r="7" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+<text x="293" y="91" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">○</text>
+<circle cx="263" cy="88" r="7" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+<text x="263" y="91" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">✕</text>
+<circle cx="278" cy="98" r="7" fill="none" stroke="#00ff88" stroke-width="0.9"/>
+<text x="278" y="101" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">□</text>
+<circle cx="190" cy="68" r="5" fill="none" stroke="#00ff88" stroke-width="0.8"/>
+<text x="190" y="71" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">PS</text>
+<rect x="95" y="15" width="50" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+<text x="120" y="19" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">L1 L2</text>
+<rect x="240" y="15" width="50" height="5" rx="2" fill="none" stroke="#00ff88" stroke-width="0.6"/>
+<text x="265" y="19" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">R1 R2</text>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --ascii<span class="cursor"></span></div></div>
+
+<!-- ===================== 18 ===================== -->
+<div class="card"><span class="label">DOT MATRIX</span><span class="num">18</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round"><use href="#body" stroke="#00ff88" stroke-width="2" stroke-dasharray="1 6"/><use href="#dpad" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="1 5"/><use href="#left-stick" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="1 5"/><use href="#right-stick" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="1 5"/><use href="#buttons" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="1 4" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="1 4" fill="none"/><use href="#psbtn" fill="#00ff88"/></svg>
+<div class="prompt">ds4@glib:~$ connect --dotmatrix<span class="cursor"></span></div></div>
+
+<!-- ===================== 19 ===================== -->
+<div class="card"><span class="label">SKETCHY</span><span class="num">19</span>
+<style>@keyframes tr{0%{transform:translate(0)}25%{transform:translate(0.5px,-0.3px)}50%{transform:translate(-0.3px,0.5px)}75%{transform:translate(0.3px,-0.5px)}100%{transform:translate(-0.5px,0.3px)}}.tr{animation:tr 0.15s infinite}</style>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g class="tr"><use href="#body" stroke="#00ff88" stroke-width="1.3"/><use href="#dpad" stroke="#00ff88" stroke-width="1.1"/><use href="#left-stick" stroke="#00ff88" stroke-width="1.1"/><use href="#right-stick" stroke="#00ff88" stroke-width="1.1"/><use href="#buttons" stroke="#00ff88" stroke-width="1" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="0.9" fill="none"/><use href="#psbtn" fill="#00ff88"/></g>
+<g class="tr" style="opacity:0.3"><use href="#body" stroke="#00ff88" stroke-width="0.8" transform="translate(1,0.5)"/><use href="#dpad" stroke="#00ff88" stroke-width="0.6" transform="translate(1,0.5)"/></g>
+<g class="tr" style="opacity:0.2"><use href="#body" stroke="#00ff88" stroke-width="0.5" transform="translate(-0.8,1)"/></g>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --sketch<span class="cursor"></span></div></div>
+
+<!-- ===================== 20 ===================== -->
+<div class="card"><span class="label">ZIGZAG</span><span class="num">20</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linejoin="miter">
+<use href="#body" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="2 4 8 4"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="2 3 6 3"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="2 3 6 3"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="1.2" stroke-dasharray="2 3 6 3"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="1.1" stroke-dasharray="2 2 5 2" fill="none"/>
+<use href="#buttons" fill="#00ff88"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="1" stroke-dasharray="2 2 4 2" fill="none"/>
+<use href="#psbtn" fill="#00ff88"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --zigzag<span class="cursor"></span></div></div>
+
+<!-- ===================== 21 ===================== -->
+<div class="card"><span class="label">STIPPLE</span><span class="num">21</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round">
+<use href="#body" stroke="#00ff88" stroke-width="3" stroke-dasharray="1 10" opacity="0.6"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="2" stroke-dasharray="1 8"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="2" stroke-dasharray="1 8"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="2" stroke-dasharray="1 8"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="2" stroke-dasharray="1 6" fill="none"/>
+<use href="#buttons" fill="#00ff88"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="1 6" fill="none"/>
+<use href="#psbtn" fill="#00ff88"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --stipple<span class="cursor"></span></div></div>
+
+<!-- ===================== 22 ===================== -->
+<div class="card" style="background:#081408"><div class="vignette"></div><span class="label">RADAR RINGS</span><span class="num">22</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="210" cy="115" r="90" stroke="#33ff44" stroke-width="0.3" opacity="0.15"/>
+<circle cx="210" cy="115" r="65" stroke="#33ff44" stroke-width="0.3" opacity="0.12"/>
+<circle cx="210" cy="115" r="40" stroke="#33ff44" stroke-width="0.3" opacity="0.1"/>
+<circle cx="210" cy="115" r="20" stroke="#33ff44" stroke-width="0.2" opacity="0.08"/>
+<use href="#body" stroke="#33ff44" stroke-width="0.8" opacity="0.5"/>
+<use href="#dpad" stroke="#33ff44" stroke-width="0.6" opacity="0.4"/>
+<use href="#left-stick" stroke="#33ff44" stroke-width="0.6" opacity="0.4"/>
+<use href="#right-stick" stroke="#33ff44" stroke-width="0.6" opacity="0.4"/>
+<use href="#buttons" stroke="#33ff44" stroke-width="0.6" opacity="0.4" fill="none"/>
+<use href="#buttons" fill="#33ff44" opacity="0.4"/>
+<use href="#psbtn" stroke="#33ff44" stroke-width="0.5" opacity="0.4" fill="none"/>
+<use href="#psbtn" fill="#33ff44" opacity="0.4"/>
+</svg>
+<div class="prompt" style="color:#33ff44;">ds4@glib:~$ scan --rings<span class="cursor" style="background:#33ff44;"></span></div></div>
+
+<!-- ===================== 23 ===================== -->
+<div class="card" style="background:#081408"><div class="vignette"></div><span class="label">MATRIX RAIN</span><span class="num">23</span>
+<div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:0.1;font-size:12px;line-height:1;color:#00ff44;font-family:monospace;padding:2px;word-break:break-all;">01010010 01000101 01000100 01010000 10010010 01010101 01000100 10010100 00110011</div>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#00ff44" stroke-width="1.3"/>
+<use href="#dpad" stroke="#00ff44" stroke-width="1"/>
+<use href="#left-stick" stroke="#00ff44" stroke-width="1"/>
+<use href="#right-stick" stroke="#00ff44" stroke-width="1"/>
+<use href="#buttons" stroke="#00ff44" stroke-width="1" fill="none"/>
+<use href="#buttons" fill="#00ff44"/>
+<use href="#psbtn" stroke="#00ff44" stroke-width="0.8" fill="none"/>
+<use href="#psbtn" fill="#00ff44"/>
+</svg>
+<div class="prompt" style="color:#2eff70;">ds4@glib:~$ connect --matrix<span class="cursor" style="background:#00ff44;"></span></div></div>
+
+<!-- ===================== 24 ===================== -->
+<div class="card"><span class="label">GLITCH</span><span class="num">24</span>
+<style>@keyframes g{0%,90%,100%{transform:translate(0)}92%{transform:translate(-3px,1px);clip-path:inset(0 0 60% 0)}94%{transform:translate(3px,-1px);clip-path:inset(30% 0 30% 0)}96%{transform:translate(-2px,0);clip-path:inset(60% 0 10% 0)}98%{transform:translate(2px,2px);clip-path:inset(10% 0 70% 0)}}</style>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g style="animation:g 2.5s infinite 0.1s;opacity:0.35;filter:blur(0.3px)"><use href="#body" stroke="#ff0080" stroke-width="1.5"/></g>
+<g style="animation:g 2.5s infinite 0.05s;opacity:0.3;filter:blur(0.3px)"><use href="#body" stroke="#00ffff" stroke-width="1.5" transform="translate(1,0)"/></g>
+<g style="animation:g 2.5s infinite"><use href="#body" stroke="#00ff88" stroke-width="1.5"/><use href="#dpad" stroke="#00ff88" stroke-width="1.2"/><use href="#left-stick" stroke="#00ff88" stroke-width="1.2"/><use href="#right-stick" stroke="#00ff88" stroke-width="1.2"/><use href="#buttons" stroke="#00ff88" stroke-width="1.1" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="1" fill="none"/><use href="#psbtn" fill="#00ff88"/></g>
+<rect x="120" y="80" width="30" height="4" fill="#00ff88" opacity="0.5" style="animation:g 2.5s infinite 0.15s"/>
+<rect x="250" y="140" width="20" height="3" fill="#00ff88" opacity="0.3" style="animation:g 2.5s infinite 0.2s"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --glitch<span class="cursor"></span></div></div>
+
+<!-- ===================== 25 ===================== -->
+<div class="card" style="background:#0a0000"><div class="vignette"></div><span class="label">THERMAL</span><span class="num">25</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="t25" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff4400"/><stop offset="50%" stop-color="#ffaa00"/><stop offset="100%" stop-color="#00ff88"/></linearGradient></defs>
+<use href="#body" stroke="url(#t25)" stroke-width="1.5"/>
+<use href="#dpad" stroke="url(#t25)" stroke-width="1.2"/>
+<use href="#left-stick" stroke="url(#t25)" stroke-width="1.2"/>
+<use href="#right-stick" stroke="url(#t25)" stroke-width="1.2"/>
+<use href="#buttons" stroke="url(#t25)" stroke-width="1.1" fill="none"/>
+<use href="#buttons" fill="#00ff88"/>
+<use href="#psbtn" stroke="url(#t25)" stroke-width="1" fill="none"/>
+<use href="#psbtn" fill="#00ff88"/>
+<circle cx="140" cy="135" r="8" fill="#ff4400" opacity="0.08"/>
+<circle cx="282" cy="135" r="8" fill="#ff4400" opacity="0.06"/>
+</svg>
+<div class="prompt">ds4@glib:~$ scan --thermal<span class="cursor"></span></div></div>
+
+<!-- ===================== 26 ===================== -->
+<div class="card" style="background:#081408"><span class="label">PHOSPHOR</span><span class="num">26</span>
+<style>@keyframes ph{0%,100%{opacity:0.6}50%{opacity:1}}.ph{animation:ph 2s ease-in-out infinite}</style>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="g26"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<g filter="url(#g26)" class="ph"><use href="#body" stroke="#33ff44" stroke-width="1.5"/><use href="#grip-lines" stroke="#33ff44"/><use href="#dpad" stroke="#33ff44" stroke-width="1.2"/><use href="#left-stick" stroke="#33ff44" stroke-width="1.2"/><use href="#right-stick" stroke="#33ff44" stroke-width="1.2"/><use href="#buttons" stroke="#33ff44" stroke-width="1.1" fill="none"/><use href="#buttons" fill="#33ff44"/><use href="#psbtn" stroke="#33ff44" stroke-width="1" fill="none"/><use href="#psbtn" fill="#33ff44"/></g></svg>
+<div class="prompt" style="color:#33ff44;text-shadow:0 0 10px #33ff44;">ds4@glib:~$ connect --phosphor<span class="cursor" style="background:#33ff44;box-shadow:0 0 10px #33ff44;"></span></div></div>
+
+<!-- ===================== 27 ===================== -->
+<div class="card"><div class="sl"></div><span class="label">CRT MONITOR</span><span class="num">27</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:blur(0.3px)">
+<use href="#body" stroke="#00ff88" stroke-width="1.5"/><use href="#dpad" stroke="#00ff88" stroke-width="1.2"/><use href="#left-stick" stroke="#00ff88" stroke-width="1.2"/><use href="#right-stick" stroke="#00ff88" stroke-width="1.2"/><use href="#buttons" stroke="#00ff88" stroke-width="1.1" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="1" fill="none"/><use href="#psbtn" fill="#00ff88"/></svg>
+<div class="prompt" style="filter:blur(0.3px)">ds4@glib:~$ connect --crt<span class="cursor"></span></div></div>
+
+<!-- ===================== 28 ===================== -->
+<div class="card"><span class="label">SPLIT HALVES</span><span class="num">28</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+<clipPath id="lh"><rect x="0" y="0" width="210" height="240"/></clipPath>
+<g clip-path="url(#lh)"><use href="#body" stroke="#00ff88" stroke-width="2"/><use href="#dpad" stroke="#00ff88" stroke-width="1.5"/><use href="#left-stick" stroke="#00ff88" stroke-width="1.5"/></g>
+<clipPath id="rh"><rect x="210" y="0" width="210" height="240"/></clipPath>
+<g clip-path="url(#rh)"><use href="#body" stroke="#00ff88" stroke-width="2"/><use href="#right-stick" stroke="#00ff88" stroke-width="1.5"/><use href="#buttons" stroke="#00ff88" stroke-width="1.5" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="1.2" fill="none"/><use href="#psbtn" fill="#00ff88"/></g>
+<line x1="210" y1="5" x2="210" y2="235" stroke="#00ff88" stroke-width="0.5" stroke-dasharray="5 4" opacity="0.6"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --split<span class="cursor"></span></div></div>
+
+<!-- ===================== 29 ===================== -->
+<div class="card"><span class="label">EXPLODED</span><span class="num">29</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g opacity="0.3"><use href="#body" stroke="#00ff88" stroke-width="1" transform="translate(0,-8)"/></g>
+<use href="#body" stroke="#00ff88" stroke-width="1.3" transform="translate(0,12)"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="1" transform="translate(0,12)"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="1" transform="translate(0,12)"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="1" transform="translate(0,12)"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="1" fill="none" transform="translate(0,12)"/>
+<use href="#buttons" fill="#00ff88" transform="translate(0,12)"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="0.8" fill="none" transform="translate(0,12)"/>
+<use href="#psbtn" fill="#00ff88" transform="translate(0,12)"/>
+<rect x="175" y="30" width="70" height="12" rx="4" stroke="#00ff88" stroke-width="0.5" opacity="0.3"/>
+<text x="210" y="39" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace" opacity="0.3">PCB</text>
+<line x1="200" y1="42" x2="190" y2="55" stroke="#00ff88" stroke-width="0.3" stroke-dasharray="3 3" opacity="0.2"/>
+<line x1="220" y1="42" x2="230" y2="55" stroke="#00ff88" stroke-width="0.3" stroke-dasharray="3 3" opacity="0.2"/>
+</svg>
+<div class="prompt">ds4@glib:~$ assemble --exploded<span class="cursor"></span></div></div>
+
+<!-- ===================== 30 ===================== -->
+<div class="card"><span class="label">GEOMETRIC</span><span class="num">30</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linejoin="miter">
+<rect x="75" y="20" width="270" height="155" rx="20" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+<rect x="75" y="175" width="70" height="45" rx="12" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+<rect x="275" y="175" width="70" height="45" rx="12" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+<circle cx="210" cy="80" r="20" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+<rect x="108" y="100" width="30" height="7" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+<rect x="120" y="88" width="7" height="30" rx="2" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+<circle cx="155" cy="140" r="14" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+<circle cx="155" cy="140" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+<circle cx="290" cy="140" r="14" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+<circle cx="290" cy="140" r="5" fill="none" stroke="#00ff88" stroke-width="0.7"/>
+<circle cx="315" cy="78" r="7" fill="none" stroke="#00ff88" stroke-width="1"/><text x="315" y="82" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">△</text>
+<circle cx="328" cy="88" r="7" fill="none" stroke="#00ff88" stroke-width="1"/><text x="328" y="92" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">○</text>
+<circle cx="302" cy="88" r="7" fill="none" stroke="#00ff88" stroke-width="1"/><text x="302" y="92" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">✕</text>
+<circle cx="315" cy="98" r="7" fill="none" stroke="#00ff88" stroke-width="1"/><text x="315" y="102" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">□</text>
+<circle cx="210" cy="60" r="5" fill="none" stroke="#00ff88" stroke-width="0.9"/><text x="210" y="63" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace">PS</text>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --geo<span class="cursor"></span></div></div>
+
+<!-- ===================== 31 ===================== -->
+<div class="card"><span class="label">CONSTELLATION</span><span class="num">31</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#00ff88" stroke-width="0.5" opacity="0.3" stroke-dasharray="6 8"/>
+<circle cx="70" cy="50" r="1.5" fill="#00ff88" opacity="0.6"/>
+<circle cx="350" cy="50" r="1.5" fill="#00ff88" opacity="0.6"/>
+<circle cx="210" cy="10" r="1.5" fill="#00ff88" opacity="0.6"/>
+<circle cx="210" cy="220" r="1.5" fill="#00ff88" opacity="0.6"/>
+<circle cx="110" cy="60" r="1" fill="#00ff88" opacity="0.4"/>
+<circle cx="310" cy="60" r="1" fill="#00ff88" opacity="0.4"/>
+<circle cx="140" cy="135" r="1.5" fill="#00ff88" opacity="0.5"/>
+<circle cx="282" cy="135" r="1.5" fill="#00ff88" opacity="0.5"/>
+<line x1="70" y1="50" x2="110" y2="60" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+<line x1="350" y1="50" x2="310" y2="60" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+<line x1="110" y1="60" x2="210" y2="10" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+<line x1="310" y1="60" x2="210" y2="10" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+<line x1="210" y1="220" x2="140" y2="135" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+<line x1="210" y1="220" x2="282" y2="135" stroke="#00ff88" stroke-width="0.3" opacity="0.3"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --stars<span class="cursor"></span></div></div>
+
+<!-- ===================== 32 ===================== -->
+<div class="card" style="background:#080800"><span class="label">BINARY</span><span class="num">32</span>
+<div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:0.06;font-size:10px;line-height:1.1;color:#00ff88;font-family:monospace;padding:2px;word-break:break-all;">01100100 01110011 00110100 00100000 01110010 01100101 01100001 01100100 01111001 00001010 01100011 01101111 01101110 01101110 01100101 01100011 01110100</div>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#00ff88" stroke-width="1.3" opacity="0.8"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="1" opacity="0.8"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="1" opacity="0.8"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="1" opacity="0.8"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="1" fill="none" opacity="0.8"/>
+<use href="#buttons" fill="#00ff88" opacity="0.8"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="0.8" fill="none" opacity="0.8"/>
+<use href="#psbtn" fill="#00ff88" opacity="0.8"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --binary<span class="cursor"></span></div></div>
+
+<!-- ===================== 33 ===================== -->
+<div class="card" style="background:#14120c"><span class="label">TYPEWRITER</span><span class="num">33</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#c8b48c" stroke-width="1.5"/><use href="#dpad" stroke="#c8b48c" stroke-width="1.2"/><use href="#left-stick" stroke="#c8b48c" stroke-width="1.2"/><use href="#right-stick" stroke="#c8b48c" stroke-width="1.2"/><use href="#buttons" stroke="#c8b48c" stroke-width="1.1" fill="none"/><use href="#buttons" fill="#c8b48c"/><use href="#psbtn" stroke="#c8b48c" stroke-width="1" fill="none"/><use href="#psbtn" fill="#c8b48c"/></svg>
+<div class="prompt" style="color:#a09070;font-style:italic;">ds4@glib:~$ connect --typewriter<span class="cursor" style="background:#c8b48c;"></span></div></div>
+
+<!-- ===================== 34 ===================== -->
+<div class="card"><span class="label">ETCH-A-SKETCH</span><span class="num">34</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="25" y="10" width="370" height="220" rx="8" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+<rect x="35" y="20" width="350" height="175" rx="4" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.3"/>
+<circle cx="140" cy="210" r="10" fill="none" stroke="#00ff88" stroke-width="1"/>
+<circle cx="140" cy="210" r="4" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+<circle cx="280" cy="210" r="10" fill="none" stroke="#00ff88" stroke-width="1"/>
+<circle cx="280" cy="210" r="4" fill="none" stroke="#00ff88" stroke-width="0.5"/>
+<text x="140" y="213" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">←</text>
+<text x="280" y="213" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">→</text>
+<text x="210" y="213" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">ETCH</text>
+<use href="#body" stroke="#00ff88" stroke-width="0.7" opacity="0.6"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="0.5" opacity="0.5"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="0.5" opacity="0.5"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="0.5" opacity="0.5"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="0.5" opacity="0.5" fill="none"/>
+<use href="#buttons" fill="#00ff88" opacity="0.5"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --etch<span class="cursor"></span></div></div>
+
+<!-- ===================== 35 ===================== -->
+<div class="card" style="background:#080012"><div class="vignette"></div><span class="label">BLACKLIGHT</span><span class="num">35</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="g35"><feGaussianBlur stdDeviation="0.8"/></filter></defs>
+<g filter="url(#g35)"><use href="#body" stroke="#b464ff" stroke-width="1.8"/><use href="#grip-lines" stroke="#b464ff"/><use href="#dpad" stroke="#b464ff" stroke-width="1.3"/><use href="#left-stick" stroke="#b464ff" stroke-width="1.3"/><use href="#right-stick" stroke="#b464ff" stroke-width="1.3"/><use href="#buttons" stroke="#b464ff" stroke-width="1.2" fill="none"/><use href="#buttons" fill="#b464ff"/><use href="#psbtn" stroke="#b464ff" stroke-width="1" fill="none"/><use href="#psbtn" fill="#b464ff"/><use href="#touchpad" stroke="#b464ff" stroke-width="0.7" opacity="0.4"/></g></svg>
+<div class="prompt" style="color:#b464ff;text-shadow:0 0 8px #b464ff;">ds4@glib:~$ connect --uv<span class="cursor" style="background:#b464ff;"></span></div></div>
+
+<!-- ===================== 36 ===================== -->
+<div class="card"><span class="label">INK BLEED</span><span class="num">36</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="g36"><feGaussianBlur stdDeviation="2"/></filter></defs>
+<g filter="url(#g36)" opacity="0.15"><use href="#body" stroke="#00ff88" stroke-width="3"/></g>
+<g filter="url(#g36)" opacity="0.3"><use href="#body" stroke="#00ff88" stroke-width="1.5"/></g>
+<use href="#body" stroke="#00ff88" stroke-width="1.2"/><use href="#dpad" stroke="#00ff88" stroke-width="1"/><use href="#left-stick" stroke="#00ff88" stroke-width="1"/><use href="#right-stick" stroke="#00ff88" stroke-width="1"/><use href="#buttons" stroke="#00ff88" stroke-width="0.9" fill="none"/><use href="#buttons" fill="#00ff88"/><use href="#psbtn" stroke="#00ff88" stroke-width="0.8" fill="none"/><use href="#psbtn" fill="#00ff88"/></svg>
+<div class="prompt">ds4@glib:~$ connect --bleed<span class="cursor"></span></div></div>
+
+<!-- ===================== 37 ===================== -->
+<div class="card"><span class="label">PARAMETRIC</span><span class="num">37</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#00ff88" stroke-width="0.5" stroke-dasharray="4 2 1 2 4 4 1 2"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="0.5" stroke-dasharray="4 2 1 2"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="0.5" stroke-dasharray="4 2 1 2"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="0.5" stroke-dasharray="4 2 1 2"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="0.5" stroke-dasharray="3 2 1 2" fill="none"/>
+<use href="#buttons" fill="#00ff88"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="0.5" stroke-dasharray="3 2" fill="none"/>
+<use href="#psbtn" fill="#00ff88"/>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --parametric<span class="cursor"></span></div></div>
+
+<!-- ===================== 38 ===================== -->
+<div class="card" style="background:#00ff88"><span class="label">INVERTED</span><span class="num">38</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#000000" stroke-width="1.5"/><use href="#grip-lines" stroke="#000000" opacity="0.4"/><use href="#dpad" stroke="#000000" stroke-width="1.2"/><use href="#left-stick" stroke="#000000" stroke-width="1.2"/><use href="#right-stick" stroke="#000000" stroke-width="1.2"/><use href="#buttons" stroke="#000000" stroke-width="1.1" fill="none"/><use href="#buttons" fill="#000000"/><use href="#psbtn" stroke="#000000" stroke-width="1" fill="none"/><use href="#psbtn" fill="#000000"/><use href="#touchpad" stroke="#000000" stroke-width="0.7" opacity="0.3"/></svg>
+<div class="prompt" style="color:#000000;">ds4@glib:~$ connect --invert<span class="cursor" style="background:#000000;"></span></div></div>
+
+<!-- ===================== 39 ===================== -->
+<div class="card"><span class="label">STICK FIGURE</span><span class="num">39</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M85 60 Q85 25 120 25 L300 25 Q335 25 335 60 L335 110 Q335 145 305 155 L285 175 Q275 190 265 190 L255 190 Q245 190 235 175 L215 155 Q180 150 160 140 Q85 120 85 100 Z" fill="none" stroke="#00ff88" stroke-width="1.2"/>
+<line x1="85" y1="65" x2="60" y2="85" stroke="#00ff88" stroke-width="1.2"/>
+<line x1="85" y1="95" x2="55" y2="115" stroke="#00ff88" stroke-width="1.2"/>
+<line x1="60" y1="85" x2="50" y2="130" stroke="#00ff88" stroke-width="1.2"/>
+<line x1="55" y1="115" x2="50" y2="155" stroke="#00ff88" stroke-width="1.2"/>
+<line x1="335" y1="65" x2="360" y2="85" stroke="#00ff88" stroke-width="1.2"/>
+<line x1="335" y1="95" x2="365" y2="115" stroke="#00ff88" stroke-width="1.2"/>
+<line x1="360" y1="85" x2="370" y2="130" stroke="#00ff88" stroke-width="1.2"/>
+<line x1="365" y1="115" x2="370" y2="155" stroke="#00ff88" stroke-width="1.2"/>
+<line x1="115" y1="95" x2="150" y2="95" stroke="#00ff88" stroke-width="1.2"/>
+<line x1="132" y1="80" x2="132" y2="112" stroke="#00ff88" stroke-width="1.2"/>
+<circle cx="155" cy="135" r="11" fill="none" stroke="#00ff88" stroke-width="1"/>
+<circle cx="290" cy="135" r="11" fill="none" stroke="#00ff88" stroke-width="1"/>
+<circle cx="315" cy="85" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/><text x="315" y="88" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">△</text>
+<circle cx="328" cy="95" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/><text x="328" y="98" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">○</text>
+<circle cx="302" cy="95" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/><text x="302" y="98" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">✕</text>
+<circle cx="315" cy="105" r="5.5" fill="none" stroke="#00ff88" stroke-width="0.9"/><text x="315" y="108" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">□</text>
+<circle cx="210" cy="72" r="4.5" fill="none" stroke="#00ff88" stroke-width="0.8"/><text x="210" y="75" text-anchor="middle" fill="#00ff88" font-size="4" font-family="monospace">PS</text>
+</svg>
+<div class="prompt">ds4@glib:~$ connect --stick<span class="cursor"></span></div></div>
+
+<!-- ===================== 40 ===================== -->
+<div class="card" style="background:#0a0a0a"><span class="label">ULTRA DETAILED</span><span class="num">40</span>
+<svg width="420" height="240" viewBox="0 0 420 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<use href="#body" stroke="#00ff88" stroke-width="1.5"/><use href="#grip-lines" stroke="#00ff88"/>
+<use href="#dpad" stroke="#00ff88" stroke-width="1.2"/>
+<use href="#left-stick" stroke="#00ff88" stroke-width="1.2"/><circle cx="140" cy="135" r="11" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+<use href="#right-stick" stroke="#00ff88" stroke-width="1.2"/><circle cx="282" cy="135" r="11" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+<use href="#buttons" stroke="#00ff88" stroke-width="1.1" fill="none"/><use href="#buttons" fill="#00ff88"/>
+<use href="#psbtn" stroke="#00ff88" stroke-width="1" fill="none"/><use href="#psbtn" fill="#00ff88"/>
+<use href="#touchpad" stroke="#00ff88" stroke-width="0.7" opacity="0.45"/>
+<line x1="175" y1="80" x2="245" y2="80" stroke="#00ff88" stroke-width="0.2" opacity="0.12"/>
+<line x1="175" y1="90" x2="245" y2="90" stroke="#00ff88" stroke-width="0.2" opacity="0.12"/>
+<line x1="175" y1="100" x2="245" y2="100" stroke="#00ff88" stroke-width="0.2" opacity="0.12"/>
+<line x1="175" y1="110" x2="245" y2="110" stroke="#00ff88" stroke-width="0.2" opacity="0.12"/>
+<line x1="195" y1="76" x2="195" y2="112" stroke="#00ff88" stroke-width="0.2" opacity="0.12"/>
+<line x1="215" y1="76" x2="215" y2="112" stroke="#00ff88" stroke-width="0.2" opacity="0.12"/>
+<line x1="235" y1="76" x2="235" y2="112" stroke="#00ff88" stroke-width="0.2" opacity="0.12"/>
+<line x1="210" y1="76" x2="210" y2="112" stroke="#00ff88" stroke-width="0.25" opacity="0.15"/>
+<use href="#shoulders" stroke="#00ff88" stroke-width="0.7"/><use href="#shoulders" fill="#00ff88"/>
+<use href="#share-options" stroke="#00ff88" stroke-width="0.6"/><use href="#share-options" fill="#00ff88"/>
+<use href="#lightbar" stroke="#00ff88" stroke-width="0.6" opacity="0.5"/>
+<circle cx="238" cy="86" r="0.8" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+<circle cx="242" cy="86" r="0.8" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+<circle cx="246" cy="86" r="0.8" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+<text x="210" y="175" text-anchor="middle" fill="#00ff88" font-size="5" font-family="monospace" opacity="0.3">DUALSHOCK 4</text>
+</svg>
+<div class="prompt">ds4@glib:~$ connect ds4 --full<span class="cursor"></span></div></div>
+
+</div>
+</body>
+</html>

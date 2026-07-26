@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Terminal — 40 PC — RETRO</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0b;
+    color: #e4e4e7;
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+    padding: 1.5rem;
+  }
+  h1 { text-align:center; font-size:1.3rem; color:#00ff88; margin-bottom:0.3rem; text-shadow:0 0 12px rgba(0,255,136,0.4); }
+  .subtitle { text-align:center; color:#52525b; font-size:0.8rem; margin-bottom:1.5rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 0.8rem;
+    max-width: 1900px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #0a0a0a;
+    border: 2px solid rgba(0,255,136,0.12);
+    border-radius: 16px;
+    padding: 0.7rem 0.7rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 260px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: inset 0 0 30px rgba(0,255,136,0.02), 0 0 15px rgba(0,255,136,0.03);
+  }
+  .card:hover { border-color: rgba(0,255,136,0.35); box-shadow: inset 0 0 30px rgba(0,255,136,0.04), 0 0 25px rgba(0,255,136,0.06); }
+  .card .label {
+    position: absolute; top: 0.4rem; left: 0.7rem;
+    font-size: 0.55rem; color: #3f3f46;
+    text-transform: uppercase; letter-spacing: 0.04em; z-index: 5;
+  }
+  .card .num {
+    position: absolute; top: 0.35rem; right: 0.7rem;
+    font-size: 0.55rem; color: #3f3f46; font-weight: 700; z-index: 5;
+  }
+  .card > svg { display:block; z-index:3; width:100%; height:auto; filter: drop-shadow(0 0 6px rgba(0,255,136,0.06)); }
+  .card .prompt {
+    font-size: 0.6rem; color: #00cc6a;
+    margin-top: 0.25rem; z-index: 5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+  }
+  .cursor {
+    display: inline-block; width: 0.45em; height: 0.8em;
+    background: #00cc6a; margin-left: 0.1em;
+    animation: blink 1s step-end infinite; vertical-align: text-bottom;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .crt {
+    position:absolute; inset:0; border-radius:15px;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+    pointer-events:none; z-index:4;
+  }
+  .vignette {
+    position:absolute; inset:0; border-radius:15px;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.5) 100%);
+    pointer-events:none; z-index:4;
+  }
+  .crn {
+    position:absolute; inset:-1px; border-radius:16px;
+    border: 1px solid rgba(0,255,136,0.06);
+    pointer-events:none; z-index:4;
+  }
+</style>
+</head>
+<body>
+<h1> &#9000; 40 PC — RETRO ROUNDED</h1>
+<p class="subtitle">40 разных рисунков ПК в ретро-терминальном стиле</p>
+<div class="grid">
+<div class="card"><span class="label">TOWER FRONT</span><span class="num">1</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="100" y="15" width="140" height="170" rx="6" stroke="#00ff88" fill="#003d22" stroke-linejoin="round"/>
+  <rect x="115" y="25" width="110" height="30" rx="4" stroke="#00ff88" fill="none" stroke-linejoin="round"/>
+  <rect x="115" y="25" width="30" height="30" rx="2" stroke="#00ff88" fill="#00ff88" stroke-linejoin="round" opacity="0.3"/>
+  <rect x="150" y="30" width="20" height="20" rx="10" stroke="#00cc6a" fill="#00cc6a" opacity="0.8"/>
+  <rect x="175" y="30" width="20" height="20" rx="10" stroke="#00cc6a" fill="none"/>
+  <rect x="200" y="30" width="15" height="20" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="115" y="65" width="110" height="45" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="115" y="65" width="20" height="45" rx="2" stroke="#005533" fill="#005533"/>
+  <rect x="140" y="70" width="25" height="10" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="115" y="120" width="110" height="55" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="125" y="130" width="30" height="35" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="165" y="130" width="30" height="35" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="130" y="155" width="20" height="5" rx="2" stroke="#00ff88" fill="#00ff88"/>
+  <rect x="170" y="155" width="20" height="5" rx="2" stroke="#00ff88" fill="#00ff88"/>
+  <circle cx="250" cy="175" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.5"/>
+  <circle cx="258" cy="175" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.3"/>
+  <circle cx="266" cy="175" r="3" stroke="#00cc6a" fill="#00cc6a" opacity="0.6"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ tower --front<span class="cursor"></span></span></div>
+<div class="card"><span class="label">TOWER SIDE</span><span class="num">2</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="80" y="20" width="180" height="160" rx="6" stroke="#00ff88" fill="#003d22" stroke-linejoin="round"/>
+  <rect x="88" y="28" width="164" height="144" rx="4" stroke="#005533" fill="#002a18" stroke-linejoin="round"/>
+  <!-- motherboard -->
+  <rect x="98" y="38" width="80" height="124" rx="3" stroke="#00ff88" fill="none" opacity="0.5"/>
+  <!-- CPU socket -->
+  <rect x="108" y="50" width="30" height="30" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="113" y="55" width="20" height="20" rx="1" stroke="#00cc6a" fill="#005533"/>
+  <!-- RAM -->
+  <rect x="108" y="88" width="8" height="25" rx="1" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <rect x="118" y="88" width="8" height="25" rx="1" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <!-- GPU -->
+  <rect x="108" y="120" width="50" height="15" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="143" y="122" width="12" height="11" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- PSU -->
+  <rect x="186" y="130" width="58" height="30" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="192" y="136" width="20" height="18" rx="9" stroke="#005533" fill="#005533"/>
+  <rect x="218" y="136" width="20" height="18" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- fan on top -->
+  <circle cx="130" cy="170" r="8" stroke="#00ff88" fill="none"/>
+  <circle cx="130" cy="170" r="2" stroke="#00ff88" fill="#00ff88"/>
+  <line x1="130" y1="162" x2="130" y2="178" stroke="#00ff88" opacity="0.3"/>
+  <line x1="122" y1="170" x2="138" y2="170" stroke="#00ff88" opacity="0.3"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ cat /proc/internals<span class="cursor"></span></span></div>
+<div class="card"><span class="label">MID TOWER ISO</span><span class="num">3</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- isometric tower -->
+  <polygon points="170,30 280,60 280,180 170,150" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="170,30 100,60 210,90 280,60" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="100,60 100,180 210,210 210,90" stroke="#00ff88" fill="none"/>
+  <!-- front panel detail -->
+  <polygon points="112,72 200,98 200,170 112,144" stroke="#005533" fill="none"/>
+  <!-- drive bay -->
+  <polygon points="115,80 195,104 195,112 115,88" stroke="#00ff88" fill="none"/>
+  <!-- power button -->
+  <polygon points="115,140 195,164 195,168 115,144" stroke="#00ff88" fill="#00cc6a" opacity="0.6"/>
+  <!-- vent lines on top -->
+  <line x1="175" y1="38" x2="185" y2="55" stroke="#005533"/>
+  <line x1="185" y1="42" x2="195" y2="59" stroke="#005533"/>
+  <line x1="195" y1="46" x2="205" y2="63" stroke="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ ./render.sh<span class="cursor"></span></span></div>
+<div class="card"><span class="label">MINI ITX FRONT</span><span class="num">4</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="120" y="30" width="100" height="140" rx="8" stroke="#00ff88" fill="#003d22"/>
+  <rect x="132" y="42" width="76" height="20" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="134" y="44" width="16" height="16" rx="2" stroke="#00ff88" fill="#00ff88" opacity="0.3"/>
+  <circle cx="194" cy="52" r="4" stroke="#00ff88" fill="#00cc6a" opacity="0.7"/>
+  <rect x="132" y="72" width="76" height="50" rx="3" stroke="#005533" fill="none"/>
+  <!-- IO ports -->
+  <rect x="140" y="78" width="8" height="6" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="152" y="78" width="8" height="6" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="164" y="78" width="8" height="6" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="140" y="90" width="12" height="8" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="156" y="90" width="12" height="8" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="172" y="90" width="14" height="8" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="140" y="106" width="8" height="8" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="150" y="106" width="8" height="8" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- bottom vent -->
+  <rect x="132" y="130" width="76" height="30" rx="3" stroke="#00ff88" fill="none"/>
+  <line x1="140" y1="135" x2="140" y2="155" stroke="#005533"/>
+  <line x1="150" y1="135" x2="150" y2="155" stroke="#005533"/>
+  <line x1="160" y1="135" x2="160" y2="155" stroke="#005533"/>
+  <line x1="170" y1="135" x2="170" y2="155" stroke="#005533"/>
+  <line x1="180" y1="135" x2="180" y2="155" stroke="#005533"/>
+  <line x1="190" y1="135" x2="190" y2="155" stroke="#005533"/>
+  <!-- feet -->
+  <rect x="125" y="166" width="12" height="4" rx="2" stroke="#00ff88" fill="#00ff88" opacity="0.5"/>
+  <rect x="203" y="166" width="12" height="4" rx="2" stroke="#00ff88" fill="#00ff88" opacity="0.5"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ compact --build<span class="cursor"></span></span></div>
+<div class="card"><span class="label">MINI ITX ISO</span><span class="num">5</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<polygon points="170,30 250,50 250,140 170,120" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="170,30 120,50 200,70 250,50" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="120,50 120,140 200,160 200,70" stroke="#00ff88" fill="none"/>
+  <!-- front panel -->
+  <polygon points="127,58 195,76 195,132 127,114" stroke="#005533" fill="none"/>
+  <polygon points="130,64 192,80 192,86 130,70" stroke="#00ff88" fill="none"/>
+  <circle cx="150" cy="106" r="3" stroke="#00ff88" fill="#00cc6a" opacity="0.8"/>
+  <!-- top vent -->
+  <line x1="175" y1="38" x2="180" y2="52" stroke="#005533"/>
+  <line x1="185" y1="42" x2="190" y2="56" stroke="#005533"/>
+  <line x1="195" y1="46" x2="200" y2="60" stroke="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ ./render.sh<span class="cursor"></span></span></div>
+<div class="card"><span class="label">TEST BENCH</span><span class="num">6</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- test bench tray -->
+  <rect x="60" y="60" width="220" height="100" rx="6" stroke="#00ff88" fill="#003d22"/>
+  <!-- standoffs -->
+  <circle cx="80" cy="80" r="4" stroke="#00ff88" fill="none"/>
+  <circle cx="260" cy="80" r="4" stroke="#00ff88" fill="none"/>
+  <circle cx="80" cy="140" r="4" stroke="#00ff88" fill="none"/>
+  <circle cx="260" cy="140" r="4" stroke="#00ff88" fill="none"/>
+  <!-- motherboard on tray -->
+  <rect x="85" y="75" width="100" height="70" rx="3" stroke="#00ff88" fill="none" opacity="0.6"/>
+  <!-- CPU -->
+  <rect x="100" y="85" width="25" height="25" rx="2" stroke="#00cc6a" fill="#005533"/>
+  <!-- GPU vertical -->
+  <rect x="140" y="80" width="12" height="50" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- GPU bracket -->
+  <rect x="185" y="90" width="60" height="12" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="190" y="93" width="50" height="6" rx="1" stroke="#00ff88" fill="#00ff88" opacity="0.3"/>
+  <!-- fan -->
+  <circle cx="120" cy="130" r="10" stroke="#00ff88" fill="none"/>
+  <circle cx="120" cy="130" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.5"/>
+  <!-- PSU on side -->
+  <rect x="210" y="100" width="50" height="30" rx="3" stroke="#00ff88" fill="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ bench --open-air<span class="cursor"></span></span></div>
+<div class="card"><span class="label">RETRO AT FRONT</span><span class="num">7</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- big beige retro box -->
+  <rect x="100" y="15" width="140" height="170" rx="6" stroke="#00ff88" fill="#003d22"/>
+  <!-- 5.25 bays top -->
+  <rect x="110" y="22" width="120" height="30" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="110" y="22" width="55" height="30" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="110" y="22" width="55" height="30" rx="2" stroke="#00ff88" fill="#00ff88" opacity="0.08"/>
+  <rect x="170" y="22" width="55" height="30" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="170" y="22" width="55" height="30" rx="2" stroke="#00ff88" fill="#00ff88" opacity="0.08"/>
+  <!-- 3.5 bay -->
+  <rect x="110" y="58" width="120" height="25" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- turbo button -->
+  <rect x="115" y="62" width="15" height="15" rx="2" stroke="#00ff88" fill="#00cc6a" opacity="0.5"/>
+  <text x="134" y="74" font-size="7" stroke="#00ff88" fill="#00ff88" font-family="monospace">TURBO</text>
+  <!-- keylock -->
+  <circle cx="200" cy="70" r="5" stroke="#00ff88" fill="none"/>
+  <line x1="200" y1="68" x2="200" y2="72" stroke="#00ff88"/>
+  <!-- reset button -->
+  <rect x="115" y="90" width="25" height="10" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- power LED -->
+  <circle cx="220" cy="95" r="3" stroke="#00cc6a" fill="#00cc6a" opacity="0.8"/>
+  <!-- HDD LED -->
+  <circle cx="230" cy="95" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <!-- lower vent slots -->
+  <rect x="115" y="112" width="110" height="60" rx="2" stroke="#005533" fill="none"/>
+  <line x1="125" y1="120" x2="125" y2="164" stroke="#005533"/>
+  <line x1="140" y1="120" x2="140" y2="164" stroke="#005533"/>
+  <line x1="155" y1="120" x2="155" y2="164" stroke="#005533"/>
+  <line x1="170" y1="120" x2="170" y2="164" stroke="#005533"/>
+  <line x1="185" y1="120" x2="185" y2="164" stroke="#005533"/>
+  <line x1="200" y1="120" x2="200" y2="164" stroke="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ retro --turbo<span class="cursor"></span></span></div>
+<div class="card"><span class="label">RETRO AT + CRT</span><span class="num">8</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- AT case -->
+  <polygon points="160,35 260,55 260,155 160,135" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="160,35 100,55 200,75 260,55" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="100,55 100,155 200,175 200,75" stroke="#00ff88" fill="none"/>
+  <!-- CRT monitor next to it -->
+  <polygon points="220,35 300,50 300,130 220,115" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="220,35 180,50 260,65 300,50" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="180,50 180,130 260,145 260,65" stroke="#00ff88" fill="none"/>
+  <!-- CRT screen -->
+  <polygon points="226,46 290,58 290,118 226,106" stroke="#005533" fill="#002a18"/>
+  <!-- glow on CRT -->
+  <polygon points="230,50 284,62 284,112 230,100" fill="rgba(0,255,136,0.04)" stroke="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ vintage --set<span class="cursor"></span></span></div>
+<div class="card"><span class="label">SERVER 1U</span><span class="num">9</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- 1U chassis -->
+  <rect x="50" y="55" width="240" height="30" rx="4" stroke="#00ff88" fill="#003d22"/>
+  <!-- rack ears -->
+  <rect x="40" y="50" width="12" height="40" rx="2" stroke="#00ff88" fill="#005533"/>
+  <rect x="288" y="50" width="12" height="40" rx="2" stroke="#00ff88" fill="#005533"/>
+  <circle cx="46" cy="56" r="2" stroke="#00ff88" fill="#00ff88"/>
+  <circle cx="294" cy="56" r="2" stroke="#00ff88" fill="#00ff88"/>
+  <circle cx="46" cy="84" r="2" stroke="#00ff88" fill="#00ff88"/>
+  <circle cx="294" cy="84" r="2" stroke="#00ff88" fill="#00ff88"/>
+  <!-- ventilation -->
+  <line x1="65" y1="60" x2="65" y2="80" stroke="#005533"/>
+  <line x1="72" y1="60" x2="72" y2="80" stroke="#005533"/>
+  <line x1="79" y1="60" x2="79" y2="80" stroke="#005533"/>
+  <line x1="86" y1="60" x2="86" y2="80" stroke="#005533"/>
+  <line x1="93" y1="60" x2="93" y2="80" stroke="#005533"/>
+  <line x1="100" y1="60" x2="100" y2="80" stroke="#005533"/>
+  <!-- drive bays -->
+  <rect x="120" y="60" width="120" height="20" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="122" y="62" width="20" height="16" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="146" y="62" width="20" height="16" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="170" y="62" width="20" height="16" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="194" y="62" width="20" height="16" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="218" y="62" width="20" height="16" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- LEDs -->
+  <circle cx="260" cy="70" r="3" stroke="#00cc6a" fill="#00cc6a" opacity="0.7"/>
+  <circle cx="270" cy="70" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ rack --slot 3<span class="cursor"></span></span></div>
+<div class="card"><span class="label">SERVER 4U ISO</span><span class="num">10</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- 4U chassis isometric -->
+  <polygon points="140,25 260,50 260,160 140,135" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="140,25 80,50 200,75 260,50" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="80,50 80,160 200,185 200,75" stroke="#00ff88" fill="none"/>
+  <!-- rack ears -->
+  <polygon points="80,50 72,52 72,165 80,160" stroke="#00ff88" fill="#005533"/>
+  <!-- front panel detail -->
+  <polygon points="90,60 192,83 192,150 90,127" stroke="#005533" fill="none"/>
+  <!-- drive sleds -->
+  <polygon points="94,65 190,85 190,92 94,72" stroke="#00ff88" fill="none"/>
+  <polygon points="94,75 190,95 190,102 94,82" stroke="#00ff88" fill="none"/>
+  <polygon points="94,85 190,105 190,112 94,92" stroke="#00ff88" fill="none"/>
+  <polygon points="94,95 190,115 190,122 94,102" stroke="#00ff88" fill="none"/>
+  <!-- power LED -->
+  <circle cx="100" cy="118" r="3" stroke="#00cc6a" fill="#00cc6a" opacity="0.8"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">_<span class="cursor"></span></span></div>
+<div class="card"><span class="label">GAMING RGB</span><span class="num">11</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- mesh front gaming -->
+  <rect x="100" y="15" width="140" height="170" rx="8" stroke="#00ff88" fill="#003d22"/>
+  <!-- mesh pattern -->
+  <rect x="110" y="22" width="120" height="95" rx="6" stroke="#00ff88" fill="none"/>
+  <line x1="120" y1="22" x2="120" y2="117" stroke="#005533" opacity="0.5"/>
+  <line x1="135" y1="22" x2="135" y2="117" stroke="#005533" opacity="0.5"/>
+  <line x1="150" y1="22" x2="150" y2="117" stroke="#005533" opacity="0.5"/>
+  <line x1="165" y1="22" x2="165" y2="117" stroke="#005533" opacity="0.5"/>
+  <line x1="180" y1="22" x2="180" y2="117" stroke="#005533" opacity="0.5"/>
+  <line x1="195" y1="22" x2="195" y2="117" stroke="#005533" opacity="0.5"/>
+  <line x1="210" y1="22" x2="210" y2="117" stroke="#005533" opacity="0.5"/>
+  <!-- 3 RGB fans visible through mesh -->
+  <circle cx="140" cy="48" r="12" stroke="#00ff88" fill="none" opacity="0.6"/>
+  <circle cx="140" cy="48" r="2" stroke="#00cc6a" fill="#00cc6a" opacity="0.8"/>
+  <circle cx="180" cy="48" r="12" stroke="#00ff88" fill="none" opacity="0.6"/>
+  <circle cx="180" cy="48" r="2" stroke="#00cc6a" fill="#00cc6a" opacity="0.8"/>
+  <circle cx="160" cy="78" r="12" stroke="#00ff88" fill="none" opacity="0.6"/>
+  <circle cx="160" cy="78" r="2" stroke="#00cc6a" fill="#00cc6a" opacity="0.8"/>
+  <!-- bottom PSU shroud -->
+  <rect x="110" y="125" width="120" height="50" rx="4" stroke="#00ff88" fill="none"/>
+  <!-- power button top -->
+  <rect x="145" y="128" width="30" height="8" rx="4" stroke="#00ff88" fill="#00cc6a" opacity="0.5"/>
+  <!-- LED strip bottom -->
+  <rect x="112" y="160" width="116" height="2" rx="1" stroke="none" fill="#00cc6a" opacity="0.5"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ rgb --sync<span class="cursor"></span></span></div>
+<div class="card"><span class="label">GAMING WINDOW</span><span class="num">12</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="80" y="15" width="180" height="170" rx="6" stroke="#00ff88" fill="#003d22"/>
+  <!-- glass window -->
+  <rect x="90" y="25" width="120" height="130" rx="6" stroke="#00ff88" fill="rgba(0,255,136,0.03)"/>
+  <!-- GPU in slot -->
+  <rect x="100" y="45" width="80" height="15" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="100" y="48" width="80" height="9" rx="1" stroke="#00cc6a" fill="#005533" opacity="0.5"/>
+  <rect x="108" y="43" width="5" height="4" rx="1" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <rect x="120" y="43" width="5" height="4" rx="1" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <!-- CPU cooler -->
+  <rect x="150" y="65" width="30" height="30" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="155" y="70" width="20" height="20" rx="2" stroke="#005533" fill="#005533"/>
+  <line x1="158" y1="70" x2="158" y2="90" stroke="#00ff88" opacity="0.3"/>
+  <line x1="162" y1="70" x2="162" y2="90" stroke="#00ff88" opacity="0.3"/>
+  <line x1="166" y1="70" x2="166" y2="90" stroke="#00ff88" opacity="0.3"/>
+  <line x1="170" y1="70" x2="170" y2="90" stroke="#00ff88" opacity="0.3"/>
+  <!-- RAM -->
+  <rect x="110" y="75" width="6" height="25" rx="1" stroke="#00ff88" fill="#00ff88" opacity="0.3"/>
+  <rect x="118" y="75" width="6" height="25" rx="1" stroke="#00ff88" fill="#00ff88" opacity="0.3"/>
+  <!-- cable combs -->
+  <rect x="110" y="100" width="50" height="3" rx="1" stroke="#005533" fill="#005533"/>
+  <rect x="110" y="107" width="50" height="3" rx="1" stroke="#005533" fill="#005533"/>
+  <!-- bottom fans -->
+  <circle cx="130" cy="145" r="8" stroke="#00ff88" fill="none"/>
+  <circle cx="130" cy="145" r="2" stroke="#00ff88" fill="#00ff88"/>
+  <circle cx="170" cy="145" r="8" stroke="#00ff88" fill="none"/>
+  <circle cx="170" cy="145" r="2" stroke="#00ff88" fill="#00ff88"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">_<span class="cursor"></span></span></div>
+<div class="card"><span class="label">WATERCOOLED</span><span class="num">13</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- case -->
+  <polygon points="160,30 270,55 270,165 160,140" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="160,30 90,55 200,80 270,55" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="90,55 90,165 200,190 200,80" stroke="#00ff88" fill="none"/>
+  <!-- reservoir tube -->
+  <polygon points="160,60 175,65 175,130 160,125" stroke="#00ff88" fill="#00ff88" opacity="0.2"/>
+  <!-- water level -->
+  <line x1="162" y1="85" x2="173" y2="88" stroke="#00cc6a" opacity="0.6"/>
+  <!-- tubing -->
+  <path d="M175,65 Q200,60 210,75" stroke="#00cc6a" fill="none"/>
+  <path d="M210,75 Q220,90 200,105" stroke="#00cc6a" fill="none"/>
+  <path d="M200,105 Q180,120 175,130" stroke="#00cc6a" fill="none"/>
+  <!-- radiator on top -->
+  <polygon points="150,40 255,63 255,70 150,47" stroke="#00ff88" fill="none"/>
+  <line x1="155" y1="44" x2="160" y2="60" stroke="#005533"/>
+  <line x1="168" y1="47" x2="173" y2="63" stroke="#005533"/>
+  <line x1="181" y1="50" x2="186" y2="66" stroke="#005533"/>
+  <line x1="194" y1="53" x2="199" y2="69" stroke="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ coolant --flow<span class="cursor"></span></span></div>
+<div class="card"><span class="label">LAPTOP OPEN</span><span class="num">14</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- screen -->
+  <polygon points="170,20 260,35 260,105 170,90" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="170,20 140,30 230,45 260,35" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="140,30 140,100 230,115 230,45" stroke="#00ff88" fill="none"/>
+  <!-- screen display -->
+  <polygon points="175,28 250,40 250,95 175,83" stroke="#005533" fill="rgba(0,255,136,0.03)"/>
+  <!-- base -->
+  <polygon points="120,105 230,130 230,160 120,135" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="120,105 80,115 190,140 230,130" stroke="#00ff88" fill="none"/>
+  <!-- keyboard area -->
+  <polygon points="90,118 190,140 190,148 90,126" stroke="#005533" fill="#002a18"/>
+  <!-- touchpad -->
+  <polygon points="130,148 180,156 180,158 130,150" stroke="#00ff88" fill="none"/>
+  <!-- hinge -->
+  <line x1="140" y1="100" x2="120" y2="105" stroke="#00ff88"/>
+  <line x1="230" y1="115" x2="230" y2="130" stroke="#00ff88"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ lid --open<span class="cursor"></span></span></div>
+<div class="card"><span class="label">LAPTOP CLOSED</span><span class="num">15</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- closed laptop -->
+  <rect x="90" y="50" width="160" height="100" rx="10" stroke="#00ff88" fill="#003d22"/>
+  <!-- lid line -->
+  <rect x="90" y="50" width="160" height="60" rx="10" stroke="#00ff88" fill="#002a18"/>
+  <!-- hinge area -->
+  <rect x="100" y="108" width="140" height="8" rx="3" stroke="#00ff88" fill="none"/>
+  <!-- logo area -->
+  <circle cx="170" cy="80" r="15" stroke="#00ff88" fill="none" opacity="0.4"/>
+  <circle cx="170" cy="80" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.5"/>
+  <!-- feet -->
+  <rect x="110" y="145" width="15" height="5" rx="2" stroke="#005533" fill="#005533"/>
+  <rect x="215" y="145" width="15" height="5" rx="2" stroke="#005533" fill="#005533"/>
+  <!-- ports on side -->
+  <rect x="90" y="120" width="4" height="8" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="90" y="132" width="4" height="8" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="246" y="118" width="4" height="10" rx="1" stroke="#00ff88" fill="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ ./render.sh<span class="cursor"></span></span></div>
+<div class="card"><span class="label">LAPTOP SIDE</span><span class="num">16</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="70" y="60" width="200" height="80" rx="6" stroke="#00ff88" fill="#003d22"/>
+  <!-- screen -->
+  <rect x="70" y="60" width="200" height="55" rx="6" stroke="#00ff88" fill="#002a18"/>
+  <!-- display inset -->
+  <rect x="76" y="66" width="188" height="40" rx="4" stroke="#005533" fill="rgba(0,255,136,0.03)"/>
+  <!-- base -->
+  <rect x="70" y="115" width="200" height="25" rx="4" stroke="#00ff88" fill="none"/>
+  <!-- wedge: thinner at front -->
+  <polygon points="70,115 270,115 270,135 70,140" stroke="#00ff88" fill="#003d22"/>
+  <!-- keyboard slope -->
+  <rect x="90" y="118" width="160" height="4" rx="1" stroke="#005533" fill="#005533"/>
+  <rect x="90" y="124" width="160" height="4" rx="1" stroke="#005533" fill="#005533"/>
+  <rect x="90" y="130" width="160" height="4" rx="1" stroke="#005533" fill="#005533"/>
+  <!-- hinge -->
+  <circle cx="80" cy="115" r="5" stroke="#00ff88" fill="none"/>
+  <circle cx="260" cy="115" r="5" stroke="#00ff88" fill="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">_<span class="cursor"></span></span></div>
+<div class="card"><span class="label">LAPTOP EXPLODED</span><span class="num">17</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- screen floating -->
+  <rect x="130" y="12" width="100" height="65" rx="6" stroke="#00ff88" fill="#002a18"/>
+  <rect x="136" y="18" width="88" height="50" rx="3" stroke="#005533" fill="rgba(0,255,136,0.02)"/>
+  <!-- gap -->
+  <line x1="180" y1="77" x2="180" y2="90" stroke="#005533"/>
+  <line x1="180" y1="77" x2="180" y2="90" stroke="#005533"/>
+  <!-- keyboard deck -->
+  <rect x="120" y="90" width="120" height="30" rx="4" stroke="#00ff88" fill="#003d22"/>
+  <rect x="130" y="95" width="100" height="8" rx="1" stroke="#005533" fill="#005533"/>
+  <rect x="130" y="106" width="100" height="8" rx="1" stroke="#005533" fill="#005533"/>
+  <!-- gap -->
+  <line x1="180" y1="120" x2="180" y2="132" stroke="#005533"/>
+  <!-- base -->
+  <rect x="115" y="132" width="130" height="20" rx="4" stroke="#00ff88" fill="none"/>
+  <!-- motherboard inside -->
+  <rect x="125" y="135" width="50" height="14" rx="2" stroke="#00ff88" fill="none" opacity="0.5"/>
+  <!-- battery -->
+  <rect x="185" y="135" width="40" height="14" rx="2" stroke="#00ff88" fill="#00ff88" opacity="0.15"/>
+  <!-- dashed lines connecting -->
+  <line x1="180" y1="77" x2="180" y2="90" stroke="#005533" stroke-dasharray="2,2"/>
+  <line x1="180" y1="120" x2="180" y2="132" stroke="#005533" stroke-dasharray="2,2"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ explode --view<span class="cursor"></span></span></div>
+<div class="card"><span class="label">GAMING LAPTOP</span><span class="num">18</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- thick gaming laptop -->
+  <polygon points="170,22 255,35 255,100 170,87" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="170,22 145,32 230,45 255,35" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="145,32 145,100 230,113 230,45" stroke="#00ff88" fill="none"/>
+  <!-- base chunky -->
+  <polygon points="118,103 232,128 232,165 118,140" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="118,103 75,115 190,140 232,128" stroke="#00ff88" fill="none"/>
+  <!-- RGB keyboard -->
+  <polygon points="85,118 190,140 190,148 85,126" stroke="#00cc6a" fill="#002a18" opacity="0.8"/>
+  <!-- extra vents on back -->
+  <line x1="145" y1="100" x2="118" y2="103" stroke="#00ff88"/>
+  <line x1="230" y1="113" x2="232" y2="128" stroke="#00ff88"/>
+  <!-- exhaust vents -->
+  <rect x="220" y="140" width="8" height="3" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="220" y="146" width="8" height="3" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="220" y="152" width="8" height="3" rx="1" stroke="#00ff88" fill="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">_<span class="cursor"></span></span></div>
+<div class="card"><span class="label">CRT MONITOR</span><span class="num">19</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- CRT big box -->
+  <rect x="80" y="15" width="180" height="170" rx="10" stroke="#00ff88" fill="#003d22"/>
+  <!-- screen bezel -->
+  <rect x="95" y="25" width="150" height="130" rx="8" stroke="#00ff88" fill="#002a18"/>
+  <!-- screen -->
+  <rect x="105" y="32" width="130" height="115" rx="5" stroke="#005533" fill="rgba(0,255,136,0.02)"/>
+  <!-- screen reflection -->
+  <path d="M110,42 Q170,35 220,45 Q220,60 150,55 Q110,55 110,42" fill="rgba(0,255,136,0.04)" stroke="none"/>
+  <!-- controls -->
+  <rect x="100" y="162" width="10" height="6" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="114" y="162" width="10" height="6" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="128" y="162" width="10" height="6" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- power button -->
+  <circle cx="240" cy="165" r="5" stroke="#00ff88" fill="none"/>
+  <circle cx="240" cy="165" r="3" stroke="#00cc6a" fill="#00cc6a" opacity="0.7"/>
+  <!-- brand area -->
+  <rect x="195" y="162" width="30" height="6" rx="2" stroke="#00ff88" fill="none" opacity="0.3"/>
+  <!-- vent slots top -->
+  <line x1="100" y1="18" x2="100" y2="22" stroke="#005533"/>
+  <line x1="110" y1="18" x2="110" y2="22" stroke="#005533"/>
+  <line x1="120" y1="18" x2="120" y2="22" stroke="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ crt --power-on<span class="cursor"></span></span></div>
+<div class="card"><span class="label">CRT ISO</span><span class="num">20</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<polygon points="170,30 260,50 260,160 170,140" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="170,30 110,50 200,70 260,50" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="110,50 110,160 200,180 200,70" stroke="#00ff88" fill="none"/>
+  <!-- screen face -->
+  <polygon points="180,42 250,58 250,135 180,119" stroke="#005533" fill="rgba(0,255,136,0.03)"/>
+  <!-- inner screen -->
+  <polygon points="186,48 242,62 242,128 186,114" stroke="#005533" fill="#002a18"/>
+  <!-- glow -->
+  <polygon points="190,52 236,64 236,120 190,108" fill="rgba(0,255,136,0.06)" stroke="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">_<span class="cursor"></span></span></div>
+<div class="card"><span class="label">LCD FRONT</span><span class="num">21</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="70" y="20" width="200" height="140" rx="8" stroke="#00ff88" fill="#003d22"/>
+  <rect x="75" y="25" width="190" height="130" rx="6" stroke="#00ff88" fill="#002a18"/>
+  <rect x="80" y="30" width="180" height="120" rx="4" stroke="#005533" fill="rgba(0,255,136,0.02)"/>
+  <!-- stand neck -->
+  <rect x="162" y="160" width="16" height="20" rx="3" stroke="#00ff88" fill="none"/>
+  <!-- stand base -->
+  <polygon points="130,180 210,180 200,190 140,190" stroke="#00ff88" fill="#005533"/>
+  <!-- power LED -->
+  <circle cx="200" cy="23" r="2" stroke="#00cc6a" fill="#00cc6a" opacity="0.8"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ ./render.sh<span class="cursor"></span></span></div>
+<div class="card"><span class="label">LCD SIDE</span><span class="num">22</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- panel side -->
+  <rect x="70" y="30" width="200" height="130" rx="4" stroke="#00ff88" fill="#003d22"/>
+  <!-- thin panel -->
+  <rect x="70" y="30" width="195" height="130" rx="4" stroke="#00ff88" fill="#002a18"/>
+  <!-- back bulge -->
+  <rect x="255" y="50" width="15" height="90" rx="4" stroke="#00ff88" fill="none"/>
+  <!-- VESA mount -->
+  <rect x="250" y="75" width="8" height="30" rx="2" stroke="#00ff88" fill="none"/>
+  <circle cx="254" cy="82" r="2" stroke="#00ff88" fill="#00ff88" opacity="0.5"/>
+  <circle cx="254" cy="98" r="2" stroke="#00ff88" fill="#00ff88" opacity="0.5"/>
+  <!-- stand arm -->
+  <rect x="258" y="80" width="6" height="60" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- base -->
+  <rect x="240" y="140" width="40" height="8" rx="3" stroke="#00ff88" fill="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">_<span class="cursor"></span></span></div>
+<div class="card"><span class="label">ALL-IN-ONE</span><span class="num">23</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<polygon points="170,15 280,35 280,135 170,115" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="170,15 120,35 230,55 280,35" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="120,35 120,135 230,155 230,55" stroke="#00ff88" fill="none"/>
+  <!-- screen -->
+  <polygon points="175,25 270,42 270,120 175,103" stroke="#005533" fill="rgba(0,255,136,0.02)"/>
+  <!-- chin -->
+  <polygon points="120,135 120,145 230,165 230,155" stroke="#00ff88" fill="#003d22"/>
+  <!-- stand -->
+  <polygon points="175,145 195,150 195,170 175,165" stroke="#00ff88" fill="none"/>
+  <polygon points="155,170 215,180 210,185 150,175" stroke="#00ff88" fill="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ ./render.sh<span class="cursor"></span></span></div>
+<div class="card"><span class="label">DUAL MONITORS</span><span class="num">24</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- left monitor -->
+  <rect x="50" y="30" width="110" height="95" rx="5" stroke="#00ff88" fill="#002a18"/>
+  <rect x="55" y="35" width="100" height="85" rx="3" stroke="#005533" fill="rgba(0,255,136,0.02)"/>
+  <!-- right monitor -->
+  <rect x="180" y="30" width="110" height="95" rx="5" stroke="#00ff88" fill="#002a18"/>
+  <rect x="185" y="35" width="100" height="85" rx="3" stroke="#005533" fill="rgba(0,255,136,0.02)"/>
+  <!-- stands -->
+  <rect x="96" y="125" width="10" height="20" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="226" y="125" width="10" height="20" rx="2" stroke="#00ff88" fill="none"/>
+  <polygon points="75,145 125,145 120,152 80,152" stroke="#00ff88" fill="#005533"/>
+  <polygon points="205,145 245,145 240,152 210,152" stroke="#00ff88" fill="#005533"/>
+  <!-- desk line -->
+  <line x1="30" y1="155" x2="310" y2="155" stroke="#00ff88" opacity="0.3"/>
+  <!-- keyboard -->
+  <rect x="110" y="165" width="120" height="20" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="115" y="168" width="110" height="14" rx="2" stroke="#005533" fill="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ dual --setup<span class="cursor"></span></span></div>
+<div class="card"><span class="label">HANDHELD FRONT</span><span class="num">25</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<path d="M120,30 Q120,25 130,22 L210,22 Q220,25 220,30 L220,160 Q220,170 210,173 L130,173 Q120,170 120,160 Z" stroke="#00ff88" fill="#003d22"/>
+  <!-- screen -->
+  <rect x="140" y="30" width="60" height="45" rx="4" stroke="#00ff88" fill="#002a18"/>
+  <rect x="143" y="33" width="54" height="39" rx="2" stroke="#005533" fill="rgba(0,255,136,0.02)"/>
+  <!-- left controls -->
+  <circle cx="128" cy="95" r="10" stroke="#00ff88" fill="none"/>
+  <circle cx="128" cy="95" r="3" stroke="#00ff88" fill="#00cc6a" opacity="0.5"/>
+  <rect x="120" y="120" width="16" height="6" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- right controls -->
+  <circle cx="212" cy="95" r="10" stroke="#00ff88" fill="none"/>
+  <circle cx="212" cy="95" r="3" stroke="#00ff88" fill="#00cc6a" opacity="0.5"/>
+  <rect x="204" y="120" width="16" height="6" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- D-pad dots -->
+  <circle cx="120" cy="88" r="2" stroke="#00ff88" fill="#00ff88" opacity="0.5"/>
+  <circle cx="120" cy="95" r="2" stroke="#00ff88" fill="#00ff88" opacity="0.5"/>
+  <circle cx="120" cy="102" r="2" stroke="#00ff88" fill="#00ff88" opacity="0.5"/>
+  <!-- bottom buttons -->
+  <circle cx="145" cy="150" r="4" stroke="#00ff88" fill="none"/>
+  <circle cx="165" cy="150" r="4" stroke="#00ff88" fill="none"/>
+  <circle cx="175" cy="150" r="4" stroke="#00ff88" fill="none"/>
+  <circle cx="195" cy="150" r="4" stroke="#00ff88" fill="none"/>
+  <!-- speaker grills -->
+  <line x1="130" y1="165" x2="160" y2="165" stroke="#005533"/>
+  <line x1="130" y1="169" x2="160" y2="169" stroke="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ steam --deck<span class="cursor"></span></span></div>
+<div class="card"><span class="label">HANDHELD ISO</span><span class="num">26</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<polygon points="170,25 240,40 240,160 170,145" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="170,25 120,40 190,55 240,40" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="120,40 120,160 190,175 190,55" stroke="#00ff88" fill="none"/>
+  <!-- screen on top -->
+  <polygon points="160,32 200,40 200,70 160,62" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="163,36 197,43 197,66 163,59" stroke="#005533" fill="rgba(0,255,136,0.02)"/>
+  <!-- controls left side -->
+  <circle cx="140" cy="90" r="6" stroke="#00ff88" fill="none"/>
+  <circle cx="140" cy="90" r="2" stroke="#00ff88" fill="#00cc6a" opacity="0.5"/>
+  <!-- controls right side -->
+  <circle cx="200" cy="100" r="6" stroke="#00ff88" fill="none"/>
+  <circle cx="200" cy="100" r="2" stroke="#00ff88" fill="#00cc6a" opacity="0.5"/>
+  <!-- shoulder buttons -->
+  <line x1="125" y1="42" x2="135" y2="55" stroke="#00ff88"/>
+  <line x1="185" y1="52" x2="195" y2="58" stroke="#00ff88"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">_<span class="cursor"></span></span></div>
+<div class="card"><span class="label">MOTHERBOARD</span><span class="num">27</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="60" y="30" width="220" height="140" rx="6" stroke="#00ff88" fill="#002a18"/>
+  <!-- CPU socket -->
+  <rect x="125" y="45" width="45" height="45" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="132" y="52" width="31" height="31" rx="2" stroke="#00cc6a" fill="#005533"/>
+  <circle cx="147" cy="67" r="8" stroke="#00ff88" fill="none" opacity="0.4"/>
+  <!-- RAM slots -->
+  <rect x="80" y="45" width="8" height="40" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="92" y="45" width="8" height="40" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="104" y="45" width="8" height="40" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- PCIe slots -->
+  <rect x="125" y="100" width="80" height="8" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="125" y="112" width="80" height="8" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="125" y="124" width="40" height="8" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- chipset -->
+  <rect x="200" y="95" width="20" height="20" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- SATA ports -->
+  <rect x="210" y="125" width="6" height="12" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="220" y="125" width="6" height="12" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- IO panel -->
+  <rect x="60" y="132" width="50" height="38" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="65" y="137" width="8" height="6" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="77" y="137" width="8" height="6" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="65" y="147" width="10" height="6" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- power connector -->
+  <rect x="180" y="75" width="12" height="14" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- mounting holes -->
+  <circle cx="70" cy="40" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.3"/>
+  <circle cx="270" cy="40" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.3"/>
+  <circle cx="70" cy="160" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.3"/>
+  <circle cx="270" cy="160" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.3"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ lspci -vvv<span class="cursor"></span></span></div>
+<div class="card"><span class="label">GPU ISO</span><span class="num">28</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<polygon points="170,35 260,50 260,150 170,135" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="170,35 100,50 190,65 260,50" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="100,50 100,150 190,165 190,65" stroke="#00ff88" fill="none"/>
+  <!-- fans -->
+  <ellipse cx="140" cy="95" rx="20" ry="10" stroke="#00ff88" fill="none"/>
+  <ellipse cx="140" cy="95" rx="8" ry="4" stroke="#00ff88" fill="#00cc6a" opacity="0.4"/>
+  <ellipse cx="190" cy="105" rx="20" ry="10" stroke="#00ff88" fill="none"/>
+  <ellipse cx="190" cy="105" rx="8" ry="4" stroke="#00ff88" fill="#00cc6a" opacity="0.4"/>
+  <!-- backplate -->
+  <polygon points="105,55 188,68 188,140 105,127" stroke="#00ff88" fill="rgba(0,255,136,0.03)"/>
+  <!-- PCI bracket -->
+  <polygon points="100,50 105,52 105,148 100,150" stroke="#00ff88" fill="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ nvidia-smi<span class="cursor"></span></span></div>
+<div class="card"><span class="label">GPU FANS</span><span class="num">29</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="80" y="30" width="180" height="140" rx="8" stroke="#00ff88" fill="#003d22"/>
+  <!-- fan 1 -->
+  <circle cx="135" cy="90" r="35" stroke="#00ff88" fill="none"/>
+  <circle cx="135" cy="90" r="30" stroke="#005533" fill="none"/>
+  <circle cx="135" cy="90" r="8" stroke="#00ff88" fill="#00cc6a" opacity="0.5"/>
+  <line x1="135" y1="60" x2="135" y2="120" stroke="#005533"/>
+  <line x1="105" y1="90" x2="165" y2="90" stroke="#005533"/>
+  <!-- fan 2 -->
+  <circle cx="215" cy="90" r="35" stroke="#00ff88" fill="none"/>
+  <circle cx="215" cy="90" r="30" stroke="#005533" fill="none"/>
+  <circle cx="215" cy="90" r="8" stroke="#00ff88" fill="#00cc6a" opacity="0.5"/>
+  <line x1="215" y1="60" x2="215" y2="120" stroke="#005533"/>
+  <line x1="185" y1="90" x2="245" y2="90" stroke="#005533"/>
+  <!-- shroud edge detail -->
+  <rect x="80" y="30" width="180" height="8" rx="3" stroke="#00ff88" fill="#005533"/>
+  <!-- backplate visible at bottom -->
+  <rect x="85" y="155" width="170" height="15" rx="2" stroke="#00ff88" fill="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ ./render.sh<span class="cursor"></span></span></div>
+<div class="card"><span class="label">CPU + COOLER</span><span class="num">30</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- motherboard PCB -->
+  <rect x="60" y="50" width="220" height="100" rx="4" stroke="#00ff88" fill="#002a18"/>
+  <!-- CPU socket area -->
+  <rect x="120" y="60" width="80" height="80" rx="4" stroke="#00ff88" fill="none"/>
+  <!-- CPU IHS -->
+  <rect x="135" y="75" width="50" height="50" rx="3" stroke="#00cc6a" fill="#005533"/>
+  <!-- thermal paste hint -->
+  <rect x="140" y="80" width="40" height="40" rx="2" stroke="none" fill="rgba(0,255,136,0.08)"/>
+  <!-- heatsink fins -->
+  <rect x="130" y="60" width="60" height="10" rx="2" stroke="#00ff88" fill="none"/>
+  <line x1="135" y1="62" x2="135" y2="68" stroke="#00ff88" opacity="0.5"/>
+  <line x1="142" y1="62" x2="142" y2="68" stroke="#00ff88" opacity="0.5"/>
+  <line x1="149" y1="62" x2="149" y2="68" stroke="#00ff88" opacity="0.5"/>
+  <line x1="156" y1="62" x2="156" y2="68" stroke="#00ff88" opacity="0.5"/>
+  <line x1="163" y1="62" x2="163" y2="68" stroke="#00ff88" opacity="0.5"/>
+  <line x1="170" y1="62" x2="170" y2="68" stroke="#00ff88" opacity="0.5"/>
+  <line x1="177" y1="62" x2="177" y2="68" stroke="#00ff88" opacity="0.5"/>
+  <line x1="184" y1="62" x2="184" y2="68" stroke="#00ff88" opacity="0.5"/>
+  <!-- socket pins hint -->
+  <circle cx="160" cy="130" r="20" stroke="#005533" fill="none" stroke-dasharray="2,2"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ sensors -u<span class="cursor"></span></span></div>
+<div class="card"><span class="label">RAM MODULES</span><span class="num">31</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- slot on motherboard -->
+  <rect x="60" y="80" width="220" height="40" rx="3" stroke="#00ff88" fill="#002a18"/>
+  <!-- RAM stick 1 -->
+  <rect x="90" y="30" width="25" height="100" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="93" y="35" width="19" height="55" rx="2" stroke="#00cc6a" fill="#005533" opacity="0.8"/>
+  <!-- notch -->
+  <rect x="97" y="92" width="11" height="4" rx="1" fill="#002a18" stroke="none"/>
+  <!-- heatspreader fins -->
+  <line x1="95" y1="40" x2="95" y2="85" stroke="#00ff88" opacity="0.3"/>
+  <line x1="100" y1="40" x2="100" y2="85" stroke="#00ff88" opacity="0.3"/>
+  <line x1="105" y1="40" x2="105" y2="85" stroke="#00ff88" opacity="0.3"/>
+  <!-- RAM stick 2 -->
+  <rect x="130" y="30" width="25" height="100" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="133" y="35" width="19" height="55" rx="2" stroke="#00cc6a" fill="#005533" opacity="0.8"/>
+  <rect x="137" y="92" width="11" height="4" rx="1" fill="#002a18" stroke="none"/>
+  <!-- RAM stick 3 -->
+  <rect x="200" y="30" width="25" height="100" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="203" y="35" width="19" height="55" rx="2" stroke="#00ff88" fill="#00ff88" opacity="0.15"/>
+  <!-- RAM stick 4 -->
+  <rect x="240" y="30" width="25" height="100" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="243" y="35" width="19" height="55" rx="2" stroke="#00ff88" fill="#00ff88" opacity="0.15"/>
+  <!-- clip at bottom -->
+  <rect x="92" y="118" width="21" height="4" rx="1" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <rect x="132" y="118" width="21" height="4" rx="1" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ free -h<span class="cursor"></span></span></div>
+<div class="card"><span class="label">PSU</span><span class="num">32</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<polygon points="170,40 260,60 260,150 170,130" stroke="#00ff88" fill="#002a18"/>
+  <polygon points="170,40 100,60 190,80 260,60" stroke="#00ff88" fill="#003d22"/>
+  <polygon points="100,60 100,150 190,170 190,80" stroke="#00ff88" fill="none"/>
+  <!-- fan grille -->
+  <polygon points="160,50 215,62 215,105 160,93" stroke="#00ff88" fill="none"/>
+  <line x1="165" y1="60" x2="210" y2="72" stroke="#005533"/>
+  <line x1="165" y1="70" x2="210" y2="82" stroke="#005533"/>
+  <line x1="165" y1="80" x2="210" y2="92" stroke="#005533"/>
+  <line x1="165" y1="90" x2="210" y2="102" stroke="#005533"/>
+  <!-- connectors side -->
+  <polygon points="105,70 108,71 108,80 105,79" stroke="#00ff88" fill="none"/>
+  <polygon points="105,84 108,85 108,94 105,93" stroke="#00ff88" fill="none"/>
+  <polygon points="105,98 108,99 108,108 105,107" stroke="#00ff88" fill="none"/>
+  <!-- label area -->
+  <polygon points="115,130 185,148 185,155 115,137" stroke="#005533" fill="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ power --supply<span class="cursor"></span></span></div>
+<div class="card"><span class="label">STORAGE</span><span class="num">33</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- 3.5 HDD -->
+  <rect x="80" y="30" width="100" height="140" rx="6" stroke="#00ff88" fill="#003d22"/>
+  <rect x="88" y="38" width="84" height="124" rx="4" stroke="#005533" fill="#002a18"/>
+  <!-- HDD label -->
+  <rect x="95" y="45" width="70" height="30" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="100" y="50" width="60" height="4" rx="1" stroke="#00ff88" opacity="0.4"/>
+  <rect x="100" y="58" width="40" height="4" rx="1" stroke="#00ff88" opacity="0.3"/>
+  <!-- HDD PCB bottom -->
+  <rect x="95" y="80" width="70" height="60" rx="2" stroke="#00ff88" fill="none"/>
+  <circle cx="110" cy="95" r="15" stroke="#00ff88" fill="none"/>
+  <circle cx="110" cy="95" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <rect x="100" y="120" width="8" height="6" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="140" y="120" width="8" height="6" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- SATA port -->
+  <rect x="95" y="140" width="15" height="6" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- M.2 SSD -->
+  <rect x="200" y="60" width="80" height="25" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="200" y="60" width="15" height="25" rx="2" stroke="#00ff88" fill="#005533"/>
+  <rect x="220" y="65" width="50" height="15" rx="1" stroke="#00cc6a" fill="#005533" opacity="0.6"/>
+  <rect x="220" y="65" width="20" height="15" rx="1" stroke="#00ff88" fill="#00ff88" opacity="0.2"/>
+  <!-- M.2 notch -->
+  <rect x="208" y="70" width="4" height="5" rx="1" fill="#002a18" stroke="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ df -h<span class="cursor"></span></span></div>
+<div class="card"><span class="label">SBC PI</span><span class="num">34</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="70" y="35" width="200" height="130" rx="6" stroke="#00ff88" fill="#002a18"/>
+  <!-- PCB -->
+  <rect x="75" y="40" width="190" height="120" rx="4" stroke="#00ff88" fill="rgba(0,255,136,0.03)"/>
+  <!-- SoC -->
+  <rect x="120" y="70" width="30" height="30" rx="2" stroke="#00cc6a" fill="#005533"/>
+  <!-- GPIO header -->
+  <rect x="80" y="70" width="8" height="60" rx="1" stroke="#00ff88" fill="none"/>
+  <circle cx="84" cy="75" r="1.5" stroke="#00ff88" fill="#00ff88"/>
+  <circle cx="84" cy="80" r="1.5" stroke="#00ff88" fill="#00ff88"/>
+  <circle cx="84" cy="85" r="1.5" stroke="#00ff88" fill="#00ff88"/>
+  <circle cx="84" cy="90" r="1.5" stroke="#00ff88" fill="#00ff88"/>
+  <circle cx="84" cy="95" r="1.5" stroke="#00ff88" fill="#00ff88"/>
+  <circle cx="84" cy="100" r="1.5" stroke="#00ff88" fill="#00ff88"/>
+  <!-- USB ports -->
+  <rect x="160" y="55" width="8" height="12" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="172" y="55" width="8" height="12" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- Ethernet -->
+  <rect x="165" y="100" width="20" height="15" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- HDMI -->
+  <rect x="200" y="60" width="14" height="6" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- power USB-C -->
+  <rect x="220" y="55" width="10" height="8" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- mounting holes -->
+  <circle cx="85" cy="50" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <circle cx="250" cy="50" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <circle cx="85" cy="150" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <circle cx="250" cy="150" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <!-- LED -->
+  <circle cx="235" cy="95" r="2" stroke="#00cc6a" fill="#00cc6a" opacity="0.8"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ gpio readall<span class="cursor"></span></span></div>
+<div class="card"><span class="label">IBM PC/XT</span><span class="num">35</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="90" y="15" width="160" height="170" rx="4" stroke="#00ff88" fill="#003d22"/>
+  <!-- dual floppy -->
+  <rect x="100" y="22" width="140" height="45" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="100" y="22" width="65" height="45" rx="2" stroke="#00ff88" fill="none"/>
+  <rect x="100" y="22" width="65" height="45" rx="2" stroke="#00ff88" fill="#00ff88" opacity="0.05"/>
+  <rect x="170" y="30" width="8" height="4" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="170" y="44" width="8" height="4" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="104" y="28" width="22" height="33" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="118" y="28" width="22" height="33" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="132" y="28" width="22" height="33" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="146" y="28" width="22" height="33" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- second floppy -->
+  <rect x="175" y="22" width="65" height="45" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- keylock -->
+  <circle cx="115" cy="78" r="4" stroke="#00ff88" fill="none"/>
+  <line x1="115" y1="76" x2="115" y2="80" stroke="#00ff88"/>
+  <!-- power LED -->
+  <circle cx="230" cy="78" r="3" stroke="#00cc6a" fill="#00cc6a" opacity="0.8"/>
+  <!-- IBM badge -->
+  <rect x="100" y="88" width="50" height="12" rx="2" stroke="#00ff88" fill="none"/>
+  <text x="104" y="97" font-size="8" stroke="#00ff88" fill="#00ff88" font-family="monospace">IBM PC</text>
+  <!-- lower vent -->
+  <rect x="100" y="110" width="140" height="65" rx="2" stroke="#005533" fill="none"/>
+  <line x1="108" y1="118" x2="108" y2="168" stroke="#005533"/>
+  <line x1="120" y1="118" x2="120" y2="168" stroke="#005533"/>
+  <line x1="132" y1="118" x2="132" y2="168" stroke="#005533"/>
+  <line x1="144" y1="118" x2="144" y2="168" stroke="#005533"/>
+  <line x1="156" y1="118" x2="156" y2="168" stroke="#005533"/>
+  <line x1="168" y1="118" x2="168" y2="168" stroke="#005533"/>
+  <line x1="180" y1="118" x2="180" y2="168" stroke="#005533"/>
+  <line x1="192" y1="118" x2="192" y2="168" stroke="#005533"/>
+  <line x1="204" y1="118" x2="204" y2="168" stroke="#005533"/>
+  <line x1="216" y1="118" x2="216" y2="168" stroke="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ ibm --model 5150<span class="cursor"></span></span></div>
+<div class="card"><span class="label">DESK TOP VIEW</span><span class="num">36</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<!-- desk -->
+  <rect x="50" y="40" width="240" height="120" rx="6" stroke="#00ff88" fill="#003d22"/>
+  <!-- monitor top view -->
+  <rect x="120" y="45" width="100" height="40" rx="4" stroke="#00ff88" fill="#002a18"/>
+  <rect x="130" y="50" width="80" height="30" rx="2" stroke="#005533" fill="rgba(0,255,136,0.02)"/>
+  <!-- keyboard -->
+  <rect x="110" y="100" width="120" height="30" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="115" y="105" width="110" height="20" rx="2" stroke="#005533" fill="#005533"/>
+  <rect x="118" y="108" width="4" height="14" rx="1" stroke="#00ff88" fill="none" opacity="0.4"/>
+  <rect x="125" y="108" width="4" height="14" rx="1" stroke="#00ff88" fill="none" opacity="0.4"/>
+  <rect x="132" y="108" width="4" height="14" rx="1" stroke="#00ff88" fill="none" opacity="0.4"/>
+  <!-- mouse -->
+  <rect x="250" y="110" width="20" height="30" rx="8" stroke="#00ff88" fill="none"/>
+  <line x1="260" y1="115" x2="260" y2="135" stroke="#005533"/>
+  <!-- mouse mat -->
+  <rect x="240" y="100" width="40" height="50" rx="4" stroke="#005533" fill="none"/>
+  <!-- tablet / phone -->
+  <rect x="60" y="100" width="30" height="40" rx="3" stroke="#00ff88" fill="none" opacity="0.5"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ pwd<span class="cursor"></span></span></div>
+<div class="card"><span class="label">HTPC</span><span class="num">37</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="70" y="50" width="200" height="100" rx="8" stroke="#00ff88" fill="#003d22"/>
+  <!-- ventilation top -->
+  <rect x="80" y="55" width="180" height="15" rx="3" stroke="#005533" fill="none"/>
+  <line x1="88" y1="58" x2="88" y2="67" stroke="#005533"/>
+  <line x1="98" y1="58" x2="98" y2="67" stroke="#005533"/>
+  <line x1="108" y1="58" x2="108" y2="67" stroke="#005533"/>
+  <line x1="118" y1="58" x2="118" y2="67" stroke="#005533"/>
+  <line x1="128" y1="58" x2="128" y2="67" stroke="#005533"/>
+  <line x1="138" y1="58" x2="138" y2="67" stroke="#005533"/>
+  <line x1="148" y1="58" x2="148" y2="67" stroke="#005533"/>
+  <line x1="158" y1="58" x2="158" y2="67" stroke="#005533"/>
+  <line x1="168" y1="58" x2="168" y2="67" stroke="#005533"/>
+  <line x1="178" y1="58" x2="178" y2="67" stroke="#005533"/>
+  <line x1="188" y1="58" x2="188" y2="67" stroke="#005533"/>
+  <line x1="198" y1="58" x2="198" y2="67" stroke="#005533"/>
+  <line x1="208" y1="58" x2="208" y2="67" stroke="#005533"/>
+  <line x1="218" y1="58" x2="218" y2="67" stroke="#005533"/>
+  <line x1="228" y1="58" x2="228" y2="67" stroke="#005533"/>
+  <line x1="238" y1="58" x2="238" y2="67" stroke="#005533"/>
+  <line x1="248" y1="58" x2="248" y2="67" stroke="#005533"/>
+  <!-- front panel -->
+  <rect x="80" y="115" width="180" height="30" rx="4" stroke="#00ff88" fill="none"/>
+  <!-- power button -->
+  <rect x="85" y="118" width="20" height="24" rx="3" stroke="#00ff88" fill="#00cc6a" opacity="0.4"/>
+  <circle cx="95" cy="130" r="3" stroke="#00cc6a" fill="#00cc6a" opacity="0.8"/>
+  <!-- USB -->
+  <rect x="112" y="122" width="6" height="16" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="122" y="122" width="6" height="16" rx="1" stroke="#00ff88" fill="none"/>
+  <!-- IR receiver -->
+  <circle cx="250" cy="130" r="4" stroke="#00ff88" fill="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ kodi --start<span class="cursor"></span></span></div>
+<div class="card"><span class="label">CUSTOM LOOP</span><span class="num">38</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="60" y="20" width="220" height="160" rx="6" stroke="#00ff88" fill="#002a18"/>
+  <!-- distro plate -->
+  <rect x="70" y="30" width="30" height="140" rx="4" stroke="#00ff88" fill="rgba(0,255,136,0.05)"/>
+  <!-- distro channels -->
+  <line x1="75" y1="50" x2="95" y2="50" stroke="#00cc6a" opacity="0.4"/>
+  <line x1="75" y1="70" x2="95" y2="70" stroke="#00cc6a" opacity="0.4"/>
+  <line x1="75" y1="90" x2="95" y2="90" stroke="#00cc6a" opacity="0.4"/>
+  <line x1="75" y1="110" x2="95" y2="110" stroke="#00cc6a" opacity="0.4"/>
+  <line x1="75" y1="130" x2="95" y2="130" stroke="#00cc6a" opacity="0.4"/>
+  <!-- tube runs -->
+  <path d="M100,50 Q130,40 150,55 Q170,70 170,90" stroke="#00cc6a" fill="none"/>
+  <path d="M170,90 Q170,110 150,120 Q130,130 100,130" stroke="#00cc6a" fill="none"/>
+  <path d="M100,70 Q120,80 140,100" stroke="#00cc6a" fill="none" opacity="0.6"/>
+  <path d="M100,110 Q120,100 140,100" stroke="#00cc6a" fill="none" opacity="0.6"/>
+  <!-- CPU block -->
+  <rect x="140" y="55" width="25" height="25" rx="3" stroke="#00ff88" fill="none"/>
+  <!-- GPU block -->
+  <rect x="130" y="120" width="50" height="15" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- radiator -->
+  <rect x="110" y="150" width="80" height="20" rx="3" stroke="#00ff88" fill="none"/>
+  <line x1="115" y1="152" x2="115" y2="168" stroke="#005533"/>
+  <line x1="122" y1="152" x2="122" y2="168" stroke="#005533"/>
+  <line x1="129" y1="152" x2="129" y2="168" stroke="#005533"/>
+  <line x1="136" y1="152" x2="136" y2="168" stroke="#005533"/>
+  <line x1="143" y1="152" x2="143" y2="168" stroke="#005533"/>
+  <line x1="150" y1="152" x2="150" y2="168" stroke="#005533"/>
+  <line x1="157" y1="152" x2="157" y2="168" stroke="#005533"/>
+  <line x1="164" y1="152" x2="164" y2="168" stroke="#005533"/>
+  <line x1="171" y1="152" x2="171" y2="168" stroke="#005533"/>
+  <line x1="178" y1="152" x2="178" y2="168" stroke="#005533"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ water --cool<span class="cursor"></span></span></div>
+<div class="card"><span class="label">DUAL GPU SLI</span><span class="num">39</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="60" y="20" width="220" height="160" rx="6" stroke="#00ff88" fill="#002a18"/>
+  <!-- motherboard area -->
+  <rect x="65" y="25" width="210" height="150" rx="4" stroke="#00ff88" fill="rgba(0,255,136,0.02)"/>
+  <!-- GPU 1 -->
+  <rect x="70" y="40" width="160" height="35" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="70" y="42" width="160" height="31" rx="2" stroke="#00cc6a" fill="#005533" opacity="0.5"/>
+  <!-- fans on GPU 1 -->
+  <circle cx="100" cy="57" r="10" stroke="#00ff88" fill="none"/>
+  <circle cx="100" cy="57" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <circle cx="135" cy="57" r="10" stroke="#00ff88" fill="none"/>
+  <circle cx="135" cy="57" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <circle cx="170" cy="57" r="10" stroke="#00ff88" fill="none"/>
+  <circle cx="170" cy="57" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <!-- SLI bridge -->
+  <rect x="70" y="80" width="50" height="8" rx="2" stroke="#00ff88" fill="none"/>
+  <!-- GPU 2 -->
+  <rect x="70" y="95" width="160" height="35" rx="3" stroke="#00ff88" fill="none"/>
+  <rect x="70" y="97" width="160" height="31" rx="2" stroke="#00cc6a" fill="#005533" opacity="0.5"/>
+  <!-- fans on GPU 2 -->
+  <circle cx="100" cy="112" r="10" stroke="#00ff88" fill="none"/>
+  <circle cx="100" cy="112" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <circle cx="135" cy="112" r="10" stroke="#00ff88" fill="none"/>
+  <circle cx="135" cy="112" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <circle cx="170" cy="112" r="10" stroke="#00ff88" fill="none"/>
+  <circle cx="170" cy="112" r="3" stroke="#00ff88" fill="#00ff88" opacity="0.4"/>
+  <!-- PCIe slots -->
+  <rect x="230" y="45" width="10" height="25" rx="1" stroke="#00ff88" fill="none"/>
+  <rect x="230" y="100" width="10" height="25" rx="1" stroke="#00ff88" fill="none"/>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ nvidia-sli --status<span class="cursor"></span></span></div>
+<div class="card"><span class="label">BLUEPRINT</span><span class="num">40</span>
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+<rect x="40" y="20" width="260" height="160" rx="6" stroke="#00ff88" fill="#002a18"/>
+  <!-- blueprint grid -->
+  <line x1="50" y1="30" x2="50" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="70" y1="30" x2="70" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="90" y1="30" x2="90" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="110" y1="30" x2="110" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="130" y1="30" x2="130" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="150" y1="30" x2="150" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="170" y1="30" x2="170" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="190" y1="30" x2="190" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="210" y1="30" x2="210" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="230" y1="30" x2="230" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="250" y1="30" x2="250" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="270" y1="30" x2="270" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <line x1="290" y1="30" x2="290" y2="170" stroke="#00ff88" opacity="0.1"/>
+  <!-- horizontal grid -->
+  <line x1="40" y1="40" x2="300" y2="40" stroke="#00ff88" opacity="0.1"/>
+  <line x1="40" y1="60" x2="300" y2="60" stroke="#00ff88" opacity="0.1"/>
+  <line x1="40" y1="80" x2="300" y2="80" stroke="#00ff88" opacity="0.1"/>
+  <line x1="40" y1="100" x2="300" y2="100" stroke="#00ff88" opacity="0.1"/>
+  <line x1="40" y1="120" x2="300" y2="120" stroke="#00ff88" opacity="0.1"/>
+  <line x1="40" y1="140" x2="300" y2="140" stroke="#00ff88" opacity="0.1"/>
+  <line x1="40" y1="160" x2="300" y2="160" stroke="#00ff88" opacity="0.1"/>
+  <!-- tower outline -->
+  <rect x="110" y="35" width="90" height="120" rx="3" stroke="#00ff88" fill="none" stroke-dasharray="4,3"/>
+  <!-- internal components -->
+  <rect x="120" y="45" width="70" height="10" rx="1" stroke="#00ff88" fill="none"/>
+  <text x="190" y="53" font-size="5" stroke="#00ff88" fill="#00ff88" opacity="0.6" font-family="monospace">PSU</text>
+  <rect x="120" y="60" width="20" height="15" rx="1" stroke="#00ff88" fill="none"/>
+  <text x="142" y="70" font-size="5" stroke="#00ff88" fill="#00ff88" opacity="0.6" font-family="monospace">CPU</text>
+  <rect x="120" y="80" width="50" height="10" rx="1" stroke="#00ff88" fill="none"/>
+  <text x="172" y="88" font-size="5" stroke="#00ff88" fill="#00ff88" opacity="0.6" font-family="monospace">GPU</text>
+  <rect x="120" y="95" width="60" height="12" rx="1" stroke="#00ff88" fill="none"/>
+  <text x="120" y="115" font-size="5" stroke="#00ff88" fill="#00ff88" opacity="0.6" font-family="monospace">MB</text>
+  <!-- dimension lines -->
+  <line x1="105" y1="35" x2="105" y2="155" stroke="#00cc6a" opacity="0.5"/>
+  <line x1="100" y1="35" x2="110" y2="35" stroke="#00cc6a" opacity="0.5"/>
+  <line x1="100" y1="155" x2="110" y2="155" stroke="#00cc6a" opacity="0.5"/>
+  <text x="88" y="100" font-size="5" stroke="#00cc6a" fill="#00cc6a" opacity="0.7" font-family="monospace" transform="rotate(-90,88,100)">120mm</text>
+  <!-- title block -->
+  <rect x="220" y="140" width="70" height="35" rx="2" stroke="#00ff88" fill="none"/>
+  <text x="225" y="150" font-size="5" stroke="#00ff88" fill="#00ff88" font-family="monospace">PC ASSY</text>
+  <text x="225" y="158" font-size="4" stroke="#00ff88" fill="#00ff88" opacity="0.6" font-family="monospace">REV 1.0</text>
+  <text x="225" y="166" font-size="4" stroke="#00ff88" fill="#00ff88" opacity="0.6" font-family="monospace">SCALE 1:1</text>
+</svg>
+<div class="crt"></div><div class="vignette"></div><div class="crn"></div>
+<span class="prompt">root@glib:~$ view --schematic<span class="cursor"></span></span></div></div>
+</body>
+</html>
