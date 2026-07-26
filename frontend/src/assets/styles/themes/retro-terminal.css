@@ -234,7 +234,7 @@
   background: #33ffaa !important;
   box-shadow: 0 0 15px rgba(0,255,136,0.5);
 }
-[data-theme="retro-terminal"] .p-button:not(.p-button-secondary):not(.p-button-success):not(.p-button-danger):not(.p-button-info):not(.p-button-help):not(.p-button-text):not(.p-button-outlined) {
+[data-theme="retro-terminal"] .p-button:not(.p-button-secondary):not(.p-button-success):not(.p-button-danger):not(.p-button-info):not(.p-button-help):not(.p-button-text):not(.p-button-outlined):not(.auth-btn):not(.footer-link) {
   background: transparent !important;
   color: #38bdf8 !important;
   border-color: #38bdf8 !important;
@@ -771,7 +771,7 @@
   border: 1px solid rgba(0,255,136,0.4);
   box-shadow: none;
 }
-[data-theme="retro-terminal"] .auth-btn {
+[data-theme="retro-terminal"] .auth-page .auth-btn {
   border-radius: 0 !important;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -781,7 +781,7 @@
   border: 1px solid #00ff88 !important;
   font-weight: bold;
 }
-[data-theme="retro-terminal"] .auth-btn:hover {
+[data-theme="retro-terminal"] .auth-page .auth-btn:hover {
   background: rgba(0,255,136,0.1) !important;
   box-shadow: 0 0 15px rgba(0,255,136,0.5) !important;
 }
@@ -793,7 +793,7 @@
   color: #00cc6a;
   font-family: 'Courier New', monospace;
 }
-[data-theme="retro-terminal"] .footer-link {
+[data-theme="retro-terminal"] .auth-page .footer-link {
   color: #00ff88 !important;
   border-bottom: 1px dashed #00ff88;
 }
