@@ -56,9 +56,10 @@
 | ⭐ Rating 1-10 per game | |
 | ❤️ Favorites collection with filter | |
 | 🌓 Dark mode (system-preference auto-detect, manual toggle) | |
+| 🖥️ 4 visual themes (default light/dark, retro terminal, yellowed CRT) | |
 | 💬 Comments on game pages | |
 | 🔔 Notifications (torrent ready, scan done, etc.) | |
-| 👁 View history (last 20, stored in localStorage) | |
+| 👁 View history (last 20, displays 12, stored in localStorage) | |
 | 🔗 Related games (same genre or similar name) | |
 | 📊 Statistics dashboard (charts by platform/genre/year, top lists) | |
 | 📂 Game collections (playlists, public/private, reorder) | |
@@ -106,7 +107,7 @@ The `semantic search` toggle appears in the filter sidebar after the first scan/
 | Component | Technology |
 |-----------|-----------|
 | Backend | Spring Boot 4.0.7, Java 25, Virtual Threads (Project Loom) |
-| Frontend | Vue 3 + Vite 5, PrimeVue 4, Pinia, VueQuill (Quill 2) |
+| Frontend | Vue 3 + Vite 5, PrimeVue 4 (custom themes: 4 presets, 2 CRT terminal variants), Pinia, VueQuill (Quill 2) |
 | Database | PostgreSQL 16 (schema `library`) |
 | ORM / JDBC | Hibernate (managed by Boot 4.x), Spring Data JPA, HikariCP |
 | REST API | Spring MVC `@RestController`, JWT auth (form login fallback) |
@@ -135,7 +136,7 @@ The `semantic search` toggle appears in the filter sidebar after the first scan/
 | `/` | USER, ADMIN | Library grid — filters, sorting, pagination |
 | `/game/:id` | USER, ADMIN | Game detail page |
 | `/game/:id/edit` | ADMIN | Editor + scraping panel |
-| `/profile` | USER | Profile, avatar, password change |
+| `/profile` | USER | Profile (3 tabs: avatar, password, info with stats) |
 | `/admin/users` | ADMIN | User management |
 | `/admin/scrapers` | ADMIN | Scraper config (API keys, on/off) |
 | `/downloads` | USER, ADMIN | Transmission seeding status |
@@ -367,7 +368,9 @@ All config stored in `${SCRAPER_CONFIG_DIR}/scrapers-config.json` (defaults to `
 
 ### PsxDataCenter Setup
 
-No API key required. The scraper works out of the box for PS1 and PS2 games. Supports both old (`<b>`-based) and new (inline-style) card markup.
+No API key required. The scraper works out of the box for PS1 and PS2 games. Supports both old (`<b>`-based) and new (inline-style) card markup. Also supports **serial number search** (e.g., `SLUS-12345`, `SCES-54321`) — auto-detected and routed to `searchBySerial()`.
+
+Each scraper provides localized `inputHintRu` / `inputHintEn` displayed as placeholder text in the frontend scraper input field.
 
 ## 🚀 Deployment
 
@@ -599,9 +602,10 @@ npm run dev
 | ⭐ Рейтинг игр 1-10 | |
 | ❤️ Избранное с фильтром в боковой панели | |
 | 🌓 Тёмная тема (авто-определение по системе, ручное переключение) | |
+| 🖥️ 4 визуальные темы (светлая/тёмная, ретро терминал, жёлтый CRT) | |
 | 💬 Комментарии на странице игры | |
 | 🔔 Уведомления (торрент готов, сканирование завершено и т.д.) | |
-| 👁 История просмотров (последние 20, localStorage) | |
+| 👁 История просмотров (последние 20, отображается 12, localStorage) | |
 | 🔗 Связанные игры (жанр или похожее название) | |
 | 📊 Статистика библиотеки (диаграммы по платформам/жанрам/годам, топы) | |
 | 📂 Коллекции игр (плейлисты, публичные/приватные, сортировка) | |
@@ -649,7 +653,7 @@ docker compose up -d
 | Компонент | Технология |
 |-----------|-----------|
 | Backend | Spring Boot 4.0.7, Java 25, Virtual Threads (Project Loom) |
-| Frontend | Vue 3 + Vite 5, PrimeVue 4, Pinia, VueQuill (Quill 2) |
+| Frontend | Vue 3 + Vite 5, PrimeVue 4 (кастомные темы: 4 пресета, 2 CRT-терминала), Pinia, VueQuill (Quill 2) |
 | База данных | PostgreSQL 16 (схема `library`) |
 | ORM / JDBC | Hibernate (управляется Boot 4.x), Spring Data JPA, HikariCP |
 | REST API | Spring MVC `@RestController`, JWT + form login |
@@ -678,7 +682,7 @@ docker compose up -d
 | `/` | USER, ADMIN | Библиотека: сетка, фильтры, пагинация |
 | `/game/:id` | USER, ADMIN | Детальная карточка игры |
 | `/game/:id/edit` | ADMIN | Редактирование + скрапинг |
-| `/profile` | USER | Профиль, аватар, пароль |
+| `/profile` | USER | Профиль (3 вкладки: аватар, пароль, инфо со статистикой) |
 | `/admin/users` | ADMIN | Управление пользователями |
 | `/admin/scrapers` | ADMIN | Настройка скраперов |
 | `/downloads` | USER, ADMIN | Статус раздач Transmission |
@@ -910,7 +914,9 @@ cp .env.example .env   # отредактировать перед первым 
 
 ### Настройка PsxDataCenter
 
-Не требуется API-ключ. Скрапер работает «из коробки» для PS1 и PS2.
+Не требуется API-ключ. Скрапер работает «из коробки» для PS1 и PS2. Поддерживает **поиск по серийному номеру** (например `SLUS-12345`, `SCES-54321`) — авто-определение и использование `searchBySerial()`.
+
+Каждый скрапер имеет локализованные `inputHintRu` / `inputHintEn`, отображаемые как placeholder в поле ввода на фронтенде.
 
 ## 🚀 Развёртывание
 
