@@ -1,7 +1,7 @@
 <template>
   <div class="statistics-page">
     <h2 class="mb-3">
-      <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('statistics.title').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+      <span v-if="isTerminalTheme">&gt; {{ t('statistics.title').replace(/ /g, '_') }}<span class="t-cursor" /></span>
       <span v-else>{{ t('statistics.title') }}</span>
     </h2>
 
@@ -141,7 +141,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend)
 
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const router = useRouter()
 const authStore = useAuthStore()
 

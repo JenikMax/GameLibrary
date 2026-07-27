@@ -5,7 +5,7 @@
         <div class="profile-header">
           <Avatar :image="authStore.avatarUrl" size="xlarge" shape="circle" class="profile-avatar" />
           <h2 class="profile-name">
-            <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
+            <span v-if="isTerminalTheme">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
             <span v-else>{{ authStore.username }}</span>
           </h2>
           <div class="profile-tags flex gap-2 mb-3">
@@ -147,7 +147,7 @@ import Divider from 'primevue/divider'
 import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const authStore = useAuthStore()
 const toast = useToast()
 
@@ -354,6 +354,31 @@ async function changePassword() {
 }
 [data-theme="retro-terminal"] .info-row {
   border-bottom: 1px dashed rgba(0,255,136,0.15);
+  padding-bottom: 0.5rem;
+}
+[data-theme="yellowed-crt"] .tab-btn {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.78rem;
+  font-family: 'Courier New', monospace;
+  border-radius: 0;
+}
+[data-theme="yellowed-crt"] .tab-btn.active {
+  color: #998833;
+  border-bottom-color: #998833;
+}
+[data-theme="yellowed-crt"] .stat-value {
+  text-shadow: 0 0 10px rgba(180,160,60,0.5);
+  color: #998833;
+}
+[data-theme="yellowed-crt"] .stat-label {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  color: #776611;
+}
+[data-theme="yellowed-crt"] .info-row {
+  border-bottom: 1px dashed rgba(180,160,60,0.15);
   padding-bottom: 0.5rem;
 }
 </style>

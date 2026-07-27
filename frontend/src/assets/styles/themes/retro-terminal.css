@@ -684,6 +684,9 @@
 }
 
 /* ═══════ GAME DETAIL: sections ═══════ */
+[data-theme="retro-terminal"] .game-poster {
+  align-self: flex-start;
+}
 [data-theme="retro-terminal"] .detail-poster {
   border-color: var(--rt-border-medium);
   background: var(--rt-bg-dark);

@@ -218,3 +218,94 @@
 [data-theme="retro-terminal"] .auth-page .p-iconfield .p-inputicon {
   color: rgba(0, 255, 136, 0.35);
 }
+
+/* ── Yellowed CRT theme override ── */
+[data-theme="yellowed-crt"] .auth-page {
+  --auth-card-bg: #1a0e00;
+  --auth-card-border: rgba(220, 200, 80, 0.2);
+  --auth-input-border: rgba(220, 200, 80, 0.35);
+  --auth-input-bg: rgba(0, 0, 0, 0.8);
+  --auth-input-color: #ccaa33;
+  --auth-input-placeholder: rgba(220, 200, 80, 0.35);
+  background-color: #1a0e00;
+}
+[data-theme="yellowed-crt"] .auth-card {
+  border-radius: 12px;
+  backdrop-filter: none;
+  border-width: 1.5px;
+  box-shadow: 0 0 20px rgba(220, 200, 80, 0.05), inset 0 0 40px rgba(220, 200, 80, 0.02);
+}
+[data-theme="yellowed-crt"] .auth-card .field-label {
+  color: #aa8833;
+  font-weight: 400;
+  font-size: 0.8rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+[data-theme="yellowed-crt"] .auth-card .field-hint {
+  color: rgba(220, 200, 80, 0.45);
+  font-size: 0.7rem;
+}
+[data-theme="yellowed-crt"] .auth-page .auth-input {
+  border-radius: 4px !important;
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.85rem !important;
+}
+[data-theme="yellowed-crt"] .auth-page .auth-input:focus {
+  box-shadow: 0 0 0 1px #ccaa33, 0 0 10px rgba(220, 200, 80, 0.15) !important;
+}
+[data-theme="yellowed-crt"] .auth-page .auth-password .p-inputtext {
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.85rem !important;
+}
+[data-theme="yellowed-crt"] .auth-page .auth-password .p-inputtext:focus {
+  box-shadow: 0 0 0 1px #ccaa33, 0 0 10px rgba(220, 200, 80, 0.15) !important;
+}
+[data-theme="yellowed-crt"] .auth-page .auth-password .p-password-toggle-mask-icon {
+  color: rgba(220, 200, 80, 0.45) !important;
+}
+[data-theme="yellowed-crt"] .auth-page .auth-btn {
+  background: transparent !important;
+  border: 1px solid #ccaa33 !important;
+  color: #ccaa33 !important;
+  border-radius: 4px !important;
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.8rem !important;
+  padding: 0.6rem 1rem !important;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+[data-theme="yellowed-crt"] .auth-page .auth-btn:hover {
+  background: rgba(220, 200, 80, 0.1) !important;
+  box-shadow: 0 0 15px rgba(220, 200, 80, 0.15);
+}
+[data-theme="yellowed-crt"] .auth-page .auth-btn.p-disabled {
+  opacity: 0.4;
+}
+[data-theme="yellowed-crt"] .auth-page .auth-msg {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid rgba(220, 200, 80, 0.15) !important;
+  color: #ccaa33 !important;
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+[data-theme="yellowed-crt"] .auth-page .auth-msg.p-message-error {
+  border-color: rgba(255, 69, 69, 0.4) !important;
+  color: #ff4545 !important;
+}
+[data-theme="yellowed-crt"] .auth-page .auth-msg.p-message-success {
+  border-color: rgba(220, 200, 80, 0.4) !important;
+}
+[data-theme="yellowed-crt"] .auth-footer .footer-text {
+  color: rgba(220, 200, 80, 0.45);
+  font-size: 0.8rem;
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+}
+[data-theme="yellowed-crt"] .auth-page .footer-link {
+  color: #ccaa33 !important;
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.8rem;
+}
+[data-theme="yellowed-crt"] .auth-page .p-iconfield .p-inputicon {
+  color: rgba(220, 200, 80, 0.35);
+}

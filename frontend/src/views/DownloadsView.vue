@@ -2,9 +2,9 @@
   <div class="downloads-container">
     <div class="flex align-items-center justify-content-between mb-3">
       <div class="flex align-items-center gap-2">
-        <i v-if="currentThemeId !== 'retro-terminal'" class="pi pi-download text-2xl"></i>
+        <i v-if="!isTerminalTheme" class="pi pi-download text-2xl"></i>
         <h2 class="m-0">
-          <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('nav.downloads').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+          <span v-if="isTerminalTheme">&gt; {{ t('nav.downloads').replace(/ /g, '_') }}<span class="t-cursor" /></span>
           <span v-else>{{ t('nav.downloads') }}</span>
         </h2>
       </div>
@@ -138,7 +138,7 @@ import TabPanel from 'primevue/tabpanel'
 import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const toast = useToast()
 const activeDownloads = ref([])
 const waitingDownloads = ref([])

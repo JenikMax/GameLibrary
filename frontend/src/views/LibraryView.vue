@@ -11,7 +11,7 @@
     <main class="library-main">
       <div class="flex align-items-center justify-content-between mb-3">
         <h2 class="m-0">
-          <span v-if="currentThemeId === 'retro-terminal'">&gt; Game_Library<span class="t-cursor" /></span>
+          <span v-if="isTerminalTheme">&gt; Game_Library<span class="t-cursor" /></span>
           <span v-else>{{ t('library.title') }}</span>
         </h2>
         <div class="flex gap-2 align-items-center">
@@ -185,7 +185,7 @@ function saveStateToSession() {
 const store = useLibraryStore()
 const authStore = useAuthStore()
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const { history } = useViewHistory()
 const router = useRouter()
 const toast = useToast()

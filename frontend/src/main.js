@@ -15,6 +15,7 @@ import 'primeicons/primeicons.css'
 import './assets/styles/themes/default-light.css'
 import './assets/styles/themes/default-dark.css'
 import './assets/styles/themes/retro-terminal.css'
+import './assets/styles/themes/yellowed-crt.css'
 
 const app = createApp(App)
 

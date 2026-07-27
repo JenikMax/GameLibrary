@@ -20,7 +20,7 @@
             localStorage.removeItem('darkMode');
           }
           document.documentElement.setAttribute('data-theme', theme);
-          var isDark = theme === 'default-dark' || theme === 'retro-terminal';
+          var isDark = theme === 'default-dark' || theme === 'retro-terminal' || theme === 'yellowed-crt';
           document.documentElement.setAttribute('data-color-scheme', isDark ? 'dark' : 'light');
           document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
 

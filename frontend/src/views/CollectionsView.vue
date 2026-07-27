@@ -2,7 +2,7 @@
   <div class="collections-page">
     <div class="flex align-items-center justify-content-between mb-3">
       <h2 class="m-0">
-        <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('collections.title').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+        <span v-if="isTerminalTheme">&gt; {{ t('collections.title').replace(/ /g, '_') }}<span class="t-cursor" /></span>
         <span v-else>{{ t('collections.title') }}</span>
       </h2>
       <Button :label="t('collections.create')" icon="pi pi-plus" severity="success" @click="showCreateDialog = true" />
@@ -79,7 +79,7 @@ import CollectionCard from '../components/CollectionCard.vue'
 import SmartRulesForm from '../components/SmartRulesForm.vue'
 
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const toast = useToast()
 const store = useLibraryStore()
 

@@ -28,14 +28,14 @@
         <div class="flex align-items-center gap-2 mb-2">
           <Button icon="pi pi-arrow-left" text @click="$router.push('/')" />
           <h1 class="m-0">
-            <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
+            <span v-if="isTerminalTheme">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
             <span v-else>{{ game.name }}</span>
           </h1>
           <Button
             v-if="authStore.isAuthenticated"
             :icon="favIcon"
             :severity="game.favorited ? 'danger' : 'secondary'"
-            :rounded="currentThemeId !== 'retro-terminal'"
+            :rounded="!isTerminalTheme"
             text
             class="favorite-btn"
             @click="toggleFav"
@@ -382,7 +382,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const libraryStore = useLibraryStore()
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const showCollectionPicker = ref(false)
 const { addToHistory } = useViewHistory()
 

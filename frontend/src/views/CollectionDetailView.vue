@@ -6,7 +6,7 @@
         <div>
           <div class="flex align-items-center gap-2">
             <h2 class="m-0">
-              <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
+              <span v-if="isTerminalTheme">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
               <span v-else>{{ collection.name }}</span>
             </h2>
             <Tag v-if="collection.isSmart" :value="t('collections.smart')" severity="info" size="small" rounded />
@@ -118,7 +118,7 @@ import GameCard from '../components/GameCard.vue'
 import SmartRulesForm from '../components/SmartRulesForm.vue'
 
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()

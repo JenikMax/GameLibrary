@@ -1,7 +1,7 @@
 <template>
   <div class="admin-dashboard">
     <h2 class="mb-3">
-      <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('admin.dashboard').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+      <span v-if="isTerminalTheme">&gt; {{ t('admin.dashboard').replace(/ /g, '_') }}<span class="t-cursor" /></span>
       <span v-else>{{ t('admin.dashboard') }}</span>
     </h2>
 
@@ -114,7 +114,7 @@ import { useToast } from 'primevue/usetoast'
 import { useTheme } from '../composables/useTheme'
 
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const toast = useToast()
 
 const scanning = ref(false)

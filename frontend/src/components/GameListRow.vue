@@ -31,7 +31,7 @@
       <Button
         :icon="favIcon"
         :severity="game.favorited ? 'danger' : 'secondary'"
-        :rounded="currentThemeId !== 'retro-terminal'"
+        :rounded="!isTerminalTheme"
         text
         size="small"
         class="favorite-btn"
@@ -68,7 +68,7 @@ const props = defineProps({
 const router = useRouter()
 const libraryStore = useLibraryStore()
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const toast = useToast()
 
 const favIcon = computed(() => {

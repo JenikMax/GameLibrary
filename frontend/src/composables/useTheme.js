@@ -39,8 +39,11 @@ export function useTheme() {
 
   const currentTheme = computed(() => themesById[currentThemeId.value])
   const isDark = computed(() => currentTheme.value?.isDark ?? false)
+  const isTerminalTheme = computed(() =>
+    currentThemeId.value === 'retro-terminal' || currentThemeId.value === 'yellowed-crt'
+  )
 
   watch(currentThemeId, applyTheme, { immediate: true })
 
-  return { currentThemeId, currentTheme, isDark, setTheme, availableThemes: themes }
+  return { currentThemeId, currentTheme, isDark, isTerminalTheme, setTheme, availableThemes: themes }
 }

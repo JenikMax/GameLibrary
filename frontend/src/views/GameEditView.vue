@@ -6,7 +6,7 @@
     <div class="flex align-items-center gap-3 mb-3">
       <Button icon="pi pi-arrow-left" text @click="$router.push(`/game/${game.id}`)" />
       <h2 class="m-0">
-        <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
+        <span v-if="isTerminalTheme">&gt; {{ terminalTitle }}<span class="t-cursor" /></span>
         <span v-else>{{ t('game.edit_title') }} {{ game.name }}</span>
       </h2>
     </div>
@@ -244,7 +244,7 @@ import 'quill/dist/quill.snow.css'
 import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const route = useRoute()
 const router = useRouter()
 const localeStore = useLocaleStore()

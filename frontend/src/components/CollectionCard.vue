@@ -207,4 +207,15 @@ function onImgError(e) {
   background: rgba(0, 255, 136, 0.08);
   color: #00ff88;
 }
+
+[data-theme="yellowed-crt"] .fade-thumb {
+  background: #0a0800;
+  border: 1px solid #998833;
+  box-shadow: 0 0 6px rgba(180, 160, 60, 0.2);
+}
+
+[data-theme="yellowed-crt"] .fade-ovfl {
+  background: rgba(180, 160, 60, 0.08);
+  color: #998833;
+}
 </style>

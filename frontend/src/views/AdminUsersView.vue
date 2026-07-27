@@ -1,7 +1,7 @@
 <template>
   <div class="admin-users-container">
     <h2>
-      <span v-if="currentThemeId === 'retro-terminal'">&gt; {{ t('admin.users.title').replace(/ /g, '_') }}<span class="t-cursor" /></span>
+      <span v-if="isTerminalTheme">&gt; {{ t('admin.users.title').replace(/ /g, '_') }}<span class="t-cursor" /></span>
       <span v-else>{{ t('admin.users.title') }}</span>
     </h2>
 
@@ -15,7 +15,7 @@
       </Column>
       <Column field="admin" :header="t('admin.users.admin')" sortable style="width:100px">
         <template #body="slotProps">
-          <span v-if="currentThemeId === 'retro-terminal'">
+          <span v-if="isTerminalTheme">
             <Button
               :label="slotProps.data.admin ? 'ADMIN' : 'USER'"
               :class="slotProps.data.admin ? 'rt-admin-btn rt-admin' : 'rt-admin-btn rt-user'"
@@ -31,7 +31,7 @@
       </Column>
       <Column field="active" :header="t('admin.users.active')" sortable style="width:100px">
         <template #body="slotProps">
-          <span v-if="currentThemeId === 'retro-terminal'">
+          <span v-if="isTerminalTheme">
             <Button
               :label="slotProps.data.active ? 'ACTIVE' : 'INACTIVE'"
               :class="slotProps.data.active ? 'rt-admin-btn rt-active' : 'rt-admin-btn rt-inactive'"
@@ -47,7 +47,7 @@
       </Column>
       <Column :header="t('admin.users.actions')" style="width:150px">
         <template #body="slotProps">
-          <span v-if="currentThemeId === 'retro-terminal'">
+          <span v-if="isTerminalTheme">
             <Button
               label="RESET"
               class="rt-admin-btn rt-reset"
@@ -94,7 +94,7 @@ import InputText from 'primevue/inputtext'
 import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 
 const users = ref([])
 const toast = useToast()

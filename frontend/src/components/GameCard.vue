@@ -78,7 +78,7 @@
           :icon="favIcon"
           :severity="game.favorited ? 'danger' : 'secondary'"
           size="small"
-          :rounded="currentThemeId !== 'retro-terminal'"
+          :rounded="!isTerminalTheme"
           class="favorite-btn"
           @click.stop="toggleFav"
           v-tooltip.left="game.favorited ? t('game.fav_remove') : t('game.fav_add')"
@@ -106,7 +106,7 @@ const props = defineProps({
 
 const router = useRouter()
 const { t } = useI18n()
-const { currentThemeId } = useTheme()
+const { isTerminalTheme } = useTheme()
 const libraryStore = useLibraryStore()
 const imgLoaded = ref(false)
 

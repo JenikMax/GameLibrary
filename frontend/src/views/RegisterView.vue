@@ -2,8 +2,8 @@
   <div class="auth-page">
     <div class="auth-card">
       <div class="auth-header">
-        <template v-if="isRetroTerminal">
-          <RetroCrtDisplay :screen-lines="crtLines" prompt="root@glib:~$ register --new-player" />
+        <template v-if="isTerminalTheme">
+          <RetroCrtDisplay :screen-lines="crtLines" v-bind="terminalPalette" prompt="root@glib:~$ register --new-player" />
         </template>
         <template v-else>
           <img :src="'/game-library/img/logo.jpg'" height="56" alt="logo" class="auth-logo" />
@@ -15,25 +15,25 @@
       <Message v-if="success" severity="success" :closable="false" class="auth-msg mb-3">{{ success }}</Message>
       <form @submit.prevent="handleRegister">
         <div class="field">
-          <label for="reg-username" class="field-label">{{ isRetroTerminal ? 'username:' : t('login.username') }}</label>
+          <label for="reg-username" class="field-label">{{ isTerminalTheme ? 'username:' : t('login.username') }}</label>
           <IconField class="w-full">
             <InputIcon><i class="pi pi-user" /></InputIcon>
-            <InputText id="reg-username" v-model="username" class="w-full auth-input" :placeholder="isRetroTerminal ? 'choose_name' : ''" autofocus />
+            <InputText id="reg-username" v-model="username" class="w-full auth-input" :placeholder="isTerminalTheme ? 'choose_name' : ''" autofocus />
           </IconField>
         </div>
         <div class="field">
-          <label for="reg-password" class="field-label">{{ isRetroTerminal ? 'password:' : t('login.password') }}</label>
+          <label for="reg-password" class="field-label">{{ isTerminalTheme ? 'password:' : t('login.password') }}</label>
           <IconField class="w-full">
             <InputIcon><i class="pi pi-lock" /></InputIcon>
-            <Password id="reg-password" v-model="password" class="w-full auth-password" inputClass="w-full auth-input" toggleMask :feedback="true" :placeholder="isRetroTerminal ? '••••••••' : ''" />
+            <Password id="reg-password" v-model="password" class="w-full auth-password" inputClass="w-full auth-input" toggleMask :feedback="true" :placeholder="isTerminalTheme ? '••••••••' : ''" />
           </IconField>
-          <small class="field-hint">{{ isRetroTerminal ? '└─ min 8 chars, letters + digits required' : t('login.password_requirements') }}</small>
+          <small class="field-hint">{{ isTerminalTheme ? '└─ min 8 chars, letters + digits required' : t('login.password_requirements') }}</small>
         </div>
-        <Button type="submit" :label="isRetroTerminal ? '$ execute register' : t('login.register')" :icon="isRetroTerminal ? undefined : 'pi pi-user-plus'" class="w-full mt-2 auth-btn" :loading="loading" />
+        <Button type="submit" :label="isTerminalTheme ? '$ execute register' : t('login.register')" :icon="isTerminalTheme ? undefined : 'pi pi-user-plus'" class="w-full mt-2 auth-btn" :loading="loading" />
       </form>
       <div class="auth-footer">
-        <span class="footer-text">{{ isRetroTerminal ? 'existing user?' : t('register.already_have_account') }}</span>
-        <Button :label="isRetroTerminal ? 'run login.sh' : t('login.signin')" link class="footer-link" @click="$router.push('/login')" />
+        <span class="footer-text">{{ isTerminalTheme ? 'existing user?' : t('register.already_have_account') }}</span>
+        <Button :label="isTerminalTheme ? 'run login.sh' : t('login.signin')" link class="footer-link" @click="$router.push('/login')" />
       </div>
     </div>
   </div>
@@ -56,16 +56,21 @@ import Message from 'primevue/message'
 const { t } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
-const { currentThemeId } = useTheme()
-const isRetroTerminal = computed(() => currentThemeId.value === 'retro-terminal')
+const { currentThemeId, isTerminalTheme } = useTheme()
 
+const terminalPalette = computed(() => {
+  if (currentThemeId.value === 'yellowed-crt') {
+    return { primary: '#ccaa33', muted: '#aa8833', bg: '#2a1e00', bgInner: '#1a1000' }
+  }
+  return { primary: '#00ff88', muted: '#00cc6a', bg: '#003d22', bgInner: '#002a18' }
+})
 const crtLines = computed(() => [
-  { text: 'GAME-LIBRARY', y: 50, size: 7, color: '#00cc6a', opacity: 0.8 },
+  { text: 'GAME-LIBRARY', y: 50, size: 7, color: terminalPalette.value.muted, opacity: 0.8 },
   { text: 'AUTH v2.4.1', y: 64, size: 6, opacity: 0.6 },
   { text: '', y: 78, size: 6 },
   { text: 'register --new-player', y: 92, size: 6, opacity: 0.5 },
   { text: '', y: 106, size: 6 },
-  { text: 'choose credentials...', y: 120, size: 6, color: '#00cc6a', opacity: 0.9 },
+  { text: 'choose credentials...', y: 120, size: 6, color: terminalPalette.value.muted, opacity: 0.9 },
 ])
 
 const username = ref('')
