@@ -13,14 +13,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
 @Repository
 public class SqlDaoImpl implements SqlDao {
-
-    private static final String BASE_64_JPEG_PREFIX = "data:image/jpeg;base64,";
 
     static final Logger logger = LogManager.getLogger(SqlDaoImpl.class.getName());
     @Autowired
@@ -58,14 +55,6 @@ public class SqlDaoImpl implements SqlDao {
                 }
             } catch (java.sql.SQLException e) {
                 dto.setTags(new ArrayList<>());
-            }
-            try {
-                byte[] logoBytes = rs.getBytes("logo");
-                if (logoBytes != null && logoBytes.length > 0) {
-                    dto.setLogo(BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(logoBytes));
-                }
-            } catch (java.sql.SQLException e) {
-                // ignore
             }
             return dto;
         });
@@ -125,14 +114,6 @@ public class SqlDaoImpl implements SqlDao {
                 }
             } catch (java.sql.SQLException e) {
                 dto.setTags(new ArrayList<>());
-            }
-            try {
-                byte[] logoBytes = rs.getBytes("logo");
-                if (logoBytes != null && logoBytes.length > 0) {
-                    dto.setLogo(BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(logoBytes));
-                }
-            } catch (java.sql.SQLException e) {
-                // ignore
             }
             return dto;
         }, params);

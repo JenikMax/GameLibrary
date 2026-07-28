@@ -91,14 +91,10 @@ async function load() {
     collections.value = res.data.data || []
 
     memberMap.value = {}
+    const memRes = await collectionsApi.membership(Number(props.gameId))
+    const memberIds = memRes.data.data || []
     for (const c of collections.value) {
-      try {
-        const gRes = await collectionsApi.getGames(c.id)
-        const gameIds = (gRes.data.data || []).map(e => e.gameId)
-        memberMap.value[c.id] = gameIds
-      } catch {
-        memberMap.value[c.id] = []
-      }
+      memberMap.value[c.id] = memberIds.includes(c.id) ? [Number(props.gameId)] : []
     }
   } catch {
     toast.add({ severity: 'error', summary: t('collections.load_failed'), life: 2000 })

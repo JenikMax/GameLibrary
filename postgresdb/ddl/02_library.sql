@@ -9,7 +9,7 @@ create table library.game_data
     create_ts         timestamp without time zone,
     name              varchar(225),
     release_date      varchar(20),
-    directory_path    varchar(255),
+    directory_path    text,
     trailer_url       varchar(255),
     platform          varchar(225),
     description       text,
@@ -136,6 +136,9 @@ create table library.game_screenshot
     source              bytea
 );
 
+
+CREATE INDEX IF NOT EXISTS idx_game_data_name ON library.game_data(name);
+CREATE INDEX IF NOT EXISTS idx_game_data_platform ON library.game_data(platform);
 
 drop view if exists library.v_platform;
 create or replace view library.v_platform as

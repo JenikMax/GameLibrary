@@ -1,6 +1,7 @@
 package com.jenikmax.game.library.service.notification;
 
 import com.jenikmax.game.library.dao.api.NotificationRepository;
+import com.jenikmax.game.library.model.dto.NotificationEvent;
 import com.jenikmax.game.library.model.entity.Notification;
 import com.jenikmax.game.library.model.entity.User;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,11 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final SseService sseService;
 
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, SseService sseService) {
         this.notificationRepository = notificationRepository;
+        this.sseService = sseService;
     }
 
     @Transactional
@@ -30,7 +33,9 @@ public class NotificationService {
         n.setGameId(gameId);
         n.setRead(false);
         n.setCreatedAt(new Timestamp(new Date().getTime()));
-        return notificationRepository.save(n);
+        n = notificationRepository.save(n);
+        sseService.send(userId, NotificationEvent.from(n));
+        return n;
     }
 
     public List<Notification> getRecent(Long userId) {

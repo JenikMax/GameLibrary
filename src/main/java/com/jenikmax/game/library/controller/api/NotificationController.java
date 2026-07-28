@@ -1,13 +1,17 @@
 package com.jenikmax.game.library.controller.api;
 
+import com.jenikmax.game.library.config.jwt.JwtTokenProvider;
 import com.jenikmax.game.library.model.dto.api.ApiResponse;
 import com.jenikmax.game.library.model.entity.Notification;
 import com.jenikmax.game.library.service.data.api.UserService;
 import com.jenikmax.game.library.service.notification.NotificationService;
+import com.jenikmax.game.library.service.notification.SseService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.*;
 
@@ -17,11 +21,39 @@ import java.util.*;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final SseService sseService;
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public NotificationController(NotificationService notificationService, UserService userService) {
+    public NotificationController(NotificationService notificationService, SseService sseService,
+                                   UserService userService, JwtTokenProvider jwtTokenProvider) {
         this.notificationService = notificationService;
+        this.sseService = sseService;
         this.userService = userService;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribe(@RequestParam("token") String token) {
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            SseEmitter error = new SseEmitter(0L);
+            try {
+                error.send(SseEmitter.event().name("error").data("Unauthorized"));
+            } catch (java.io.IOException ignored) {}
+            error.complete();
+            return error;
+        }
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        var userDto = userService.getUserInfoByName(username);
+        if (userDto == null) {
+            SseEmitter error = new SseEmitter(0L);
+            try {
+                error.send(SseEmitter.event().name("error").data("Unauthorized"));
+            } catch (java.io.IOException ignored) {}
+            error.complete();
+            return error;
+        }
+        return sseService.subscribe(userDto.getId());
     }
 
     @GetMapping

@@ -9,7 +9,6 @@ import com.jenikmax.game.library.model.dto.api.*;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.UserService;
-import com.jenikmax.game.library.service.ai.EmbeddingService;
 import com.jenikmax.game.library.service.ai.AutoTagService;
 import com.jenikmax.game.library.service.ai.TranslationService;
 import com.jenikmax.game.library.service.scraper.ScraperConfigService;
@@ -102,7 +101,7 @@ public class LibraryController {
             pageSize = 12;
         }
 
-        searchText = searchText != null ? EmbeddingService.fixEncoding(searchText) : "";
+        searchText = searchText != null ? searchText : "";
         selectedPlatforms = selectedPlatforms != null ? selectedPlatforms : new ArrayList<>();
         selectedYears = selectedYears != null ? selectedYears : new ArrayList<>();
         selectedGenres = selectedGenres != null ? selectedGenres : new ArrayList<>();
@@ -317,9 +316,8 @@ public class LibraryController {
         resp.setReleaseDate(dto.getReleaseDate());
         resp.setGenres(dto.getGenres());
         resp.setTags(dto.getTags());
-        resp.setLogoUrl(buildLogoUrl(dto.getId()));
-        resp.setLogo(dto.getLogo());
-        return resp;
+            resp.setLogoUrl(buildLogoUrl(dto.getId()));
+            return resp;
     }
 
     private GameDetailResponse toGameDetailResponse(GameDto dto) {

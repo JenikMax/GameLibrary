@@ -7,8 +7,8 @@ services:
       - "5432:5432"
     volumes:
       # Данные PostgreSQL (БД). Хранятся между перезапусками контейнера.
-      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/db/data:/var/lib/postgresql/data
-      #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/db/data:/var/lib/postgresql/data  #рабочий пример
+      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/db/data:/var/lib/postgresql/data
+      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/db/data:/var/lib/postgresql/data  #рабочий пример
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -52,14 +52,20 @@ services:
       - TTORRENT_HASHING_THREADS=2
     volumes:
       # Корень библиотеки игр. Внутри контейнера: games/ (файлы игр), images/ (скриншоты, обложки).
-      - /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
-      #- /host_mnt/f/Work/Git/my_project/data:/gameLibrary  #рабочий пример
+      #- /host_mnt/d/Work/MyProjects/gametest:/gameLibrary
+      - /host_mnt/f/Work/Git/my_project/data:/gameLibrary  #рабочий пример
       # Временная директория для созданных .torrent-файлов (TorrentTaskService).
-      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents:/torrentDirTmp
-      #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/torrents:/torrentDirTmp  #рабочий пример
+      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents:/torrentDirTmp
+      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/torrents:/torrentDirTmp  #рабочий пример
       # Конфигурация скраперов (scrapers-config.json). Редактируется через админку или напрямую.
-      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/scrapers:/scraper-config
-      #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/scrapers:/scraper-config
+      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/scrapers:/scraper-config
+      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/scrapers:/scraper-config
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/game-library/api/images/games/0/logo"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     depends_on:
       postgresdb:
         condition: service_healthy
@@ -76,10 +82,16 @@ services:
       - "8000:8000"
     volumes:
       # Локальные LLM модели.
-      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/models:/models
-      #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/models:/models
+      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/models:/models
+      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/models:/models
     environment:
       - MODELS_DIR=/models
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
     restart: unless-stopped
     mem_limit: 2048m
     cpu_shares: 512
@@ -90,6 +102,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
     depends_on:
       - backend
     restart: unless-stopped
@@ -104,20 +121,20 @@ services:
       - "51413:51413/udp"
     volumes:
       # Файлы игр, которые Transmission будет раздавать (та же директория, что и в GAMES_DIRECTORY).
-      #- /host_mnt/f/Work/Git/my_project/data/games:/downloads/games
-      - /host_mnt/d/Work/MyProjects/gametest/games:/downloads/games
+      - /host_mnt/f/Work/Git/my_project/data/games:/downloads/games
+      #- /host_mnt/d/Work/MyProjects/gametest/games:/downloads/games
       # Настройки Transmission (settings.json). После первого запуска файл создаётся автоматически.
-      #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/config:/config
-      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/config:/config
+      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/config:/config
+      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/config:/config
       # Авто-добавление .torrent-файлов (положите .torrent → Transmission подхватит).
-      #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/watch:/watch
-      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/watch:/watch
+      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/watch:/watch
+      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/watch:/watch
       # Завершённые загрузки.
-      #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/complete:/downloads/complete
-      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/complete:/downloads/complete
+      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/complete:/downloads/complete
+      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/complete:/downloads/complete
       # Незавершённые загрузки (докачка).
-      #- /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
-      - /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
+      - /host_mnt/f/Work/Git/my_project/data/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
+      #- /host_mnt/d/Work/MyProjects/gametest/gameLibraryConfigs/tracker/incomplete:/downloads/incomplete
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}

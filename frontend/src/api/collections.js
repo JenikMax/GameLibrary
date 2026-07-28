@@ -30,5 +30,8 @@ export const collectionsApi = {
   },
   reorder(id, order) {
     return api.put(`/collections/${id}/games/reorder`, { order })
+  },
+  membership(gameId) {
+    return api.get('/collections/membership', { params: { gameId } })
   }
 }

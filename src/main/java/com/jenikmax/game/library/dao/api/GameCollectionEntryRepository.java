@@ -8,6 +8,9 @@ import java.util.Optional;
 
 public interface GameCollectionEntryRepository extends JpaRepository<GameCollectionEntry, Long> {
 
+    @org.springframework.data.jpa.repository.Query("SELECT e.collection.id FROM GameCollectionEntry e WHERE e.gameId = :gameId AND e.collection.user.id = :userId")
+    List<Long> findCollectionIdsByGameIdAndUserId(@org.springframework.data.repository.query.Param("gameId") Long gameId, @org.springframework.data.repository.query.Param("userId") Long userId);
+
     List<GameCollectionEntry> findByCollectionIdOrderBySortOrderAsc(Long collectionId);
 
     Optional<GameCollectionEntry> findByCollectionIdAndGameId(Long collectionId, Long gameId);

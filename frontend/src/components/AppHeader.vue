@@ -120,6 +120,7 @@ import { useLibraryStore } from '../stores/library'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from '../composables/useI18n'
 import { notificationsApi } from '../api/notifications'
+import { useNotifications } from '../composables/useNotifications'
 import LocaleSwitcher from './LocaleSwitcher.vue'
 import Menubar from 'primevue/menubar'
 import Button from 'primevue/button'
@@ -144,11 +145,8 @@ function selectTheme(themeId) {
   themeMenuRef.value?.hide()
 }
 
+const { notifications, unreadCount, subscribe, unsubscribe, fetchNotifications } = useNotifications()
 const showNotifications = ref(false)
-const notifications = ref([])
-const unreadCount = ref(0)
-let pollTimer = null
-let isUnmounted = false
 const notificationAreaRef = ref(null)
 
 function onClickOutside(e) {
@@ -222,17 +220,6 @@ const items = computed(() => {
   return menu
 })
 
-async function fetchNotifications() {
-  if (!authStore.isAuthenticated) return
-  try {
-    const res = await notificationsApi.getNotifications()
-    notifications.value = res.data.data.items || []
-    unreadCount.value = res.data.data.unread || 0
-  } catch {
-    // ignore
-  }
-}
-
 function toggleNotifications() {
   showNotifications.value = !showNotifications.value
   if (showNotifications.value) fetchNotifications()
@@ -303,21 +290,15 @@ function handleLogout() {
 
 onMounted(() => {
   document.addEventListener('click', onClickOutside, true)
-  if (authStore.isAuthenticated) {
+  if (authStore.isAuthenticated && authStore.token) {
+    subscribe(authStore.token)
     fetchNotifications()
-    pollTimer = setInterval(() => {
-      if (!isUnmounted) fetchNotifications()
-    }, 15000)
   }
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', onClickOutside, true)
-  isUnmounted = true
-  if (pollTimer) {
-    clearInterval(pollTimer)
-    pollTimer = null
-  }
+  unsubscribe()
 })
 </script>
 

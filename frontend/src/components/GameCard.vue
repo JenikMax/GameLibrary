@@ -3,7 +3,7 @@
     <template #header>
       <div class="game-card-img-wrapper glitch-trigger" @click="goToGame">
         <img
-          :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
+          :src="game.logoUrl || '/game-library/img/default.jpg'"
           :alt="game.name"
           class="game-card-img img-fade"
           :class="{ loaded: imgLoaded }"
@@ -11,7 +11,7 @@
           @load="imgLoaded = true"
           @error="imgLoaded = true"
         />
-        <div class="glitch-overlay" :style="{ backgroundImage: `url(${game.logo || game.logoUrl || '/game-library/img/default.jpg'})` }"></div>
+        <div class="glitch-overlay" :style="{ backgroundImage: `url(${game.logoUrl || '/game-library/img/default.jpg'})` }"></div>
       </div>
     </template>
     <template #title>

@@ -2,7 +2,7 @@
   <div class="game-list-row" @click="goToGame">
     <div class="row-img-wrap">
       <img
-        :src="game.logo || game.logoUrl || '/game-library/img/default.jpg'"
+        :src="game.logoUrl || '/game-library/img/default.jpg'"
         :alt="game.name"
         class="row-img"
         loading="lazy"

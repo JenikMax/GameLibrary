@@ -31,13 +31,13 @@ public class RelatedGamesController {
     }
 
     private List<GameShortDto> findByGenre(Long gameId) {
-        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, " +
                 "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
                 "from game_data g " +
                 "join library.game_data_genre dg on dg.game_id = g.id " +
                 "where g.id != ? " +
                 "and dg.genre_code in (select genre_code from library.game_data_genre where game_id = ?) " +
-                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo " +
+                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date " +
                 "order by count(*) desc, g.name limit 6";
         return sqlDao.executeShortGame(sql, new Object[]{gameId, gameId});
     }
@@ -69,12 +69,12 @@ public class RelatedGamesController {
     }
 
     private List<GameShortDto> findByNamePrefix(Long gameId, String prefix) {
-        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, " +
                 "string_agg(dg.genre_code, ',' order by dg.genre_code) filter (where dg.genre_code is not null) as genre_codes " +
                 "from game_data g " +
                 "left join library.game_data_genre dg on dg.game_id = g.id " +
                 "where g.id != ? and g.name ilike ? " +
-                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo " +
+                "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date " +
                 "order by g.name limit 6";
         return sqlDao.executeShortGame(sql, new Object[]{gameId, prefix + "%"});
     }

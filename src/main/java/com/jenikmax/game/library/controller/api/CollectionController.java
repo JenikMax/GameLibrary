@@ -55,6 +55,14 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
+    @GetMapping("/membership")
+    public ResponseEntity<ApiResponse<List<Long>>> getMembership(@RequestParam Long gameId) {
+        Long userId = getCurrentUserId();
+        if (userId == null) return ResponseEntity.status(401).body(ApiResponse.error("Unauthorized"));
+        List<Long> ids = entryRepository.findCollectionIdsByGameIdAndUserId(gameId, userId);
+        return ResponseEntity.ok(ApiResponse.ok(ids));
+    }
+
     @GetMapping("/with-hero")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> listCollectionsWithHero() {
         Long currentUserId = getCurrentUserId();

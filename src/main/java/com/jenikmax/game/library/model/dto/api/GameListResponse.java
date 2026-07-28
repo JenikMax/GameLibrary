@@ -12,20 +12,18 @@ public class GameListResponse {
     private List<String> genres;
     private List<String> tags;
     private String logoUrl;
-    private String logo;
     private Double avgRating;
     private boolean favorited;
 
     public GameListResponse() {}
 
-    public GameListResponse(Long id, String name, String platform, String releaseDate, List<String> genres, String logoUrl, String logo) {
+    public GameListResponse(Long id, String name, String platform, String releaseDate, List<String> genres, String logoUrl) {
         this.id = id;
         this.name = name;
         this.platform = platform;
         this.releaseDate = releaseDate;
         this.genres = genres;
         this.logoUrl = logoUrl;
-        this.logo = logo;
     }
 
     public Long getId() { return id; }
@@ -42,8 +40,6 @@ public class GameListResponse {
     public void setTags(List<String> tags) { this.tags = tags; }
     public String getLogoUrl() { return logoUrl; }
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
-    public String getLogo() { return logo; }
-    public void setLogo(String logo) { this.logo = logo; }
     public Double getAvgRating() { return avgRating; }
     public void setAvgRating(Double avgRating) { this.avgRating = avgRating; }
     public boolean isFavorited() { return favorited; }

@@ -28,8 +28,8 @@ spring:
     username: library-manager-user
     password: ${DB_PASSWORD}
     hikari:
-      maximum-pool-size: 4
-      minimum-idle: 1
+      maximum-pool-size: 10
+      minimum-idle: 2
       connection-timeout: 10000
       connection-test-query: SELECT 1
   jpa:

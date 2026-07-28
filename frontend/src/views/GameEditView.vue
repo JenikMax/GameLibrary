@@ -282,6 +282,7 @@ const form = ref({
 })
 
 const existingScreenshots = ref([])
+const existingScreenshotsMap = ref({})
 const newScreenshotPreviews = ref([])
 const logoPreview = ref('')
 const allGenres = ref([])
@@ -396,7 +397,7 @@ onMounted(async () => {
       description: g.description || '',
       instruction: g.instruction || '',
       logo: '',
-      screenshots: [],
+      screenshots: g.screenshots || [],
       deleteScreenshotIds: []
     }
     logoPreview.value = ''
@@ -404,6 +405,12 @@ onMounted(async () => {
       const parts = url.split('/')
       return { id: Number(parts[parts.length - 1]), url }
     })
+    const map = {}
+    ;(g.screenshots || []).forEach((base64, i) => {
+      const id = existingScreenshots.value[i] ? existingScreenshots.value[i].id : null
+      if (id) map[id] = base64
+    })
+    existingScreenshotsMap.value = map
     newScreenshotPreviews.value = []
     allGenres.value = filterRes.data.data.genres || []
     allTags.value = filterRes.data.data.tags || []
@@ -452,6 +459,11 @@ function handleScreenshotsUpload(e) {
 function removeExistingScreenshot(id) {
   existingScreenshots.value = existingScreenshots.value.filter(s => s.id !== id)
   form.value.deleteScreenshotIds.push(id)
+  const base64 = existingScreenshotsMap.value[id]
+  if (base64) {
+    const idx = form.value.screenshots.indexOf(base64)
+    if (idx !== -1) form.value.screenshots.splice(idx, 1)
+  }
 }
 
 function removeNewScreenshot(index) {

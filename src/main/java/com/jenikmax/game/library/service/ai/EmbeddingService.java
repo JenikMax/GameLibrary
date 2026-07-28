@@ -115,8 +115,4 @@ public class EmbeddingService {
         return "passage: " + name + " " + name + " " + genresEn + " " + genresRu + " " + desc;
     }
 
-    public static String fixEncoding(String input) {
-        if (input == null) return null;
-        return new String(input.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-    }
 }

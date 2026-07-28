@@ -79,36 +79,13 @@ public class SecurityConfig {
                 .accessDeniedHandler(new CustomAccessDeniedHandler())
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint))
             .sessionManagement(sm -> sm
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/images/**").permitAll()
                 .requestMatchers("/api/tracker/**").permitAll()
+                .requestMatchers("/api/notifications/subscribe").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").hasAnyRole("ADMIN", "USER")
-
-                .requestMatchers("/resources/**").permitAll()
-                .requestMatchers("/css/**").permitAll()
-                .requestMatchers("/img/**").permitAll()
-                .requestMatchers("/js/**").permitAll()
-                .requestMatchers("/login").permitAll()
-                .requestMatchers("/register").permitAll()
-                .requestMatchers("/changeLocale").permitAll()
-
-                .requestMatchers(HttpMethod.GET, "/profile").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/profile").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/profile/pass").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/profile/update").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/profile/pass_reset").hasRole("ADMIN")
-
-                .requestMatchers(HttpMethod.GET, "/library").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.GET, "/library/game/{id}").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.GET, "/library/game/{id}/edit").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/library/game/{id}/edit").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/library/game/{id}/download").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/library/game/{id}/grab").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/filter").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/sort").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/scan").hasRole("ADMIN")
 
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/scan").hasRole("ADMIN")
@@ -118,17 +95,7 @@ public class SecurityConfig {
 
                 .requestMatchers("/api/**").hasAnyRole("ADMIN", "USER")
 
-                .anyRequest().authenticated())
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/library")
-                .permitAll())
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID", "token")
-                .permitAll());
+                .anyRequest().permitAll());
 
         http.addFilterBefore(rateLimitFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

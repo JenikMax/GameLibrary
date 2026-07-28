@@ -59,7 +59,7 @@ public class GameDataService implements GameService {
 
     @SuppressWarnings("deprecation")
     public List<GameShortDto> getGameShortList(){
-        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, " +
                 "(select string_agg(dg.genre_code, ',' order by dg.genre_code) from library.game_data_genre dg where dg.game_id = g.id) as genre_codes, " +
                 "(select string_agg(dt.tag_code, ',' order by dt.tag_code) from library.game_data_tag dt where dt.game_id = g.id) as tag_codes " +
                 "from game_data g order by g.name";
@@ -68,7 +68,7 @@ public class GameDataService implements GameService {
 
     @SuppressWarnings("deprecation")
     public List<GameShortDto> getGameShortList(int startIndex, int endIndex){
-        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, " +
                 "(select string_agg(dg.genre_code, ',' order by dg.genre_code) from library.game_data_genre dg where dg.game_id = g.id) as genre_codes, " +
                 "(select string_agg(dt.tag_code, ',' order by dt.tag_code) from library.game_data_tag dt where dt.game_id = g.id) as tag_codes " +
                 "from game_data g order by g.name" +
@@ -122,7 +122,7 @@ public class GameDataService implements GameService {
         }
         String order = buildOrderClause(sortField, sortType);
         String limit = (endIndex != 0) ? " offset " + startIndex + " limit " + (endIndex - startIndex) : "";
-        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, " +
                 "(select string_agg(dg.genre_code, ',' order by dg.genre_code) from library.game_data_genre dg where dg.game_id = g.id) as genre_codes, " +
                 "(select string_agg(dt.tag_code, ',' order by dt.tag_code) from library.game_data_tag dt where dt.game_id = g.id) as tag_codes " +
                 from + where + order + limit;
@@ -133,7 +133,7 @@ public class GameDataService implements GameService {
     public List<GameShortDto> getGameShortListByIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) return java.util.Collections.emptyList();
         String placeholders = String.join(",", java.util.Collections.nCopies(ids.size(), "?"));
-        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, g.logo, " +
+        String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, " +
                 "(select string_agg(dg.genre_code, ',' order by dg.genre_code) from library.game_data_genre dg where dg.game_id = g.id) as genre_codes, " +
                 "(select string_agg(dt.tag_code, ',' order by dt.tag_code) from library.game_data_tag dt where dt.game_id = g.id) as tag_codes " +
                 "from game_data g " +
