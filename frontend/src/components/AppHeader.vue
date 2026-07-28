@@ -92,8 +92,8 @@
               <i v-else-if="n.type === 'scan_complete'" class="pi pi-refresh text-blue-500 mt-1" />
               <i v-else class="pi pi-exclamation-triangle text-red-500 mt-1" />
               <div class="flex-1">
-                <div class="font-semibold text-sm">{{ n.title }}</div>
-                <div class="text-xs text-color-secondary">{{ n.message }}</div>
+                <div class="font-semibold text-sm">{{ t('notifications.' + n.type + '_title') || n.title }}</div>
+                <div class="text-xs text-color-secondary">{{ t('notifications.' + n.type + '_message') || n.message }}</div>
                 <div class="text-xs text-color-secondary mt-1">{{ n.createdAt }}</div>
               </div>
               <Button
