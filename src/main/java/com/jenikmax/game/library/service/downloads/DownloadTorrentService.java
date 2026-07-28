@@ -23,6 +23,11 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+/**
+ * Сервис создания и кэширования .torrent-файлов.
+ * Использует TorrentCacheManager для кэширования, GameTorrentCreator для генерации
+ * и TransmissionService для добавления в раздачу.
+ */
 @Component
 public class DownloadTorrentService {
 
@@ -41,6 +46,10 @@ public class DownloadTorrentService {
         this.transmissionService = transmissionService;
     }
 
+    /**
+     * Создаёт .torrent для директории, опционально добавляя в Transmission.
+     * Поддерживает колбэк прогресса хеширования.
+     */
     public TorrentResult createTorrent(String directoryPath, boolean seedViaTransmission,
                                         GameTorrentCreator.ProgressCallback callback)
             throws IOException, NoSuchAlgorithmException {
@@ -79,16 +88,25 @@ public class DownloadTorrentService {
         return new TorrentResult(torrentPath, seedId);
     }
 
+    /**
+     * Создаёт .torrent с опциональной раздачей через Transmission (без колбэка).
+     */
     public TorrentResult createTorrent(String directoryPath, boolean seedViaTransmission)
             throws IOException, InterruptedException, NoSuchAlgorithmException {
         return createTorrent(directoryPath, seedViaTransmission, null);
     }
 
+    /**
+     * Создаёт .torrent без раздачи, возвращает путь к файлу.
+     */
     public String createTorrent(String directoryPath)
             throws IOException, InterruptedException, NoSuchAlgorithmException {
         return createTorrent(directoryPath, false, null).getTorrentPath();
     }
 
+    /**
+     * Возвращает рекурсивный список всех файлов в директории игры.
+     */
     public List<File> listGameFiles(String directoryPath) {
         File directory = new File(directoryPath);
         List<File> files = new ArrayList<>();
@@ -96,6 +114,9 @@ public class DownloadTorrentService {
         return files;
     }
 
+    /**
+     * Проверяет, закэширован ли .torrent для указанной директории.
+     */
     public boolean isTorrentCached(String directoryPath) {
         File directory = new File(directoryPath);
         if (!directory.isDirectory()) return false;

@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Конфигурация скрапера.
+ * Содержит настройки типа, URL, CSS-селекторы, JSON Path, маппинги жанров,
+ * API-ключ (зашифрованный), заголовки и подсказки для UI.
+ */
 public class ScraperConfig {
 
     private String type;

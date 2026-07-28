@@ -1,5 +1,9 @@
 package com.jenikmax.game.library.model.dto.api;
 
+/**
+ * Ответ на успешную аутентификацию.
+ * Содержит JWT-токен, его тип и профиль пользователя.
+ */
 public class LoginResponse {
 
     private String token;

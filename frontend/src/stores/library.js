@@ -1,14 +1,18 @@
+// Pinia- store для управления состоянием библиотеки: список игр, фильтры, пагинация, сортировка
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { gamesApi } from '../api/games'
 import { useLocaleStore } from './locale'
 
 export const useLibraryStore = defineStore('library', () => {
+  // Состояние списка игр и пагинации
   const games = ref([])
   const totalItems = ref(0)
   const totalPages = ref(1)
   const currentPage = ref(1)
   const loading = ref(false)
+
+  // Параметры фильтрации
   const searchText = ref('')
   const selectedPlatforms = ref([])
   const selectedYears = ref([])
@@ -18,6 +22,8 @@ export const useLibraryStore = defineStore('library', () => {
   const sortType = ref('')
   const favoritesOnly = ref(false)
   const semanticSearch = ref(false)
+
+  // Опции фильтра (получаемые с сервера) и настройки отображения
   const filterOptions = ref({ years: [], platforms: [], genres: [], tags: [] })
   const pageSize = ref(12)
   const viewMode = ref('grid')
@@ -26,6 +32,7 @@ export const useLibraryStore = defineStore('library', () => {
     viewMode.value = mode
   }
 
+  // Загрузка игр с сервера с текущими параметрами фильтрации
   async function fetchGames(page = 1) {
     loading.value = true
     currentPage.value = page
@@ -50,12 +57,13 @@ export const useLibraryStore = defineStore('library', () => {
         totalPages.value = data.data.totalPages
       }
     } catch {
-      // error handled by global axios interceptor
+      // Ошибка обрабатывается глобальным перехватчиком axios
     } finally {
       loading.value = false
     }
   }
 
+  // Получение доступных опций для фильтров (платформы, жанры и т.д.)
   async function fetchFilterOptions() {
     try {
       const response = await gamesApi.getFilterOptions()
@@ -64,10 +72,11 @@ export const useLibraryStore = defineStore('library', () => {
         filterOptions.value = data.data
       }
     } catch {
-      // ignore
+      // игнорируем
     }
   }
 
+  // Сеттеры для параметров фильтрации
   function setSearch(text) {
     searchText.value = text
   }
@@ -96,6 +105,7 @@ export const useLibraryStore = defineStore('library', () => {
     semanticSearch.value = false
   }
 
+  // Маппинг кодов жанров в названия для отображения
   const genreMap = computed(() => {
     const map = {}
     for (const g of filterOptions.value.genres || []) {
@@ -104,6 +114,7 @@ export const useLibraryStore = defineStore('library', () => {
     return map
   })
 
+  // Перезагрузка опций фильтра при смене языка
   const localeStore = useLocaleStore()
   watch(() => localeStore.locale, () => {
     fetchFilterOptions()

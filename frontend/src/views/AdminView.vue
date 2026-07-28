@@ -1,3 +1,4 @@
+<!-- Админ-панель: сканирование ФС с progress bar, генерация эмбеддингов для semantic search (с регенерацией), быстрые ссылки на управление пользователями и скраперами. -->
 <template>
   <div class="admin-dashboard">
     <h2 class="mb-3">
@@ -104,6 +105,7 @@
 </template>
 
 <script setup>
+// Админ-дашборд: управление сканированием ФС, генерацией эмбеддингов (с поддержкой force-регенерации), ссылки на управление пользователями и скраперами
 import { ref, computed, onBeforeUnmount } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { adminApi } from '../api/admin'
@@ -117,6 +119,7 @@ const { t } = useI18n()
 const { isTerminalTheme } = useTheme()
 const toast = useToast()
 
+// Сканирование ФС
 const scanning = ref(false)
 const scanTaskId = ref(null)
 const scanProgress = ref(0)
@@ -124,12 +127,14 @@ const scanCurrentGame = ref('')
 const scanPhase = ref('')
 let scanPollTimer = null
 
+// Генерация эмбеддингов
 const embeddingTaskId = ref(null)
 const embeddingProgress = ref(0)
 const embeddingCurrentGame = ref('')
 const embeddingGenerating = ref(false)
 let embeddingPollTimer = null
 
+// Локализованная метка фазы сканирования
 const scanPhaseLabel = computed(() => {
   const phaseMap = {
     'PENDING': t('scan.phase_scanning'),
@@ -144,6 +149,7 @@ const scanPhaseLabel = computed(() => {
   return phaseMap[scanPhase.value] || ''
 })
 
+// Запуск сканирования файловой системы
 async function scanLibrary() {
   scanning.value = true
   try {
@@ -160,6 +166,7 @@ async function scanLibrary() {
   }
 }
 
+// Polling статуса сканирования каждые 500ms
 function pollScanStatus() {
   if (!scanTaskId.value) return
   scanPollTimer = setInterval(async () => {
@@ -191,6 +198,7 @@ function pollScanStatus() {
   }, 500)
 }
 
+// Запуск генерации эмбеддингов (force=true — перегенерировать все, force=false — только отсутствующие)
 async function generateEmbeddings(force) {
   embeddingGenerating.value = true
   try {
@@ -206,6 +214,7 @@ async function generateEmbeddings(force) {
   }
 }
 
+// Polling статуса генерации эмбеддингов каждые 500ms
 function pollEmbeddingStatus() {
   if (!embeddingTaskId.value) return
   embeddingPollTimer = setInterval(async () => {
@@ -236,6 +245,7 @@ function pollEmbeddingStatus() {
   }, 500)
 }
 
+// Очистка таймеров при уходе со страницы
 onBeforeUnmount(() => {
   if (scanPollTimer) {
     clearInterval(scanPollTimer)

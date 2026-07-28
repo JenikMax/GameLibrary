@@ -7,6 +7,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+/**
+ * Сервис перевода описаний игр между русским и английским языками.
+ * Использует AI-клиент для вызова моделей Helsinki-NLP OPUS-MT.
+ * Автоматически определяет направление перевода по кириллице/латинице.
+ * Кэширует результат в колонке description_translated БД.
+ */
 @Service
 public class TranslationService {
 
@@ -22,6 +28,9 @@ public class TranslationService {
         this.jdbc = jdbc;
     }
 
+    /**
+     * Переводит описание игры и сохраняет результат в БД. Если перевод уже есть — возвращает его.
+     */
     public String translateAndCache(Long gameId) {
         if (!isAvailable()) {
             return "";
@@ -52,10 +61,16 @@ public class TranslationService {
         return translated;
     }
 
+    /**
+     * Проверяет доступность AI-сервиса.
+     */
     public boolean isAvailable() {
         return aiClient.isAvailable();
     }
 
+    /**
+     * Переводит текст в указанном направлении (ru-en или en-ru).
+     */
     public String translateText(String text, String direction) {
         if (!isAvailable()) {
             return text;
@@ -69,6 +84,9 @@ public class TranslationService {
         }
     }
 
+    /**
+     * Переводит произвольный текст с автоопределением направления.
+     */
     public String translateArbitraryText(String text) {
         if (!isAvailable() || text == null || text.isBlank()) {
             return text;

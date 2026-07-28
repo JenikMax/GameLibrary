@@ -1,17 +1,21 @@
+// Pinia- store для управления аутентификацией и состоянием пользователя
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authApi } from '../api/auth'
 
 export const useAuthStore = defineStore('auth', () => {
+  // Инициализация состояния из localStorage (переживает перезагрузку страницы)
   const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
   const token = ref(localStorage.getItem('token') || '')
 
+  // Вычисляемые свойства для удобного доступа
   const isAuthenticated = computed(() => !!token.value)
   const isAdmin = computed(() => user.value?.admin || false)
   const username = computed(() => user.value?.name || '')
   const userId = computed(() => user.value?.id || null)
   const avatarUrl = computed(() => user.value?.avatarUrl || '')
 
+  // Логин: сохранение токена и данных пользователя
   async function login(username, password) {
     const response = await authApi.login(username, password)
     const data = response.data
@@ -25,6 +29,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // Регистрация (без сохранения токена — пользователь должен войти)
   async function register(username, password) {
     const response = await authApi.register(username, password)
     const data = response.data
@@ -33,6 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // Проверка валидности токена через API /auth/me
   async function checkAuth() {
     if (!token.value) return false
     try {
@@ -49,6 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
     return false
   }
 
+  // Выход: очистка всех данных аутентификации
   function logout() {
     token.value = ''
     user.value = null

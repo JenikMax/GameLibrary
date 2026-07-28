@@ -11,6 +11,12 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/games")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Related Games", description = "Related games by genre and series")
+/**
+ * Контроллер похожих игр.
+ * Обрабатывает запросы по пути /api/games/{id}/related.
+ * Выполняет два SQL-запроса: поиск по общим жанрам и поиск по схожему названию
+ * (серии игр). Результаты объединяются и возвращаются отдельными списками.
+ */
 public class RelatedGamesController {
 
     private final SqlDao sqlDao;
@@ -19,6 +25,11 @@ public class RelatedGamesController {
         this.sqlDao = sqlDao;
     }
 
+    /**
+     * Получить похожие игры: по жанру (sameGenre) и по серии (sameSeries).
+     * @param id идентификатор игры
+     * @return объект с двумя списками похожих игр
+     */
     @GetMapping("/{id}/related")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getRelatedGames(@PathVariable Long id) {
         List<GameShortDto> sameGenre = findByGenre(id);

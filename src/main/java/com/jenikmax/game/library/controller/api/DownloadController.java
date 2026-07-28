@@ -27,6 +27,13 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequestMapping("/api")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Downloads", description = "Game downloads and seeding")
+/**
+ * Контроллер загрузки и раздачи игр.
+ * Обрабатывает запросы по пути /api (загрузка, раздача, торренты).
+ * Поддерживает потоковую загрузку ZIP-архивов, подготовку .torrent-файлов
+ * для больших игр (≥5 ГБ), управление загрузками через Transmission RPC,
+ * а также проверку статуса seed-задач.
+ */
 public class DownloadController {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadController.class);
@@ -52,6 +59,13 @@ public class DownloadController {
         this.userService = userService;
     }
 
+    /**
+     * Скачать игру ZIP-архивом (потоково, без буферизации в памяти).
+     * Для игр ≥5 ГБ требуется предварительная подготовка .torrent.
+     * @param id       идентификатор игры
+     * @param response HTTP-ответ для стриминга
+     * @return StreamingResponseBody с содержимым архива
+     */
     @GetMapping("/games/{id}/download")
     public CompletableFuture<ResponseEntity<StreamingResponseBody>> downloadGame(
             @PathVariable Long id, HttpServletResponse response) {
@@ -60,6 +74,12 @@ public class DownloadController {
         return libraryService.downloadGameInStream(gameDto, response);
     }
 
+    /**
+     * Получить информацию о загрузке игры: размер на диске,
+     * статус кэша .torrent, URL для скачивания.
+     * @param id идентификатор игры
+     * @return информация о загрузке
+     */
     @GetMapping("/games/{id}/download-info")
     public ResponseEntity<ApiResponse<DownloadInfoResponse>> getDownloadInfo(@PathVariable Long id) {
         GameDto gameDto = libraryService.getGameInfo(id);
@@ -75,6 +95,12 @@ public class DownloadController {
         return ResponseEntity.ok(ApiResponse.ok(info));
     }
 
+    /**
+     * Запустить раздачу игры через Transmission (seed).
+     * Запускает асинхронную задачу создания .torrent и добавления в Transmission.
+     * @param id идентификатор игры
+     * @return 202 Accepted с taskId и URL статуса
+     */
     @PostMapping("/games/{id}/seed")
     public ResponseEntity<ApiResponse<Map<String, Object>>> seedGame(@PathVariable Long id) {
         logger.info("Seed game via Transmission - {}", id);
@@ -97,6 +123,12 @@ public class DownloadController {
         }
     }
 
+    /**
+     * Подготовить .torrent-файл для скачивания большой игры (≥5 ГБ).
+     * Запускает асинхронную задачу хеширования файлов.
+     * @param id идентификатор игры
+     * @return 202 Accepted с taskId и URL статуса
+     */
     @PostMapping("/games/{id}/prepare-download")
     public ResponseEntity<ApiResponse<Map<String, Object>>> prepareDownload(@PathVariable Long id) {
         logger.info("Prepare torrent download for game - {}", id);
@@ -119,6 +151,11 @@ public class DownloadController {
         }
     }
 
+    /**
+     * Получить статус задачи подготовки .torrent-файла.
+     * @param taskId идентификатор задачи
+     * @return текущий статус, прогресс, имя обрабатываемого файла
+     */
     @GetMapping("/download/prepare-status/{taskId}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getPrepareStatus(@PathVariable String taskId) {
         TorrentTask task = torrentTaskService.getTask(taskId);
@@ -137,6 +174,11 @@ public class DownloadController {
         return ResponseEntity.ok(ApiResponse.ok(data));
     }
 
+    /**
+     * Получить статус задачи seed-раздачи.
+     * @param taskId идентификатор задачи
+     * @return статус, прогресс, путь к .torrent, seedId
+     */
     @GetMapping("/seed/status/{taskId}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getSeedStatus(@PathVariable String taskId) {
         TorrentTask task = torrentTaskService.getTask(taskId);
@@ -157,12 +199,22 @@ public class DownloadController {
         return ResponseEntity.ok(ApiResponse.ok(data));
     }
 
+    /**
+     * Получить список активных загрузок из Transmission.
+     * @return список активных торрентов
+     */
     @GetMapping("/downloads/active")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getActiveDownloads() {
         List<Map<String, Object>> active = transmissionService.getActive();
         return ResponseEntity.ok(ApiResponse.ok(active));
     }
 
+    /**
+     * Получить список ожидающих загрузок из Transmission.
+     * @param offset смещение
+     * @param num    количество записей
+     * @return список ожидающих торрентов
+     */
     @GetMapping("/downloads/waiting")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getWaitingDownloads(
             @RequestParam(defaultValue = "0") int offset,
@@ -171,6 +223,12 @@ public class DownloadController {
         return ResponseEntity.ok(ApiResponse.ok(waiting));
     }
 
+    /**
+     * Получить список остановленных загрузок из Transmission.
+     * @param offset смещение
+     * @param num    количество записей
+     * @return список остановленных торрентов
+     */
     @GetMapping("/downloads/stopped")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getStoppedDownloads(
             @RequestParam(defaultValue = "0") int offset,
@@ -179,6 +237,11 @@ public class DownloadController {
         return ResponseEntity.ok(ApiResponse.ok(stopped));
     }
 
+    /**
+     * Получить статус конкретной загрузки по идентификатору торрента.
+     * @param gid идентификатор торрента в Transmission
+     * @return статус загрузки
+     */
     @GetMapping("/downloads/{gid}/status")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDownloadStatus(@PathVariable String gid) {
         Map<String, Object> status = transmissionService.getStatus(gid);
@@ -188,6 +251,11 @@ public class DownloadController {
         return ResponseEntity.ok(ApiResponse.ok(status));
     }
 
+    /**
+     * Удалить загрузку из Transmission (без удаления файлов).
+     * @param gid идентификатор торрента
+     * @return сообщение об успешном удалении
+     */
     @PostMapping("/downloads/{gid}/remove")
     public ResponseEntity<ApiResponse<Void>> removeDownload(@PathVariable String gid) {
         boolean removed = transmissionService.remove(gid, false);
@@ -197,6 +265,11 @@ public class DownloadController {
         return ResponseEntity.badRequest().body(ApiResponse.error("Failed to remove download"));
     }
 
+    /**
+     * Поставить загрузку на паузу.
+     * @param gid идентификатор торрента
+     * @return сообщение об успешной паузе
+     */
     @PostMapping("/downloads/{gid}/pause")
     public ResponseEntity<ApiResponse<Void>> pauseDownload(@PathVariable String gid) {
         boolean paused = transmissionService.stopTorrent(gid);
@@ -206,6 +279,11 @@ public class DownloadController {
         return ResponseEntity.badRequest().body(ApiResponse.error("Failed to pause download"));
     }
 
+    /**
+     * Возобновить приостановленную загрузку.
+     * @param gid идентификатор торрента
+     * @return сообщение об успешном возобновлении
+     */
     @PostMapping("/downloads/{gid}/unpause")
     public ResponseEntity<ApiResponse<Void>> unpauseDownload(@PathVariable String gid) {
         boolean unpaused = transmissionService.startTorrent(gid);
@@ -222,12 +300,22 @@ public class DownloadController {
         return userDto != null ? userDto.getId() : null;
     }
 
+    /**
+     * Получить глобальную статистику Transmission (количество торрентов,
+     * скорость загрузки/отдачи, объём данных).
+     * @return глобальная статистика
+     */
     @GetMapping("/downloads/global-stat")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getGlobalStat() {
         Map<String, Object> stat = transmissionService.getGlobalStat();
         return ResponseEntity.ok(ApiResponse.ok(stat));
     }
 
+    /**
+     * Проверить доступность Transmission RPC. Legacy-эндпоинт (название
+     * историческое, фактически проверяет Transmission).
+     * @return "Transmission is connected" или 503
+     */
     @GetMapping("/downloads/aria2-version")
     public ResponseEntity<ApiResponse<String>> getTransmissionStatus() {
         boolean connected = transmissionService.isConnected();

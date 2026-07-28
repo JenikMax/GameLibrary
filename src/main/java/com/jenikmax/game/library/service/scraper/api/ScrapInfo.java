@@ -1,5 +1,10 @@
 package com.jenikmax.game.library.service.scraper.api;
 
+/**
+ * Модель данных для настройки скрапинга.
+ * Содержит URL источника и флаги, какие поля игры нужно извлекать
+ * (название, постер, описание, год, жанры, скриншоты, инструкция).
+ */
 public class ScrapInfo {
 
     private String url;

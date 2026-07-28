@@ -1,5 +1,11 @@
 package com.jenikmax.game.library.service.scaner;
 
+/**
+ * Модель задачи сканирования библиотеки.
+ * Отслеживает статус (SCANNING_DIRS → STORING_METADATA → LOADING_IMAGES
+ * → GENERATING_EMBEDDINGS → REFRESHING_SIZES → COMPLETED), прогресс,
+ * текущую игру и количество добавленных/удалённых игр.
+ */
 public class ScanTask {
 
     public enum Status {

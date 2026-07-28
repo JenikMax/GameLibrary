@@ -18,6 +18,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Скрапер для TheGamesDB (thegamesdb.net).
+ * Требует API-ключ. Выполняет поиск по названию, извлекает обложку,
+ * описание, жанры (с кэшированием ID→имя), дату и скриншоты.
+ */
 public class TheGameDBScraper implements Scraper {
 
     private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;

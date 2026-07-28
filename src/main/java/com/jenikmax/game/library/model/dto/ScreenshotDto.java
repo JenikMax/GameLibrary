@@ -1,5 +1,9 @@
 package com.jenikmax.game.library.model.dto;
 
+/**
+ * DTO скриншота игры.
+ * Содержит ID, ID игры, имя файла и данные изображения в Base64.
+ */
 public class ScreenshotDto {
 
     private Long id;

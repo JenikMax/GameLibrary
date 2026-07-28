@@ -12,9 +12,14 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Locale;
 
+/**
+ * Конфигурация Spring MVC: интернационализация (i18n), локализация.
+ * Сообщения из msg/messages_*.properties, переключение языка через ?lang=ru|en.
+ */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
+    /** Источник сообщений из classpath:msg/messages. */
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource source = new ResourceBundleMessageSource();
@@ -23,6 +28,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return source;
     }
 
+    /** Локаль по умолчанию — английская, хранится в сессии. */
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver resolver = new SessionLocaleResolver();
@@ -30,6 +36,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return resolver;
     }
 
+    /** Перехватчик для смены языка через параметр запроса 'lang'. */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();

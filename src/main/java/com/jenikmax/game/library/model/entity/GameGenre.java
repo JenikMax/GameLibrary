@@ -5,6 +5,10 @@ import com.jenikmax.game.library.model.entity.enums.Genre;
 import jakarta.persistence.*;
 import java.io.Serializable;
 
+/**
+ * Сущность связи между игрой и жанром (многие-ко-многим).
+ * Хранит ссылку на игру и код жанра из перечисления Genre.
+ */
 @Entity
 @Table(name = "game_data_genre")
 @SequenceGenerator(

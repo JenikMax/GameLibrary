@@ -1,3 +1,4 @@
+<!-- Страница регистрации нового пользователя. Валидация пароля (мин. 8 символов, буквы + цифры), редирект на логин через 1.5с после успеха. -->
 <template>
   <div class="auth-page">
     <div class="auth-card">
@@ -40,6 +41,7 @@
 </template>
 
 <script setup>
+// Регистрация: валидация пароля, вызов AuthStore.register, авто-редирект на /login через 1.5с
 import { ref, computed, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -84,6 +86,7 @@ onBeforeUnmount(() => {
   if (redirectTimer) clearTimeout(redirectTimer)
 })
 
+// Обработчик регистрации: валидация пароля, вызов API, редирект
 async function handleRegister() {
   if (!username.value || !password.value) {
     error.value = t('login.fill_fields')

@@ -6,6 +6,11 @@ import org.springframework.stereotype.Component;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Компонент для локализации названий жанров.
+ * Загружает EnumMap-маппинг Genre → локализованная строка
+ * из конфигурационных свойств с префиксом "enum".
+ */
 @Component
 @ConfigurationProperties("enum")
 public class GenreLoc {

@@ -1,3 +1,4 @@
+<!-- Страница редактирования игры. Содержит форму с полями (название, платформа, жанры, теги, описание, инструкция, скриншоты), боковую панель с логотипом и скрапером, авто-тегирование через AI, перевод описания. -->
 <template>
   <div v-if="loading" class="flex justify-content-center p-5">
     <ProgressSpinner />
@@ -221,6 +222,7 @@
 </template>
 
 <script setup>
+// Редактор игры: форма с валидацией, загрузка логотипа/скриншотов, скрапинг с внешних источников, авто-тегирование через AI, перевод описания
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
@@ -251,6 +253,7 @@ const localeStore = useLocaleStore()
 const libraryStore = useLibraryStore()
 const toast = useToast()
 
+// Название игры с префиксом Edit:_ для терминальной темы
 const terminalTitle = computed(() => {
   if (!game.value) return ''
   return 'Edit:_' + game.value.name.replace(/ /g, '_')
@@ -264,8 +267,9 @@ const error = ref('')
 const success = ref('')
 const logoLoaded = ref(false)
 const existingSsLoaded = reactive({})
-const errors = ref({})
+const errors = ref({}) // Ошибки валидации полей
 
+// Модель формы
 const form = ref({
   name: '',
   platform: '',
@@ -283,7 +287,7 @@ const form = ref({
 
 const existingScreenshots = ref([])
 const existingScreenshotsMap = ref({})
-const newScreenshotPreviews = ref([])
+const newScreenshotPreviews = ref([]) // Предпросмотр новых скриншотов
 const logoPreview = ref('')
 const allGenres = ref([])
 const allTags = ref([])
@@ -296,10 +300,12 @@ const suggestedGenres = ref([])
 const selectedSuggestedTags = ref([])
 const selectedSuggestedGenres = ref([])
 
+// Преобразует код жанра в локализованное название
 function genreName(code) {
   return libraryStore.genreMap[code] || code
 }
 
+// Запрос к AI для авто-подбора тегов и жанров по описанию
 async function suggestTags() {
   autoTagLoading.value = true
   try {
@@ -322,12 +328,14 @@ async function suggestTags() {
   }
 }
 
+// Применение выбранных предложенных тегов/жанров
 function applySuggestedTags() {
   form.value.tags = [...new Set([...form.value.tags, ...selectedSuggestedTags.value])]
   form.value.genres = [...new Set([...form.value.genres, ...selectedSuggestedGenres.value])]
   autoTagDialog.value = false
 }
-const scrapeSources = ref([])
+const scrapeSources = ref([]) // Список доступных скраперов
+// Поля для скрапинга (какие данные импортировать)
 const scrapeFields = [
   { key: 'title', labelKey: 'game.scraper.field.title' },
   { key: 'poster', labelKey: 'game.scraper.field.poster' },
@@ -337,6 +345,7 @@ const scrapeFields = [
   { key: 'screens', labelKey: 'game.scraper.field.screenshots' },
   { key: 'instruction', labelKey: 'game.scraper.field.instruction' }
 ]
+// Настройки скрапинга
 const scrape = ref({
   source: '',
   url: '',
@@ -349,12 +358,14 @@ const scrape = ref({
   instruction: true
 })
 
+// Локализованная подсказка в поле URL скрапера
 const currentScraperHint = computed(() => {
   const s = scrapeSources.value.find(s => s.value === scrape.value.source)
   if (!s) return ''
   return localeStore.locale === 'en' ? (s.inputHintEn || '') : (s.inputHintRu || '')
 })
 
+// Подпись поля URL в зависимости от выбранного скрапера
 const scrapeUrlLabel = computed(() => {
   const type = scrape.value.source
   if (type === 'psxdatacenter') return t('game.scraper.name_serial_or_url')
@@ -364,6 +375,7 @@ const scrapeUrlLabel = computed(() => {
   return t('game.scraper.url')
 })
 
+// Опции тулбара Quill-редактора
 const editorOptions = {
   modules: {
     toolbar: [
@@ -424,6 +436,7 @@ onMounted(async () => {
   }
 })
 
+// Обновление списка жанров/тегов при смене языка
 watch(() => localeStore.locale, async () => {
   try {
     const res = await gamesApi.getFilterOptions()
@@ -432,6 +445,7 @@ watch(() => localeStore.locale, async () => {
   } catch { /* ignore */ }
 })
 
+// Загрузка нового логотипа через FileReader
 function handleLogoUpload(e) {
   const file = e.target.files[0]
   if (!file) return
@@ -443,6 +457,7 @@ function handleLogoUpload(e) {
   reader.readAsDataURL(file)
 }
 
+// Загрузка новых скриншотов
 function handleScreenshotsUpload(e) {
   const files = e.target.files
   for (const file of files) {
@@ -456,6 +471,7 @@ function handleScreenshotsUpload(e) {
   }
 }
 
+// Удаление существующего скриншота (помечаем ID на удаление)
 function removeExistingScreenshot(id) {
   existingScreenshots.value = existingScreenshots.value.filter(s => s.id !== id)
   form.value.deleteScreenshotIds.push(id)
@@ -466,11 +482,13 @@ function removeExistingScreenshot(id) {
   }
 }
 
+// Удаление только что загруженного скриншота
 function removeNewScreenshot(index) {
   form.value.screenshots.splice(index, 1)
   newScreenshotPreviews.value.splice(index, 1)
 }
 
+// Перевод описания через AI-сервис
 async function translateDescription() {
   if (!form.value.description) return
   translatingDesc.value = true
@@ -484,6 +502,7 @@ async function translateDescription() {
   }
 }
 
+// Сохранение формы: валидация, отправка, редирект на карточку игры
 async function handleSave() {
   errors.value = {}
   if (!form.value.name?.trim()) {
@@ -511,6 +530,7 @@ async function handleSave() {
   }
 }
 
+// Запуск скрапинга данных игры
 async function handleScrape() {
   scraping.value = true
   error.value = ''

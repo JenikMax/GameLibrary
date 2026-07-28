@@ -1,7 +1,15 @@
 package com.jenikmax.game.library.service.ai;
 
+/**
+ * Модель задачи генерации эмбеддингов.
+ * Хранит состояние, прогресс, количество обработанных игр и сообщение об ошибке.
+ * Используется EmbeddingTaskService для отслеживания фоновых задач.
+ */
 public class EmbeddingTask {
 
+    /**
+     * Статусы задачи: ожидание, генерация, завершено, ошибка.
+     */
     public enum Status {
         PENDING, GENERATING, COMPLETED, FAILED
     }

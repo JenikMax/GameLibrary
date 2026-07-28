@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * Сущность избранной игры.
+ * Связывает пользователя с игрой, которую он добавил в избранное.
+ */
 @Entity
 @Table(name = "favorite_game")
 @SequenceGenerator(

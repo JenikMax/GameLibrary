@@ -12,6 +12,12 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+/**
+ * Сервис шифрования API-ключей скраперов.
+ * Использует AES-256/GCM/NoPadding с 12-байтным IV.
+ * Ключ загружается из переменной окружения SCRAPER_ENCRYPTION_KEY.
+ * Формат зашифрованных данных: ENC:{base64(IV + ciphertext)}.
+ */
 @Service
 public class ConfigEncryptionService {
 
@@ -37,6 +43,9 @@ public class ConfigEncryptionService {
         }
     }
 
+    /**
+     * Шифрует строку в формат ENC:{base64(IV + ciphertext)}.
+     */
     public String encrypt(String plaintext) {
         if (plaintext == null || plaintext.isEmpty()) return "";
         try {
@@ -55,6 +64,9 @@ public class ConfigEncryptionService {
         }
     }
 
+    /**
+     * Расшифровывает строку из формата ENC:{...} или возвращает как есть, если не зашифровано.
+     */
     public String decrypt(String ciphertext) {
         if (ciphertext == null || ciphertext.isEmpty()) return "";
         if (!ciphertext.startsWith(ENC_PREFIX)) return ciphertext;
@@ -71,10 +83,16 @@ public class ConfigEncryptionService {
         }
     }
 
+    /**
+     * Проверяет, зашифровано ли значение (начинается с ENC:).
+     */
     public boolean isEncrypted(String value) {
         return value != null && value.startsWith(ENC_PREFIX);
     }
 
+    /**
+     * Маскирует строку для отображения (первые 4 символа + ****).
+     */
     public String mask(String value) {
         if (value == null || value.isEmpty()) return "";
         return value.length() > 8 ? value.substring(0, 4) + "****" : "****";

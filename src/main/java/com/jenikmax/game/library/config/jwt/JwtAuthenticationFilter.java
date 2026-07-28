@@ -20,6 +20,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * Фильтр JWT-аутентификации.
+ * Извлекает JWT из заголовка Authorization (Bearer) или из cookie 'token'.
+ * Устанавливает SecurityContext для каждого запроса.
+ */
 @Component
 @Order(1800)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -53,11 +58,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {
-            logger.warn("Could not set user authentication: {}", ex.getMessage());
+            logger.warn("Не удалось установить аутентификацию пользователя: {}", ex.getMessage());
         }
         filterChain.doFilter(request, response);
     }
 
+    /** Извлечь JWT из заголовка Authorization или cookie 'token'. */
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {

@@ -3,6 +3,11 @@ package com.jenikmax.game.library.model.dto;
 import java.sql.Timestamp;
 import java.util.List;
 
+/**
+ * DTO для краткого представления игры в списках.
+ * Содержит основные поля: ID, название, платформа, дата выхода,
+ * жанры, теги и логотип в формате Base64.
+ */
 public class GameShortDto {
 
     protected Long id;

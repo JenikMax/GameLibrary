@@ -17,6 +17,13 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/games")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Reviews", description = "Game reviews with category scores")
+/**
+ * Контроллер рецензий на игры.
+ * Обрабатывает запросы по пути /api/games/{id}/reviews.
+ * Поддерживает получение списка рецензий с агрегированными средними оценками
+ * по 4 категориям (gameplay/graphics/story/music), добавление/обновление
+ * рецензии и удаление с проверкой прав владельца или администратора.
+ */
 public class ReviewController {
 
     private final GameReviewRepository reviewRepository;
@@ -27,6 +34,11 @@ public class ReviewController {
         this.userService = userService;
     }
 
+    /**
+     * Получить все рецензии к игре с агрегированными средними оценками по категориям.
+     * @param id идентификатор игры
+     * @return список рецензий и агрегированные оценки
+     */
     @GetMapping("/{id}/reviews")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getReviews(@PathVariable Long id) {
         List<GameReview> reviews = reviewRepository.findByGameIdOrderByCreatedAtDesc(id);
@@ -69,6 +81,13 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
+    /**
+     * Добавить или обновить рецензию. Если рецензия пользователя на эту игру
+     * уже существует — обновляет её, иначе создаёт новую.
+     * @param id   идентификатор игры
+     * @param body JSON с полями text, pros, cons, gameplayScore, graphicsScore, storyScore, musicScore
+     * @return созданная/обновлённая рецензия
+     */
     @PostMapping("/{id}/reviews")
     public ResponseEntity<ApiResponse<Map<String, Object>>> addOrUpdateReview(
             @PathVariable Long id,
@@ -113,6 +132,12 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponse.ok(m));
     }
 
+    /**
+     * Удалить рецензию. Доступно автору или администратору.
+     * @param gameId   идентификатор игры
+     * @param reviewId идентификатор рецензии
+     * @return пустой ответ или 403 при отсутствии прав
+     */
     @DeleteMapping("/{gameId}/reviews/{reviewId}")
     public ResponseEntity<ApiResponse<Void>> deleteReview(
             @PathVariable Long gameId,

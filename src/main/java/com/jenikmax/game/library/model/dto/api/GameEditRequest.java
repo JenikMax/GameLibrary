@@ -3,6 +3,10 @@ package com.jenikmax.game.library.model.dto.api;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
+/**
+ * Запрос на создание или редактирование игры.
+ * Содержит все редактируемые поля с валидацией.
+ */
 public class GameEditRequest {
 
     @NotBlank(message = "Game name is required")

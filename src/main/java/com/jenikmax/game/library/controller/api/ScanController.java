@@ -22,6 +22,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
+/**
+ * Контроллер сканирования файловой системы библиотеки.
+ * Обрабатывает запросы по пути /api/scan.
+ * Сканирование запускается асинхронно и выполняется в фоновом потоке
+ * в две фазы: запись метаданных (Phase 1) и загрузка изображений (Phase 2).
+ * Статус и прогресс отслеживаются через polling по taskId.
+ */
 public class ScanController {
 
     private static final Logger logger = LoggerFactory.getLogger(ScanController.class);
@@ -41,6 +48,10 @@ public class ScanController {
         this.userService = userService;
     }
 
+    /**
+     * Запустить асинхронное сканирование библиотеки (ФС → БД).
+     * @return 202 Accepted с taskId и URL статуса
+     */
     @PostMapping("/scan")
     public ResponseEntity<ApiResponse<Map<String, Object>>> scanLibrary() {
         logger.info("REST scan library (async)");
@@ -54,6 +65,12 @@ public class ScanController {
                 .body(ApiResponse.ok("Library scan started", data));
     }
 
+    /**
+     * Получить статус и прогресс задачи сканирования.
+     * При завершении или ошибке отправляет уведомление пользователю.
+     * @param taskId идентификатор задачи
+     * @return статус, прогресс, количество найденных/удалённых игр
+     */
     @GetMapping("/scan/status/{taskId}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getScanStatus(@PathVariable String taskId) {
         ScanTask task = scanTaskService.getTask(taskId);

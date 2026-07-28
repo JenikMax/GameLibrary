@@ -1,3 +1,4 @@
+<!-- Менеджер загрузок Transmission. Три вкладки: активные (с прогресс-баром, скоростями, паузой/возобновлением/удалением), ожидающие, завершённые/остановленные. Проверка подключения к Transmission, авто-обновление каждые 5 секунд. -->
 <template>
   <div class="downloads-container">
     <div class="flex align-items-center justify-content-between mb-3">
@@ -123,6 +124,7 @@
 </template>
 
 <script setup>
+// Менеджер загрузок: мониторинг Transmission через RPC API, авто-обновление каждые 5с, управление загрузками (пауза/возобновление/удаление), форматирование скорости
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { useTheme } from '../composables/useTheme'
@@ -165,6 +167,7 @@ onUnmounted(() => {
   if (pollInterval) clearInterval(pollInterval)
 })
 
+// Проверка соединения с Transmission
 async function checkTransmission() {
   try {
     await downloadsApi.getAria2Version()
@@ -174,6 +177,7 @@ async function checkTransmission() {
   }
 }
 
+// Загрузка всех списков и глобальной статистики
 async function fetchAll() {
   loading.value = true
   try {
@@ -194,6 +198,7 @@ async function fetchAll() {
   }
 }
 
+// Пауза загрузки
 async function pauseDownload(gid) {
   try {
     await downloadsApi.pause(gid)
@@ -204,6 +209,7 @@ async function pauseDownload(gid) {
   }
 }
 
+// Возобновление загрузки
 async function unpauseDownload(gid) {
   try {
     await downloadsApi.unpause(gid)
@@ -214,6 +220,7 @@ async function unpauseDownload(gid) {
   }
 }
 
+// Удаление загрузки
 async function removeDownload(gid) {
   try {
     await downloadsApi.remove(gid)
@@ -224,6 +231,7 @@ async function removeDownload(gid) {
   }
 }
 
+// Форматирование скорости в человекочитаемый вид (B/s, KB/s, MB/s, GB/s)
 function formatSpeed(speed) {
   if (!speed) return '0 B/s'
   const s = parseInt(speed)
@@ -238,6 +246,7 @@ function formatSpeed(speed) {
   return v.toFixed(v >= 10 ? 0 : 1) + ' ' + units[i]
 }
 
+// Определение severity тега статуса
 function statusSeverity(status) {
   switch (status) {
     case 'active': return 'success'

@@ -36,6 +36,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/games")
 @Tag(name = "Library", description = "Game library browsing, filtering, and management")
+/**
+ * Основной контроллер библиотеки игр.
+ * Обрабатывает запросы по пути /api/games.
+ * Предоставляет CRUD-операции для игр, поиск с фильтрацией/пагинацией/сортировкой,
+ * семантический поиск, скрапинг данных с внешних сайтов, авто-тегирование,
+ * перевод описаний, а также информацию для фильтров и случайную игру.
+ */
 public class LibraryController {
 
     private static final Logger logger = LoggerFactory.getLogger(LibraryController.class);
@@ -73,6 +80,10 @@ public class LibraryController {
         this.imagesDirectory = imagesDirectory;
     }
 
+    /**
+     * Получить список доступных источников для скрапинга (скраперов).
+     * @return список с информацией о скраперах и подсказками для ввода
+     */
     @GetMapping("/scrapers")
     public ResponseEntity<ApiResponse<List<ScraperInfoResponse>>> getScraperSources() {
         List<ScraperInfoResponse> items = scraperConfigService.getEnabledConfigs().stream()
@@ -159,6 +170,12 @@ public class LibraryController {
         return ResponseEntity.ok(ApiResponse.ok(pageResponse));
     }
 
+    /**
+     * Получить доступные опции для фильтрации: список годов, платформ,
+     * жанров (локализованных), тегов и флаг доступности семантического поиска.
+     * @param locale локаль для локализации названий жанров
+     * @return объект с опциями фильтрации
+     */
     @GetMapping("/filter-options")
     public ResponseEntity<ApiResponse<FilterOptionsResponse>> getFilterOptions(Locale locale) {
         List<String> years = libraryService.getReleaseDates();
@@ -179,6 +196,10 @@ public class LibraryController {
         return ResponseEntity.ok(ApiResponse.ok(options));
     }
 
+    /**
+     * Получить случайную игру из библиотеки.
+     * @return детальная информация о случайной игре или null, если библиотека пуста
+     */
     @GetMapping("/random")
     public ResponseEntity<ApiResponse<GameDetailResponse>> getRandomGame() {
         GameDto gameDto = libraryService.getRandomGame();
@@ -190,6 +211,11 @@ public class LibraryController {
         return ResponseEntity.ok(ApiResponse.ok(detailResp));
     }
 
+    /**
+     * Получить детальную информацию об игре по ID.
+     * @param id идентификатор игры
+     * @return детальная информация (описание, жанры, скриншоты, рейтинг и т.д.)
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<GameDetailResponse>> getGame(@PathVariable Long id) {
         logger.info("REST get game - {}", id);
@@ -199,6 +225,13 @@ public class LibraryController {
         return ResponseEntity.ok(ApiResponse.ok(detailResp));
     }
 
+    /**
+     * Обновить информацию об игре. Заменяет скриншоты целиком (не merge).
+     * Логотип обновляется только если передан новый; иначе сохраняется существующий.
+     * @param id      идентификатор игры
+     * @param gameEdit запрос с обновлёнными полями игры
+     * @return обновлённая информация об игре
+     */
     @PostMapping("/{id}/edit")
     public ResponseEntity<ApiResponse<GameDetailResponse>> editGame(@PathVariable Long id, @Valid @RequestBody GameEditRequest gameEdit) {
         logger.info("REST edit game - {}", id);
@@ -247,6 +280,12 @@ public class LibraryController {
         }
     }
 
+    /**
+     * Запустить скрапинг данных об игре с внешнего источника.
+     * @param id          идентификатор игры
+     * @param scrapRequest запрос с указанием источника и полей для скрапинга
+     * @return обновлённая информация об игре после скрапинга
+     */
     @PostMapping("/{id}/grab")
     public ResponseEntity<ApiResponse<GameDetailResponse>> grabGameData(
             @PathVariable Long id,
@@ -271,6 +310,11 @@ public class LibraryController {
         }
     }
 
+    /**
+     * Предложить теги и жанры для игры на основе её описания (авто-тегирование).
+     * @param id идентификатор игры
+     * @return результат с предложенными тегами и жанрами
+     */
     @PostMapping("/{id}/suggest-tags")
     public ResponseEntity<ApiResponse<AutoTagService.AutoTagResult>> suggestTags(@PathVariable Long id) {
         GameDto gameDto = libraryService.getGameInfo(id);
@@ -281,6 +325,11 @@ public class LibraryController {
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
+    /**
+     * Предпросмотр авто-тегирования для произвольного текста.
+     * @param body JSON с полем text
+     * @return предложенные теги и жанры для переданного текста
+     */
     @PostMapping("/auto-tag-preview")
     public ResponseEntity<ApiResponse<AutoTagService.AutoTagResult>> autoTagPreview(
             @RequestBody Map<String, String> body) {
@@ -289,6 +338,12 @@ public class LibraryController {
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
+    /**
+     * Перевести описание игры (авто-определение направления ru↔en).
+     * Результат кэшируется в поле description_translated.
+     * @param id идентификатор игры
+     * @return переведённый текст
+     */
     @PostMapping("/{id}/translate")
     public ResponseEntity<ApiResponse<Map<String, String>>> translateDescription(@PathVariable Long id) {
         if (!translationService.isAvailable()) {
@@ -298,6 +353,11 @@ public class LibraryController {
         return ResponseEntity.ok(ApiResponse.ok(Map.of("translatedText", translated)));
     }
 
+    /**
+     * Перевести произвольный текст (ru↔en, авто-определение направления).
+     * @param body JSON с полем text
+     * @return переведённый текст
+     */
     @PostMapping("/translate-text")
     public ResponseEntity<ApiResponse<Map<String, String>>> translateText(@RequestBody Map<String, String> body) {
         if (!translationService.isAvailable()) {

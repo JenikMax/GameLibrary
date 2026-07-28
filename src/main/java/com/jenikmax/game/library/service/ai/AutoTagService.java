@@ -8,6 +8,12 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Сервис автоматического тегирования игр на основе описания.
+ * Анализирует текст, находит ключевые слова через KeywordTagMapper
+ * и маппинги жанров из ScraperConfigService, возвращает
+ * предлагаемые теги и жанры.
+ */
 @Service
 public class AutoTagService {
 
@@ -19,6 +25,9 @@ public class AutoTagService {
 
     public record AutoTagResult(List<String> suggestedTags, List<String> suggestedGenres) {}
 
+    /**
+     * Анализирует описание и возвращает предлагаемые теги и жанры.
+     */
     public AutoTagResult suggest(String description) {
         if (description == null || description.isEmpty()) {
             return new AutoTagResult(List.of(), List.of());
@@ -44,6 +53,9 @@ public class AutoTagService {
         return new AutoTagResult(new ArrayList<>(tags), new ArrayList<>(genres));
     }
 
+    /**
+     * Предварительный просмотр тегов для текста (синоним suggest).
+     */
     public AutoTagResult preview(String text) {
         return suggest(text);
     }

@@ -1,5 +1,10 @@
 package com.jenikmax.game.library.model.dto.api;
 
+/**
+ * DTO профиля пользователя.
+ * Содержит ID, имя, флаги, аватар, дату регистрации
+ * и агрегированные счётчики (игры, оценки, коллекции, рецензии, комментарии, избранное).
+ */
 public class UserProfileResponse {
 
     private Long id;

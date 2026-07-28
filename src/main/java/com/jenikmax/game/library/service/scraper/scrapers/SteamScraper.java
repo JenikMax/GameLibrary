@@ -17,6 +17,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.context.i18n.LocaleContextHolder;
 
+/**
+ * Скрапер для Steam Store (store.steampowered.com).
+ * Использует Storefront API без ключа. Извлекает appId из URL,
+ * запрашивает данные через /api/appdetails с локализацией.
+ */
 public class SteamScraper implements Scraper {
 
     private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;

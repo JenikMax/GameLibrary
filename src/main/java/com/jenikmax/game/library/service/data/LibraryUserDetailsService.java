@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Реализация UserDetailsService для Spring Security.
+ * Загружает пользователя из БД по имени, назначает роли ROLE_USER и/или ROLE_ADMIN.
+ */
 @Service
 public class LibraryUserDetailsService implements UserDetailsService {
 

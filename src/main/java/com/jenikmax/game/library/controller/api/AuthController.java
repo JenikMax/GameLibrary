@@ -24,6 +24,13 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/auth")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Auth", description = "Authentication and registration")
+/**
+ * Контроллер аутентификации и регистрации.
+ * Обрабатывает запросы по пути /api/auth.
+ * Предоставляет endpoints для входа (JWT + httpOnly cookie), регистрации новых
+ * пользователей и получения информации о текущем аутентифицированном пользователе.
+ * Не требует предварительной аутентификации (кроме /me).
+ */
 public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
@@ -41,6 +48,13 @@ public class AuthController {
         this.jwtExpirationMs = jwtExpirationMs;
     }
 
+    /**
+     * Аутентификация пользователя. При успешном входе возвращает JWT-токен,
+     * а также устанавливает httpOnly cookie с токеном.
+     * @param loginRequest запрос с именем пользователя и паролем
+     * @param response     HTTP-ответ для установки cookie
+     * @return объект с JWT-токеном и профилем пользователя
+     */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest,
                                                              HttpServletResponse response) {
@@ -77,6 +91,11 @@ public class AuthController {
         }
     }
 
+    /**
+     * Регистрация нового пользователя.
+     * @param registerRequest запрос с именем пользователя и паролем
+     * @return сообщение об успешной регистрации или ошибку валидации
+     */
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody RegisterRequest registerRequest) {
         logger.info("REST register request for user: {}", registerRequest.getUsername());
@@ -95,6 +114,10 @@ public class AuthController {
         }
     }
 
+    /**
+     * Получить профиль текущего аутентифицированного пользователя.
+     * @return профиль пользователя (ID, имя, роль, статус, URL аватара)
+     */
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserProfileResponse>> me() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

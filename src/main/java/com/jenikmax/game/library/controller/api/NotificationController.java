@@ -18,6 +18,12 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/notifications")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Notifications", description = "User notifications")
+/**
+ * Контроллер уведомлений пользователя.
+ * Обрабатывает запросы по пути /api/notifications.
+ * Поддерживает получение списка уведомлений, отметку прочитанными (одного
+ * или всех), а также SSE-подписку для получения уведомлений в реальном времени.
+ */
 public class NotificationController {
 
     private final NotificationService notificationService;
@@ -33,6 +39,12 @@ public class NotificationController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    /**
+     * Подписаться на SSE-уведомления. Токен передаётся как query-параметр
+     * для аутентификации (т.к. SSE не поддерживает заголовки).
+     * @param token JWT-токен для аутентификации
+     * @return SseEmitter для получения событий в реальном времени
+     */
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@RequestParam("token") String token) {
         if (token == null || !jwtTokenProvider.validateToken(token)) {
@@ -56,6 +68,10 @@ public class NotificationController {
         return sseService.subscribe(userDto.getId());
     }
 
+    /**
+     * Получить список последних уведомлений и количество непрочитанных.
+     * @return список уведомлений и поле unread
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getNotifications() {
         Long userId = getCurrentUserId();
@@ -79,6 +95,11 @@ public class NotificationController {
         return ResponseEntity.ok(ApiResponse.ok(Map.of("items", items, "unread", unread)));
     }
 
+    /**
+     * Отметить одно уведомление как прочитанное.
+     * @param id идентификатор уведомления
+     * @return пустой ответ
+     */
     @PutMapping("/{id}/read")
     public ResponseEntity<ApiResponse<Void>> markAsRead(@PathVariable Long id) {
         Long userId = getCurrentUserId();
@@ -87,6 +108,10 @@ public class NotificationController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
+    /**
+     * Отметить все уведомления текущего пользователя как прочитанные.
+     * @return пустой ответ
+     */
     @PutMapping("/read-all")
     public ResponseEntity<ApiResponse<Void>> markAllAsRead() {
         Long userId = getCurrentUserId();

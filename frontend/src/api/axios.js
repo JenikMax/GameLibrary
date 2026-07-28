@@ -1,3 +1,5 @@
+// Axios-инстанс для API-запросов к бэкенду
+// Содержит перехватчики для JWT-авторизации, локали, повторных попыток и обработки ошибок
 import axios from 'axios'
 import { useLocaleStore } from '../stores/locale'
 
@@ -6,6 +8,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
+  // Сериализация параметров: массивы преобразуются в повторяющиеся ключи
   paramsSerializer: (params) => {
     const searchParams = new URLSearchParams()
     Object.entries(params).forEach(([key, value]) => {
@@ -19,9 +22,11 @@ const api = axios.create({
   }
 })
 
+// Настройки повторных попыток при ошибках сервера/сети
 const MAX_RETRIES = 1
 const RETRY_DELAY = 1000
 
+// Перехватчик запросов: добавляет JWT-токен и язык
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -37,6 +42,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Перехватчик ответов: обработка ошибок, авторетрян, редирект при 401
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -48,12 +54,14 @@ api.interceptors.response.use(
     const isNetworkError = !error.response
     const isServerOrNetworkError = status >= 500 || isNetworkError
 
+    // Повтор при 5xx или сетевой ошибке для GET-запросов
     if (isServerOrNetworkError && isGet && config._retryCount < MAX_RETRIES) {
       config._retryCount++
       await new Promise(r => setTimeout(r, RETRY_DELAY))
       return api(config)
     }
 
+    // При 401 (кроме логина/регистрации) — сброс токена и редирект
     if (status === 401) {
       const url = config.url || ''
       if (!url.includes('/auth/login') && !url.includes('/auth/register')) {
@@ -70,6 +78,7 @@ api.interceptors.response.use(
   }
 )
 
+// Формирование человекочитаемого сообщения об ошибке по статусу
 function getErrorMessage(error) {
   const status = error.response?.status
   if (status === 403) return 'Доступ запрещён'

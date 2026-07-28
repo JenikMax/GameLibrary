@@ -34,6 +34,12 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+/**
+ * Реализация сервиса библиотеки игр.
+ * Объединяет сканирование файловой системы, CRUD-операции над играми,
+ * поиск/фильтрацию, скрапинг метаданных и скачивание игр (ZIP/Torrent).
+ * Также управляет семантическим поиском через AI-сервис.
+ */
 @Service
 public class LibraryOperationService implements LibraryService {
 
@@ -62,6 +68,10 @@ public class LibraryOperationService implements LibraryService {
         this.embeddingService = embeddingService;
     }
 
+    /**
+     * Запускает полное сканирование директории с играми.
+     * Добавляет новые игры, обновляет метаданные, загружает изображения и удаляет отсутствующие.
+     */
     @Override
     public void scanLibrary() {
         List<Game> findGames = scanerService.scanDirectory(rootDirectory + LIBRARY_PREFIX);
@@ -113,21 +123,33 @@ public class LibraryOperationService implements LibraryService {
 
     }
 
+    /**
+     * Возвращает краткий список всех игр.
+     */
     @Override
     public List<GameShortDto> getGameList() {
         return gameService.getGameShortList();
     }
 
+    /**
+     * Возвращает краткий список игр с пагинацией.
+     */
     @Override
     public List<GameShortDto> getGameList(int startIndex, int endIndex) {
         return gameService.getGameShortList(startIndex, endIndex);
     }
 
+    /**
+     * Возвращает список идентификаторов всех игр.
+     */
     @Override
     public List<Long> getGameListId() {
         return gameService.getGameShortIdList();
     }
 
+    /**
+     * Возвращает отфильтрованный список игр с сортировкой (без пагинации).
+     */
     @Override
     public List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         return getGameList(searchText, selectedPlatforms, selectedYears, selectedGenres, null, sortField, sortType, 0, 0);
@@ -137,46 +159,73 @@ public class LibraryOperationService implements LibraryService {
         return getGameList(searchText, selectedPlatforms, selectedYears, selectedGenres, null, sortField, sortType, startIndex, endIndex);
     }
 
+    /**
+     * Возвращает отфильтрованный список игр с сортировкой, пагинацией и фильтром по тегам.
+     */
     public List<GameShortDto> getGameList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags, String sortField, String sortType, int startIndex, int endIndex) {
         if(searchText.isEmpty() && selectedPlatforms.size() == 0 && selectedYears.size() == 0 && selectedGenres.size() == 0 && (selectedTags == null || selectedTags.size() == 0) && sortField.isEmpty()) return getGameList(startIndex,endIndex);
         return gameService.getGameShortList(searchText,selectedPlatforms,selectedYears,selectedGenres,selectedTags,sortField,sortType,startIndex,endIndex);
     }
 
+    /**
+     * Возвращает краткий список игр по переданному набору идентификаторов.
+     */
     @Override
     public List<GameShortDto> getGameShortListByIds(List<Long> ids) {
         return gameService.getGameShortListByIds(ids);
     }
 
+    /**
+     * Возвращает отфильтрованный список ID игр (без пагинации).
+     */
     public List<Long> getGameIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, String sortField, String sortType) {
         return getGameIdList(searchText, selectedPlatforms, selectedYears, selectedGenres, null, sortField, sortType);
     }
 
+    /**
+     * Возвращает отфильтрованный список ID игр с фильтром по тегам.
+     */
     @Override
     public List<Long> getGameIdList(String searchText, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags, String sortField, String sortType) {
         if(searchText.isEmpty() && selectedPlatforms.size() == 0 && selectedYears.size() == 0 && selectedGenres.size() == 0 && (selectedTags == null || selectedTags.size() == 0) && sortField.isEmpty()) return getGameListId();
         return gameService.getGameShortIdList(searchText,selectedPlatforms,selectedYears,selectedGenres,selectedTags,sortField,sortType);
     }
 
+    /**
+     * Выполняет семантический поиск игр по текстовому запросу через AI-эмбеддинги.
+     */
     @Override
     public List<Long> semanticSearchGameIds(String query, int limit) {
         return gameService.semanticSearchGameIds(query, limit);
     }
 
+    /**
+     * Фильтрует список ID игр по платформам, годам, жанрам и тегам.
+     */
     @Override
     public List<Long> filterGameIdsByCriteria(List<Long> candidateIds, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags) {
         return gameService.filterGameIdsByCriteria(candidateIds, selectedPlatforms, selectedYears, selectedGenres, selectedTags);
     }
 
+    /**
+     * Проверяет доступность семантического поиска (модель + хотя бы один эмбеддинг).
+     */
     @Override
     public boolean isSemanticSearchAvailable() {
         return gameService.isEmbeddingModelAvailable() && gameService.hasEmbeddings();
     }
 
+    /**
+     * Возвращает список всех тегов.
+     */
     @Override
     public List<String> getTags() {
         return gameService.getTags();
     }
 
+    /**
+     * Возвращает полную информацию об игре по ID, включая переведённое описание.
+     */
     @Override
     public GameDto getGameInfo(Long gameId) {
         GameDto dto = GameConverter.gameToDtoConverter(gameService.getGameById(gameId));
@@ -184,6 +233,10 @@ public class LibraryOperationService implements LibraryService {
         return dto;
     }
 
+    /**
+     * Обновляет информацию об игре: сохраняет данные, сбрасывает перевод,
+     * сохраняет на ФС и генерирует эмбеддинг.
+     */
     @Override
     public GameDto updateGameInfo(GameDto gameDto) {
         gameService.ensureTagsExist(gameDto.getTags());
@@ -195,6 +248,9 @@ public class LibraryOperationService implements LibraryService {
         return getGameInfo(gameDto.getId());
     }
 
+    /**
+     * Скрапит метаданные игры из указанного источника по URL.
+     */
     @Override
     public GameDto grabGameInfo(Long id, String source, String url) {
         GameDto gameDto = new GameDto();
@@ -205,6 +261,9 @@ public class LibraryOperationService implements LibraryService {
         return scraperFactory.getScraper(source).scrap(gameDto);
     }
 
+    /**
+     * Скрапит метаданные игры с использованием структурированной информации ScrapInfo.
+     */
     @Override
     public GameDto grabGameInfo(Long id, ScrapInfo scrapInfo) {
         GameDto gameDto = new GameDto();
@@ -216,41 +275,65 @@ public class LibraryOperationService implements LibraryService {
         return scraperFactory.getScraper(scrapInfo.getSource()).scrap(gameDto);
     }
 
+    /**
+     * Скрапит метаданные для DTO игры из указанного источника.
+     */
     @Override
     public GameDto grabGameInfo(GameDto gameDto, String source) {
         return scraperFactory.getScraper(source).scrap(gameDto);
     }
 
+    /**
+     * Возвращает список всех годов релиза.
+     */
     @Override
     public List<String> getReleaseDates() {
         return gameService.getReleaseDates();
     }
 
+    /**
+     * Возвращает список всех платформ.
+     */
     @Override
     public List<String> getGamesPlatforms() {
         return gameService.getGamesPlatforms();
     }
 
+    /**
+     * Возвращает список всех жанров.
+     */
     @Override
     public List<Genre> getGenres() {
         return gameService.getGenres();
     }
 
+    /**
+     * Возвращает список жанров с учётом локали.
+     */
     public List<Genre> getGenres(Locale locale){
         return gameService.getGenres(locale);
     }
 
+    /**
+     * Преобразует строковые жанры DTO в enum Genre.
+     */
     @Override
     public List<Genre> getGenres(GameDto gameDto) {
         List<Genre> genres = new ArrayList<>();
         for(String genre : gameDto.getGenres()) genres.add(Genre.valueOf(genre));
         return genres;
     }
+    /**
+     * Возвращает список кодов жанров (строки).
+     */
     @Override
     public List<String> getGameGenres() {
         return gameService.getGameGenres();
     }
 
+    /**
+     * Скачивает игру как ZIP-архив (для небольших игр до 5 ГБ).
+     */
     @Override
     public ResponseEntity<Resource> downloadGame(GameDto game) {
         ByteArrayResource resource;
@@ -264,6 +347,9 @@ public class LibraryOperationService implements LibraryService {
         return new ResponseEntity<Resource>((Resource) resource, headers, HttpStatus.OK);
     }
 
+    /**
+     * Скачивает игру стримингом: ZIP для игр до 5 ГБ, .torrent для больших игр.
+     */
     @Override
     public CompletableFuture<ResponseEntity<StreamingResponseBody>> downloadGameInStream(GameDto game, HttpServletResponse response) {
         CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture = new CompletableFuture<>();
@@ -324,6 +410,9 @@ public class LibraryOperationService implements LibraryService {
         return completableFuture;
     }
 
+    /**
+     * Возвращает случайную игру из библиотеки.
+     */
     @Override
     public GameDto getRandomGame() {
         Long gameId = gameService.findRandomGameId();
@@ -331,6 +420,9 @@ public class LibraryOperationService implements LibraryService {
         return getGameInfo(gameId);
     }
 
+    /**
+     * Возвращает информацию о текущем аутентифицированном пользователе.
+     */
     @Override
     public ShortUser getUserInfo() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

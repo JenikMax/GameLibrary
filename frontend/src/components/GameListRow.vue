@@ -1,3 +1,4 @@
+<!-- Строка игры для отображения в виде списка (list). Компактный формат: мини-постер, название, платформа, год, рейтинг, жанры (макс. 4), теги (макс. 3), кнопки избранного и скачивания. -->
 <template>
   <div class="game-list-row" @click="goToGame">
     <div class="row-img-wrap">
@@ -51,6 +52,7 @@
 </template>
 
 <script setup>
+// Строковый формат карточки игры для list-режима: компактное отображение с постером, метаданными и действиями
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLibraryStore } from '../stores/library'

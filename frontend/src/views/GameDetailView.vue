@@ -1,5 +1,7 @@
+<!-- Карточка игры: детальная информация (постер, название, теги, рейтинг, описание, трейлер), скриншоты с галереей, похожие игры, вкладки отзывов и комментариев, скачивание/сидирование через Transmission. -->
 <template>
   <div v-if="loading" class="game-detail-container">
+    <!-- Скелетоны при загрузке данных -->
     <div class="game-main">
       <div class="game-poster">
         <Skeleton width="300px" height="450px" />
@@ -335,7 +337,7 @@
       </div>
     </Dialog>
 
-    <!-- Рендерим CollectionPicker только когда он виден -->
+    <!-- CollectionPicker рендерится только при открытии, чтобы не нагружать запросами -->
     <CollectionPicker
       v-if="showCollectionPicker"
       :visible="showCollectionPicker"
@@ -351,6 +353,7 @@
 </template>
 
 <script setup>
+// Карточка игры: детальная информация, скриншоты, трейлер, рейтинг, избранное, отзывы, комментарии, скачивание/сидирование, галерея
 import { ref, reactive, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -383,40 +386,41 @@ const authStore = useAuthStore()
 const libraryStore = useLibraryStore()
 const { t } = useI18n()
 const { isTerminalTheme } = useTheme()
-const showCollectionPicker = ref(false)
+const showCollectionPicker = ref(false) // Управляет видимостью диалога выбора коллекции
 const { addToHistory } = useViewHistory()
 
 const game = ref(null)
 const loading = ref(true)
-const seeding = ref(false)
+const seeding = ref(false) // Флаг процесса сидирования
 const seedTaskId = ref(null)
 const seedProgress = ref(0)
 const seedCurrentFile = ref('')
 let seedPollTimer = null
-const preparing = ref(false)
+const preparing = ref(false) // Флаг подготовки торрента для скачивания
 const prepareTaskId = ref(null)
 const prepareProgress = ref(0)
 const prepareCurrentFile = ref('')
 let preparePollTimer = null
 let isUnmounted = false
 const toast = useToast()
-const viewerVisible = ref(false)
-const viewerIndex = ref(0)
+const viewerVisible = ref(false) // Видимость галереи скриншотов
+const viewerIndex = ref(0) // Текущий индекс в галерее
 const viewerRef = ref(null)
 const screenshotLoaded = reactive({})
 const userRating = ref(0)
 const comments = ref([])
 const commentsLoading = ref(false)
 const newCommentText = ref('')
-const related = ref({ sameGenre: [], sameSeries: [] })
+const related = ref({ sameGenre: [], sameSeries: [] }) // Похожие игры
 const reviews = ref([])
 const reviewsLoading = ref(false)
-const reviewsAggregated = ref(null)
+const reviewsAggregated = ref(null) // Агрегированные средние оценки по категориям
 const showReviewForm = ref(false)
-const userReview = ref(null)
+const userReview = ref(null) // Отзыв текущего пользователя (если есть)
 const showingTranslation = ref(false)
 const translating = ref(false)
 
+// Переключение избранного (сердечко)
 async function toggleFav() {
   try {
     const res = await gamesApi.toggleFavorite(game.value.id)
@@ -426,6 +430,7 @@ async function toggleFav() {
   }
 }
 
+// Переключение перевода описания ru↔en через AI-сервис
 async function toggleTranslation() {
   if (showingTranslation.value) {
     showingTranslation.value = false
@@ -447,10 +452,12 @@ async function toggleTranslation() {
   }
 }
 
+// Преобразует код жанра в локализованное название
 function genreName(code) {
   return libraryStore.genreMap[code] || code
 }
 
+// Заголовок галереи: "Скриншоты 3 / 10"
 const screenshotHeader = computed(() => {
   if (!game.value?.screenshotUrls) return ''
   return t('game.screenshots') + ' ' + (viewerIndex.value + 1) + ' / ' + game.value.screenshotUrls.length
@@ -460,15 +467,18 @@ watch(viewerVisible, (val) => {
   if (val) nextTick(() => viewerRef.value?.focus())
 })
 
+// Иконка избранного: заполненное или пустое сердечко
 const favIcon = computed(() => {
   return game.value?.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'
 })
 
+// Название игры с подчёркиваниями для терминальной темы
 const terminalTitle = computed(() => {
   if (!game.value) return ''
   return game.value.name.replace(/ /g, '_')
 })
 
+// URL для встраивания YouTube-трейлера
 const trailerEmbedUrl = computed(() => {
   if (!game.value?.trailerUrl) return ''
   const url = game.value.trailerUrl
@@ -476,6 +486,7 @@ const trailerEmbedUrl = computed(() => {
   return match ? `https://www.youtube.com/embed/${match[1]}` : (url && url !== 'N/A' ? url : '')
 })
 
+// Загрузка похожих игр (по жанру и названию)
 async function loadRelated() {
   try {
     const res = await gamesApi.getRelated(route.params.id)
@@ -485,6 +496,7 @@ async function loadRelated() {
   }
 }
 
+// Загрузка отзывов и агрегированных оценок
 async function loadReviews() {
   reviewsLoading.value = true
   try {
@@ -500,6 +512,7 @@ async function loadReviews() {
   }
 }
 
+// Загрузка комментариев к игре
 async function loadComments() {
   commentsLoading.value = true
   try {
@@ -531,6 +544,7 @@ onMounted(async () => {
   }
 })
 
+// Скачивание игры: если размер <5 ГБ — прямая ссылка, иначе подготовка торрента
 async function downloadGame() {
   if (!game.value || preparing.value) return
 
@@ -567,6 +581,7 @@ async function downloadGame() {
   }
 }
 
+// Принудительное скачивание файла через создание скрытой ссылки
 function downloadFile(url) {
   const a = document.createElement('a')
   a.href = url
@@ -576,6 +591,7 @@ function downloadFile(url) {
   document.body.removeChild(a)
 }
 
+// Polling статуса подготовки торрента
 function pollPrepareStatus() {
   if (!prepareTaskId.value) return
   preparePollTimer = setInterval(async () => {
@@ -628,6 +644,7 @@ function pollPrepareStatus() {
   }, 1000)
 }
 
+// Polling статуса сидирования через Transmission
 function pollSeedStatus() {
   if (!seedTaskId.value) return
   seedPollTimer = setInterval(async () => {
@@ -679,6 +696,7 @@ function pollSeedStatus() {
   }, 1000)
 }
 
+// Запуск сидирования игры через Transmission
 async function seedGame() {
   seeding.value = true
   seedProgress.value = 0
@@ -711,11 +729,13 @@ onUnmounted(() => {
   }
 })
 
+// Открытие галереи по индексу скриншота
 function openGallery(index) {
   viewerIndex.value = index
   viewerVisible.value = true
 }
 
+// Навигация по галерее
 function prevImage() {
   if (viewerIndex.value > 0) viewerIndex.value--
 }
@@ -724,6 +744,7 @@ function nextImage() {
   if (viewerIndex.value < game.value.screenshotUrls.length - 1) viewerIndex.value++
 }
 
+// Отправка комментария
 async function submitComment() {
   const text = newCommentText.value.trim()
   if (!text) return
@@ -736,6 +757,7 @@ async function submitComment() {
   }
 }
 
+// Удаление комментария (с проверкой прав на бэкенде)
 async function deleteComment(commentId) {
   try {
     await gamesApi.deleteComment(route.params.id, commentId)
@@ -745,6 +767,7 @@ async function deleteComment(commentId) {
   }
 }
 
+// Сохранение оценки пользователя (1-10)
 async function saveRating(val) {
   userRating.value = val
   try {
@@ -757,6 +780,7 @@ async function saveRating(val) {
   }
 }
 
+// Отправка/обновление отзыва
 async function submitReview(data) {
   try {
     await gamesApi.addReview(route.params.id, data)
@@ -768,6 +792,7 @@ async function submitReview(data) {
   }
 }
 
+// Удаление отзыва (с проверкой прав)
 async function deleteReview(reviewId) {
   try {
     await gamesApi.deleteReview(route.params.id, reviewId)
@@ -778,6 +803,7 @@ async function deleteReview(reviewId) {
   }
 }
 
+// Навигация по галерее стрелками клавиатуры
 function onViewerKeydown(e) {
   if (e.key === 'ArrowLeft') { prevImage(); e.preventDefault() }
   if (e.key === 'ArrowRight') { nextImage(); e.preventDefault() }

@@ -1,10 +1,13 @@
+<!-- Страница входа. Поддерживает две темы оформления: стандартную (PrimeVue) и ретро-терминальную (RetroCrtDisplay). Форма с username/password, обработка ошибок с таймаутом очистки. -->
 <template>
   <div class="auth-page">
     <div class="auth-card">
       <div class="auth-header">
+        <!-- Терминальная тема: SVG-монитор с приглашением -->
         <template v-if="isTerminalTheme">
           <RetroCrtDisplay :screen-lines="crtLines" v-bind="terminalPalette" prompt="root@glib:~$ login --user" />
         </template>
+        <!-- Обычная тема: логотип и заголовок -->
         <template v-else>
           <img :src="'/game-library/img/logo.jpg'" height="56" alt="logo" class="auth-logo" />
           <h2 class="auth-title">{{ t('login.signin') }}</h2>
@@ -38,6 +41,7 @@
 </template>
 
 <script setup>
+// Страница входа: аутентификация через AuthStore, поддержка CRT-темы, авто-очистка ошибки через 7с
 import { ref, computed, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -56,12 +60,14 @@ const authStore = useAuthStore()
 const { t } = useI18n()
 const { currentThemeId, isTerminalTheme } = useTheme()
 
+// Палитра для ретро-терминала в зависимости от темы
 const terminalPalette = computed(() => {
   if (currentThemeId.value === 'yellowed-crt') {
     return { primary: '#ccaa33', muted: '#aa8833', bg: '#2a1e00', bgInner: '#1a1000' }
   }
   return { primary: '#00ff88', muted: '#00cc6a', bg: '#003d22', bgInner: '#002a18' }
 })
+// Строки для SVG-дисплея ретро-монитора
 const crtLines = computed(() => [
   { text: 'GAME-LIBRARY', y: 50, size: 7, color: terminalPalette.value.muted, opacity: 0.8 },
   { text: 'AUTH v2.4.1', y: 64, size: 6, opacity: 0.6 },
@@ -75,12 +81,13 @@ const username = ref('')
 const password = ref('')
 const error = ref('')
 const loading = ref(false)
-let errorTimer = null
+let errorTimer = null // Таймер авто-очистки сообщения об ошибке
 
 onBeforeUnmount(() => {
   if (errorTimer) clearTimeout(errorTimer)
 })
 
+// Обработчик входа: валидация, вызов AuthStore, редирект на главную
 async function handleLogin() {
   if (!username.value || !password.value) {
     error.value = t('login.fill_fields')

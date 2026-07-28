@@ -13,6 +13,12 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Скрапер для Igromania.ru.
+ * Извлекает данные из JSON-блока <script id="__NEXT_DATA__"> через JsonPath.
+ * Использует предварительно настроенные JSON Path для получения
+ * названия, описания, года, жанров, постера и скриншотов.
+ */
 public class IgromaniaScraper implements Scraper {
 
     private final ScraperConfig config;

@@ -8,6 +8,10 @@ import com.jenikmax.game.library.model.entity.enums.Genre;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Интерфейс сервиса для работы с данными игр.
+ * Определяет CRUD-операции, поиск, фильтрацию, работу с жанрами/тегами/эмбеддингами.
+ */
 public interface GameService {
 
     List<GameShortDto> getGameShortList();

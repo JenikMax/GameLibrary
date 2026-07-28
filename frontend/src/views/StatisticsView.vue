@@ -1,3 +1,4 @@
+<!-- Страница статистики: 4 карточки (игры, размер, добавления, рейтинг), столбчатые диаграммы по платформам/годам, круговая по жанрам, топ-5 списки (рейтинг, оценки, избранное). Кнопка обновления размера для админов. -->
 <template>
   <div class="statistics-page">
     <h2 class="mb-3">
@@ -119,6 +120,7 @@
 </template>
 
 <script setup>
+// Статистика библиотеки: агрегированные данные через StatisticsController (JdbcTemplate), графики Chart.js (Bar для платформ/лет, Pie для жанров), топ-5 списки, кнопка обновления размера (ADMIN)
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -149,6 +151,7 @@ const stats = ref(null)
 const loading = ref(false)
 const refreshing = ref(false)
 
+// Принудительное обновление размеров игр (ADMIN) — сбрасывает total_size_bytes в NULL для пересчёта
 async function handleRefreshSizes() {
   if (!window.confirm(t('statistics.refresh_sizes_confirm'))) return
   refreshing.value = true
@@ -164,6 +167,7 @@ async function handleRefreshSizes() {
   }
 }
 
+// Общие опции для столбчатых диаграмм
 const chartOptions = {
   responsive: true,
   plugins: {
@@ -177,6 +181,7 @@ const chartOptions = {
   }
 }
 
+// Опции круговой диаграммы с легендой справа
 const pieOptions = {
   responsive: true,
   plugins: {
@@ -184,6 +189,7 @@ const pieOptions = {
   }
 }
 
+// Данные для столбчатой диаграммы по платформам
 const platformChartData = computed(() => {
   if (!stats.value?.gamesByPlatform?.length) return null
   return {
@@ -196,6 +202,7 @@ const platformChartData = computed(() => {
   }
 })
 
+// Данные для круговой диаграммы по жанрам (top 12)
 const genreChartData = computed(() => {
   if (!stats.value?.gamesByGenre?.length) return null
   const top = stats.value.gamesByGenre.filter(i => i.count > 0).slice(0, 12)
@@ -213,6 +220,7 @@ const genreChartData = computed(() => {
   }
 })
 
+// Данные для столбчатой диаграммы по годам (отсортированы по возрастанию)
 const yearChartData = computed(() => {
   if (!stats.value?.gamesByYear?.length) return null
   const sorted = [...stats.value.gamesByYear].sort((a, b) => a.label.localeCompare(b.label))
@@ -238,6 +246,7 @@ onMounted(async () => {
   }
 })
 
+// Форматирование размера в человекочитаемый вид (B, KB, MB, GB, TB)
 function formatSize(bytes) {
   if (!bytes) return '0 B'
   const units = ['B', 'KB', 'MB', 'GB', 'TB']

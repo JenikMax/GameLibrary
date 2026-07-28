@@ -9,6 +9,11 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * Сервис для работы с эмбеддингами игр.
+ * Генерирует векторные представления текста через AI-клиент,
+ * сохраняет их в pgvector и выполняет семантический поиск.
+ */
 @Service
 public class EmbeddingService {
 
@@ -22,10 +27,16 @@ public class EmbeddingService {
         this.jdbc = jdbc;
     }
 
+    /**
+     * Проверяет доступность AI-сервиса для генерации эмбеддингов.
+     */
     public boolean isAvailable() {
         return aiClient.isAvailable();
     }
 
+    /**
+     * Генерирует эмбеддинг для игры и сохраняет его в БД.
+     */
     public float[] generateAndStore(Long gameId) {
         if (!isAvailable()) return null;
 
@@ -63,6 +74,9 @@ public class EmbeddingService {
         return embedding;
     }
 
+    /**
+     * Генерирует эмбеддинг для произвольного текста через AI-клиент.
+     */
     public float[] generateEmbedding(String text) {
         if (!isAvailable()) {
             return null;
@@ -75,6 +89,9 @@ public class EmbeddingService {
         }
     }
 
+    /**
+     * Выполняет семантический поиск по текстому запросу, используя косинусное расстояние (<=>).
+     */
     public List<Long> semanticSearch(String query, int limit) {
         log.info("semanticSearch: query='{}', limit={}", query, limit);
         float[] queryEmbedding = generateEmbedding("query: " + query);
@@ -94,6 +111,9 @@ public class EmbeddingService {
         return results;
     }
 
+    /**
+     * Проверяет, есть ли хотя бы один эмбеддинг в БД.
+     */
     public boolean hasEmbeddings() {
         Long count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM library.game_data WHERE embedding IS NOT NULL",
@@ -101,6 +121,9 @@ public class EmbeddingService {
         return count != null && count > 0;
     }
 
+    /**
+     * Возвращает количество игр без эмбеддинга (с непустым описанием).
+     */
     public int getMissingEmbeddingCount() {
         Long count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM library.game_data " +

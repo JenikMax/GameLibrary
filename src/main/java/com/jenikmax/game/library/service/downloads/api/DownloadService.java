@@ -9,6 +9,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Интерфейс сервиса скачивания игр.
+ * Поддерживает ZIP-архивацию (в память и стримингом),
+ * генерацию и отдачу .torrent-файлов, а также кэширование.
+ */
 public interface DownloadService {
 
     void downloadTorrent(String path, OutputStream outputStream, CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture);

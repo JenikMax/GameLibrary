@@ -1,36 +1,42 @@
+# ============================================================
+# Основная конфигурация Spring Boot для GameLibrary
+# ============================================================
+
+# ─── Настройки встроенного Tomcat ────────────────────────
 server:
   max-http-header-size: 16KB
   tomcat:
     uri-encoding: ISO-8859-1
     max-http-form-post-size: 100MB
     threads:
-      max: 10
-      min-spare: 2
-    accept-count: 5
-    connection-timeout: 30000
-  port: ${SERVER_PORT:8080}
+      max: 10          # Максимум 10 рабочих потоков (виртуальные треды)
+      min-spare: 2      # Минимальное число свободных потоков
+    accept-count: 5     # Размер очереди входящих соединений
+    connection-timeout: 30000  # Таймаут соединения (мс)
+  port: ${SERVER_PORT:8080}   # Порт сервера
   servlet:
-    context-path: /game-library
+    context-path: /game-library  # Базовый путь контекста
 
+# ─── Spring и JPA ───────────────────────────────────────
 spring:
   threads:
     virtual:
-      enabled: true
+      enabled: true   # Виртуальные треды Java (Project Loom)
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
+      max-file-size: 100MB     # Максимальный размер загружаемого файла
+      max-request-size: 100MB  # Максимальный размер запроса
   mvc:
     async:
-      request-timeout: 600000
+      request-timeout: 600000  # Таймаут асинхронных запросов (10 мин)
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/game-library?currentSchema=library
     username: library-manager-user
     password: ${DB_PASSWORD}
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
-      connection-timeout: 10000
+      maximum-pool-size: 10     # Максимум соединений в пуле HikariCP
+      minimum-idle: 2            # Минимум idle-соединений
+      connection-timeout: 10000  # Таймаут получения соединения (мс)
       connection-test-query: SELECT 1
   jpa:
     properties:
@@ -38,11 +44,12 @@ spring:
       hibernate.default_batch_fetch_size: 10
       hibernate.jdbc.fetch_size: 100
       hibernate.jdbc.batch_size: 20
-      hibernate.order_inserts: true
-      hibernate.order_updates: true
+      hibernate.order_inserts: true  # Оптимизация batch-вставок
+      hibernate.order_updates: true  # Оптимизация batch-обновлений
     hibernate:
       default_schema: library
 
+# ─── SpringDoc / Swagger UI ──────────────────────────────
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -54,27 +61,29 @@ springdoc:
     path: /v3/api-docs
   default-produces-media-type: application/json
 
+# ─── Настройки приложения GameLibrary ───────────────────
 game-library:
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:}  # Разрешённые CORS-источники
   games:
-    directory: ${GAMES_DIRECTORY:/gameLibrary}
+    directory: ${GAMES_DIRECTORY:/gameLibrary}           # Корень библиотеки игр
     torrent:
-      directory-tmp: ${TORRENT_DIR_TMP:/torrentDirTmp}
+      directory-tmp: ${TORRENT_DIR_TMP:/torrentDirTmp}   # Временная директория .torrent
   images:
-    directory: ${IMAGES_DIRECTORY:/gameLibrary/images}
+    directory: ${IMAGES_DIRECTORY:/gameLibrary/images}   # Директория изображений
   jwt:
-    secret: ${JWT_SECRET}
-    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+    secret: ${JWT_SECRET}                                # Секрет для подписи JWT
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}         # Время жизни токена (24ч)
   tracker:
     announce-base-url: ${TRACKER_ANNOUNCE_URL:http://localhost:8080/game-library/api/tracker/announce}
   transmission:
     rpc-url: ${TRANSMISSION_RPC_URL:http://transmission:9091/transmission/rpc}
     download-dir: ${TRANSMISSION_DOWNLOAD_DIR:/downloads}
   scraper:
-    config-dir: ${SCRAPER_CONFIG_DIR:/gameLibrary/gameLibraryConfigs/scrapers}
+    config-dir: ${SCRAPER_CONFIG_DIR:/gameLibrary/gameLibraryConfigs/scrapers}  # Конфиги скраперов
 
+# ─── AI-сервис (Python FastAPI) ─────────────────────────
 ai:
-  service-url: ${AI_SERVICE_URL:http://ai-service:8000}
+  service-url: ${AI_SERVICE_URL:http://ai-service:8000}  # URL AI-сервиса
   auto-tag:
-    enabled: true
+    enabled: true    # Включить авто-тегирование

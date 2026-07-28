@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * Сущность коллекции игр пользователя.
+ * Может быть обычной (с фиксированным набором игр) или «умной»
+ * (с динамическим составом, определяемым правилами в smartRules).
+ */
 @Entity
 @Table(name = "game_collection", schema = "library")
 @SequenceGenerator(name = "game_collection_id_gen", allocationSize = 1, sequenceName = "game_collection_id_seq")

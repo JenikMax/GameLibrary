@@ -1,5 +1,9 @@
 package com.jenikmax.game.library.model.dto;
 
+/**
+ * Форма регистрации пользователя (Thymeleaf).
+ * Содержит имя пользователя и пароль.
+ */
 public class RegistrationForm {
 
     private String username;

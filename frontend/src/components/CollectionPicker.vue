@@ -1,3 +1,4 @@
+<!-- Диалог выбора коллекции для добавления игры. Показывает список коллекций с поиском, отмечает те, в которые игра уже входит. Позволяет добавлять/удалять игру из коллекции кликом. -->
 <template>
   <Dialog :visible="visible" @update:visible="$emit('close')" :header="t('collections.add_to')" :modal="true" :closable="true" :dismissableMask="true" class="w-[700px]">
     <div v-if="loading" class="flex justify-content-center p-3">
@@ -9,6 +10,7 @@
     </div>
 
     <div v-else class="flex flex-column" style="max-height: 55vh; overflow: hidden">
+      <!-- Поиск по названию коллекции -->
       <InputText
         v-model="search"
         :placeholder="t('filter.search_placeholder')"
@@ -16,6 +18,7 @@
         size="small"
       />
       <div class="picker-list flex-1 overflow-y-auto" style="min-height: 0">
+        <!-- Элемент коллекции: иконка, название, счётчик игр, статус (входит/не входит) -->
         <div
           v-for="collection in filteredCollections"
           :key="collection.id"
@@ -43,6 +46,7 @@
 </template>
 
 <script setup>
+// Диалог добавления игры в коллекцию: загрузка списка, проверка членства, переключение через API
 import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { collectionsApi } from '../api/collections'
@@ -64,15 +68,17 @@ const toast = useToast()
 
 const collections = ref([])
 const loading = ref(false)
-const memberMap = ref({})
+const memberMap = ref({}) // Карта: id коллекции → массив gameId (для проверки членства)
 const search = ref('')
 
+// Фильтрация коллекций по поисковому запросу
 const filteredCollections = computed(() => {
   const q = search.value.trim().toLowerCase()
   if (!q) return collections.value
   return collections.value.filter(c => c.name.toLowerCase().includes(q))
 })
 
+// Загрузка при открытии диалога
 watch(() => props.visible, async (val) => {
   if (val) {
     search.value = ''
@@ -84,6 +90,7 @@ onMounted(async () => {
   if (props.visible) await load()
 })
 
+// Загрузка списка коллекций и членства текущей игры
 async function load() {
   loading.value = true
   try {
@@ -103,10 +110,12 @@ async function load() {
   }
 }
 
+// Проверка: входит ли игра в коллекцию
 function isInCollection(c) {
   return (memberMap.value[c.id] || []).includes(Number(props.gameId))
 }
 
+// Добавление/удаление игры из коллекции
 async function toggleGame(c) {
   const gid = Number(props.gameId)
   try {

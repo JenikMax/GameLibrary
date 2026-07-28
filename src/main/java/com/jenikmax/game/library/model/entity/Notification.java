@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * Сущность уведомления пользователя.
+ * Содержит тип, заголовок, сообщение, ссылку на игру
+ * и флаг прочитанности.
+ */
 @Entity
 @Table(name = "notification")
 @SequenceGenerator(

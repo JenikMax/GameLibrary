@@ -20,6 +20,12 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Скрапер для Playground.ru.
+ * Поддерживает поиск по названию игры через API game.search,
+ * извлекает данные из JSON-LD (schema.org/VideoGame) и CSS-селекторов.
+ * Нормализует URL скриншотов для устранения дубликатов.
+ */
 public class PlaygroundScraper implements Scraper {
 
     private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;

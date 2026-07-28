@@ -1,4 +1,11 @@
-/* ═══════ PRIMEVUE TOKEN OVERRIDES (Yellowed CRT) ═══════ */
+/* ============================================================
+ * yellowed-crt.css — Жёлтая/янтарная CRT-тема
+ * Имитация старых монохромных ЭЛТ-мониторов с янтарным
+ * свечением (#ccaa33) на тёмно-коричневом фоне (#1a0e00).
+ * Аналогична retro-terminal, но в тёплой гамме.
+ * ============================================================ */
+
+/* ═══════ ПЕРЕОПРЕДЕЛЕНИЕ ТОКЕНОВ PRIMEVUE (Yellowed CRT) ═══════ */
 :root[data-theme="yellowed-crt"] {
   --p-surface-0: #ccaa33;
   --p-surface-50: #ccaa33;
@@ -543,7 +550,7 @@
   box-shadow: 0 0 15px rgba(220,200,80,0.2);
 }
 
-/* ═══════ PROGRESS BAR ═══════ */
+/* ═══════ ИНДИКАТОР ПРОГРЕССА ═══════ */
 [data-theme="yellowed-crt"] .p-progressbar {
   border-radius: 0;
   background: #442200;
@@ -558,7 +565,7 @@
   color: #000 !important;
 }
 
-/* ═══════ TOAST (terminal style) ═══════ */
+/* ═══════ TOAST-УВЕДОМЛЕНИЯ (стиль терминала) ═══════ */
 [data-theme="yellowed-crt"] .p-toast {
   font-family: 'Courier New', monospace;
 }
@@ -571,7 +578,7 @@
   color: #ccaa33;
 }
 
-/* ═══════ DIALOG (terminal style) ═══════ */
+/* ═══════ ДИАЛОГОВОЕ ОКНО (стиль терминала) ═══════ */
 [data-theme="yellowed-crt"] .p-dialog {
   border-radius: 0;
   border: 1px solid var(--rt-border);
@@ -591,7 +598,7 @@
   background: #1a0e00;
 }
 
-/* ═══════ POPOVER (theme switcher etc.) ═══════ */
+/* ═══════ ВСПЛЫВАЮЩАЯ ПАНЕЛЬ (переключатель тем) ═══════ */
 [data-theme="yellowed-crt"] .p-popover {
   border-radius: 0 !important;
   border: 1px solid var(--rt-border) !important;
@@ -602,7 +609,7 @@
   padding: 0.25rem;
 }
 
-/* ═══════ MULTISELECT / CHIP ═══════ */
+/* ═══════ МУЛЬТИВЫБОР / CHIP ═══════ */
 [data-theme="yellowed-crt"] .p-multiselect-item {
   border-radius: 0;
   font-family: 'Courier New', monospace;
@@ -618,7 +625,7 @@
   font-family: 'Courier New', monospace;
 }
 
-/* ═══════ DIVIDER ═══════ */
+/* ═══════ РАЗДЕЛИТЕЛЬ ═══════ */
 [data-theme="yellowed-crt"] .p-divider {
   border-color: var(--rt-border-dim);
 }
@@ -626,14 +633,14 @@
   border-color: var(--rt-border-dim);
 }
 
-/* ═══════ MESSAGE / ALERT ═══════ */
+/* ═══════ СООБЩЕНИЕ / АЛЕРТ ═══════ */
 [data-theme="yellowed-crt"] .p-message {
   border-radius: 0;
   border-color: var(--rt-border);
   background: var(--rt-bg-panel);
 }
 
-/* ═══════ PASSWORD TOGGLE ICON ═══════ */
+/* ═══════ ИКОНКА ПЕРЕКЛЮЧЕНИЯ ПАРОЛЯ ═══════ */
 [data-theme="yellowed-crt"] .p-password-toggle-mask-icon {
   color: #aa8833 !important;
 }
@@ -641,7 +648,7 @@
   color: #ccaa33 !important;
 }
 
-/* ═══════ QUILL EDITOR ═══════ */
+/* ═══════ РЕДАКТОР QUILL (VueQuill) ═══════ */
 [data-theme="yellowed-crt"] .ql-toolbar {
   background: #1a0e00;
   border-color: var(--rt-border) !important;
@@ -668,7 +675,7 @@
   color: #aa8833 !important;
 }
 
-/* ═══════ SELECT / DROPDOWN ═══════ */
+/* ═══════ ВЫПАДАЮЩИЙ СПИСОК ═══════ */
 [data-theme="yellowed-crt"] .p-overlay-popover,
 [data-theme="yellowed-crt"] .p-select-overlay {
   background: #1a0e00 !important;
@@ -683,7 +690,7 @@
   color: #ccaa33 !important;
 }
 
-/* ═══════ GAME DETAIL: sections ═══════ */
+/* ═══════ ДЕТАЛИ ИГРЫ: секции ═══════ */
 [data-theme="yellowed-crt"] .game-poster {
   align-self: flex-start;
 }
@@ -717,7 +724,7 @@
   box-shadow: 0 0 10px rgba(220,200,80,0.2);
 }
 
-/* ═══════ COLLECTION CARDS ═══════ */
+/* ═══════ КАРТОЧКИ КОЛЛЕКЦИЙ ═══════ */
 [data-theme="yellowed-crt"] .collection-card {
   border: 1px solid var(--rt-border);
   border-radius: 0;
@@ -755,7 +762,7 @@
 }
 
 
-/* ═══════ STAT CARDS ═══════ */
+/* ═══════ КАРТОЧКИ СТАТИСТИКИ ═══════ */
 [data-theme="yellowed-crt"] .stat-card {
   border: 1px solid var(--rt-border);
   background: var(--rt-bg-panel);
@@ -772,7 +779,7 @@
   color: #aa8833;
 }
 
-/* ═══════ AUTH PAGE (terminal style) ═══════ */
+/* ═══════ СТРАНИЦА АВТОРИЗАЦИИ (стиль терминала) ═══════ */
 [data-theme="yellowed-crt"] .auth-page {
   --auth-card-bg: rgba(30,24,0,0.5);
   --auth-card-border: rgba(220,200,80,0.4);
@@ -824,7 +831,7 @@
   font-family: 'Courier New', monospace;
 }
 
-/* ═══════ SKELETON LOADER ═══════ */
+/* ═══════ СКЕЛЕТОН-ЗАГЛУШКА ═══════ */
 [data-theme="yellowed-crt"] .img-skeleton {
   background: linear-gradient(
     110deg,
@@ -835,7 +842,7 @@
   background-size: 200% 100%;
 }
 
-/* ═══════ CONFIRM DIALOG ═══════ */
+/* ═══════ ДИАЛОГ ПОДТВЕРЖДЕНИЯ ═══════ */
 [data-theme="yellowed-crt"] .p-confirmdialog .p-confirmdialog-content {
   background: transparent;
   color: #aa8833;
@@ -844,7 +851,7 @@
   color: #ccaa33;
 }
 
-/* ═══════ GLOBAL: dashed borders for panels ═══════ */
+/* ═══════ ГЛОБАЛЬНО: пунктирные рамки для панелей ═══════ */
 [data-theme="yellowed-crt"] .p-panel .p-panel-header {
   border-bottom: 1px dashed var(--rt-border-dim);
 }
@@ -852,7 +859,7 @@
   border-color: var(--rt-border-dim);
 }
 
-/* ═══════ NOTIFICATION PANEL (terminal style) ═══════ */
+/* ═══════ ПАНЕЛЬ УВЕДОМЛЕНИЙ (стиль терминала) ═══════ */
 [data-theme="yellowed-crt"] .notification-panel {
   background: #1a0e00 !important;
   border: 1px solid var(--rt-border) !important;
@@ -872,7 +879,7 @@
   border-left: 2px solid #ccaa33;
 }
 
-/* ═══════ THEME SWITCHER POPOVER ═══════ */
+/* ═══════ ВСПЛЫВАЮЩАЯ ПАНЕЛЬ ТЕМ ═══════ */
 [data-theme="yellowed-crt"] .theme-option {
   font-family: 'Courier New', monospace;
 }
@@ -887,7 +894,7 @@
   border-color: var(--rt-border);
 }
 
-/* ═══════ ACTIVE ELEMENTS: remove text-shadow/box-shadow halo ═══════ */
+/* ═══════ АКТИВНЫЕ ЭЛЕМЕНТЫ: убрать свечение ═══════ */
 [data-theme="yellowed-crt"] .p-togglebutton-checked,
 [data-theme="yellowed-crt"] .p-togglebutton-checked *,
 [data-theme="yellowed-crt"] .p-paginator-page.p-paginator-page-selected,
@@ -900,7 +907,7 @@
   box-shadow: none !important;
 }
 
-/* ═══════ TOGGLE SWITCH (semantic search) ═══════ */
+/* ═══════ ПЕРЕКЛЮЧАТЕЛЬ (семантический поиск) ═══════ */
 [data-theme="yellowed-crt"] .p-toggleswitch-checked .p-toggleswitch-slider {
   background: #ccaa33 !important;
   border-color: #ccaa33 !important;
@@ -914,7 +921,7 @@
   border-color: #ccaa33 !important;
 }
 
-/* ═══════ CHIP SELECTED (platforms, years in filter) ═══════ */
+/* ═══════ ВЫБРАННЫЙ ЧИП (платформы, годы) ═══════ */
 [data-theme="yellowed-crt"] .chip-selected {
   background: #ccaa33 !important;
   color: #000 !important;
@@ -922,7 +929,7 @@
   font-weight: bold;
 }
 
-/* ═══════ SORT BAR (custom buttons in LibraryView) ═══════ */
+/* ═══════ ПАНЕЛЬ СОРТИРОВКИ (LibraryView) ═══════ */
 [data-theme="yellowed-crt"] .sort-btn {
   background: transparent;
   border-color: var(--rt-border-dim) !important;
@@ -950,7 +957,7 @@
   border-radius: 0;
 }
 
-/* ═══════ RATING (square blocks like preview) ═══════ */
+/* ═══════ РЕЙТИНГ (квадратные блоки) ═══════ */
 [data-theme="yellowed-crt"] .p-rating {
   display: inline-flex;
   gap: 2px;
@@ -982,14 +989,14 @@
   color: #ccaa33 !important;
 }
 
-/* ═══════ YEAR TAG (orange/warn) ═══════ */
+/* ═══════ ТЕГ ГОДА (оранжевый) ═══════ */
 [data-theme="yellowed-crt"] .p-tag.p-tag-warn {
   border-color: #f59e0b !important;
   color: #f59e0b !important;
   background: rgba(245,158,11,0.1) !important;
 }
 
-/* ═══════ SEED BUTTON (orange) ═══════ */
+/* ═══════ КНОПКА РАЗДАЧИ (оранжевая) ═══════ */
 [data-theme="yellowed-crt"] .p-button.rt-btn-seed {
   color: #f59e0b !important;
   border-color: #f59e0b !important;
@@ -1000,7 +1007,7 @@
   box-shadow: 0 0 12px rgba(245,158,11,0.3) !important;
 }
 
-/* ═══════ EDIT BUTTON (blue) ═══════ */
+/* ═══════ КНОПКА РЕДАКТИРОВАНИЯ (синяя) ═══════ */
 [data-theme="yellowed-crt"] .p-button.rt-btn-edit {
   color: #38bdf8 !important;
   border-color: #38bdf8 !important;
@@ -1010,7 +1017,7 @@
   background: rgba(56,189,248,0.1) !important;
   box-shadow: 0 0 12px rgba(56,189,248,0.3) !important;
 }
-/* ═══════ ADMIN USERS — styled buttons ═══════ */
+/* ═══════ АДМИНИСТРИРОВАНИЕ — кнопки ═══════ */
 [data-theme="yellowed-crt"] .rt-admin-btn {
   font-family: 'Courier New', monospace;
   font-size: 0.75rem;
@@ -1047,7 +1054,7 @@
   opacity: 0.85;
 }
 
-/* ═══════ HEADER ACTION BUTTONS — no frame, green ═══════ */
+/* ═══════ КНОПКИ ШАПКИ — без рамки, зелёные ═══════ */
 [data-theme="yellowed-crt"] .app-header .p-button.p-button-text {
   border: none !important;
   background: transparent !important;
@@ -1068,7 +1075,7 @@
   border-color: transparent !important;
 }
 
-/* ═══════ FAVORITE BUTTON — no frame, just heart ═══════ */
+/* ═══════ КНОПКА ИЗБРАННОГО — только сердечко ═══════ */
 [data-theme="yellowed-crt"] .favorite-btn {
   background: transparent !important;
   border: none !important;
@@ -1099,7 +1106,7 @@
   color: var(--rt-danger) !important;
 }
 
-/* ═══════ GREEN TEXT BUTTON (library view toggle, etc.) ═══════ */
+/* ═══════ ЗЕЛЁНАЯ ТЕКСТОВАЯ КНОПКА (переключение вида) ═══════ */
 [data-theme="yellowed-crt"] .p-button.rt-btn-green {
   color: #ccaa33 !important;
   border-color: transparent !important;
@@ -1109,7 +1116,7 @@
   text-shadow: 0 0 8px rgba(220,200,80,0.5);
 }
 
-/* ═══════ UTILITY BUTTON CLASSES ═══════ */
+/* ═══════ УТИЛИТАРНЫЕ КЛАССЫ КНОПОК ═══════ */
 [data-theme="yellowed-crt"] .p-button.rt-btn-success-outline {
   color: #ccaa33 !important;
   border-color: #ccaa33 !important;
@@ -1139,13 +1146,13 @@
   box-shadow: 0 0 12px rgba(220,200,80,0.3) !important;
 }
 
-/* ═══════ CRT SCANLINE ANIMATION ═══════ */
+/* ═══════ АНИМАЦИЯ CRT-СТРОК РАЗВЁРТКИ ═══════ */
 @keyframes crtScanCrawl {
   0% { background-position: 0 0; }
   100% { background-position: 0 -4px; }
 }
 
-/* ═══════ GLITCH TEAR EFFECT (variant #9, no shift) ═══════ */
+/* ═══════ GLITCH-ЭФФЕКТ РАЗРЫВА (вариант #9) ═══════ */
 @keyframes glitch-tear {
   0%, 87% { clip-path: inset(0); filter: none; }
   88% { clip-path: inset(0 0 70% 0); filter: hue-rotate(90deg) brightness(1.5); }

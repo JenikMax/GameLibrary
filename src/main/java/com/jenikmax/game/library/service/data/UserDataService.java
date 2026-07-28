@@ -20,6 +20,11 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.*;
 
+/**
+ * Реализация сервиса управления пользователями.
+ * Поддерживает регистрацию, обновление профиля и аватара, смену пароля,
+ * сброс пароля (с генерацией через SecureRandom), блокировку и смену прав.
+ */
 @Service
 public class UserDataService implements UserService {
 

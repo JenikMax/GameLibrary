@@ -5,6 +5,11 @@ import com.jenikmax.game.library.model.dto.UserDto;
 
 import java.util.List;
 
+/**
+ * Интерфейс сервиса управления пользователями.
+ * Определяет операции регистрации, получения/обновления профиля,
+ * сброса пароля и изменения прав/активности.
+ */
 public interface UserService {
 
     void registerUser(RegistrationForm user);

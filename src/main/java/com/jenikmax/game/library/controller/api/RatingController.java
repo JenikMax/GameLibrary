@@ -19,6 +19,12 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/games")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Ratings", description = "Game ratings 1-10")
+/**
+ * Контроллер оценок игр (рейтинг 1-10).
+ * Обрабатывает запросы по пути /api/games/{id}/rating.
+ * Поддерживает получение среднего рейтинга и оценки текущего пользователя,
+ * а также добавление/обновление оценки.
+ */
 public class RatingController {
 
     private final GameRatingRepository ratingRepository;
@@ -29,6 +35,11 @@ public class RatingController {
         this.userService = userService;
     }
 
+    /**
+     * Получить рейтинг игры: средняя оценка, количество оценок, оценка текущего пользователя.
+     * @param id идентификатор игры
+     * @return средний рейтинг, количество и оценка пользователя
+     */
     @GetMapping("/{id}/rating")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getRating(@PathVariable Long id) {
         Double avg = ratingRepository.findAvgRatingByGameId(id);
@@ -48,6 +59,12 @@ public class RatingController {
         )));
     }
 
+    /**
+     * Оценить игру (1-10). При повторном вызове обновляет существующую оценку.
+     * @param id   идентификатор игры
+     * @param body JSON с полем rating (число от 1 до 10)
+     * @return обновлённый средний рейтинг и оценка пользователя
+     */
     @PostMapping("/{id}/rating")
     public ResponseEntity<ApiResponse<Map<String, Object>>> rateGame(
             @PathVariable Long id,

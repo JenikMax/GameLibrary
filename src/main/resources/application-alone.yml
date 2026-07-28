@@ -1,11 +1,27 @@
+# ============================================================
+# application-alone.yml — Профиль для локальной разработки
+# Активируется: --spring.profiles.active=alone
+# Переопределяет переменные окружения из application.yml
+# для работы без Docker.
+# ============================================================
+
+# Путь к директории с тестовыми играми
 GAMES_DIRECTORY: D:/Work/MyProjects/gametest
+# Порт PostgreSQL
 DB_PORT: 5432
+# Хост PostgreSQL (локальный)
 DB_HOST: localhost
+# Порт веб-сервера
 SERVER_PORT: 8080
+# Время жизни торрента (мс)
 TORRENT_TTL: 180000
+# Директория для .torrent-файлов (watch)
 TORRENT_DIR: D:/Work/MyProjects/gametest/gameLibraryConfigs/tracker/watch
+# Временная директория .torrent-файлов
 TORRENT_DIR_TMP: D:/Work/MyProjects/gametest/gameLibraryConfigs/tracker/torrents
+# Хост торрент-трекера (локальная сеть)
 TORRENT_TRACKER_HOST: 192.168.0.109
+# Порт торрент-трекера
 TORRENT_TRACKER_PORT: 9020
 
 

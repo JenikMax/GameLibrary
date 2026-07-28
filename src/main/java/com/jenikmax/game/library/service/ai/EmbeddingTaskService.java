@@ -17,6 +17,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Сервис управления фоновыми задачами генерации эмбеддингов.
+ * Позволяет запускать полную перегенерацию (с force-сбросом),
+ * отслеживать прогресс и автоматически удаляет завершённые задачи через 5 мин.
+ */
 @Service
 public class EmbeddingTaskService implements DisposableBean {
 
@@ -40,6 +45,10 @@ public class EmbeddingTaskService implements DisposableBean {
         this.jdbc = jdbc;
     }
 
+    /**
+     * Запускает фоновую задачу генерации эмбеддингов для всех игр без эмбеддинга.
+     * Если force=true, предварительно сбрасывает все существующие эмбеддинги.
+     */
     public String submitGenerateEmbeddings(boolean force) {
         pruneOldTasks();
 
@@ -95,10 +104,16 @@ public class EmbeddingTaskService implements DisposableBean {
         return taskId;
     }
 
+    /**
+     * Возвращает задачу по её идентификатору.
+     */
     public EmbeddingTask getTask(String taskId) {
         return tasks.get(taskId);
     }
 
+    /**
+     * Периодически удаляет завершённые задачи старше 5 минут.
+     */
     @Scheduled(fixedRate = 60000)
     public void pruneOldTasks() {
         long threshold = System.currentTimeMillis() - 300000;

@@ -1,5 +1,10 @@
 package com.jenikmax.game.library.service.tracker;
 
+/**
+ * Информация о пире в торрент-рое.
+ * Хранит peerId, IP, порт, объёмы переданных/полученных данных,
+ * время последней активности и флаг сида (left == 0).
+ */
 public class PeerInfo {
 
     private final String peerId;

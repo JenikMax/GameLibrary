@@ -14,22 +14,28 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import javax.sql.DataSource;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Основная конфигурация приложения: JDBC-шаблоны, HTTP-клиент, ObjectMapper.
+ */
 @Configuration
 public class AppConfig {
 
     @Autowired
     private DataSource dataSource;
 
+    /** JdbcTemplate для прямых SQL-запросов (статистика, трекер). */
     @Bean
     public JdbcTemplate jdbcTemplate(){
         return new JdbcTemplate(dataSource);
     }
 
+    /** NamedParameterJdbcTemplate для запросов с именованными параметрами. */
     @Bean
     public NamedParameterJdbcTemplate namedParameterJdbcTemplate(){
         return new NamedParameterJdbcTemplate(dataSource);
     }
 
+    /** Единый HTTP-клиент OkHttp для всех скраперов и AI-сервиса. */
     @Bean
     public OkHttpClient okHttpClient() {
         return new OkHttpClient.Builder()
@@ -40,6 +46,7 @@ public class AppConfig {
                 .build();
     }
 
+    /** ObjectMapper с pretty-print для отладки JSON. */
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);

@@ -13,12 +13,19 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+/**
+ * Провайдер JWT-токенов: генерация, парсинг, валидация.
+ * Использует HMAC-SHA (алгоритм выбирается по длине ключа).
+ * Срок жизни токена — из конфигурации (по умолч. 24ч).
+ */
 @Component
 public class JwtTokenProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
+    /** Секретный ключ подписи JWT. */
     private final SecretKey key;
+    /** Время жизни токена в миллисекундах. */
     private final long expirationMs;
 
     public JwtTokenProvider(
@@ -28,6 +35,7 @@ public class JwtTokenProvider {
         this.expirationMs = expirationMs;
     }
 
+    /** Создать JWT-токен для аутентифицированного пользователя. */
     public String generateToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Date now = new Date();
@@ -41,6 +49,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /** Извлечь имя пользователя из JWT-токена. */
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
                 .verifyWith(key)
@@ -50,12 +59,13 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
+    /** Проверить валидность JWT-токена (подпись + срок). */
     public boolean validateToken(String token) {
         try {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
-            logger.warn("Invalid JWT token: {}", ex.getMessage());
+            logger.warn("Невалидный JWT-токен: {}", ex.getMessage());
             return false;
         }
     }

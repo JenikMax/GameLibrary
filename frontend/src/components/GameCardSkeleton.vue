@@ -1,3 +1,4 @@
+<!-- Скелетон-заглушка для карточки игры. Отображается во время загрузки списка игр, повторяет структуру GameCard в виде серых блоков Skeleton. -->
 <template>
   <Card class="game-card">
     <template #header>
@@ -27,6 +28,7 @@
 </template>
 
 <script setup>
+// Скелетон для loading-состояния карточки игры
 import Card from 'primevue/card'
 import Skeleton from 'primevue/skeleton'
 </script>

@@ -1,3 +1,4 @@
+// API-методы аутентификации: логин, регистрация, проверка текущего пользователя
 import api from './axios'
 
 export const authApi = {
@@ -7,6 +8,7 @@ export const authApi = {
   register(username, password) {
     return api.post('/auth/register', { username, password })
   },
+  // Получение данных текущего аутентифицированного пользователя
   me() {
     return api.get('/auth/me')
   }

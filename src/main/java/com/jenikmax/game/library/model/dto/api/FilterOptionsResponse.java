@@ -2,6 +2,11 @@ package com.jenikmax.game.library.model.dto.api;
 
 import java.util.List;
 
+/**
+ * DTO с доступными опциями фильтрации для библиотеки игр.
+ * Содержит списки годов, платформ, жанров, тегов
+ * и флаг доступности семантического поиска.
+ */
 public class FilterOptionsResponse {
 
     private List<String> years;
@@ -21,6 +26,9 @@ public class FilterOptionsResponse {
     public boolean isSemanticAvailable() { return semanticAvailable; }
     public void setSemanticAvailable(boolean semanticAvailable) { this.semanticAvailable = semanticAvailable; }
 
+    /**
+     * Элемент жанра: код и отображаемое имя.
+     */
     public static class GenreItem {
         private String code;
         private String name;

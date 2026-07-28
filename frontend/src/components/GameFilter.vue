@@ -1,3 +1,4 @@
+<!-- Боковая панель фильтра библиотеки. Аккордеон с полями: текстовый поиск (250ms debounce), тумблер semantic search, чипсы платформ/годов, MultiSelect жанров/тегов. Автоматически применяет фильтры при изменении. -->
 <template>
   <Accordion :activeIndex="0">
     <AccordionTab :header="t('filter.search')">
@@ -18,6 +19,7 @@
           </IconField>
         </div>
 
+        <!-- Semantic search (AI-поиск по смыслу) — доступен только если ai-service включён -->
         <div class="field" v-if="options.semanticAvailable">
           <div class="flex align-items-center gap-2">
             <ToggleSwitch v-model="semanticSearch" @change="applyFilters" />
@@ -26,6 +28,7 @@
           <small class="text-color-secondary ml-1">{{ t('filter.semantic_hint') }}</small>
         </div>
 
+        <!-- Платформы в виде чипсов -->
         <div class="field">
           <label>{{ t('filter.platforms') }}</label>
           <div class="flex flex-wrap gap-2">
@@ -39,6 +42,7 @@
           </div>
         </div>
 
+        <!-- Годы в виде чипсов -->
         <div class="field">
           <label>{{ t('filter.years') }}</label>
           <div class="flex flex-wrap gap-2">
@@ -52,6 +56,7 @@
           </div>
         </div>
 
+        <!-- Жанры через MultiSelect -->
         <div class="field">
           <label>{{ t('filter.genres') }}</label>
           <MultiSelect
@@ -68,6 +73,7 @@
           />
         </div>
 
+        <!-- Теги через MultiSelect -->
         <div class="field" v-if="options.tags && options.tags.length">
           <label>{{ t('filter.tags') }}</label>
           <MultiSelect
@@ -81,6 +87,7 @@
           />
         </div>
 
+        <!-- Кнопка сброса всех фильтров -->
         <div class="flex gap-2">
           <Button :label="t('filter.reset')" icon="pi pi-times" severity="secondary" @click="resetFilters" class="flex-1" />
         </div>
@@ -90,6 +97,7 @@
 </template>
 
 <script setup>
+// Фильтр библиотеки: текстовый поиск, semantic search, платформы, годы, жанры, теги. Debounced watch 250ms, авто-применение.
 import { ref, watch } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import Accordion from 'primevue/accordion'
@@ -104,6 +112,7 @@ import Button from 'primevue/button'
 
 const { t } = useI18n()
 
+// Утилита debounce для задержки применения фильтров
 function debounce(fn, delay) {
   let timer
   return function (...args) {
@@ -124,8 +133,9 @@ const selectedYears = ref([])
 const selectedGenres = ref([])
 const selectedTags = ref([])
 const semanticSearch = ref(false)
-const resetting = ref(false)
+const resetting = ref(false) // Флаг, блокирующий срабатывание watch во время restoreState/reset
 
+// Восстановление состояния фильтра из sessionStorage
 function restoreState(state) {
   resetting.value = true
   searchText.value = state.searchText || state.search || ''
@@ -139,6 +149,7 @@ function restoreState(state) {
 
 defineExpose({ restoreState, semanticSearch })
 
+// Debounced-применение фильтров при изменении любого поля
 const debouncedApply = debounce(() => {
   if (!resetting.value) applyFilters()
 }, 250)
@@ -149,18 +160,21 @@ watch(selectedYears, debouncedApply, { deep: true })
 watch(selectedGenres, debouncedApply, { deep: true })
 watch(selectedTags, debouncedApply, { deep: true })
 
+// Переключение платформы (чипс)
 function togglePlatform(p) {
   const idx = selectedPlatforms.value.indexOf(p)
   if (idx >= 0) selectedPlatforms.value.splice(idx, 1)
   else selectedPlatforms.value.push(p)
 }
 
+// Переключение года (чипс)
 function toggleYear(y) {
   const idx = selectedYears.value.indexOf(y)
   if (idx >= 0) selectedYears.value.splice(idx, 1)
   else selectedYears.value.push(y)
 }
 
+// Эмит события apply с текущими значениями фильтров
 function applyFilters() {
   emit('apply', {
     search: searchText.value,
@@ -172,6 +186,7 @@ function applyFilters() {
   })
 }
 
+// Сброс всех фильтров
 function resetFilters() {
   resetting.value = true
   searchText.value = ''

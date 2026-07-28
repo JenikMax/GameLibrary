@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * Сущность пользователя системы.
+ * Содержит учётные данные (имя, пароль), роли (администратор),
+ * статус активности и аватар.
+ */
 @Entity
 @Table(name = "library_user")
 @SequenceGenerator(name = "library_user_id_gen",

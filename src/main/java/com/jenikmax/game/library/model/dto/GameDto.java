@@ -3,6 +3,11 @@ package com.jenikmax.game.library.model.dto;
 import java.sql.Timestamp;
 import java.util.List;
 
+/**
+ * Расширенное DTO игры, наследующее GameShortDto.
+ * Добавляет поля для трейлера, описания, перевода описания,
+ * инструкции и списка скриншотов.
+ */
 public class GameDto extends GameShortDto {
 
     private String trailerUrl;

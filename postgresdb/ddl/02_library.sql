@@ -1,37 +1,50 @@
+-- ============================================================
+-- 02_library.sql — Основные таблицы библиотеки игр
+-- Содержит: game_data (игры), game_genre (жанры),
+--           game_data_genre (связь игр с жанрами),
+--           game_screenshot (скриншоты), v_platform,
+--           v_release_date (представления).
+-- ============================================================
 \c "game-library"
---SET search_path TO library;
 
+-- ============================================================
+-- Таблица game_data — основная информация об игре
+-- ============================================================
 create sequence game_data_id_seq start 1;
 drop table if exists library.game_data;
 create table library.game_data
 (
-    id                bigserial primary key,
-    create_ts         timestamp without time zone,
-    name              varchar(225),
-    release_date      varchar(20),
-    directory_path    text,
-    trailer_url       varchar(255),
-    platform          varchar(225),
-    description       text,
-    instruction       text,
-    logo              bytea
+    id                bigserial primary key,        -- Уникальный идентификатор игры
+    create_ts         timestamp without time zone,  -- Дата и время добавления
+    name              varchar(225),                  -- Название игры
+    release_date      varchar(20),                   -- Дата релиза (строка)
+    directory_path    text,                          -- Путь к директории с файлами игры
+    trailer_url       varchar(255),                  -- URL трейлера
+    platform          varchar(225),                  -- Платформа (PC, PS4, Xbox и т.д.)
+    description       text,                          -- Описание игры
+    instruction       text,                          -- Инструкция по установке/запуску
+    logo              bytea                          -- Логотип/обложка игры (бинарные данные)
 );
 
+-- Общий размер файлов игры в байтах (для статистики). NULL = не вычислен.
 ALTER TABLE library.game_data ADD COLUMN IF NOT EXISTS total_size_bytes BIGINT DEFAULT NULL;
 
+-- ============================================================
+-- Таблица game_genre — справочник жанров
+-- ============================================================
 drop table if exists library.game_genre;
 create table library.game_genre
 (
-    code        varchar(50)  not null,
-    description varchar(200) not null,
-    description_ru varchar(200) not null,
+    code        varchar(50)  not null,  -- Код жанра (ключ, латиница)
+    description varchar(200) not null,  -- Название жанра на английском
+    description_ru varchar(200) not null, -- Название жанра на русском
     constraint game_genre_pkey primary key (code)
 );
 
-COMMENT ON TABLE library.game_genre IS '';
-COMMENT ON COLUMN library.game_genre.code IS '';
-COMMENT ON COLUMN library.game_genre.description IS '';
-COMMENT ON COLUMN library.game_genre.description IS '';
+COMMENT ON TABLE library.game_genre IS 'Справочник жанров игр';
+COMMENT ON COLUMN library.game_genre.code IS 'Код жанра (латиница)';
+COMMENT ON COLUMN library.game_genre.description IS 'Название жанра на английском';
+COMMENT ON COLUMN library.game_genre.description_ru IS 'Название жанра на русском';
 
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('rpg','RPG','Ролевая');
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('action','Action','Экшен');
@@ -116,39 +129,57 @@ INSERT INTO library.game_genre (code, description, description_ru) VALUES ('othe
 INSERT INTO library.game_genre (code, description, description_ru) VALUES ('meha','Meha','Меха');
 
 
+-- ============================================================
+-- Таблица game_data_genre — связь M:N между играми и жанрами
+-- ============================================================
 create sequence game_data_genre_id_seq start 1;
 drop table if exists library.game_data_genre;
 create table library.game_data_genre
 (
-    id bigserial primary key,
-    game_id      bigint           not null references library.game_data (id),
-    genre_code   varchar(200)      not null references library.game_genre (code)
+    id bigserial primary key,                               -- Уникальный идентификатор связи
+    game_id      bigint           not null references library.game_data (id),  -- Идентификатор игры
+    genre_code   varchar(200)      not null references library.game_genre (code) -- Код жанра
 );
 
 
+-- ============================================================
+-- Таблица game_screenshot — скриншоты игры
+-- ============================================================
 create sequence game_screenshot_id_seq start 1;
 drop table if exists library.game_screenshot;
 create table library.game_screenshot
 (
-    id bigserial primary key,
-    game_id      bigint           not null references library.game_data (id),
-    name        varchar(200)  not null,
-    source              bytea
+    id bigserial primary key,                               -- Уникальный идентификатор скриншота
+    game_id      bigint           not null references library.game_data (id),  -- Идентификатор игры
+    name        varchar(200)  not null,                      -- Имя/название скриншота
+    source              bytea                                -- Бинарные данные изображения
 );
 
 
+-- ============================================================
+-- Индексы для ускорения поиска по названию и платформе
+-- ============================================================
 CREATE INDEX IF NOT EXISTS idx_game_data_name ON library.game_data(name);
 CREATE INDEX IF NOT EXISTS idx_game_data_platform ON library.game_data(platform);
 
+-- ============================================================
+-- Представление v_platform — список уникальных платформ
+-- ============================================================
 drop view if exists library.v_platform;
 create or replace view library.v_platform as
 select platform from library.game_data group by platform;
 
+-- ============================================================
+-- Представление v_release_date — список уникальных дат релиза
+-- ============================================================
 drop view if exists library.v_release_date;
 create or replace view library.v_release_date as
 select release_date from library.game_data group by release_date;
 
 
+-- ============================================================
+-- Права доступа для пользователя приложения
+-- ============================================================
 GRANT ALL ON ALL TABLES IN SCHEMA library TO "library-manager-user";
 GRANT ALL ON ALL SEQUENCES IN SCHEMA library TO "library-manager-user";
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO "library-manager-user";

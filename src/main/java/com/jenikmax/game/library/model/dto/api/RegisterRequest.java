@@ -4,6 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+/**
+ * Запрос на регистрацию пользователя (REST API).
+ * Содержит имя пользователя и пароль с валидацией.
+ */
 public class RegisterRequest {
 
     @NotBlank

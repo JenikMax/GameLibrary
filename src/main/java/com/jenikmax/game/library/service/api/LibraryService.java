@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Интерфейс основного сервиса библиотеки игр.
+ * Определяет контракт для сканирования, поиска, фильтрации,
+ * скрапинга, скачивания игр и управления метаданными.
+ */
 public interface LibraryService {
 
     void scanLibrary();

@@ -1,4 +1,15 @@
-/* ═══════ PRIMEVUE TOKEN OVERRIDES ═══════ */
+/* ============================================================
+ * retro-terminal.css — Ретро-терминальная тема (CRT)
+ * Зелёный моноширинный стиль с эффектами ЭЛТ-монитора:
+ *   - Scanlines (строки развёртки)
+ *   - Glow-эффект (свечение)
+ *   - Vignette (затемнение по краям)
+ *   - Noise (шум)
+ *   - Glitch-анимация
+ * Использует неон-зелёный (#00ff88) на чёрном фоне.
+ * ============================================================ */
+
+/* ═══════ ПЕРЕОПРЕДЕЛЕНИЕ ТОКЕНОВ PRIMEVUE ═══════ */
 :root[data-theme="retro-terminal"] {
   --p-surface-0: #00ff88;
   --p-surface-50: #00ee88;
@@ -75,7 +86,7 @@
   --rt-warn: #f59e0b;
 }
 
-/* ═══════ CRT BACKGROUND LAYERS ═══════ */
+/* ═══════ ФОНОВЫЕ СЛОИ CRT (свечение + виньетка + шум) ═══════ */
 /* glow + vignette + noise (behind content) */
 [data-theme="retro-terminal"] body::before {
   content: '';
@@ -100,7 +111,7 @@
   animation: crtScanCrawl 0.6s linear infinite;
 }
 
-/* ═══════ GLOBAL OVERRIDES ═══════ */
+/* ═══════ ГЛОБАЛЬНЫЕ ПЕРЕОПРЕДЕЛЕНИЯ ═══════ */
 [data-theme="retro-terminal"] body {
   background: #000 !important;
   color: #00ff88 !important;
@@ -129,12 +140,12 @@
   text-shadow: 0 0 8px rgba(0,255,136,0.5);
 }
 
-/* ═══════ MAIN CONTAINER ═══════ */
+/* ═══════ ОСНОВНОЙ КОНТЕЙНЕР ═══════ */
 [data-theme="retro-terminal"] .main-container {
   background-color: #000 !important;
 }
 
-/* ═══════ HEADER / MENUBAR ═══════ */
+/* ═══════ ШАПКА / МЕНЮ ═══════ */
 [data-theme="retro-terminal"] .app-header-wrapper {
   background: #000000 !important;
   border-bottom-color: var(--rt-border) !important;
@@ -177,7 +188,7 @@
   border-radius: 0;
 }
 
-/* ═══════ BUTTONS (outlined glowing-border style) ═══════ */
+/* ═══════ КНОПКИ (контурные со свечением) ═══════ */
 [data-theme="retro-terminal"] .p-button,
 [data-theme="retro-terminal"] .p-button::after,
 [data-theme="retro-terminal"] .p-button:focus,
@@ -259,7 +270,7 @@
   box-shadow: 0 0 15px rgba(56,189,248,0.3);
 }
 
-/* ═══════ INPUTS ═══════ */
+/* ═══════ ПОЛЯ ВВОДА ═══════ */
 [data-theme="retro-terminal"] .p-inputtext,
 [data-theme="retro-terminal"] .p-multiselect,
 [data-theme="retro-terminal"] .p-select,
@@ -275,7 +286,7 @@
   border-color: #00ff88 !important;
 }
 
-/* ═══════ GAME CARDS ═══════ */
+/* ═══════ КАРТОЧКИ ИГР ═══════ */
 [data-theme="retro-terminal"] .game-card {
   border: 1px solid var(--rt-border);
   background: var(--rt-bg-panel);
@@ -297,7 +308,7 @@
   pointer-events: none;
 }
 
-/* ═══════ GAME LIST ROW ═══════ */
+/* ═══════ СТРОКА СПИСКА ИГР ═══════ */
 [data-theme="retro-terminal"] .game-list-row {
   border-color: var(--rt-border);
   border-radius: 0;
@@ -308,7 +319,7 @@
   border-color: #00ff88;
 }
 
-/* ═══════ TAGS ═══════ */
+/* ═══════ ТЕГИ ═══════ */
 [data-theme="retro-terminal"] .p-tag {
   border: 1px solid var(--rt-border);
   border-radius: 0;
@@ -338,7 +349,7 @@
   background: transparent;
 }
 
-/* ═══════ COMMENT / REVIEW ITEMS ═══════ */
+/* ═══════ КОММЕНТАРИИ / ОТЗЫВЫ ═══════ */
 [data-theme="retro-terminal"] .comment-item {
   background: var(--rt-bg-panel) !important;
   border: 1px dashed var(--rt-border-dim);
@@ -366,12 +377,12 @@
   border-radius: 0;
 }
 
-/* ═══════ COLLECTION PICKER ═══════ */
+/* ═══════ ВЫБОР КОЛЛЕКЦИИ ═══════ */
 [data-theme="retro-terminal"] .collection-item:hover {
   background-color: rgba(0,255,136,0.05) !important;
 }
 
-/* ═══════ BLINKING CURSOR ═══════ */
+/* ═══════ МИГАЮЩИЙ КУРСОР ═══════ */
 @keyframes rt-blink { 50% { opacity: 0; } }
 [data-theme="retro-terminal"] .t-cursor,
 [data-theme="retro-terminal"] .terminal-cursor {
@@ -389,7 +400,7 @@
   display: none;
 }
 
-/* ═══════ BADGE (notification count) ═══════ */
+/* ═══════ БЕЙДЖ (счётчик уведомлений) ═══════ */
 [data-theme="retro-terminal"] .p-badge {
   background: #00ff88 !important;
   color: #000 !important;
@@ -406,7 +417,7 @@
   color: #000 !important;
 }
 
-/* ═══════ SORT ICONS (DataTable) ═══════ */
+/* ═══════ ИКОНКИ СОРТИРОВКИ (DataTable) ═══════ */
 [data-theme="retro-terminal"] .p-datatable .p-datatable-thead > tr > th {
   background: rgba(0,26,13,0.5) !important;
   border-color: var(--rt-border) !important;
@@ -443,7 +454,7 @@
   border-top: 1px dashed var(--rt-border-dim);
 }
 
-/* ═══════ SORT BAR (SelectButton) ═══════ */
+/* ═══════ ПАНЕЛЬ СОРТИРОВКИ (SelectButton) ═══════ */
 [data-theme="retro-terminal"] .p-selectbutton .p-togglebutton {
   border-radius: 0;
   border: 1px solid var(--rt-border-dim);
@@ -468,7 +479,7 @@
   box-shadow: none !important;
 }
 
-/* ═══════ INPUT PLACEHOLDER ═══════ */
+/* ═══════ ПЛЕЙСХОЛДЕР ПОЛЕЙ ВВОДА ═══════ */
 [data-theme="retro-terminal"] .p-inputtext::placeholder {
   color: rgba(0,255,136,0.25) !important;
 }
@@ -476,7 +487,7 @@
   color: rgba(0,255,136,0.25) !important;
 }
 
-/* ═══════ FILTER LABELS ═══════ */
+/* ═══════ ПОДПИСИ ФИЛЬТРОВ ═══════ */
 [data-theme="retro-terminal"] .filter-title,
 [data-theme="retro-terminal"] .field-label,
 [data-theme="retro-terminal"] label {
@@ -487,7 +498,7 @@
   font-family: 'Courier New', monospace;
 }
 
-/* ═══════ SIDEBAR FILTER ═══════ */
+/* ═══════ БОКОВОЙ ФИЛЬТР ═══════ */
 [data-theme="retro-terminal"] .filter-sidebar {
   background: rgba(0,26,13,0.3);
   border-right: 1px solid var(--rt-border-dim);
@@ -502,7 +513,7 @@
   color: #00ff88 !important;
 }
 
-/* ═══════ PAGINATION (terminal style) ═══════ */
+/* ═══════ ПАГИНАЦИЯ (в стиле терминала) ═══════ */
 [data-theme="retro-terminal"] .p-paginator {
   background: transparent;
   font-family: 'Courier New', monospace;
@@ -534,7 +545,7 @@
   color: #00cc6a;
 }
 
-/* ═══════ AVATAR (profile) ═══════ */
+/* ═══════ АВАТАР (профиль) ═══════ */
 [data-theme="retro-terminal"] .p-avatar-circle {
   border-radius: 50%;
 }
@@ -543,7 +554,7 @@
   box-shadow: 0 0 15px rgba(0,255,136,0.2);
 }
 
-/* ═══════ PROGRESS BAR ═══════ */
+/* ═══════ ИНДИКАТОР ПРОГРЕССА ═══════ */
 [data-theme="retro-terminal"] .p-progressbar {
   border-radius: 0;
   background: #001a0d;
@@ -558,7 +569,7 @@
   color: #000 !important;
 }
 
-/* ═══════ TOAST (terminal style) ═══════ */
+/* ═══════ TOAST-УВЕДОМЛЕНИЯ (стиль терминала) ═══════ */
 [data-theme="retro-terminal"] .p-toast {
   font-family: 'Courier New', monospace;
 }
@@ -571,7 +582,7 @@
   color: #00ff88;
 }
 
-/* ═══════ DIALOG (terminal style) ═══════ */
+/* ═══════ ДИАЛОГОВОЕ ОКНО (стиль терминала) ═══════ */
 [data-theme="retro-terminal"] .p-dialog {
   border-radius: 0;
   border: 1px solid var(--rt-border);
@@ -591,7 +602,7 @@
   background: #000000;
 }
 
-/* ═══════ POPOVER (theme switcher etc.) ═══════ */
+/* ═══════ ВСПЛЫВАЮЩАЯ ПАНЕЛЬ (переключатель тем) ═══════ */
 [data-theme="retro-terminal"] .p-popover {
   border-radius: 0 !important;
   border: 1px solid var(--rt-border) !important;
@@ -602,7 +613,7 @@
   padding: 0.25rem;
 }
 
-/* ═══════ MULTISELECT / CHIP ═══════ */
+/* ═══════ МУЛЬТИВЫБОР / CHIP ═══════ */
 [data-theme="retro-terminal"] .p-multiselect-item {
   border-radius: 0;
   font-family: 'Courier New', monospace;
@@ -618,7 +629,7 @@
   font-family: 'Courier New', monospace;
 }
 
-/* ═══════ DIVIDER ═══════ */
+/* ═══════ РАЗДЕЛИТЕЛЬ ═══════ */
 [data-theme="retro-terminal"] .p-divider {
   border-color: var(--rt-border-dim);
 }
@@ -626,14 +637,14 @@
   border-color: var(--rt-border-dim);
 }
 
-/* ═══════ MESSAGE / ALERT ═══════ */
+/* ═══════ СООБЩЕНИЕ / АЛЕРТ ═══════ */
 [data-theme="retro-terminal"] .p-message {
   border-radius: 0;
   border-color: var(--rt-border);
   background: var(--rt-bg-panel);
 }
 
-/* ═══════ PASSWORD TOGGLE ICON ═══════ */
+/* ═══════ ИКОНКА ПЕРЕКЛЮЧЕНИЯ ПАРОЛЯ ═══════ */
 [data-theme="retro-terminal"] .p-password-toggle-mask-icon {
   color: #00cc6a !important;
 }
@@ -641,7 +652,7 @@
   color: #00ff88 !important;
 }
 
-/* ═══════ QUILL EDITOR ═══════ */
+/* ═══════ РЕДАКТОР QUILL (VueQuill) ═══════ */
 [data-theme="retro-terminal"] .ql-toolbar {
   background: #000000;
   border-color: var(--rt-border) !important;
@@ -668,7 +679,7 @@
   color: #00cc6a !important;
 }
 
-/* ═══════ SELECT / DROPDOWN ═══════ */
+/* ═══════ ВЫПАДАЮЩИЙ СПИСОК ═══════ */
 [data-theme="retro-terminal"] .p-overlay-popover,
 [data-theme="retro-terminal"] .p-select-overlay {
   background: #000000 !important;
@@ -683,7 +694,7 @@
   color: #00ff88 !important;
 }
 
-/* ═══════ GAME DETAIL: sections ═══════ */
+/* ═══════ ДЕТАЛИ ИГРЫ: секции ═══════ */
 [data-theme="retro-terminal"] .game-poster {
   align-self: flex-start;
 }
@@ -717,7 +728,7 @@
   box-shadow: 0 0 10px rgba(0,255,136,0.2);
 }
 
-/* ═══════ COLLECTION CARDS ═══════ */
+/* ═══════ КАРТОЧКИ КОЛЛЕКЦИЙ ═══════ */
 [data-theme="retro-terminal"] .collection-card {
   border: 1px solid var(--rt-border);
   border-radius: 0;
@@ -755,7 +766,7 @@
 }
 
 
-/* ═══════ STAT CARDS ═══════ */
+/* ═══════ КАРТОЧКИ СТАТИСТИКИ ═══════ */
 [data-theme="retro-terminal"] .stat-card {
   border: 1px solid var(--rt-border);
   background: var(--rt-bg-panel);
@@ -772,7 +783,7 @@
   color: #00cc6a;
 }
 
-/* ═══════ AUTH PAGE (terminal style) ═══════ */
+/* ═══════ СТРАНИЦА АВТОРИЗАЦИИ (стиль терминала) ═══════ */
 [data-theme="retro-terminal"] .auth-page {
   --auth-card-bg: rgba(0,26,13,0.5);
   --auth-card-border: rgba(0,255,136,0.4);
@@ -824,7 +835,7 @@
   font-family: 'Courier New', monospace;
 }
 
-/* ═══════ SKELETON LOADER ═══════ */
+/* ═══════ СКЕЛЕТОН-ЗАГЛУШКА ═══════ */
 [data-theme="retro-terminal"] .img-skeleton {
   background: linear-gradient(
     110deg,
@@ -835,7 +846,7 @@
   background-size: 200% 100%;
 }
 
-/* ═══════ CONFIRM DIALOG ═══════ */
+/* ═══════ ДИАЛОГ ПОДТВЕРЖДЕНИЯ ═══════ */
 [data-theme="retro-terminal"] .p-confirmdialog .p-confirmdialog-content {
   background: transparent;
   color: #00cc6a;
@@ -844,7 +855,7 @@
   color: #00ff88;
 }
 
-/* ═══════ GLOBAL: dashed borders for panels ═══════ */
+/* ═══════ ГЛОБАЛЬНО: пунктирные рамки для панелей ═══════ */
 [data-theme="retro-terminal"] .p-panel .p-panel-header {
   border-bottom: 1px dashed var(--rt-border-dim);
 }
@@ -852,7 +863,7 @@
   border-color: var(--rt-border-dim);
 }
 
-/* ═══════ NOTIFICATION PANEL (terminal style) ═══════ */
+/* ═══════ ПАНЕЛЬ УВЕДОМЛЕНИЙ (стиль терминала) ═══════ */
 [data-theme="retro-terminal"] .notification-panel {
   background: #000000 !important;
   border: 1px solid var(--rt-border) !important;
@@ -872,7 +883,7 @@
   border-left: 2px solid #00ff88;
 }
 
-/* ═══════ THEME SWITCHER POPOVER ═══════ */
+/* ═══════ ВСПЛЫВАЮЩАЯ ПАНЕЛЬ ТЕМ ═══════ */
 [data-theme="retro-terminal"] .theme-option {
   font-family: 'Courier New', monospace;
 }
@@ -887,7 +898,7 @@
   border-color: var(--rt-border);
 }
 
-/* ═══════ ACTIVE ELEMENTS: remove text-shadow/box-shadow halo ═══════ */
+/* ═══════ АКТИВНЫЕ ЭЛЕМЕНТЫ: убрать свечение ═══════ */
 [data-theme="retro-terminal"] .p-togglebutton-checked,
 [data-theme="retro-terminal"] .p-togglebutton-checked *,
 [data-theme="retro-terminal"] .p-paginator-page.p-paginator-page-selected,
@@ -900,7 +911,7 @@
   box-shadow: none !important;
 }
 
-/* ═══════ TOGGLE SWITCH (semantic search) ═══════ */
+/* ═══════ ПЕРЕКЛЮЧАТЕЛЬ (семантический поиск) ═══════ */
 [data-theme="retro-terminal"] .p-toggleswitch-checked .p-toggleswitch-slider {
   background: #00ff88 !important;
   border-color: #00ff88 !important;
@@ -914,7 +925,7 @@
   border-color: #00ff88 !important;
 }
 
-/* ═══════ CHIP SELECTED (platforms, years in filter) ═══════ */
+/* ═══════ ВЫБРАННЫЙ ЧИП (платформы, годы) ═══════ */
 [data-theme="retro-terminal"] .chip-selected {
   background: #00ff88 !important;
   color: #000 !important;
@@ -922,7 +933,7 @@
   font-weight: bold;
 }
 
-/* ═══════ SORT BAR (custom buttons in LibraryView) ═══════ */
+/* ═══════ ПАНЕЛЬ СОРТИРОВКИ (LibraryView) ═══════ */
 [data-theme="retro-terminal"] .sort-btn {
   background: transparent;
   border-color: var(--rt-border-dim) !important;
@@ -950,7 +961,7 @@
   border-radius: 0;
 }
 
-/* ═══════ RATING (square blocks like preview) ═══════ */
+/* ═══════ РЕЙТИНГ (квадратные блоки) ═══════ */
 [data-theme="retro-terminal"] .p-rating {
   display: inline-flex;
   gap: 2px;
@@ -982,14 +993,14 @@
   color: #00ff88 !important;
 }
 
-/* ═══════ YEAR TAG (orange/warn) ═══════ */
+/* ═══════ ТЕГ ГОДА (оранжевый) ═══════ */
 [data-theme="retro-terminal"] .p-tag.p-tag-warn {
   border-color: #f59e0b !important;
   color: #f59e0b !important;
   background: rgba(245,158,11,0.1) !important;
 }
 
-/* ═══════ SEED BUTTON (orange) ═══════ */
+/* ═══════ КНОПКА РАЗДАЧИ (оранжевая) ═══════ */
 [data-theme="retro-terminal"] .p-button.rt-btn-seed {
   color: #f59e0b !important;
   border-color: #f59e0b !important;
@@ -1000,7 +1011,7 @@
   box-shadow: 0 0 12px rgba(245,158,11,0.3) !important;
 }
 
-/* ═══════ EDIT BUTTON (blue) ═══════ */
+/* ═══════ КНОПКА РЕДАКТИРОВАНИЯ (синяя) ═══════ */
 [data-theme="retro-terminal"] .p-button.rt-btn-edit {
   color: #38bdf8 !important;
   border-color: #38bdf8 !important;
@@ -1010,7 +1021,7 @@
   background: rgba(56,189,248,0.1) !important;
   box-shadow: 0 0 12px rgba(56,189,248,0.3) !important;
 }
-/* ═══════ ADMIN USERS — styled buttons ═══════ */
+/* ═══════ АДМИНИСТРИРОВАНИЕ — кнопки ═══════ */
 [data-theme="retro-terminal"] .rt-admin-btn {
   font-family: 'Courier New', monospace;
   font-size: 0.75rem;
@@ -1047,7 +1058,7 @@
   opacity: 0.85;
 }
 
-/* ═══════ HEADER ACTION BUTTONS — no frame, green ═══════ */
+/* ═══════ КНОПКИ ШАПКИ — без рамки, зелёные ═══════ */
 [data-theme="retro-terminal"] .app-header .p-button.p-button-text {
   border: none !important;
   background: transparent !important;
@@ -1068,7 +1079,7 @@
   border-color: transparent !important;
 }
 
-/* ═══════ FAVORITE BUTTON — no frame, just heart ═══════ */
+/* ═══════ КНОПКА ИЗБРАННОГО — только сердечко ═══════ */
 [data-theme="retro-terminal"] .favorite-btn {
   background: transparent !important;
   border: none !important;
@@ -1099,7 +1110,7 @@
   color: var(--rt-danger) !important;
 }
 
-/* ═══════ GREEN TEXT BUTTON (library view toggle, etc.) ═══════ */
+/* ═══════ ЗЕЛЁНАЯ ТЕКСТОВАЯ КНОПКА (переключение вида) ═══════ */
 [data-theme="retro-terminal"] .p-button.rt-btn-green {
   color: #00ff88 !important;
   border-color: transparent !important;
@@ -1109,7 +1120,7 @@
   text-shadow: 0 0 8px rgba(0,255,136,0.5);
 }
 
-/* ═══════ UTILITY BUTTON CLASSES ═══════ */
+/* ═══════ УТИЛИТАРНЫЕ КЛАССЫ КНОПОК ═══════ */
 [data-theme="retro-terminal"] .p-button.rt-btn-success-outline {
   color: #00ff88 !important;
   border-color: #00ff88 !important;
@@ -1139,13 +1150,13 @@
   box-shadow: 0 0 12px rgba(0,255,136,0.3) !important;
 }
 
-/* ═══════ CRT SCANLINE ANIMATION ═══════ */
+/* ═══════ АНИМАЦИЯ CRT-СТРОК РАЗВЁРТКИ ═══════ */
 @keyframes crtScanCrawl {
   0% { background-position: 0 0; }
   100% { background-position: 0 -4px; }
 }
 
-/* ═══════ GLITCH TEAR EFFECT (variant #9, no shift) ═══════ */
+/* ═══════ GLITCH-ЭФФЕКТ РАЗРЫВА (вариант #9) ═══════ */
 @keyframes glitch-tear {
   0%, 87% { clip-path: inset(0); filter: none; }
   88% { clip-path: inset(0 0 70% 0); filter: hue-rotate(90deg) brightness(1.5); }

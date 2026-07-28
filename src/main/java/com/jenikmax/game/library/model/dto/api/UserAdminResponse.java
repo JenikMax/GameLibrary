@@ -1,5 +1,9 @@
 package com.jenikmax.game.library.model.dto.api;
 
+/**
+ * DTO для отображения пользователя в админ-панели.
+ * Содержит ID, имя, флаги администратора и активности, URL аватара.
+ */
 public class UserAdminResponse {
 
     private Long id;

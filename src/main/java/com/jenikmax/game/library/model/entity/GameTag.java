@@ -3,6 +3,10 @@ package com.jenikmax.game.library.model.entity;
 import jakarta.persistence.*;
 import java.io.Serializable;
 
+/**
+ * Сущность тега игры (многие-ко-многим).
+ * Связывает игру с тегом, представленным строковым кодом.
+ */
 @Entity
 @Table(name = "game_data_tag")
 @SequenceGenerator(

@@ -1,5 +1,10 @@
 package com.jenikmax.game.library.model.dto.api;
 
+/**
+ * DTO с информацией о скрапере для отображения на фронтенде.
+ * Содержит тип, отображаемое имя и подсказки для поля ввода
+ * на русском и английском языках.
+ */
 public class ScraperInfoResponse {
 
     private String type;

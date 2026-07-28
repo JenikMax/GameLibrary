@@ -18,6 +18,13 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/collections")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Collections", description = "User game collections management")
+/**
+ * Контроллер управления коллекциями игр пользователя.
+ * Обрабатывает запросы по пути /api/collections.
+ * Поддерживает CRUD-операции, добавление/удаление игр из коллекции,
+ * переупорядочивание, а также «умные» коллекции (smart collections)
+ * с динамически вычисляемым набором игр по правилам.
+ */
 public class CollectionController {
 
     private final CollectionService collectionService;
@@ -35,6 +42,11 @@ public class CollectionController {
         this.userService = userService;
     }
 
+    /**
+     * Получить список всех доступных коллекций: собственные коллекции
+     * пользователя + публичные коллекции других пользователей (без дубликатов).
+     * @return список коллекций с метаданными и количеством игр
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> listCollections() {
         Long userId = getCurrentUserId();
@@ -55,6 +67,11 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
+    /**
+     * Получить список ID коллекций, в которые входит указанная игра.
+     * @param gameId идентификатор игры
+     * @return список ID коллекций
+     */
     @GetMapping("/membership")
     public ResponseEntity<ApiResponse<List<Long>>> getMembership(@RequestParam Long gameId) {
         Long userId = getCurrentUserId();
@@ -63,6 +80,11 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok(ids));
     }
 
+    /**
+     * Получить список коллекций с hero-данными (логотип первой игры)
+     * для отображения карточек коллекций на фронтенде.
+     * @return список коллекций с preview-данными
+     */
     @GetMapping("/with-hero")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> listCollectionsWithHero() {
         Long currentUserId = getCurrentUserId();
@@ -70,6 +92,11 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
+    /**
+     * Получить информацию о коллекции по ID.
+     * @param id идентификатор коллекции
+     * @return метаданные коллекции или 404
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getCollection(@PathVariable Long id) {
         return collectionService.getById(id)
@@ -77,6 +104,11 @@ public class CollectionController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Создать новую коллекцию (обычную или «умную»).
+     * @param body JSON с полями name, description, isPublic, isSmart, smartRules
+     * @return созданная коллекция с метаданными
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> create(@RequestBody Map<String, Object> body) {
         String name = (String) body.get("name");
@@ -98,6 +130,12 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok(toMap(c)));
     }
 
+    /**
+     * Обновить метаданные коллекции (название, описание, публичность, правила).
+     * @param id   идентификатор коллекции
+     * @param body JSON с обновлёнными полями
+     * @return обновлённая коллекция
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> update(@PathVariable Long id,
                                                                     @RequestBody Map<String, Object> body) {
@@ -117,6 +155,11 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok(toMap(c)));
     }
 
+    /**
+     * Удалить коллекцию вместе со всеми записями игр в ней.
+     * @param id идентификатор коллекции
+     * @return сообщение об успешном удалении
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         if (!canModify(id)) return ResponseEntity.status(403).body(ApiResponse.error("Forbidden"));
@@ -124,6 +167,12 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok("Deleted", null));
     }
 
+    /**
+     * Получить список игр в коллекции. Для «умных» коллекций выполняет
+     * динамический запрос по правилам, для обычных — возвращает сохранённые записи.
+     * @param id идентификатор коллекции
+     * @return список игр с sortOrder и датой добавления
+     */
     @GetMapping("/{id}/games")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getGames(@PathVariable Long id) {
         Optional<GameCollection> optCollection = collectionService.getById(id);
@@ -148,6 +197,12 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
+    /**
+     * Добавить игру в коллекцию.
+     * @param id   идентификатор коллекции
+     * @param body JSON с полем gameId
+     * @return созданная запись с sortOrder
+     */
     @PostMapping("/{id}/games")
     public ResponseEntity<ApiResponse<Map<String, Object>>> addGame(@PathVariable Long id,
                                                                      @RequestBody Map<String, Object> body) {
@@ -162,6 +217,12 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok(m));
     }
 
+    /**
+     * Удалить игру из коллекции.
+     * @param id     идентификатор коллекции
+     * @param gameId идентификатор игры
+     * @return сообщение об успешном удалении
+     */
     @DeleteMapping("/{id}/games/{gameId}")
     public ResponseEntity<ApiResponse<Void>> removeGame(@PathVariable Long id, @PathVariable Long gameId) {
         if (!canModify(id)) return ResponseEntity.status(403).body(ApiResponse.error("Forbidden"));
@@ -169,6 +230,12 @@ public class CollectionController {
         return ResponseEntity.ok(ApiResponse.ok("Removed", null));
     }
 
+    /**
+     * Переупорядочить игры в коллекции. Принимает полный упорядоченный список gameId.
+     * @param id   идентификатор коллекции
+     * @param body JSON с полем order — массивом gameId в новом порядке
+     * @return сообщение об успешном переупорядочивании
+     */
     @PutMapping("/{id}/games/reorder")
     public ResponseEntity<ApiResponse<Void>> reorder(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         if (!canModify(id)) return ResponseEntity.status(403).body(ApiResponse.error("Forbidden"));

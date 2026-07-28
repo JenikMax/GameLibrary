@@ -12,6 +12,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 
+/**
+ * Клиент для управления Transmission через JSON-RPC API.
+ * Позволяет добавлять торренты, получать статус, список активных/остановленных,
+ * управлять раздачами (стоп/старт/удаление) и проверять соединение.
+ */
 @Service
 public class TransmissionService {
 
@@ -82,6 +87,9 @@ public class TransmissionService {
         }
     }
 
+    /**
+     * Добавляет торрент в Transmission. Принимает путь к .torrent-файлу и директорию данных.
+     */
     public String addTorrent(String torrentPath, String dir) {
         try {
             byte[] torrentBytes = Files.readAllBytes(new File(torrentPath).toPath());
@@ -121,6 +129,9 @@ public class TransmissionService {
         return null;
     }
 
+    /**
+     * Возвращает статус торрента по его ID в Transmission.
+     */
     public Map<String, Object> getStatus(String id) {
         Map<String, Object> args = new LinkedHashMap<>();
         args.put("ids", Collections.singletonList(parseId(id)));
@@ -141,14 +152,23 @@ public class TransmissionService {
         return Collections.emptyMap();
     }
 
+    /**
+     * Возвращает список активных торрентов (статусы 4, 6).
+     */
     public List<Map<String, Object>> getActive() {
         return getTorrentsByStatus(Arrays.asList(4, 6));
     }
 
+    /**
+     * Возвращает список ожидающих торрентов (статусы 1, 2, 3, 5).
+     */
     public List<Map<String, Object>> getWaiting() {
         return getTorrentsByStatus(Arrays.asList(1, 2, 3, 5));
     }
 
+    /**
+     * Возвращает список остановленных торрентов (статус 0).
+     */
     public List<Map<String, Object>> getStopped(int offset, int limit) {
         return getTorrentsByStatus(Collections.singletonList(0));
     }
@@ -177,6 +197,9 @@ public class TransmissionService {
         return Collections.emptyList();
     }
 
+    /**
+     * Удаляет торрент из Transmission, опционально удаляя файлы.
+     */
     public boolean remove(String id, boolean deleteFiles) {
         Map<String, Object> args = new LinkedHashMap<>();
         args.put("ids", Collections.singletonList(parseId(id)));
@@ -185,6 +208,9 @@ public class TransmissionService {
         return response != null && "success".equals(response.get("result"));
     }
 
+    /**
+     * Останавливает торрент.
+     */
     public boolean stopTorrent(String id) {
         Map<String, Object> args = new LinkedHashMap<>();
         args.put("ids", Collections.singletonList(parseId(id)));
@@ -192,6 +218,9 @@ public class TransmissionService {
         return response != null && "success".equals(response.get("result"));
     }
 
+    /**
+     * Запускает остановленный торрент.
+     */
     public boolean startTorrent(String id) {
         Map<String, Object> args = new LinkedHashMap<>();
         args.put("ids", Collections.singletonList(parseId(id)));
@@ -200,6 +229,9 @@ public class TransmissionService {
     }
 
     @SuppressWarnings("unchecked")
+    /**
+     * Возвращает глобальную статистику сессии Transmission.
+     */
     public Map<String, Object> getGlobalStat() {
         Map<String, Object> response = callRpc("session-stats", null);
         if (response != null && response.containsKey("arguments")) {
@@ -208,6 +240,9 @@ public class TransmissionService {
         return Collections.emptyMap();
     }
 
+    /**
+     * Проверяет соединение с Transmission RPC.
+     */
     public boolean isConnected() {
         Map<String, Object> response = callRpc("session-get", null);
         return response != null && "success".equals(response.get("result"));

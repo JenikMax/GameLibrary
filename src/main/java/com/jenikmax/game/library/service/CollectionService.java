@@ -17,6 +17,12 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Сервис для управления коллекциями игр.
+ * Поддерживает создание, обновление, удаление коллекций,
+ * а также управление записями (добавление/удаление/сортировка игр).
+ * Реализует логику «умных» коллекций с динамическими правилами фильтрации.
+ */
 @Service
 public class CollectionService {
 
@@ -36,18 +42,30 @@ public class CollectionService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Возвращает коллекции указанного пользователя, отсортированные по дате обновления.
+     */
     public List<GameCollection> getUserCollections(Long userId) {
         return collectionRepository.findByUserIdOrderByUpdatedAtDesc(userId);
     }
 
+    /**
+     * Возвращает все публичные коллекции всех пользователей.
+     */
     public List<GameCollection> getPublicCollections() {
         return collectionRepository.findByIsPublicTrueOrderByUpdatedAtDesc();
     }
 
+    /**
+     * Находит коллекцию по идентификатору.
+     */
     public Optional<GameCollection> getById(Long id) {
         return collectionRepository.findById(id);
     }
 
+    /**
+     * Создаёт новую коллекцию для указанного пользователя.
+     */
     @Transactional
     public GameCollection create(String name, String description, boolean isPublic, Long userId) {
         GameCollection c = new GameCollection();
@@ -60,6 +78,9 @@ public class CollectionService {
         return collectionRepository.save(c);
     }
 
+    /**
+     * Обновляет название, описание и видимость существующей коллекции.
+     */
     @Transactional
     public GameCollection update(Long id, String name, String description, boolean isPublic) {
         GameCollection c = collectionRepository.findById(id).orElseThrow();
@@ -70,15 +91,24 @@ public class CollectionService {
         return collectionRepository.save(c);
     }
 
+    /**
+     * Удаляет коллекцию по идентификатору.
+     */
     @Transactional
     public void delete(Long id) {
         collectionRepository.deleteById(id);
     }
 
+    /**
+     * Возвращает список записей (игр) указанной коллекции, отсортированный по порядку.
+     */
     public List<GameCollectionEntry> getEntries(Long collectionId) {
         return entryRepository.findByCollectionIdOrderBySortOrderAsc(collectionId);
     }
 
+    /**
+     * Добавляет игру в коллекцию. Если игра уже есть — возвращает существующую запись.
+     */
     @Transactional
     public GameCollectionEntry addGame(Long collectionId, Long gameId) {
         Optional<GameCollectionEntry> existing = entryRepository.findByCollectionIdAndGameId(collectionId, gameId);
@@ -93,11 +123,17 @@ public class CollectionService {
         return entryRepository.save(e);
     }
 
+    /**
+     * Удаляет игру из коллекции.
+     */
     @Transactional
     public void removeGame(Long collectionId, Long gameId) {
         entryRepository.deleteByCollectionIdAndGameId(collectionId, gameId);
     }
 
+    /**
+     * Изменяет порядок игр в коллекции согласно переданному списку идентификаторов.
+     */
     @Transactional
     public void reorder(Long collectionId, List<Long> gameIds) {
         for (int i = 0; i < gameIds.size(); i++) {
@@ -110,10 +146,16 @@ public class CollectionService {
         }
     }
 
+    /**
+     * Возвращает количество игр в коллекции.
+     */
     public long getEntryCount(Long collectionId) {
         return entryRepository.countByCollectionId(collectionId);
     }
 
+    /**
+     * Подсчитывает количество игр, соответствующих правилам «умной» коллекции.
+     */
     public long countSmartGames(String rulesJson) {
         if (rulesJson == null || rulesJson.isBlank()) return 0;
         try {
@@ -127,6 +169,9 @@ public class CollectionService {
         }
     }
 
+    /**
+     * Выполняет поиск игр по правилам «умной» коллекции и возвращает результат с рейтингами.
+     */
     public List<Map<String, Object>> findSmartGames(String rulesJson, int limit) {
         if (rulesJson == null || rulesJson.isBlank()) return List.of();
         try {
@@ -211,12 +256,19 @@ public class CollectionService {
         }
     }
 
+    /**
+     * Проверяет, является ли пользователь владельцем коллекции.
+     */
     public boolean isOwner(Long collectionId, Long userId) {
         return collectionRepository.findById(collectionId)
                 .map(c -> c.getUser().getId().equals(userId))
                 .orElse(false);
     }
 
+    /**
+     * Возвращает все коллекции пользователя вместе с публичными коллекциями других,
+     * обогащая каждую данными о главной игре-герое и списке превью игр.
+     */
     public List<Map<String, Object>> getCollectionsWithHeroData(Long currentUserId) {
         List<GameCollection> mine = getUserCollections(currentUserId);
         List<GameCollection> shared = getPublicCollections();

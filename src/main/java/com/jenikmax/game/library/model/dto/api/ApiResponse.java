@@ -1,5 +1,9 @@
 package com.jenikmax.game.library.model.dto.api;
 
+/**
+ * Стандартный ответ API.
+ * @param <T> тип данных в поле data
+ */
 public class ApiResponse<T> {
 
     private boolean success;
@@ -14,14 +18,30 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
+    /**
+     * Создаёт успешный ответ с данными.
+     * @param data данные ответа
+     * @return ApiResponse с success = true
+     */
     public static <T> ApiResponse<T> ok(T data) {
         return new ApiResponse<>(true, null, data);
     }
 
+    /**
+     * Создаёт успешный ответ с сообщением и данными.
+     * @param message сообщение
+     * @param data данные ответа
+     * @return ApiResponse с success = true
+     */
     public static <T> ApiResponse<T> ok(String message, T data) {
         return new ApiResponse<>(true, message, data);
     }
 
+    /**
+     * Создаёт ответ с ошибкой.
+     * @param message сообщение об ошибке
+     * @return ApiResponse с success = false
+     */
     public static <T> ApiResponse<T> error(String message) {
         return new ApiResponse<>(false, message, null);
     }

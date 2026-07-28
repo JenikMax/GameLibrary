@@ -1,5 +1,9 @@
 package com.jenikmax.game.library.model.dto.api;
 
+/**
+ * Запрос на скрапинг данных игры с внешнего источника.
+ * Содержит источник, URL и флаги полей для заполнения.
+ */
 public class ScrapRequest {
 
     private String source;

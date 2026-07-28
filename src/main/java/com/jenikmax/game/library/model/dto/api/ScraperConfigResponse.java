@@ -6,6 +6,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DTO конфигурации скрапера для отображения и редактирования в админке.
+ * Содержит все настройки: URL, CSS-селекторы, JSON Paths,
+ * маппинги жанров, заголовки, SSL и флаг наличия API-ключа.
+ */
 public class ScraperConfigResponse {
 
     private String type;
@@ -27,6 +32,13 @@ public class ScraperConfigResponse {
     private String sslProtocol;
     private boolean trustAllCerts;
 
+    /**
+     * Создаёт DTO из конфигурации скрапера с маскированным ключом.
+     * @param cfg конфигурация скрапера
+     * @param maskedKey маскированный API-ключ
+     * @param hasKey флаг наличия ключа
+     * @return DTO для админки
+     */
     public static ScraperConfigResponse from(ScraperConfig cfg, String maskedKey, boolean hasKey) {
         ScraperConfigResponse r = new ScraperConfigResponse();
         r.type = cfg.getType();

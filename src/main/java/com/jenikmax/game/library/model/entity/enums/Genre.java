@@ -1,5 +1,9 @@
 package com.jenikmax.game.library.model.entity.enums;
 
+/**
+ * Перечисление всех игровых жанров, используемых в системе.
+ * Каждый жанр имеет русскоязычное название для отображения.
+ */
 public enum Genre {
     rpg("Ролевая"),
     action("Экшен"),
@@ -82,6 +86,7 @@ public enum Genre {
     other("Другое");
 
 
+    /** Русскоязычное название жанра для отображения в интерфейсе */
     private String name;
 
     Genre(String name){

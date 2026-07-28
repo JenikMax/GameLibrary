@@ -10,6 +10,12 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 
+/**
+ * Сущность игры — центральная таблица game_data.
+ * Содержит полную информацию об игре: название, платформу, дату выхода,
+ * описание, трейлер, логотип, скриншоты, жанры, теги, инструкцию,
+ * перевод описания и общий размер файлов.
+ */
 @Entity
 @Table(name = "game_data")
 @SequenceGenerator(name = "game_data_id_gen",

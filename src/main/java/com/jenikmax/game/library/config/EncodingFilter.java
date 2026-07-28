@@ -10,6 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Фильтр кодировки запросов.
+ * Исправляет кракозябры (ISO-8859-1 → UTF-8) пришедшие от Thymeleaf-форм.
+ * Пропускает /api/tracker/ без изменений (бинарные данные BitTorrent).
+ */
 @Component
 public class EncodingFilter implements Filter {
 
@@ -24,6 +29,7 @@ public class EncodingFilter implements Filter {
         chain.doFilter(request, response);
     }
 
+    /** Обёртка запроса, перекодирующая параметры из ISO-8859-1 в UTF-8. */
     private static class EncodingRequestWrapper extends HttpServletRequestWrapper {
 
         public EncodingRequestWrapper(HttpServletRequest request) {
@@ -61,6 +67,7 @@ public class EncodingFilter implements Filter {
             return fixed;
         }
 
+        /** Перекодировка строки из ISO-8859-1 в UTF-8. */
         private static String fixEncoding(String input) {
             if (input == null || input.isEmpty()) return input;
             return new String(input.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);

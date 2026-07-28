@@ -27,6 +27,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+/**
+ * Сервис управления фоновыми задачами сканирования файловой системы.
+ * Запускает полный цикл: сканирование директорий, сохранение метаданных,
+ * загрузка изображений, генерация эмбеддингов, обновление размеров.
+ * Прогресс доступен для polling'а через ScanTask.
+ */
 @Service
 public class ScanTaskService implements DisposableBean {
 
@@ -58,6 +64,10 @@ public class ScanTaskService implements DisposableBean {
         this.rootDirectory = rootDirectory;
     }
 
+    /**
+     * Запускает полное сканирование библиотеки в фоновом потоке.
+     * Возвращает ID задачи для отслеживания прогресса.
+     */
     public String submitScanTask() {
         pruneOldTasks();
         String taskId = UUID.randomUUID().toString();
@@ -208,10 +218,16 @@ public class ScanTaskService implements DisposableBean {
         return taskId;
     }
 
+    /**
+     * Возвращает задачу сканирования по ID.
+     */
     public ScanTask getTask(String taskId) {
         return tasks.get(taskId);
     }
 
+    /**
+     * Периодически удаляет завершённые задачи старше 5 минут.
+     */
     @Scheduled(fixedRate = 60000)
     public void pruneOldTasks() {
         long now = System.currentTimeMillis();

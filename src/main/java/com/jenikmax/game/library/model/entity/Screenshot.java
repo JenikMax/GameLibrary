@@ -3,6 +3,10 @@ package com.jenikmax.game.library.model.entity;
 import jakarta.persistence.*;
 import java.io.Serializable;
 
+/**
+ * Сущность скриншота игры.
+ * Хранит имя файла и бинарные данные изображения.
+ */
 @Entity
 @Table(name = "game_screenshot")
 @SequenceGenerator(

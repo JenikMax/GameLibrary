@@ -1,3 +1,4 @@
+<!-- Детальная страница коллекции. Отображает название, описание, правила смарт-коллекции (если isSmart), список игр сеткой. Владелец может редактировать, удалять коллекцию, удалять игры из неё. -->
 <template>
   <div class="collection-detail" v-if="collection">
     <div class="flex align-items-center justify-content-between mb-3">
@@ -99,6 +100,7 @@
 </template>
 
 <script setup>
+// Детальный просмотр коллекции: загрузка данных коллекции и игр (для smart — через findSmartGames, для обычных — по gameId с запросом каждой игры)
 import { ref, onActivated, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
@@ -129,6 +131,7 @@ const collection = ref(null)
 const games = ref([])
 const loading = ref(false)
 
+// Состояние диалога редактирования
 const showEditDialog = ref(false)
 const editName = ref('')
 const editDescription = ref('')
@@ -139,16 +142,19 @@ const updating = ref(false)
 
 const terminalTitle = computed(() => collection.value ? collection.value.name.replace(/ /g, '_') : '')
 
+// Парсинг smartRules JSON в объект
 const parsedRules = computed(() => {
   if (!collection.value?.smartRules) return {}
   try { return JSON.parse(collection.value.smartRules) }
   catch { return {} }
 })
 
+// Проверка: текущий пользователь — владелец коллекции
 const isOwner = computed(() =>
   collection.value && authStore.userId && collection.value.userId === authStore.userId
 )
 
+// Загрузка коллекции и её игр
 async function load() {
   loading.value = true
   try {
@@ -173,6 +179,7 @@ async function load() {
 
     const entries = gamesRes.data.data || []
 
+    // Для smart-коллекций сервер уже вернул данные, для обычных — загружаем каждую игру отдельно
     if (collection.value.isSmart) {
       games.value = entries.map(e => ({
         gameId: e.gameId,
@@ -209,6 +216,7 @@ async function load() {
         }
       })
     }
+    // Сортировка по рейтингу (desc), затем по имени
     games.value.sort((a, b) => {
       const ra = a.gameData.avgRating ?? 0
       const rb = b.gameData.avgRating ?? 0
@@ -225,6 +233,7 @@ async function load() {
 onActivated(load)
 watch(() => route.params.id, load, { immediate: true })
 
+// Обновление коллекции (название, описание, правила)
 async function handleUpdate() {
   if (!editName.value.trim()) return
   updating.value = true
@@ -250,6 +259,7 @@ async function handleUpdate() {
   }
 }
 
+// Удаление коллекции с подтверждением
 async function handleDelete() {
   if (!confirm(t('collections.delete_confirm'))) return
   try {
@@ -261,6 +271,7 @@ async function handleDelete() {
   }
 }
 
+// Удаление игры из коллекции
 async function handleRemove(gameId) {
   try {
     await collectionsApi.removeGame(route.params.id, gameId)

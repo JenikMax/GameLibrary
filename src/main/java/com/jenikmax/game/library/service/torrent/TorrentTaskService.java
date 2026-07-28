@@ -15,6 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Сервис управления фоновыми задачами создания торрентов.
+ * Поддерживает два типа задач: seed (раздача) и download (скачивание).
+ * Создаёт торрент через DownloadTorrentService, добавляет в Transmission
+ * и уведомляет пользователя о готовности.
+ */
 @Service
 public class TorrentTaskService implements DisposableBean {
 
@@ -36,6 +42,9 @@ public class TorrentTaskService implements DisposableBean {
         this.notificationService = notificationService;
     }
 
+    /**
+     * Запускает фоновую задачу создания торрента для раздачи (seed).
+     */
     public String submitSeedTask(Long gameId, String directoryPath, Long userId) {
         pruneOldTasks();
         String taskId = UUID.randomUUID().toString();
@@ -78,6 +87,9 @@ public class TorrentTaskService implements DisposableBean {
         return taskId;
     }
 
+    /**
+     * Запускает фоновую задачу подготовки торрента для скачивания.
+     */
     public String submitDownloadTask(Long gameId, String directoryPath, Long userId) {
         pruneOldTasks();
         String taskId = UUID.randomUUID().toString();
@@ -120,10 +132,16 @@ public class TorrentTaskService implements DisposableBean {
         return taskId;
     }
 
+    /**
+     * Возвращает задачу по ID.
+     */
     public TorrentTask getTask(String taskId) {
         return tasks.get(taskId);
     }
 
+    /**
+     * Периодически удаляет завершённые задачи старше 5 минут.
+     */
     @Scheduled(fixedRate = 60000)
     public void pruneOldTasks() {
         long now = System.currentTimeMillis();

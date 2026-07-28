@@ -13,6 +13,11 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
+/**
+ * Утилитарный класс для конвертации между сущностями Game и DTO (GameShortDto, GameDto).
+ * Содержит статические методы для преобразования в обоих направлениях,
+ * включая конвертацию жанров, тегов и скриншотов с кодированием/декодированием Base64.
+ */
 public class GameConverter {
 
     private final static String BASE_64_JPEG_PREFIX = "data:image/jpeg;base64,";
@@ -24,6 +29,12 @@ public class GameConverter {
 
     private final static List<String> BASE_64_EMPTY = Arrays.asList(BASE_64_JPEG_EMPTY, BASE_64_JPG_EMPTY, BASE_64_PNG_EMPTY);
 
+    /**
+     * Конвертирует сущность Game в краткое DTO (GameShortDto).
+     * Логотип кодируется в Base64 с JPEG-префиксом.
+     * @param entity сущность игры
+     * @return DTO для списка
+     */
     public static GameShortDto gameShortToDtoConverter(Game entity){
         GameShortDto dto = new GameShortDto();
         dto.setId(entity.getId());
@@ -46,6 +57,12 @@ public class GameConverter {
         return dto;
     }
 
+    /**
+     * Конвертирует краткое DTO в сущность Game.
+     * Логотип декодируется из Base64.
+     * @param dto краткое DTO игры
+     * @return сущность игры
+     */
     public static Game dtoToGameEntityConverter(GameShortDto dto){
         Game entity = new Game();
         entity.setId(dto.getId());
@@ -70,6 +87,12 @@ public class GameConverter {
         return entity;
     }
 
+    /**
+     * Конвертирует сущность Game в полное DTO (GameDto).
+     * Включает логотип, скриншоты, жанры и теги.
+     * @param entity сущность игры
+     * @return полное DTO для карточки игры
+     */
     public static GameDto gameToDtoConverter(Game entity){
         GameDto dto = new GameDto();
         dto.setId(entity.getId());
@@ -100,6 +123,12 @@ public class GameConverter {
         return dto;
     }
 
+    /**
+     * Конвертирует полное DTO в сущность Game.
+     * Декодирует логотип и скриншоты из Base64, разбирает жанры и теги.
+     * @param dto полное DTO игры
+     * @return сущность игры
+     */
     public static Game dtoToGameEntityConverter(GameDto dto){
         Game entity = new Game();
         entity.setId(dto.getId());
@@ -137,6 +166,11 @@ public class GameConverter {
         return entity;
     }
 
+    /**
+     * Конвертирует GameGenre в строковое представление кода жанра.
+     * @param entity связь игры и жанра
+     * @return строковый код жанра
+     */
     public static String gameGenreToDtoConverter(GameGenre entity){
         //GameGenreDto dto = new GameGenreDto();
         //dto.setId(entity.getId());
@@ -146,6 +180,13 @@ public class GameConverter {
         return entity.getGenre().toString();
     }
 
+    /**
+     * Конвертирует строковый код жанра в сущность GameGenre.
+     * При неизвестном жанре возвращает null.
+     * @param genre код жанра
+     * @param game игра, к которой привязывается жанр
+     * @return GameGenre или null при ошибке парсинга
+     */
     public static GameGenre dtoToGameGenreEntityConverter(String genre, Game game){
         GameGenre entity = new GameGenre();
         entity.setGame(game);
@@ -157,6 +198,11 @@ public class GameConverter {
         return entity;
     }
 
+    /**
+     * Конвертирует Screenshot в Base64-строку с JPEG-префиксом.
+     * @param entity сущность скриншота
+     * @return Base64-строка изображения
+     */
     public static String screenshotToDtoConverter(Screenshot entity){
         //ScreenshotDto dto = new ScreenshotDto();
         //dto.setId(entity.getId());
@@ -166,6 +212,13 @@ public class GameConverter {
         return BASE_64_JPEG_PREFIX + Base64.getEncoder().encodeToString(entity.getSource());
     }
 
+    /**
+     * Конвертирует Base64-строку скриншота в сущность Screenshot.
+     * Имя файла генерируется автоматически.
+     * @param screenshot Base64-строка изображения
+     * @param game игра, к которой привязывается скриншот
+     * @return сущность скриншота
+     */
     public static Screenshot dtoToScreenshotEntityConverter(String screenshot, Game game){
         Screenshot entity = new Screenshot();
         //entity.setId(dto.getId());
@@ -176,6 +229,12 @@ public class GameConverter {
         return entity;
     }
 
+    /**
+     * Конвертирует строковый код тега в сущность GameTag.
+     * @param tag код тега
+     * @param game игра, к которой привязывается тег
+     * @return сущность тега
+     */
     public static GameTag dtoToGameTagEntityConverter(String tag, Game game){
         GameTag entity = new GameTag();
         entity.setGame(game);

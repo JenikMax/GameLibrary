@@ -2,6 +2,10 @@ package com.jenikmax.game.library.model.dto.api;
 
 import java.util.List;
 
+/**
+ * DTO для постраничного ответа API.
+ * @param <T> тип элементов списка
+ */
 public class PageResponse<T> {
 
     private List<T> items;

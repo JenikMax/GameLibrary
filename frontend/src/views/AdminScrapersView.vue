@@ -1,3 +1,4 @@
+<!-- Управление конфигурациями скраперов (ADMIN). Таблица со списком скраперов, боковая панель редактирования с полями: URL, API-ключ (с возможностью показать/скрыть), CSS-селекторы, JSON-пути, маппинги жанров, заголовки. -->
 <template>
   <div class="admin-scrapers-container">
     <div class="flex align-items-center justify-content-between mb-3">
@@ -114,6 +115,7 @@
 </template>
 
 <script setup>
+// Админ-панель скраперов: загрузка/сохранение/перезагрузка конфигураций, редактирование в Sidebar, переключение enabled, показ/скрытие API-ключа
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { adminApi } from '../api/admin'
@@ -139,10 +141,11 @@ const loading = ref(false)
 const reloading = ref(false)
 const saving = ref(false)
 
+// Состояние редактора скрапера в Sidebar
 const editVisible = ref(false)
 const editData = ref(null)
 const originalType = ref('')
-const apiKeyVisible = ref(false)
+const apiKeyVisible = ref(false) // Показывать/скрывать API-ключ
 
 const editTitle = computed(() => {
   return editData.value ? `${t('admin.scrapers.edit')}: ${editData.value.type}` : ''
@@ -150,6 +153,7 @@ const editTitle = computed(() => {
 
 onMounted(loadConfigs)
 
+// Загрузка списка конфигураций скраперов
 async function loadConfigs() {
   loading.value = true
   try {
@@ -162,6 +166,7 @@ async function loadConfigs() {
   }
 }
 
+// Быстрое переключение enabled/disabled через ToggleSwitch
 async function toggleEnabled(item, newVal) {
   item.enabled = newVal
   try {
@@ -173,6 +178,7 @@ async function toggleEnabled(item, newVal) {
   }
 }
 
+// Открытие боковой панели редактирования (deep-clone объекта)
 function openEdit(item) {
   originalType.value = item.type
   editData.value = JSON.parse(JSON.stringify(item))
@@ -184,6 +190,7 @@ function openEdit(item) {
   editVisible.value = true
 }
 
+// Сохранение изменённой конфигурации скрапера
 async function handleSave() {
   if (!editData.value) return
   saving.value = true
@@ -199,6 +206,7 @@ async function handleSave() {
   }
 }
 
+// Перезагрузка конфигураций скраперов с диска
 async function handleReload() {
   reloading.value = true
   try {

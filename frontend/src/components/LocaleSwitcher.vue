@@ -1,3 +1,4 @@
+<!-- Переключатель языка интерфейса (RU/EN) через SelectButton. Сохраняет выбор через LocaleStore. При смене языка происходит window.location.reload() для перезапуска приложения. -->
 <template>
   <SelectButton
     v-model="lang"
@@ -9,6 +10,7 @@
 </template>
 
 <script setup>
+// Переключатель языка: RU/EN, сохраняет в LocaleStore, перезагружает страницу при смене
 import { ref, watch } from 'vue'
 import { useLocaleStore } from '../stores/locale'
 import SelectButton from 'primevue/selectbutton'

@@ -14,6 +14,12 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Скрапер для IGDB (Internet Game Database).
+ * Использует Twitch OAuth 2.0 (Client-ID + Bearer token).
+ * Выполняет поиск через /v4/games Api с запросом на игровом языке (search).
+ * Извлекает название, описание, обложку, жанры, дату релиза и скриншоты.
+ */
 public class IGDBScraper implements Scraper {
 
     private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;

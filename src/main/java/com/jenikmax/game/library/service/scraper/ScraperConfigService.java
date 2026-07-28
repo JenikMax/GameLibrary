@@ -22,6 +22,11 @@ import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
+/**
+ * Сервис конфигурации скраперов.
+ * Загружает/сохраняет scrapers-config.json, управляет hot-reload через WatchService,
+ * шифрует API-ключи и предоставляет маппинги жанров для всех скраперов (~220 записей WorldArt).
+ */
 @Service
 public class ScraperConfigService {
 
@@ -61,6 +66,9 @@ public class ScraperConfigService {
         if (watchThread != null) watchThread.interrupt();
     }
 
+    /**
+     * Загружает конфигурацию скраперов из scrapers-config.json.
+     */
     public synchronized void load() {
         File dir = new File(configDir);
         if (!dir.exists()) dir.mkdirs();
@@ -89,6 +97,9 @@ public class ScraperConfigService {
         }
     }
 
+    /**
+     * Сохраняет текущую конфигурацию в scrapers-config.json.
+     */
     public synchronized void save() {
         File dir = new File(configDir);
         if (!dir.exists()) dir.mkdirs();
@@ -102,31 +113,50 @@ public class ScraperConfigService {
         }
     }
 
+    /**
+     * Перезагружает конфигурацию с диска.
+     */
     public synchronized void reload() {
         load();
     }
 
+    /**
+     * Возвращает конфигурацию скрапера по типу (с авто-перезагрузкой при изменении на диске).
+     */
     public ScraperConfig getConfig(String type) {
         if (dirty.get()) reload();
         return configs.get(type);
     }
 
+    /**
+     * Возвращает неизменяемую карту всех конфигураций скраперов.
+     */
     public Map<String, ScraperConfig> getAllConfigs() {
         if (dirty.get()) reload();
         return Collections.unmodifiableMap(configs);
     }
 
+    /**
+     * Возвращает список только включённых скраперов.
+     */
     public List<ScraperConfig> getEnabledConfigs() {
         return getAllConfigs().values().stream()
                 .filter(ScraperConfig::isEnabled)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Проверяет, включён ли скрапер указанного типа.
+     */
     public boolean isEnabled(String type) {
         ScraperConfig c = getConfig(type);
         return c != null && c.isEnabled();
     }
 
+    /**
+     * Обновляет конфигурацию скрапера: шифрует API-ключ (если передан в plaintext),
+     * сохраняет на диск и инвалидирует кэш фабрики.
+     */
     public synchronized void updateConfig(String type, ScraperConfig newConfig) {
         newConfig.setType(type);
         ScraperConfig existing = configs.get(type);
@@ -144,6 +174,9 @@ public class ScraperConfigService {
         scraperFactory.invalidateCache();
     }
 
+    /**
+     * Разрешает API-ключ: расшифровывает из конфига или читает из переменной окружения.
+     */
     public String resolveApiKey(String type) {
         ScraperConfig cfg = getConfig(type);
         if (cfg == null) return null;
@@ -157,6 +190,9 @@ public class ScraperConfigService {
         return stored;
     }
 
+    /**
+     * Возвращает маппинги жанров WorldArt (русские названия → коды жанров).
+     */
     public Map<String, List<String>> getWorldArtGenreMappings() {
         return new LinkedHashMap<>(buildWorldArtGenreMappings());
     }

@@ -2,6 +2,11 @@ package com.jenikmax.game.library.model.dto.api;
 
 import java.util.List;
 
+/**
+ * DTO для детального отображения игры на странице карточки.
+ * Содержит всю информацию об игре, включая рейтинг,
+ * оценку пользователя, флаг избранного и списки скриншотов.
+ */
 public class GameDetailResponse {
 
     private Long id;

@@ -10,9 +10,15 @@ import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Конфигурация Swagger/OpenAPI.
+ * Документация доступна по /swagger-ui.html, /v3/api-docs.
+ * Разделена на группы: Public API и Admin API.
+ */
 @Configuration
 public class OpenApiConfig {
 
+    /** Глобальная конфигурация OpenAPI: заголовок, версия, JWT-авторизация. */
     @Bean
     public OpenAPI customOpenAPI() {
         final String securitySchemeName = "bearerAuth";
@@ -20,7 +26,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("GameLibrary API")
                         .version("1.0")
-                        .description("REST API for Game Library application. Use the JWT token from /api/auth/login in the Authorize button.")
+                        .description("REST API для приложения GameLibrary. Используйте JWT-токен от /api/auth/login в кнопке Authorize.")
                         .license(new License().name("MIT")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
@@ -30,9 +36,10 @@ public class OpenApiConfig {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
-                                        .description("JWT token obtained from /api/auth/login")));
+                                        .description("JWT-токен, полученный от /api/auth/login")));
     }
 
+    /** Группа публичных эндпоинтов (игры, авторизация, коллекции, статистика). */
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
@@ -42,6 +49,7 @@ public class OpenApiConfig {
                 .build();
     }
 
+    /** Группа административных эндпоинтов (админка, сканирование). */
     @Bean
     public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()

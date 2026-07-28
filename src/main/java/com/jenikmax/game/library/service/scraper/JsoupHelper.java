@@ -9,6 +9,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * Обёртка над OkHttp + Jsoup для fetCH-запросов HTML-страниц.
+ * Использует единый OkHttpClient с Mozilla User-Agent.
+ * Предоставляет методы для получения Document и сырых байт.
+ */
 @Component
 public class JsoupHelper {
 
@@ -18,6 +23,9 @@ public class JsoupHelper {
         this.client = client;
     }
 
+    /**
+     * Загружает HTML-страницу и возвращает Jsoup Document.
+     */
     public Document fetchDocument(String url, ScraperConfig config) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
@@ -28,6 +36,9 @@ public class JsoupHelper {
         }
     }
 
+    /**
+     * Загружает бинарные данные по URL.
+     */
     public byte[] fetchBytes(String url, ScraperConfig config) throws IOException {
         Request request = new Request.Builder()
                 .url(url)

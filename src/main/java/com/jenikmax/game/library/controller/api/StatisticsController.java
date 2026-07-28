@@ -28,6 +28,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/statistics")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Statistics", description = "Library statistics and charts")
+/**
+ * Контроллер статистики библиотеки.
+ * Обрабатывает запросы по пути /api/statistics.
+ * Предоставляет агрегированные данные для графиков (по платформам, жанрам, годам),
+ * топ-листы (самые высоко оценённые, самые оценённые, самые популярные),
+ * общий размер библиотеки с lazy-вычислением, а также сброс кэша размеров (ADMIN).
+ * Все запросы выполняются через JdbcTemplate напрямую, минуя Hibernate.
+ */
 public class StatisticsController {
 
     private static final Logger logger = LoggerFactory.getLogger(StatisticsController.class);
@@ -39,6 +47,12 @@ public class StatisticsController {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Получить полную статистику библиотеки: общее количество игр, недавние
+     * добавления, средний рейтинг, общий размер, распределение по платформам/
+     * жанрам/годам, топ-10 по рейтингу, по количеству оценок, по избранному.
+     * @return объект StatisticsResponse со всеми агрегированными данными
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<StatisticsResponse>> getStatistics() {
         StatisticsResponse stats = new StatisticsResponse();
@@ -97,6 +111,11 @@ public class StatisticsController {
         return ResponseEntity.ok(ApiResponse.ok(stats));
     }
 
+    /**
+     * Сбросить кэшированные размеры игр (total_size_bytes) для пересчёта.
+     * Доступно только администраторам (ADMIN).
+     * @return количество сброшенных записей
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/refresh-sizes")
     public ResponseEntity<ApiResponse<Map<String, Object>>> refreshSizes() {

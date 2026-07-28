@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * Сущность записи в коллекции игр.
+ * Связывает коллекцию с конкретной игрой, хранит порядок сортировки.
+ */
 @Entity
 @Table(name = "game_collection_entry", schema = "library",
        uniqueConstraints = @UniqueConstraint(columnNames = {"collection_id", "game_id"}))

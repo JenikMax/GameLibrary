@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * Сущность оценки игры пользователем (рейтинг от 1 до 10).
+ * Одна игра может иметь множество оценок от разных пользователей.
+ */
 @Entity
 @Table(name = "game_rating")
 @SequenceGenerator(

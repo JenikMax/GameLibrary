@@ -1,3 +1,4 @@
+<!-- Страница профиля пользователя. Три вкладки: аватар (загрузка/смена), пароль (смена), информация (статистика). Отображает роль, дату регистрации и 4 счётчика (игры, оценки, коллекции, отзывы). -->
 <template>
   <div class="profile-container">
     <Card>
@@ -131,6 +132,7 @@
 </template>
 
 <script setup>
+// Профиль пользователя: 3 вкладки (аватар/пароль/инфо), загрузка аватара через FileReader, смена пароля с валидацией, статистика с бэкенда
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useI18n } from '../composables/useI18n'
@@ -153,12 +155,12 @@ const toast = useToast()
 
 const terminalTitle = computed(() => authStore.username.replace(/ /g, '_'))
 
-const activeTab = ref('avatar')
+const activeTab = ref('avatar') // Активная вкладка: avatar/password/info
 const profileData = ref(null)
 const newPassword = ref('')
 const passError = ref('')
 const selectedFile = ref(null)
-const previewUrl = ref('')
+const previewUrl = ref('') // Предпросмотр нового аватара
 const saving = ref(false)
 const changingPass = ref(false)
 const message = ref('')
@@ -174,6 +176,7 @@ onMounted(async () => {
   }
 })
 
+// Обработчик выбора файла аватара
 function onFileSelect(event) {
   const file = event.files[0]
   if (file) {
@@ -186,6 +189,7 @@ function onFileSelect(event) {
   }
 }
 
+// Загрузка нового аватара на сервер
 async function uploadAvatar() {
   if (!previewUrl.value) return
   saving.value = true
@@ -204,6 +208,7 @@ async function uploadAvatar() {
   }
 }
 
+// Смена пароля с клиентской валидацией
 async function changePassword() {
   passError.value = ''
   if (!newPassword.value) return

@@ -2,6 +2,11 @@ package com.jenikmax.game.library.service.ai;
 
 import java.util.*;
 
+/**
+ * Статический маппер ключевых слов на теги и жанры.
+ * Содержит ~125 правил сопоставления русских и английских ключевых слов
+ * с кодами тегов и жанров. Используется AutoTagService для авто-тегирования.
+ */
 public final class KeywordTagMapper {
 
     public record Rule(Set<String> tags, Set<String> genres) {}
@@ -176,10 +181,16 @@ public final class KeywordTagMapper {
         return values.length == 0 ? Set.of() : Set.of(values);
     }
 
+    /**
+     * Возвращает неизменяемую карту всех правил (ключевое слово → теги + жанры).
+     */
     public static Map<String, Rule> getKeywords() {
         return Collections.unmodifiableMap(KEYWORDS);
     }
 
+    /**
+     * Находит все теги, соответствующие ключевым словам в тексте.
+     */
     public static Set<String> matchTags(String lowerText) {
         Set<String> tags = new LinkedHashSet<>();
         for (var entry : KEYWORDS.entrySet()) {
@@ -190,6 +201,9 @@ public final class KeywordTagMapper {
         return tags;
     }
 
+    /**
+     * Находит все жанры, соответствующие ключевым словам в тексте.
+     */
     public static Set<String> matchGenres(String lowerText) {
         Set<String> genres = new LinkedHashSet<>();
         for (var entry : KEYWORDS.entrySet()) {

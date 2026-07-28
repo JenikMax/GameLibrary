@@ -17,6 +17,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Скрапер для World-Art.ru.
+ * Извлекает данные по ID игры из URL, парсит HTML-таблицы с информацией.
+ * Поддерживает поиск по названию. Скриншоты формирует по формуле bucket = ((id+9999)/10000)*10000.
+ */
 public class WorldArtScraper implements Scraper {
 
     private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;

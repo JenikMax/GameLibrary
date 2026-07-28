@@ -16,6 +16,12 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Скрапер для PSX Data Center (psxdatacenter.com).
+ * Собирает данные PS1/PS2 игр без API-ключа. Поддерживает поиск по названию
+ * и серийному номеру (SLUS-XXXXX, SCES-XXXXX). Обрабатывает две версии
+ * разметки (Version A со <b> и Version B без), кодировку windows-1252.
+ */
 public class PsxDataCenterScraper implements Scraper {
 
     private static final long MAX_IMAGE_BYTES = 3L * 1024 * 1024;

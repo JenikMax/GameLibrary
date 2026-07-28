@@ -16,6 +16,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Реализация DAO-слоя на основе JdbcTemplate и NamedParameterJdbcTemplate.
+ * Содержит методы для выполнения произвольных SQL-запросов с маппингом
+ * результатов в DTO (GameShortDto), списки ID, строковые списки и Map.
+ */
 @Repository
 public class SqlDaoImpl implements SqlDao {
 
@@ -26,7 +31,11 @@ public class SqlDaoImpl implements SqlDao {
     protected NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated
     public List<GameShortDto> executeShortGame(String query) {
         List<GameShortDto> gameShortDtoList = jdbcTemplate.query(query, (rs, rowNum) -> {
             GameShortDto dto = new GameShortDto();
@@ -61,23 +70,39 @@ public class SqlDaoImpl implements SqlDao {
         return gameShortDtoList;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated
     public List<Long> executeIdGame(String query) {
         List<Long> gameIdList = jdbcTemplate.query(query, (rs, rowNum) -> rs.getLong("id"));
         return gameIdList;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated
     public List<String> executeByStringList(String query, String column) {
         return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString(column));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated
     public List<Genre> getGenreList(String query, String column) {
         return jdbcTemplate.query(query, (rs, rowNum) ->  Genre.valueOf(rs.getString(column)));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated
     public List<String> executeByLowerStringList(String query, String column) {
         return jdbcTemplate.query(query, (rs, rowNum) -> {
             String result = rs.getString(column);
@@ -85,6 +110,9 @@ public class SqlDaoImpl implements SqlDao {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<GameShortDto> executeShortGame(String query, Object[] params) {
         List<GameShortDto> gameShortDtoList = jdbcTemplate.query(query, (rs, rowNum) -> {
@@ -120,27 +148,43 @@ public class SqlDaoImpl implements SqlDao {
         return gameShortDtoList;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Long> executeShortGameId(String query, Object[] params) {
         List<Long> gameIdList = jdbcTemplate.query(query, (rs, rowNum) -> rs.getLong("id"), params);
         return gameIdList;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated
     public List<Map<String, Object>> execute(String query) {
         return jdbcTemplate.query(query, new ColumnMapRowMapper());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Map<String, Object>> execute(String query, Object[] params) {
         return jdbcTemplate.query(query, new ColumnMapRowMapper(), params);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int executeUpdate(String query, Map<String, Object> params) {
         return namedParameterJdbcTemplate.update(query, params);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int executeUpdate(String query, Object[] params) {
         return jdbcTemplate.update(query, params);

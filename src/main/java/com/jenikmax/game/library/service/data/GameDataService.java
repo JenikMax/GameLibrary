@@ -29,6 +29,12 @@ import java.sql.Timestamp;
 import java.util.*;
 
 
+/**
+ * Реализация сервиса данных игр.
+ * Выполняет CRUD-операции через JPA репозитории и SqlDao,
+ * формирует динамические SQL-запросы для фильтрации/сортировки,
+ * управляет тегами, жанрами и эмбеддингами.
+ */
 @Service
 public class GameDataService implements GameService {
 
@@ -58,6 +64,9 @@ public class GameDataService implements GameService {
 
 
     @SuppressWarnings("deprecation")
+    /**
+     * Возвращает краткий список всех игр, отсортированный по названию.
+     */
     public List<GameShortDto> getGameShortList(){
         String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, " +
                 "(select string_agg(dg.genre_code, ',' order by dg.genre_code) from library.game_data_genre dg where dg.game_id = g.id) as genre_codes, " +
@@ -67,6 +76,9 @@ public class GameDataService implements GameService {
     }
 
     @SuppressWarnings("deprecation")
+    /**
+     * Возвращает краткий список игр с пагинацией.
+     */
     public List<GameShortDto> getGameShortList(int startIndex, int endIndex){
         String sql = "select g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date, " +
                 "(select string_agg(dg.genre_code, ',' order by dg.genre_code) from library.game_data_genre dg where dg.game_id = g.id) as genre_codes, " +
@@ -78,6 +90,9 @@ public class GameDataService implements GameService {
 
 
     @SuppressWarnings("deprecation")
+    /**
+     * Возвращает список ID всех игр, отсортированный по названию.
+     */
     public List<Long> getGameShortIdList(){
         return sqlDao.executeIdGame("select id from game_data order by name");
     }
@@ -141,10 +156,16 @@ public class GameDataService implements GameService {
         return sqlDao.executeShortGame(sql, ids.toArray());
     }
 
+    /**
+     * Выполняет семантический поиск ID игр по текстовому запросу.
+     */
     public List<Long> semanticSearchGameIds(String query, int limit) {
         return embeddingService.semanticSearch(query, limit);
     }
 
+    /**
+     * Фильтрует список ID игр по платформам, годам, жанрам и тегам.
+     */
     public List<Long> filterGameIdsByCriteria(List<Long> candidateIds,
             List<String> selectedPlatforms, List<String> selectedYears,
             List<String> selectedGenres, List<String> selectedTags) {
@@ -263,10 +284,16 @@ public class GameDataService implements GameService {
     }
 
     @SuppressWarnings("deprecation")
+    /**
+     * Возвращает список всех кодов тегов.
+     */
     public List<String> getTags() {
         return sqlDao.executeByStringList("select code from library.game_tag union select tag_code from library.game_data_tag order by 1", "code");
     }
 
+    /**
+     * Гарантирует существование указанных тегов в таблице game_tag (upsert).
+     */
     public void ensureTagsExist(List<String> tagCodes) {
         if (tagCodes == null || tagCodes.isEmpty()) return;
         for (String code : tagCodes) {
@@ -304,18 +331,27 @@ public class GameDataService implements GameService {
 
     @SuppressWarnings("deprecation")
     @Override
+    /**
+     * Возвращает список годов релизов.
+     */
     public List<String> getReleaseDates() {
         return sqlDao.executeByStringList("select release_date from library.game_data group by release_date order by release_date","release_date");
     }
 
     @SuppressWarnings("deprecation")
     @Override
+    /**
+     * Возвращает список всех платформ.
+     */
     public List<String> getGamesPlatforms() {
         return sqlDao.executeByStringList("select platform from library.game_data group by platform order by platform","platform");
     }
 
     @SuppressWarnings("deprecation")
     @Override
+    /**
+     * Возвращает список всех жанров (сортировка по RU-описанию).
+     */
     public List<Genre> getGenres() {
         return sqlDao.getGenreList("select code from library.game_genre group by code order by description_ru","code");
     }
@@ -332,17 +368,26 @@ public class GameDataService implements GameService {
 
     @SuppressWarnings("deprecation")
     @Override
+    /**
+     * Возвращает ID случайной игры.
+     */
     public Long findRandomGameId() {
         return sqlDao.executeIdGame("SELECT id FROM library.game_data ORDER BY RANDOM() LIMIT 1").stream().findFirst().orElse(null);
     }
 
     @SuppressWarnings("deprecation")
     @Override
+    /**
+     * Возвращает список кодов жанров (в нижнем регистре).
+     */
     public List<String> getGameGenres() {
         return sqlDao.executeByLowerStringList("select code from library.game_genre group by code order by description","code");
     }
 
     @Transactional
+    /**
+     * Создаёт тестовую игру с минимальными данными (для отладки).
+     */
     public GameDto testCreate() {
         Game game = new Game();
         game.setCreateTs(new Timestamp(new Date().getTime()));
@@ -382,21 +427,33 @@ public class GameDataService implements GameService {
 
 
     @Override
+    /**
+     * Возвращает полный список всех игр (с загрузкой всех полей, включая bytea).
+     */
     public List<Game> getGameList() {
         return gameRepository.findAll();
     }
 
     @Override
+    /**
+     * Возвращает пары (id, directoryPath) для всех игр (лёгкий запрос без bytea).
+     */
     public List<Object[]> getGameDirectoryPaths() {
         return entityManager.createQuery("select g.id, g.directoryPath from Game g")
                 .getResultList();
     }
 
     @Override
+    /**
+     * Находит игру по ID через reference (прокси-объект).
+     */
     public Game getGameById(Long gameId) {
         return gameRepository.getReferenceById(gameId);
     }
 
+    /**
+     * Сохраняет новую игру в БД.
+     */
     @Transactional
     @Override
     public void storeGame(Game game) {
@@ -406,6 +463,9 @@ public class GameDataService implements GameService {
 
     @Transactional
     @Override
+    /**
+     * Сохраняет метаданные игры без логотипа и скриншотов (фаза 1 сканирования).
+     */
     public Game storeGameMetadata(Game game) {
         game.setCreateTs(new Timestamp(new Date().getTime()));
         game.setLogo(null);
@@ -415,6 +475,9 @@ public class GameDataService implements GameService {
 
     @Transactional
     @Override
+    /**
+     * Обновляет изображения игры (логотип + скриншоты). Удаляет старые скриншоты.
+     */
     public void updateGameImages(Game game) {
         jdbcTemplate.update("DELETE FROM library.game_screenshot WHERE game_id = ?", game.getId());
         gameRepository.save(game);
@@ -422,11 +485,16 @@ public class GameDataService implements GameService {
 
     @Transactional
     @Override
+    /**
+     * Удаляет игру по ID.
+     */
     public void deleteGameInfo(Long id){
         gameRepository.deleteById(id);
     }
 
-
+    /**
+     * Полностью обновляет игру: удаляет старые теги, жанры, скриншоты и сохраняет новые.
+     */
     @Transactional
     @Override
     public void updateGame(Game game) {
@@ -439,6 +507,9 @@ public class GameDataService implements GameService {
 
     @Transactional
     @Override
+    /**
+     * Подготавливает список новых игр для сохранения (дефолтные значения).
+     */
     public void storeNewGameInLibrary(List<Game> games) {
         for(Game gameShort : games){
             if(gameShort.getGenres() == null) gameShort.setGenres(new ArrayList<>());

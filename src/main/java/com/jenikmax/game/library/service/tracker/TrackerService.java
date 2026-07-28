@@ -13,6 +13,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Встроенный HTTP-трекер для BitTorrent протокола.
+ * Обрабатывает announce-запросы (регистрация/обновление/уход пиров),
+ * поддерживает scrape-запросы, формирует bencode-ответы.
+ * Периодически очищает просроченных пиров (30 мин таймаут).
+ */
 @Service
 public class TrackerService {
 
@@ -34,6 +40,10 @@ public class TrackerService {
         logger.info("TrackerService initialized on port {}", port);
     }
 
+    /**
+     * Обрабатывает announce-запрос от пира: регистрирует/обновляет пир в рое,
+     * возвращает список активных пиров.
+     */
     public synchronized TrackerResponse announce(
             String infoHash, String peerId, String ip, int port,
             long uploaded, long downloaded, long left, String event) {
@@ -89,6 +99,9 @@ public class TrackerService {
         }
     }
 
+    /**
+     * Формирует bencode-ответ на announce-запрос.
+     */
     public String bencodeResponse(TrackerResponse response) {
         StringBuilder sb = new StringBuilder();
         sb.append("d");
@@ -121,6 +134,9 @@ public class TrackerService {
         sb.append(value);
     }
 
+    /**
+     * Формирует bencode-ответ на scrape-запрос (количество сидов/пиров).
+     */
     public String bencodeScrape(String infoHash) {
         StringBuilder sb = new StringBuilder();
         sb.append("d5:filesd");

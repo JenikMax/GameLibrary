@@ -24,6 +24,13 @@ import java.time.ZoneId;
 @RestController
 @RequestMapping("/api/profile")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Profile", description = "User profile management")
+/**
+ * Контроллер управления профилем пользователя.
+ * Обрабатывает запросы по пути /api/profile.
+ * Предоставляет получение и обновление профиля, смену пароля,
+ * а также агрегированную статистику пользователя (количество игр,
+ * рейтингов, рецензий, комментариев, избранного, коллекций).
+ */
 public class ProfileController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);
@@ -55,6 +62,10 @@ public class ProfileController {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Получить профиль текущего пользователя со статистикой.
+     * @return профиль пользователя и агрегированные счётчики
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<UserProfileResponse>> getProfile() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -62,6 +73,11 @@ public class ProfileController {
         return ResponseEntity.ok(ApiResponse.ok(toProfileResponse(shortUser)));
     }
 
+    /**
+     * Обновить аватар текущего пользователя.
+     * @param request запрос с новым аватаром (base64)
+     * @return обновлённый профиль
+     */
     @PutMapping
     public ResponseEntity<ApiResponse<UserProfileResponse>> updateProfile(@RequestBody ProfileUpdateRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -84,6 +100,11 @@ public class ProfileController {
         }
     }
 
+    /**
+     * Сменить пароль текущего пользователя.
+     * @param request запрос с новым паролем
+     * @return сообщение об успешной смене пароля
+     */
     @PostMapping("/pass")
     public ResponseEntity<ApiResponse<Void>> changePassword(@Valid @RequestBody PasswordChangeRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

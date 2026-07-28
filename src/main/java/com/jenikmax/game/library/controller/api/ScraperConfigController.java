@@ -18,6 +18,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin/scraper-config")
 @PreAuthorize("hasRole('ADMIN')")
+/**
+ * Контроллер управления конфигурациями скраперов.
+ * Обрабатывает запросы по пути /api/admin/scraper-config.
+ * Доступен только пользователям с ролью ADMIN.
+ * Предоставляет просмотр, обновление и перезагрузку конфигураций скраперов
+ * с диска. API-ключи шифруются при сохранении через API.
+ */
 public class ScraperConfigController {
 
     private static final Logger log = LoggerFactory.getLogger(ScraperConfigController.class);
@@ -34,6 +41,10 @@ public class ScraperConfigController {
         this.encryptionService = encryptionService;
     }
 
+    /**
+     * Получить список всех конфигураций скраперов.
+     * @return список конфигураций с маскированными API-ключами
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<ScraperConfigResponse>>> getAll() {
         List<ScraperConfigResponse> items = configService.getAllConfigs().values().stream()
@@ -42,6 +53,11 @@ public class ScraperConfigController {
         return ResponseEntity.ok(ApiResponse.ok(items));
     }
 
+    /**
+     * Получить конфигурацию конкретного скрапера по его типу.
+     * @param type тип скрапера (например, igdb, thegamesdb, playground)
+     * @return конфигурация скрапера или ошибка, если не найден
+     */
     @GetMapping("/{type}")
     public ResponseEntity<ApiResponse<ScraperConfigResponse>> getOne(@PathVariable String type) {
         ScraperConfig cfg = configService.getConfig(type);
@@ -51,6 +67,13 @@ public class ScraperConfigController {
         return ResponseEntity.ok(ApiResponse.ok(toResponse(cfg)));
     }
 
+    /**
+     * Обновить конфигурацию скрапера. API-ключ шифруется перед сохранением.
+     * После обновления кэш скраперов инвалидируется.
+     * @param type   тип скрапера
+     * @param config новая конфигурация
+     * @return обновлённая конфигурация
+     */
     @PutMapping("/{type}")
     public ResponseEntity<ApiResponse<ScraperConfigResponse>> update(
             @PathVariable String type,
@@ -67,6 +90,10 @@ public class ScraperConfigController {
         }
     }
 
+    /**
+     * Перезагрузить конфигурации скраперов с диска и инвалидировать кэш.
+     * @return сообщение об успешной перезагрузке
+     */
     @PostMapping("/reload")
     public ResponseEntity<ApiResponse<Void>> reload() {
         log.info("Reloading scraper config from disk");

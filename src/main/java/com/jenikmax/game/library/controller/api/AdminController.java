@@ -18,6 +18,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Admin", description = "User administration (admin only)")
+/**
+ * Контроллер административной панели.
+ * Обрабатывает запросы по пути /api/admin.
+ * Доступен только пользователям с ролью ADMIN.
+ * Предоставляет CRUD-операции над пользователями: просмотр списка, назначение/снятие
+ * прав администратора, блокировка/разблокировка аккаунта, сброс пароля.
+ */
 public class AdminController {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
@@ -28,6 +35,10 @@ public class AdminController {
         this.userService = userService;
     }
 
+    /**
+     * Получить список всех пользователей.
+     * @return список пользователей с информацией об ID, имени, роли, статусе и аватаре
+     */
     @GetMapping("/users")
     public ResponseEntity<ApiResponse<List<UserAdminResponse>>> getUsers() {
         List<UserDto> users = userService.getAllUsers();
@@ -37,6 +48,12 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.ok(items));
     }
 
+    /**
+     * Переключить права администратора у пользователя.
+     * @param id      идентификатор пользователя
+     * @param isAdmin флаг — назначить (true) или снять (false) роль ADMIN
+     * @return сообщение об успехе или ошибке
+     */
     @PostMapping("/users/{id}/toggle-admin")
     public ResponseEntity<ApiResponse<Void>> toggleAdmin(@PathVariable Long id,
                                                            @RequestParam boolean isAdmin) {
@@ -50,6 +67,12 @@ public class AdminController {
         }
     }
 
+    /**
+     * Переключить статус активности пользователя (блокировка/разблокировка).
+     * @param id       идентификатор пользователя
+     * @param isActive флаг — активировать (true) или деактивировать (false)
+     * @return сообщение об успехе или ошибке
+     */
     @PostMapping("/users/{id}/toggle-active")
     public ResponseEntity<ApiResponse<Void>> toggleActive(@PathVariable Long id,
                                                            @RequestParam boolean isActive) {
@@ -64,6 +87,11 @@ public class AdminController {
         }
     }
 
+    /**
+     * Сбросить пароль пользователя. Генерирует новый случайный пароль (8 байт, base64).
+     * @param id идентификатор пользователя
+     * @return новый пароль в теле ответа
+     */
     @PostMapping("/users/{id}/reset-pass")
     public ResponseEntity<ApiResponse<String>> resetPassword(@PathVariable Long id) {
         logger.info("REST reset password for user {}", id);

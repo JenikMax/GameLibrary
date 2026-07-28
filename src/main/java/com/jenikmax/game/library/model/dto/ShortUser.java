@@ -1,5 +1,9 @@
 package com.jenikmax.game.library.model.dto;
 
+/**
+ * DTO для краткого представления пользователя.
+ * Содержит ID, имя, флаги администратора и активности, аватар.
+ */
 public class ShortUser{
     private Long id;
     private String name;

@@ -1,3 +1,5 @@
+// Кастомная интернационализация (i18n) без внешних библиотек
+// Содержит ~297 ключей для RU и EN локалей
 import { watch } from 'vue'
 import { useLocaleStore } from '../stores/locale'
 
@@ -724,9 +726,11 @@ const messages = {
   }
 }
 
+// Возвращает функцию t() для перевода по ключу с поддержкой параметров
 export function useI18n() {
   const localeStore = useLocaleStore()
 
+  // Функция перевода: ищет ключ в словаре текущей локали, подставляет параметры {key}
   function t(key, params) {
     const dict = messages[localeStore.locale] || messages.en
     let val = dict[key] || key
@@ -738,6 +742,7 @@ export function useI18n() {
     return val
   }
 
+  // Синхронизация атрибута lang у <html> при смене локали
   watch(() => localeStore.locale, (newLocale) => {
     document.documentElement.lang = newLocale
   }, { immediate: true })

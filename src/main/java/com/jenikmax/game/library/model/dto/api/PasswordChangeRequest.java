@@ -4,6 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+/**
+ * Запрос на смену пароля.
+ * Содержит текущий и новый пароль с валидацией.
+ */
 public class PasswordChangeRequest {
 
     @NotBlank

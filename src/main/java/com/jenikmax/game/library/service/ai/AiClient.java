@@ -12,6 +12,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * HTTP-клиент для взаимодействия с Python AI-сервисом.
+ * Предоставляет методы для проверки доступности, перевода текста
+ * и генерации эмбеддингов (одиночных и пакетных).
+ * Использует OkHttpClient с таймаутами: обычный 30с, для инференса 60сconnect/300сread.
+ */
 @Component
 public class AiClient {
 
@@ -33,6 +39,9 @@ public class AiClient {
                 .build();
     }
 
+    /**
+     * Проверяет доступность AI-сервиса через endpoint /health.
+     */
     public boolean isAvailable() {
         try {
             Request request = new Request.Builder()
@@ -48,6 +57,9 @@ public class AiClient {
         }
     }
 
+    /**
+     * Отправляет текст на перевод в AI-сервис. Возвращает оригинал при ошибке.
+     */
     public String translate(String text, String direction) {
         try {
             String body = objectMapper.writeValueAsString(new TranslateRequest(text, direction));
@@ -69,6 +81,9 @@ public class AiClient {
         }
     }
 
+    /**
+     * Генерирует эмбеддинг для одного текста через AI-сервис.
+     */
     public float[] embed(String text) {
         try {
             String body = objectMapper.writeValueAsString(new EmbedRequest(text));
@@ -90,6 +105,9 @@ public class AiClient {
         }
     }
 
+    /**
+     * Генерирует эмбеддинги для списка текстов (пакетный режим).
+     */
     public float[][] embedBatch(List<String> texts) {
         try {
             String body = objectMapper.writeValueAsString(new EmbedBatchRequest(texts));

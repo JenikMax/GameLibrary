@@ -11,6 +11,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/embeddings")
+/**
+ * Контроллер генерации эмбеддингов для семантического поиска.
+ * Обрабатывает запросы по пути /api/embeddings.
+ * Генерация эмбеддингов (ADMIN only) запускается асинхронно; статус
+ * задачи можно отслеживать через polling. Использует AI-сервис для
+ * вычисления векторных представлений описаний игр.
+ */
 public class EmbeddingController {
 
     private final EmbeddingTaskService taskService;
@@ -19,6 +26,11 @@ public class EmbeddingController {
         this.taskService = taskService;
     }
 
+    /**
+     * Запустить асинхронную генерацию эмбеддингов для всех игр (ADMIN only).
+     * @param force если true — перегенерировать даже существующие эмбеддинги
+     * @return 202 Accepted с taskId и URL статуса
+     */
     @PostMapping("/generate")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Map<String, String>>> generateEmbeddings(
@@ -30,6 +42,11 @@ public class EmbeddingController {
         )));
     }
 
+    /**
+     * Получить статус задачи генерации эмбеддингов.
+     * @param taskId идентификатор задачи
+     * @return информация о текущем статусе, прогрессе и ошибках
+     */
     @GetMapping("/status/{taskId}")
     public ResponseEntity<ApiResponse<EmbeddingTask>> getStatus(@PathVariable String taskId) {
         EmbeddingTask task = taskService.getTask(taskId);

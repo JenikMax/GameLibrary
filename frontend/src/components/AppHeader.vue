@@ -1,3 +1,4 @@
+<!-- Верхняя панель навигации. Содержит Menubar с подменю (Библиотека/Избранное, Загрузки, Коллекции, Статистика, Админка), уведомления (с автозакрытием по клику вне), переключатель языка/темы, аватар и кнопку выхода. -->
 <template>
   <div class="app-header-wrapper">
     <Menubar :model="items" class="app-header">
@@ -7,6 +8,7 @@
 
       <template #end>
         <div class="flex align-items-center gap-2">
+          <!-- Кнопка уведомлений (bell) с бейджем непрочитанных -->
           <div v-if="authStore.isAuthenticated" ref="notificationAreaRef" class="notification-area" @click="toggleNotifications">
             <Button
               icon="pi pi-bell"
@@ -19,6 +21,7 @@
             </Button>
           </div>
           <LocaleSwitcher />
+          <!-- Кнопка выбора темы с Popover -->
           <Button
             :icon="currentTheme?.icon || 'pi pi-palette'"
             severity="secondary"
@@ -42,6 +45,7 @@
               </div>
             </div>
           </Popover>
+          <!-- Аватар пользователя -->
           <Avatar
             :image="authStore.avatarUrl || '/game-library/img/user.png'"
             shape="circle"
@@ -50,6 +54,7 @@
             @click="goToProfile"
             class="cursor-pointer"
           />
+          <!-- Кнопка выхода -->
           <Button
             icon="pi pi-sign-out"
             severity="danger"
@@ -62,6 +67,7 @@
       </template>
     </Menubar>
 
+    <!-- Выпадающая панель уведомлений -->
     <div v-if="showNotifications" class="notification-panel p-panel p-component">
       <div class="p-panel-header px-3 pt-3 pb-0">
         <div class="flex align-items-center justify-content-between w-full">
@@ -80,6 +86,7 @@
           {{ t('notifications.empty') }}
         </div>
         <div v-else class="notification-list">
+          <!-- Элемент уведомления с иконкой по типу -->
           <div
             v-for="n in notifications"
             :key="n.id"
@@ -113,6 +120,7 @@
 </template>
 
 <script setup>
+// Шапка приложения: навигационное меню, уведомления (polling 15с), переключатель темы/языка, профиль, выход
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -136,6 +144,7 @@ const { t } = useI18n()
 const toast = useToast()
 const themeMenuRef = ref(null)
 
+// Открытие/закрытие Popover тем
 function toggleThemeMenu(e) {
   themeMenuRef.value?.toggle(e)
 }
@@ -145,10 +154,12 @@ function selectTheme(themeId) {
   themeMenuRef.value?.hide()
 }
 
+// Подписка на уведомления через composable
 const { notifications, unreadCount, subscribe, unsubscribe, fetchNotifications } = useNotifications()
 const showNotifications = ref(false)
 const notificationAreaRef = ref(null)
 
+// Закрытие панели уведомлений по клику вне области
 function onClickOutside(e) {
   if (!showNotifications.value) return
   const el = notificationAreaRef.value
@@ -157,6 +168,7 @@ function onClickOutside(e) {
   }
 }
 
+// Пункты меню (генерируются динамически с учётом роли admin)
 const items = computed(() => {
   const menu = [
     {
@@ -191,6 +203,7 @@ const items = computed(() => {
       command: goToStatistics
     }
   ]
+  // Админские пункты добавляются только для ROLE_ADMIN
   if (authStore.isAdmin) {
     menu.push({
       label: t('nav.admin'),
@@ -220,11 +233,13 @@ const items = computed(() => {
   return menu
 })
 
+// Переключение видимости панели уведомлений
 function toggleNotifications() {
   showNotifications.value = !showNotifications.value
   if (showNotifications.value) fetchNotifications()
 }
 
+// Отметить одно уведомление как прочитанное
 async function handleMarkRead(id) {
   await notificationsApi.markAsRead(id)
   const n = notifications.value.find(x => x.id === id)
@@ -232,12 +247,14 @@ async function handleMarkRead(id) {
   unreadCount.value = Math.max(0, unreadCount.value - 1)
 }
 
+// Отметить все уведомления как прочитанные
 async function handleMarkAllRead() {
   await notificationsApi.markAllAsRead()
   notifications.value.forEach(n => { n.read = true })
   unreadCount.value = 0
 }
 
+// Клик по уведомлению: отметить прочитанным, перейти к игре (если есть gameId)
 function handleClickNotification(n) {
   if (!n.read) handleMarkRead(n.id)
   if (n.gameId) {
@@ -246,6 +263,7 @@ function handleClickNotification(n) {
   }
 }
 
+// Переход в библиотеку со сбросом фильтров
 async function goToLibrary() {
   sessionStorage.removeItem('libraryState')
   const libStore = useLibraryStore()
@@ -258,6 +276,7 @@ async function goToLibrary() {
   }
 }
 
+// Переход в избранное
 async function goToFavorites() {
   sessionStorage.removeItem('libraryState')
   const libStore = useLibraryStore()

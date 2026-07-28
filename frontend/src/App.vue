@@ -1,3 +1,4 @@
+<!-- Корневой компонент приложения. Содержит Toast, ConfirmDialog, LocaleSwitcher (для неавторизованных), AppHeader (для авторизованных) и router-view с анимацией перехода. Слушает глобальное событие api-error для показа всплывающих уведомлений. -->
 <template>
   <div>
     <Toast />
@@ -15,6 +16,7 @@
 </template>
 
 <script setup>
+// Импорты Vue и хранилищ
 import { onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from './stores/auth'
 import { useTheme } from './composables/useTheme'
@@ -25,9 +27,10 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import { useToast } from 'primevue/usetoast'
 
 const authStore = useAuthStore()
-useTheme()
+useTheme() // Инициализация темы из localStorage
 const toast = useToast()
 
+// Обработчик глобальной ошибки API — показывает тост
 function onApiError(e) {
   toast.add({ severity: 'error', summary: e.detail, life: 5000 })
 }
@@ -42,6 +45,7 @@ onUnmounted(() => {
 </script>
 
 <style>
+/* Переключатель языка поверх контента на странице логина */
 .lang-switcher-top {
   position: fixed;
   top: 0.5rem;

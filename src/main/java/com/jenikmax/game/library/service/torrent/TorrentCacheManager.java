@@ -16,6 +16,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Менеджер кэша .torrent-файлов на диске.
+ * Хранит сгенерированные торренты вместе с .meta-файлами
+ * (размеры и mtime файлов). При повторном запросе проверяет
+ * актуальность кэша и возвращает его при совпадении.
+ */
 public class TorrentCacheManager {
 
     private static final Logger logger = LoggerFactory.getLogger(TorrentCacheManager.class);

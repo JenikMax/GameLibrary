@@ -1,4 +1,9 @@
 #!/bin/bash
+# ============================================================
+# 01_init.sh — Скрипт инициализации базы данных
+# Создаёт пользователя library-manager-user, базу данных
+# game-library и схему library.
+# ============================================================
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL

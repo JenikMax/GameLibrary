@@ -4,6 +4,10 @@ import com.jenikmax.game.library.model.entity.Notification;
 
 import java.sql.Timestamp;
 
+/**
+ * DTO для отправки уведомления клиенту (через SSE или WebSocket).
+ * Содержит все поля уведомления, кроме ссылки на пользователя.
+ */
 public class NotificationEvent {
 
     private Long id;
@@ -16,6 +20,11 @@ public class NotificationEvent {
 
     public NotificationEvent() {}
 
+    /**
+     * Создаёт DTO из сущности Notification.
+     * @param n сущность уведомления
+     * @return DTO для передачи клиенту
+     */
     public static NotificationEvent from(Notification n) {
         NotificationEvent e = new NotificationEvent();
         e.setId(n.getId());

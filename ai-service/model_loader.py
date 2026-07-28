@@ -1,3 +1,5 @@
+# Загрузчик моделей HuggingFace с кэшированием на диск
+# Поддерживает 2 модели перевода (MarianMT ru-en, en-ru) и 1 модель эмбеддингов (multilingual-e5-small)
 import logging
 import os
 
@@ -8,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class ModelLoader:
+    # Словарь направлений перевода и соответствующих моделей HuggingFace
     TRANSLATION_MODELS = {
         "ru-en": "Helsinki-NLP/opus-mt-ru-en",
         "en-ru": "Helsinki-NLP/opus-mt-en-ru",
@@ -19,8 +22,9 @@ class ModelLoader:
         self.translation_tokenizers: dict = {}
         self.translation_models: dict = {}
         self.embedding_model: SentenceTransformer = None
-        self._status: dict = {}
+        self._status: dict = {}  # Статус загрузки каждой модели
 
+    # Загрузка всех моделей: создание директорий, загрузка переводчиков и эмбеддинга
     def load_all(self):
         os.makedirs(self.models_dir, exist_ok=True)
         cache_dir = os.path.join(self.models_dir, "hf_cache")
@@ -31,6 +35,7 @@ class ModelLoader:
 
         self._load_embedding_model(cache_dir)
 
+    # Загрузка одной модели перевода: проверка кэша, скачивание при необходимости
     def _load_translation_model(self, direction: str, model_name: str, cache_dir: str):
         logger.info("Loading translation model [%s]: %s", direction, model_name)
         try:
@@ -56,6 +61,7 @@ class ModelLoader:
             logger.error("  [FAIL] Translation model [%s]: %s", direction, e)
             self._status[direction] = f"error: {e}"
 
+    # Загрузка модели эмбеддингов SentenceTransformer
     def _load_embedding_model(self, cache_dir: str):
         logger.info("Loading embedding model: %s", self.EMBEDDING_MODEL)
         try:
@@ -75,5 +81,6 @@ class ModelLoader:
             logger.error("  [FAIL] Embedding model: %s", e)
             self._status["embedding"] = f"error: {e}"
 
+    # Возвращает копию словаря статусов загрузки моделей
     def get_status(self) -> dict:
         return dict(self._status)

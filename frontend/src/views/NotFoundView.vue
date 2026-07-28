@@ -1,3 +1,4 @@
+<!-- Страница 404. Отображает иконку предупреждения, код ошибки и кнопку возврата в библиотеку. Catch-all маршрут в роутере. -->
 <template>
   <div class="not-found">
     <i class="pi pi-exclamation-triangle not-found-icon"></i>
@@ -13,6 +14,7 @@
 </template>
 
 <script setup>
+// Компонент 404: заглушка для несуществующих маршрутов с кнопкой возврата в библиотеку
 import Button from 'primevue/button'
 import { useI18n } from '../composables/useI18n'
 import { useTheme } from '../composables/useTheme'

@@ -1,5 +1,10 @@
 package com.jenikmax.game.library.model.dto.api;
 
+/**
+ * DTO с информацией о загрузке игры.
+ * Содержит данные об игре, размере, статусе кэша торрента
+ * и ссылку для скачивания.
+ */
 public class DownloadInfoResponse {
 
     private Long gameId;

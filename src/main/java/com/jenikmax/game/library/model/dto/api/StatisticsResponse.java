@@ -3,6 +3,10 @@ package com.jenikmax.game.library.model.dto.api;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DTO со статистикой библиотеки игр.
+ * Содержит общие счётчики и списки для диаграмм и топ-списков.
+ */
 public class StatisticsResponse {
 
     private long totalGames;
@@ -46,6 +50,7 @@ public class StatisticsResponse {
     public List<GameRatingItem> getMostRated() { return mostRated; }
     public void setMostRated(List<GameRatingItem> mostRated) { this.mostRated = mostRated; }
 
+    /** Элемент подсчёта: метка и количество */
     public static class CountItem {
         private String label;
         private long count;
@@ -59,6 +64,7 @@ public class StatisticsResponse {
         public void setCount(long count) { this.count = count; }
     }
 
+    /** Элемент подсчёта по жанру: код, имя и количество */
     public static class GenreCountItem {
         private String code;
         private String name;
@@ -75,6 +81,7 @@ public class StatisticsResponse {
         public void setCount(long count) { this.count = count; }
     }
 
+    /** Элемент рейтинга игры: ID, название, средняя оценка и количество голосов */
     public static class GameRatingItem {
         private long id;
         private String name;
@@ -96,6 +103,7 @@ public class StatisticsResponse {
         public void setRatingCount(long ratingCount) { this.ratingCount = ratingCount; }
     }
 
+    /** Элемент избранного: ID игры, название и количество добавлений */
     public static class GameFavItem {
         private long id;
         private String name;

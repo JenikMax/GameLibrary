@@ -1,6 +1,10 @@
 package com.jenikmax.game.library.model.dto;
 
 
+/**
+ * DTO для связи игры и жанра.
+ * Содержит ID записи, ID игры, код жанра и его описание.
+ */
 public class GameGenreDto {
 
     private Long id;

@@ -1,3 +1,4 @@
+<!-- Главная страница библиотеки. Содержит боковую панель фильтра (GameFilter), полосу истории просмотров, сортировку, пагинацию и отображение игр в виде сетки (GameCard) или списка (GameListRow). Поддерживает сканирование ФС с progress bar и случайную игру. -->
 <template>
   <div class="library-layout">
     <aside class="filter-sidebar">
@@ -143,6 +144,7 @@
 </template>
 
 <script setup>
+// Основная логика библиотеки: фильтрация, сортировка, пагинация, сканирование, случайная игра, сохранение состояния в sessionStorage
 import { onMounted, onBeforeUnmount, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLibraryStore } from '../stores/library'
@@ -165,6 +167,7 @@ import SelectButton from 'primevue/selectbutton'
 
 const LIBRARY_STATE_KEY = 'libraryState'
 
+// Сохраняет текущее состояние фильтров/пагинации в sessionStorage для восстановления при возврате
 function saveStateToSession() {
   sessionStorage.setItem(LIBRARY_STATE_KEY, JSON.stringify({
     currentPage: store.currentPage,
@@ -190,13 +193,14 @@ const { history } = useViewHistory()
 const router = useRouter()
 const toast = useToast()
 const scanning = ref(false)
-const scanTaskId = ref(null)
+const scanTaskId = ref(null) // ID задачи сканирования для polling
 const scanProgress = ref(0)
 const scanCurrentGame = ref('')
 const scanPhase = ref('')
 let scanPollTimer = null
 const filterRef = ref(null)
 
+// Локализованная метка фазы сканирования
 const scanPhaseLabel = computed(() => {
   const phaseMap = {
     'PENDING': t('scan.phase_scanning'),
@@ -211,6 +215,7 @@ const scanPhaseLabel = computed(() => {
   return phaseMap[scanPhase.value] || ''
 })
 
+// Опции сортировки: по имени, году, дате добавления, рейтингу
 const sortOptions = [
   { label: t('filter.sort_name'), value: 'name' },
   { label: t('filter.sort_year'), value: 'year' },
@@ -223,14 +228,17 @@ const pageSizeOptions = [
   { label: '48', value: 48 }
 ]
 
+// Проверяет, активна ли сортировка по данному полю
 function isActiveSort(field) {
   return store.sortField === field
 }
 
+// Возвращает иконку стрелки в зависимости от направления сортировки
 function sortArrowIcon(field) {
   return store.sortField === field && store.sortType === 'desc' ? 'pi-arrow-down' : 'pi-arrow-up'
 }
 
+// Переключает сортировку: первый клик — ASC, повторный — DESC, третий — отмена
 function toggleSort(field) {
   if (store.sortField !== field) {
     store.sortField = field
@@ -248,6 +256,7 @@ onMounted(async () => {
   await store.fetchFilterOptions()
   const saved = sessionStorage.getItem(LIBRARY_STATE_KEY)
   if (saved) {
+    // Восстановление состояния после возврата со страницы игры
     const state = JSON.parse(saved)
     store.searchText = state.searchText || ''
     store.selectedPlatforms = state.platforms || []
@@ -279,6 +288,7 @@ onMounted(async () => {
   }
 })
 
+// Сохраняет состояние перед уходом со страницы, останавливает polling сканирования
 onBeforeUnmount(() => {
   saveStateToSession()
   if (scanPollTimer) {
@@ -287,15 +297,18 @@ onBeforeUnmount(() => {
   }
 })
 
+// Обработчик смены страницы пагинатором
 function onPageChange(event) {
   store.fetchGames(event.page + 1)
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+// Обработчик смены размера страницы
 function onPageSizeChange() {
   store.fetchGames(1)
 }
 
+// Применяет фильтры из компонента GameFilter
 function handleApplyFilters(filters) {
   store.setSearch(filters.search)
   store.setFilters({
@@ -308,6 +321,7 @@ function handleApplyFilters(filters) {
   store.fetchGames(1)
 }
 
+// Сбрасывает фильтры и перезагружает игры
 function handleResetFilters() {
   store.resetFilters()
   if (router.currentRoute.value.query.favorites === '1') {
@@ -317,6 +331,7 @@ function handleResetFilters() {
   store.fetchGames(1)
 }
 
+// Переход к случайной игре
 async function handleRandom() {
   try {
     const res = await gamesApi.getRandomGame()
@@ -330,6 +345,7 @@ async function handleRandom() {
   }
 }
 
+// Запуск сканирования файловой системы (ADMIN)
 async function handleScan() {
   scanning.value = true
   try {
@@ -346,6 +362,7 @@ async function handleScan() {
   }
 }
 
+// Polling статуса сканирования каждые 500ms
 function pollScanStatus() {
   if (!scanTaskId.value) return
   scanPollTimer = setInterval(async () => {

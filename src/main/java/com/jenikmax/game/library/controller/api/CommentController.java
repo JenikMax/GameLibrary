@@ -18,6 +18,13 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/games")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Comments", description = "Game comments")
+/**
+ * Контроллер комментариев к играм.
+ * Обрабатывает запросы по пути /api/games/{id}/comments.
+ * Поддерживает получение, добавление и удаление комментариев.
+ * Проверяет права владельца комментария при удалении; администратор может
+ * удалить любой комментарий.
+ */
 public class CommentController {
 
     private final GameCommentRepository commentRepository;
@@ -32,6 +39,11 @@ public class CommentController {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Получить все комментарии к игре, отсортированные по дате (сначала новые).
+     * @param id идентификатор игры
+     * @return список комментариев с флагом canDelete для текущего пользователя
+     */
     @GetMapping("/{id}/comments")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getComments(@PathVariable Long id) {
         List<GameComment> comments = commentRepository.findByGameIdOrderByCreatedAtDesc(id);
@@ -51,6 +63,12 @@ public class CommentController {
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
+    /**
+     * Добавить новый комментарий к игре.
+     * @param id   идентификатор игры
+     * @param body JSON с полем text
+     * @return созданный комментарий с метаданными
+     */
     @PostMapping("/{id}/comments")
     public ResponseEntity<ApiResponse<Map<String, Object>>> addComment(
             @PathVariable Long id,
@@ -85,6 +103,12 @@ public class CommentController {
         return ResponseEntity.ok(ApiResponse.ok(m));
     }
 
+    /**
+     * Удалить комментарий. Доступно автору комментария или администратору.
+     * @param gameId    идентификатор игры
+     * @param commentId идентификатор комментария
+     * @return сообщение об успешном удалении или 403 при отсутствии прав
+     */
     @DeleteMapping("/{gameId}/comments/{commentId}")
     public ResponseEntity<ApiResponse<Void>> deleteComment(
             @PathVariable Long gameId,

@@ -13,12 +13,20 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Сервис Server-Sent Events для real-time уведомлений.
+ * Управляет подключениями SseEmitter по userId,
+ * рассылает события при создании новых уведомлений.
+ */
 @Service
 public class SseService {
 
     private static final Logger log = LoggerFactory.getLogger(SseService.class);
     private final Map<Long, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
+    /**
+     * Создаёт SSE-подписку для пользователя (таймаут 180с).
+     */
     public SseEmitter subscribe(Long userId) {
         SseEmitter emitter = new SseEmitter(180_000L);
         emitter.onCompletion(() -> remove(userId, emitter));
@@ -36,6 +44,9 @@ public class SseService {
         return emitter;
     }
 
+    /**
+     * Отправляет событие уведомления всем подключениям пользователя.
+     */
     public void send(Long userId, NotificationEvent event) {
         List<SseEmitter> userEmitters = emitters.get(userId);
         if (userEmitters == null) return;

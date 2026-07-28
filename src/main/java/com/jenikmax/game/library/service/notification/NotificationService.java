@@ -11,6 +11,11 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Сервис управления уведомлениями пользователей.
+ * Создаёт уведомления, отправляет их через SSE, возвращает
+ * последние уведомления и количество непрочитанных.
+ */
 @Service
 public class NotificationService {
 
@@ -22,6 +27,9 @@ public class NotificationService {
         this.sseService = sseService;
     }
 
+    /**
+     * Создаёт уведомление и отправляет его через SSE.
+     */
     @Transactional
     public Notification create(Long userId, String type, String title, String message, Long gameId) {
         Notification n = new Notification();
@@ -38,19 +46,31 @@ public class NotificationService {
         return n;
     }
 
+    /**
+     * Возвращает последние 20 уведомлений пользователя.
+     */
     public List<Notification> getRecent(Long userId) {
         return notificationRepository.findTop20ByUserIdOrderByCreatedAtDesc(userId);
     }
 
+    /**
+     * Возвращает количество непрочитанных уведомлений.
+     */
     public long getUnreadCount(Long userId) {
         return notificationRepository.countByUserIdAndReadFalse(userId);
     }
 
+    /**
+     * Отмечает одно уведомление как прочитанное.
+     */
     @Transactional
     public void markAsRead(Long id, Long userId) {
         notificationRepository.markAsRead(id, userId);
     }
 
+    /**
+     * Отмечает все уведомления пользователя как прочитанные.
+     */
     @Transactional
     public void markAllAsRead(Long userId) {
         notificationRepository.markAllAsRead(userId);

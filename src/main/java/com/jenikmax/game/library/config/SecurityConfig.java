@@ -33,6 +33,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Конфигурация Spring Security: JWT-аутентификация, rate limiting, CORS, CSRF.
+ * Двойная аутентификация: form login (Thymeleaf) + JWT (REST API).
+ * Stateless-сессии, BCrypt для паролей, Content Security Policy.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -55,11 +60,16 @@ public class SecurityConfig {
             : Arrays.asList(corsAllowedOrigins.split(","));
     }
 
+    /** Игнорировать статические ресурсы в цепочке безопасности. */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring().requestMatchers("/resources/**");
     }
 
+    /**
+     * Цепочка фильтров безопасности.
+     * CORS, CSRF (только для не-API), Security Headers, JWT + RateLimit фильтры.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -102,11 +112,13 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /** AuthenticationManager из стандартной конфигурации. */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
+    /** Провайдер аутентификации: UserDetailsService + BCrypt. */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
@@ -114,23 +126,26 @@ public class SecurityConfig {
         return provider;
     }
 
+    /** BCrypt-хэширование паролей. */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /** Фильтр ограничения запросов (login: 5/мин, API: 100/мин). */
     @Bean
     public RateLimitFilter rateLimitFilter() {
         return new RateLimitFilter();
     }
 
+    /** CORS-конфигурация из переменной окружения CORS_ALLOWED_ORIGINS. */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         if (corsAllowedOrigins != null && !corsAllowedOrigins.isEmpty()) {
             configuration.setAllowedOrigins(corsAllowedOrigins);
         } else {
-            // same-origin only (no CORS headers sent)
+            // Если origins не заданы — same-origin (CORS-заголовки не отправляются)
             configuration.setAllowedOriginPatterns(Collections.emptyList());
         }
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

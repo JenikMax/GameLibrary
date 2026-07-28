@@ -5,6 +5,11 @@ import com.jenikmax.game.library.model.entity.Screenshot;
 
 import java.util.List;
 
+/**
+ * Интерфейс сервиса сканирования файловой системы игр.
+ * Определяет операции обхода директорий, извлечения метаданных,
+ * логотипов, скриншотов и вычисления размера директории.
+ */
 public interface ScanerService {
 
     List<Game> scanDirectory(String path);

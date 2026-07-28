@@ -1,13 +1,18 @@
+-- ============================================================
+-- 06_favorite.sql — Избранные игры пользователей
+-- Позволяет добавлять игры в список избранного.
+-- ============================================================
 \c "game-library"
 
+-- Таблица избранного (уникальность по паре пользователь+игра)
 create sequence if not exists library.favorite_game_id_seq start 1;
 create table if not exists library.favorite_game
 (
-    id         bigserial primary key,
-    user_id    bigint  not null references library.library_user (id),
-    game_id    bigint  not null references library.game_data (id),
-    created_at timestamp without time zone default now(),
-    unique(user_id, game_id)
+    id         bigserial primary key,            -- Уникальный идентификатор записи
+    user_id    bigint  not null references library.library_user (id),  -- Идентификатор пользователя
+    game_id    bigint  not null references library.game_data (id),     -- Идентификатор игры
+    created_at timestamp without time zone default now(),              -- Дата добавления в избранное
+    unique(user_id, game_id)                    -- Одна запись на пару пользователь+игра
 );
 
 GRANT ALL ON library.favorite_game TO "library-manager-user";

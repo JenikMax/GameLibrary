@@ -2,6 +2,10 @@ package com.jenikmax.game.library.model.dto.api;
 
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * Запрос на аутентификацию (REST API).
+ * Содержит имя пользователя и пароль с валидацией.
+ */
 public class LoginRequest {
 
     @NotBlank

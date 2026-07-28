@@ -26,6 +26,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/images")
+/**
+ * Контроллер отдачи изображений (логотипы, скриншоты, аватары).
+ * Обрабатывает запросы по пути /api/images.
+ * Поддерживает ETag и Cache-Control (max-age=86400) для кэширования.
+ * Сначала проверяет файловую систему — если файл найден, отдаёт его,
+ * иначе загружает изображение из BLOB (bytea) в БД.
+ */
 public class ImageController {
 
     private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
@@ -47,6 +54,13 @@ public class ImageController {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Получить логотип игры. Сначала ищет на ФС (images.directory/games/{id}/logo.jpg),
+     * затем — в БД (bytea).
+     * @param gameId      идентификатор игры
+     * @param ifNoneMatch значение заголовка If-None-Match для ETag
+     * @return изображение с заголовками кэширования или 304 Not Modified
+     */
     @GetMapping("/games/{gameId}/logo")
     public ResponseEntity<Resource> getGameLogo(
             @PathVariable Long gameId,
@@ -71,6 +85,13 @@ public class ImageController {
         return ResponseEntity.notFound().build();
     }
 
+    /**
+     * Получить скриншот игры. Сначала ищет на ФС, затем — в БД.
+     * @param gameId       идентификатор игры
+     * @param screenshotId идентификатор скриншота
+     * @param ifNoneMatch  значение заголовка If-None-Match
+     * @return изображение с заголовками кэширования
+     */
     @GetMapping("/games/{gameId}/screenshots/{screenshotId}")
     public ResponseEntity<Resource> getScreenshot(
             @PathVariable Long gameId,
@@ -96,6 +117,12 @@ public class ImageController {
         return ResponseEntity.notFound().build();
     }
 
+    /**
+     * Получить аватар пользователя. Сначала ищет на ФС, затем — в БД.
+     * @param userId      идентификатор пользователя
+     * @param ifNoneMatch значение заголовка If-None-Match
+     * @return изображение аватара с заголовками кэширования
+     */
     @GetMapping("/avatars/{userId}")
     public ResponseEntity<Resource> getAvatar(
             @PathVariable Long userId,

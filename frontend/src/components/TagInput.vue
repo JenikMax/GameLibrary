@@ -1,5 +1,7 @@
+<!-- Компонент управления тегами: поле ввода нового тега (Enter/+), выпадающий список существующих тегов с поиском/фильтрацией, удаление тега по крестику. Закрытие дропдауна по клику вне. -->
 <template>
   <div class="tag-input" ref="containerRef">
+    <!-- Чипсы выбранных тегов -->
     <div class="tag-input-chips flex flex-wrap gap-1 mb-1" v-if="modelValue?.length">
       <span
         v-for="tag in modelValue"
@@ -10,6 +12,7 @@
         <i class="pi pi-times-circle tag-chip-remove" @click.stop="removeTag(tag)" />
       </span>
     </div>
+    <!-- Строка ввода нового тега + кнопки -->
     <div class="tag-input-row flex align-items-center gap-1">
       <InputText
         v-model="newTag"
@@ -26,6 +29,7 @@
         @click="addNewTag"
         :disabled="!newTag.trim()"
       />
+      <!-- Кнопка открытия/закрытия дропдауна -->
       <Button
         :icon="showDropdown ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
         size="small"
@@ -34,6 +38,7 @@
         @click="showDropdown = !showDropdown"
       />
     </div>
+    <!-- Выпадающий список существующих тегов с поиском -->
     <div v-if="showDropdown" class="tag-dropdown mt-1 border-round">
       <div class="p-1">
         <InputText
@@ -61,6 +66,7 @@
 </template>
 
 <script setup>
+// Компонент ввода тегов: поддерживает добавление через Enter/кнопку, выбор из выпадающего списка с фильтрацией, удаление через крестик
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
@@ -80,6 +86,7 @@ const filterQuery = ref('')
 const showDropdown = ref(false)
 const containerRef = ref(null)
 
+// Фильтрация доступных тегов: исключаем уже выбранные, применяем текстовый поиск
 const filteredTags = computed(() => {
   const selected = new Set(props.modelValue || [])
   const q = filterQuery.value.toLowerCase().trim()
@@ -90,6 +97,7 @@ const filteredTags = computed(() => {
   })
 })
 
+// Добавление нового тега из поля ввода
 function addNewTag() {
   const tag = newTag.value.trim()
   if (!tag) return
@@ -104,6 +112,7 @@ function addNewTag() {
   filterQuery.value = ''
 }
 
+// Выбор тега из выпадающего списка
 function selectTag(tag) {
   const current = [...(props.modelValue || [])]
   if (!current.includes(tag)) {
@@ -114,11 +123,13 @@ function selectTag(tag) {
   filterQuery.value = ''
 }
 
+// Удаление тега по крестику
 function removeTag(tag) {
   const current = (props.modelValue || []).filter(t => t !== tag)
   emit('update:modelValue', current)
 }
 
+// Закрытие дропдауна при клике вне компонента
 function onClickOutside(e) {
   if (containerRef.value && !containerRef.value.contains(e.target)) {
     showDropdown.value = false

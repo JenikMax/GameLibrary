@@ -28,6 +28,12 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+/**
+ * Реализация сервиса сканирования файловой системы.
+ * Обходит директории платформ/игр, читает information.json,
+ * извлекает логотипы, скриншоты и метаданные.
+ * Также сохраняет изменения обратно на ФС.
+ */
 @Service
 public class GameScanerService implements ScanerService {
 
@@ -40,6 +46,10 @@ public class GameScanerService implements ScanerService {
 
 
 
+    /**
+     * Сканирует корневую директорию и возвращает список найденных игр
+     * (обход платформа → игра).
+     */
     public List<Game> scanDirectory(String path) {
         List<Game> findGames = new ArrayList<>();
         File directory = new File(path);
@@ -61,6 +71,9 @@ public class GameScanerService implements ScanerService {
         return findGames;
     }
 
+    /**
+     * Возвращает полную информацию об игре (метаданные + лого + скриншоты).
+     */
     public Game getAdditinalGameInfo(Game game){
         game = getBasicGameInfo(game);
         game.setLogo(getLogo(game));
@@ -69,6 +82,9 @@ public class GameScanerService implements ScanerService {
     }
 
     @Override
+    /**
+     * Извлекает базовые метаданные игры из information.json (без лого/скриншотов).
+     */
     public Game getBasicGameInfo(Game game){
         File gameinfoDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX);
         if(!gameinfoDir.exists()){
@@ -104,6 +120,9 @@ public class GameScanerService implements ScanerService {
     }
 
     @Override
+    /**
+     * Читает логотип игры с ФС (logo.jpg) или возвращает умолчание.
+     */
     public byte[] getLogo(Game game){
         File logo = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_LOGO_FILE_NAME);
         if(logo.exists()) return readImage(logo);
@@ -111,6 +130,9 @@ public class GameScanerService implements ScanerService {
     }
 
     @Override
+    /**
+     * Загружает скриншоты игры из директории /information/img/.
+     */
     public List<Screenshot> getScreenshots(Game game){
         List<Screenshot> screenshots = new ArrayList<>();
         File screenDir = new File(game.getDirectoryPath() + GAME_INFO_PREFIX + GAME_SCREEN_PREFIX);
@@ -130,6 +152,9 @@ public class GameScanerService implements ScanerService {
     }
 
     @Override
+    /**
+     * Вычисляет полный размер директории игры (рекурсивно, до глубины 3).
+     */
     public long calculateGameDirSize(String directoryPath) {
         Path path = Paths.get(directoryPath);
         if (!Files.exists(path)) {
@@ -156,6 +181,9 @@ public class GameScanerService implements ScanerService {
         return total[0];
     }
 
+    /**
+     * Сохраняет игру на ФС: метаданные, логотип и скриншоты.
+     */
     public void storeGame(Game game){
         this.storeAdditinalGameInfo(game);
         this.storeLogoGameInfo(game);

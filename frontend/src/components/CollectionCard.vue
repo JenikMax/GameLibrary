@@ -1,9 +1,12 @@
+<!-- Карточка коллекции с фоновым изображением (hero-game), градиентной затемнением, информацией (название, smart-бейдж, описание, счётчик игр) и превью-обложками до 4 игр. -->
 <template>
   <div
     class="collection-card border-round overflow-hidden surface-card cursor-pointer transition-all"
     @click="router.push(`/collections/${collection.id}`)"
   >
+    <!-- Фоновое изображение геройской игры -->
     <div class="fade-bg" :style="heroStyle"></div>
+    <!-- Градиент затемнения снизу -->
     <div class="fade-grad"></div>
     <div class="fade-info">
       <div class="flex align-items-center gap-2 mb-1">
@@ -12,6 +15,7 @@
       </div>
       <p v-if="collection.description" class="fade-desc line-clamp-1">{{ collection.description }}</p>
       <span class="fade-count">{{ t('collections.game_count', { n: collection.gameCount }) }}</span>
+      <!-- Превью обложек игр в коллекции (макс. 4) -->
       <div class="fade-covers">
         <div
           v-for="pg in fadeGames"
@@ -25,6 +29,7 @@
             @error="onImgError"
           />
         </div>
+        <!-- Счётчик оставшихся игр, если >4 -->
         <div v-if="collection.overflow > 0" class="fade-ovfl">
           +{{ collection.overflow }}
         </div>
@@ -34,6 +39,7 @@
 </template>
 
 <script setup>
+// Карточка коллекции: hero-фон, градиент, превью-обложки, счётчик игр, smart-бейдж
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
@@ -46,6 +52,7 @@ const props = defineProps({
 const { t } = useI18n()
 const router = useRouter()
 
+// Фоновое изображение из heroGameId коллекции
 const heroStyle = computed(() => {
   const img = props.collection.heroGameId
     ? `/game-library/api/images/games/${props.collection.heroGameId}/logo`
@@ -53,11 +60,13 @@ const heroStyle = computed(() => {
   return { backgroundImage: `url(${img})` }
 })
 
+// До 4 превью-обложек для отображения
 const fadeGames = computed(() => {
   if (!props.collection.previewGames) return []
   return props.collection.previewGames.slice(0, 4)
 })
 
+// Fallback для битой ссылки на изображение
 function onImgError(e) {
   e.target.src = '/game-library/img/default.jpg'
 }

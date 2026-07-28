@@ -14,6 +14,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Реализация сервиса скачивания игр.
+ * Поддерживает ZIP-архивацию (в память и стримингом),
+ * генерацию .torrent через Transmission и стриминг через StreamingZipWriter.
+ */
 @Service
 public class DownloadFileService implements DownloadService {
 
@@ -111,11 +116,17 @@ public class DownloadFileService implements DownloadService {
         }
     }
 
+    /**
+     * Отдаёт кэшированный .torrent-файл через OutputStream.
+     */
     public void serveCachedTorrent(String path, OutputStream outputStream,
                                     CompletableFuture<ResponseEntity<StreamingResponseBody>> completableFuture) {
         torrentService.serveTorrentFile(path, outputStream, completableFuture);
     }
 
+    /**
+     * Рекурсивно вычисляет размер директории.
+     */
     public long getDirectorySizeRecursively(String path) {
         File file = new File(path);
         long size = 0;

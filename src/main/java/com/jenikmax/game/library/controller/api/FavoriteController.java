@@ -19,6 +19,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/games")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Favorites", description = "User favorites management")
+/**
+ * Контроллер управления избранными играми.
+ * Обрабатывает запросы по пути /api/games/{id}/favorite.
+ * Поддерживает получение статуса избранного, переключение (heart toggle)
+ * и получение списка ID избранных игр для текущего пользователя.
+ */
 public class FavoriteController {
 
     private final FavoriteGameRepository favoriteRepository;
@@ -29,6 +35,12 @@ public class FavoriteController {
         this.userService = userService;
     }
 
+    /**
+     * Получить статус избранного для игры: отмечена ли она текущим
+     * пользователем как избранная, и общее количество отметок.
+     * @param id идентификатор игры
+     * @return статус избранного и счётчик
+     */
     @GetMapping("/{id}/favorite")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getFavoriteStatus(@PathVariable Long id) {
         Long userId = getCurrentUserId();
@@ -37,6 +49,12 @@ public class FavoriteController {
         return ResponseEntity.ok(ApiResponse.ok(Map.of("favorited", favorited, "favoritesCount", count)));
     }
 
+    /**
+     * Переключить статус избранного для игры (heart toggle).
+     * Если игра в избранном — удаляет, если нет — добавляет.
+     * @param id идентификатор игры
+     * @return обновлённый статус и счётчик
+     */
     @PostMapping("/{id}/favorite")
     public ResponseEntity<ApiResponse<Map<String, Object>>> toggleFavorite(@PathVariable Long id) {
         Long userId = getCurrentUserId();
@@ -64,6 +82,10 @@ public class FavoriteController {
         return ResponseEntity.ok(ApiResponse.ok(Map.of("favorited", nowFavorited, "favoritesCount", count)));
     }
 
+    /**
+     * Получить список ID всех игр, отмеченных текущим пользователем как избранные.
+     * @return объект с массивом ID избранных игр
+     */
     @GetMapping("/favorites")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getFavorites() {
         Long userId = getCurrentUserId();

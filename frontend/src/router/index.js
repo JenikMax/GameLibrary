@@ -1,3 +1,4 @@
+// Конфигурация маршрутов Vue Router с guards аутентификации и ролей
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import LoginView from '../views/LoginView.vue'
@@ -15,12 +16,13 @@ import CollectionDetailView from '../views/CollectionDetailView.vue'
 import StatisticsView from '../views/StatisticsView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 
+// Определение маршрутов с мета-тегами для guards
 const routes = [
   {
     path: '/login',
     name: 'Login',
     component: LoginView,
-    meta: { guest: true }
+    meta: { guest: true }            // Только для неавторизованных
   },
   {
     path: '/register',
@@ -32,7 +34,7 @@ const routes = [
     path: '/',
     name: 'Library',
     component: LibraryView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true }     // Требуется авторизация
   },
   {
     path: '/game/:id',
@@ -44,7 +46,7 @@ const routes = [
     path: '/game/:id/edit',
     name: 'GameEdit',
     component: GameEditView,
-    meta: { requiresAuth: true, requiresAdmin: true }
+    meta: { requiresAuth: true, requiresAdmin: true }  // Только админ
   },
   {
     path: '/profile',
@@ -95,6 +97,7 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    // Catch-all для 404
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: NotFoundView
@@ -102,21 +105,22 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory('/game-library/'),
+  history: createWebHistory('/game-library/'),  // Базовый URL с учётом контекстного пути
   routes
 })
 
+// Guard маршрутизации: проверка аутентификации и прав администратора
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next({ name: 'Login' })
+    next({ name: 'Login' })                      // Редирект на логин
   } else if (to.meta.guest && authStore.isAuthenticated) {
-    next({ name: 'Library' })
+    next({ name: 'Library' })                     // Авторизованных с guest-страниц → в библиотеку
   } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
-    next({ name: 'Library' })
+    next({ name: 'Library' })                     // Не-админов → в библиотеку
   } else {
-    next()
+    next()                                        // Всё в порядке — пропускаем
   }
 })
 

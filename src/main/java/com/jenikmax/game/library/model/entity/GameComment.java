@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * Сущность комментария к игре.
+ * Содержит текст комментария, даты создания и обновления,
+ * а также ссылки на игру и автора.
+ */
 @Entity
 @Table(name = "game_comment")
 @SequenceGenerator(

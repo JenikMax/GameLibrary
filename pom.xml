@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================
+     pom.xml — Maven POM для GameLibrary
+     Spring Boot 4.0.7, Java 25, fat JAR.
+     ============================================================ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -6,7 +10,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.0.7</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/> <!-- Родительский POM из репозитория -->
 	</parent>
 
 	<groupId>com.jenikmax</groupId>
@@ -14,13 +18,14 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Game Library App</name>
-	<description>Application for managing the game catalog</description>
+	<description>Приложение для управления каталогом игр</description>
 
 	<properties>
-		<java.version>25</java.version>
+		<java.version>25</java.version>  <!-- Целевая версия Java -->
 	</properties>
 
 	<dependencies>
+		<!-- ─── Spring Boot Web + Security ────────────── -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -38,62 +43,68 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- Генерация метаданных конфигурации для IDE -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
 
+		<!-- ─── База данных ──────────────────────────── -->
+		<!-- PostgreSQL JDBC-драйвер -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
-		<!-- Spring Data JPA + Hibernate + HikariCP (managed by Spring Boot BOM) -->
+		<!-- JPA + Hibernate + HikariCP (управляется Spring Boot BOM) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
+		<!-- ─── Утилиты ──────────────────────────────── -->
+		<!-- Guava — коллекции, кэширование, хэши -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>33.4.0-jre</version>
 		</dependency>
 
-
+		<!-- OkHttp — HTTP-клиент для скраперов и AI-сервиса -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
 			<version>4.12.0</version>
 		</dependency>
 
-
+		<!-- Jsoup — парсинг HTML (скраперы) -->
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>1.18.3</version>
 		</dependency>
 
-
+		<!-- JsonPath — навигация по JSON (скраперы) -->
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
 		</dependency>
 
+		<!-- ttorrent — генерация .torrent-файлов -->
 		<dependency>
 			<groupId>com.turn</groupId>
 			<artifactId>ttorrent-core</artifactId>
 			<version>1.5</version>
 		</dependency>
 
-		<!-- SpringDoc OpenAPI (Swagger) -->
+		<!-- ─── Документация API (Swagger) ──────────── -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>3.0.3</version>
 		</dependency>
 
-		<!-- JWT -->
+		<!-- ─── JWT-аутентификация ──────────────────── -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -112,13 +123,14 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Validation -->
+		<!-- ─── Валидация (Bean Validation) ─────────── -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
-		<!-- Rate limiting (bucket4j) -->
+		<!-- ─── Rate Limiting (bucket4j) ────────────── -->
+		<!-- Ограничение количества запросов (логин: 5/мин, API: 100/мин) -->
 		<dependency>
 			<groupId>com.bucket4j</groupId>
 			<artifactId>bucket4j-core</artifactId>
@@ -127,8 +139,9 @@
 
 	</dependencies>
 
+	<!-- ─── Сборка ──────────────────────────────── -->
 	<build>
-		<finalName>game-library</finalName>
+		<finalName>game-library</finalName>  <!-- Имя итогового JAR -->
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

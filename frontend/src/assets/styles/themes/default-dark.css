@@ -1,12 +1,23 @@
+/* ============================================================
+ * default-dark.css — Тёмная тема
+ * Переопределяет фон и цвета элементов для тёмного режима.
+ * ============================================================ */
+
+/* Фон страницы */
 [data-theme="default-dark"] body {
   background-color: var(--p-surface-950);
 }
+/* Фон основного контейнера */
 [data-theme="default-dark"] .main-container {
   background-color: var(--p-surface-950);
 }
+
+/* ─── Комментарии ──────────────────────────────────────── */
 [data-theme="default-dark"] .comment-item {
   background: var(--p-surface-800);
 }
+
+/* ─── Отзывы ────────────────────────────────────────────── */
 [data-theme="default-dark"] .review-item {
   background: var(--p-surface-800);
 }
@@ -16,6 +27,11 @@
 [data-theme="default-dark"] .aggregated-scores {
   background: var(--p-surface-800);
 }
+[data-theme="default-dark"] .review-form {
+  background: var(--p-surface-800);
+}
+
+/* ─── Уведомления ───────────────────────────────────────── */
 [data-theme="default-dark"] .notification-panel {
   background: var(--p-surface-800);
   border-color: var(--p-surface-700);
@@ -26,18 +42,21 @@
 [data-theme="default-dark"] .notification-item.unread {
   background: var(--p-primary-900);
 }
+
+/* ─── Элементы коллекций ────────────────────────────────── */
 [data-theme="default-dark"] .collection-item:hover {
   background-color: var(--p-surface-700);
 }
-[data-theme="default-dark"] .review-form {
-  background: var(--p-surface-800);
-}
+
+/* ─── Строка списка игр ─────────────────────────────────── */
 [data-theme="default-dark"] .game-list-row {
   border-color: var(--p-surface-700, #374151);
 }
 [data-theme="default-dark"] .game-list-row:hover {
   background: var(--p-surface-800);
 }
+
+/* ─── Переключатель тем ─────────────────────────────────── */
 [data-theme="default-dark"] .theme-option:hover {
   background: var(--p-surface-700);
 }

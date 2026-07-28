@@ -1,5 +1,10 @@
 package com.jenikmax.game.library.service.torrent;
 
+/**
+ * Модель задачи подготовки торрента для скачивания/раздачи.
+ * Отслеживает статус (PENDING → HASHING → COMPLETED/FAILED),
+ * прогресс хеширования и результат (путь к .torrent, seedId).
+ */
 public class TorrentTask {
 
     public enum Status {

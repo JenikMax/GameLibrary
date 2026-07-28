@@ -1,3 +1,4 @@
+<!-- Управление пользователями (ADMIN). Таблица с полями ID, имя, аватар, статус админа, активность. Возможность переключить роль, деактивировать, сбросить пароль (генерируется случайно и показывается в диалоге). -->
 <template>
   <div class="admin-users-container">
     <h2>
@@ -80,6 +81,7 @@
 </template>
 
 <script setup>
+// Управление пользователями: загрузка списка, переключение admin/active, сброс пароля с копированием в буфер обмена
 import { ref, onMounted } from 'vue'
 import { adminApi } from '../api/admin'
 import { useI18n } from '../composables/useI18n'
@@ -99,6 +101,7 @@ const { isTerminalTheme } = useTheme()
 const users = ref([])
 const toast = useToast()
 
+// Состояние диалога сброса пароля
 const resetDialogVisible = ref(false)
 const resetDialogUser = ref('')
 const resetDialogPassword = ref('')
@@ -112,6 +115,7 @@ onMounted(async () => {
   }
 })
 
+// Переключение роли admin/user
 async function toggleAdmin(id, value) {
   try {
     await adminApi.toggleAdmin(id, value)
@@ -123,6 +127,7 @@ async function toggleAdmin(id, value) {
   }
 }
 
+// Переключение активности пользователя
 async function toggleActive(id, value) {
   try {
     await adminApi.toggleActive(id, value)
@@ -134,6 +139,7 @@ async function toggleActive(id, value) {
   }
 }
 
+// Сброс пароля: генерируется случайный, показывается в диалоге
 async function resetPassword(id, userName) {
   try {
     const res = await adminApi.resetPassword(id)
@@ -145,6 +151,7 @@ async function resetPassword(id, userName) {
   }
 }
 
+// Копирование сгенерированного пароля в буфер обмена
 function copyPassword() {
   const ta = document.createElement('textarea')
   ta.value = resetDialogPassword.value

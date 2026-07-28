@@ -19,21 +19,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Утилита для создания .torrent-файлов в форматеBencode.
+ * Поддерживает мульти-файловые и одиночные торренты,
+ * с прогресс-колбэком хеширования кусков (SHA-1).
+ */
 public class GameTorrentCreator {
 
     public static final int PIECE_HASH_SIZE = 20;
 
+    /**
+     * Колбэк для отслеживания прогресса хеширования.
+     */
     @FunctionalInterface
     public interface ProgressCallback {
         void onProgress(int piecesHashed, int totalPieces, String currentFileName);
     }
 
+    /**
+     * Создаёт мульти-файловый .torrent для указанного набора файлов.
+     */
     public static byte[] createMultiFile(File parentDir, List<File> files, int pieceLength,
                                           List<List<URI>> announceList, String createdBy,
                                           ProgressCallback callback) throws IOException, NoSuchAlgorithmException {
         return create(parentDir, files, pieceLength, announceList, createdBy, callback);
     }
 
+    /**
+     * Создаёт одно-файловый .torrent.
+     */
     public static byte[] createSingleFile(File file, int pieceLength,
                                            List<List<URI>> announceList, String createdBy,
                                            ProgressCallback callback) throws IOException, NoSuchAlgorithmException {
@@ -115,6 +129,9 @@ public class GameTorrentCreator {
         return result;
     }
 
+    /**
+     * Вычисляет SHA-1 хеши для всех кусков файлов.
+     */
     public static byte[] hashPieces(String gameName, List<File> files, int pieceLength,
                                      ProgressCallback callback) throws IOException, NoSuchAlgorithmException {
         byte[] buffer = new byte[pieceLength];
@@ -171,6 +188,9 @@ public class GameTorrentCreator {
         return piecesOut.toByteArray();
     }
 
+    /**
+     * Выбирает оптимальный размер куска в зависимости от общего размера данных.
+     */
     public static int selectPieceLength(long totalSize) {
         if (totalSize > 200L * 1024 * 1024 * 1024) return 16 * 1024 * 1024;
         if (totalSize > 50L  * 1024 * 1024 * 1024) return 8 * 1024 * 1024;

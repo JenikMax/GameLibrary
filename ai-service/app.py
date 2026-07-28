@@ -1,3 +1,7 @@
+# FastAPI-приложение AI-сервиса GameLibrary
+# Предоставляет 4 эндпоинта: health, translate, embed, embed/batch
+# Модели загружаются при старте приложения через lifespan-обработчик
+
 import logging
 import os
 import time
@@ -13,11 +17,13 @@ from embedding_service import EmbeddingService
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
+# Глобальные экземпляры сервисов, инициализируются при старте
 model_loader: ModelLoader = None
 translation_service: TranslationService = None
 embedding_service: EmbeddingService = None
 
 
+# Инициализация и завершение работы приложения
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global model_loader, translation_service, embedding_service
@@ -25,12 +31,14 @@ async def lifespan(app: FastAPI):
     models_dir = os.environ.get("MODELS_DIR", "/models")
     logger.info("Loading AI models from: %s", models_dir)
 
+    # Загрузка всех моделей HuggingFace при старте
     start = time.time()
     model_loader = ModelLoader(models_dir)
     model_loader.load_all()
     elapsed = time.time() - start
     logger.info("All models loaded in %.1fs", elapsed)
 
+    # Инициализация сервисов перевода и эмбеддингов
     translation_service = TranslationService(model_loader)
     embedding_service = EmbeddingService(model_loader)
 
@@ -41,6 +49,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="GameLibrary AI Service", lifespan=lifespan)
 
+
+# Pydantic-модели запросов и ответов
 
 class TranslateRequest(BaseModel):
     text: str
@@ -72,6 +82,7 @@ class HealthResponse(BaseModel):
     models: dict
 
 
+# Проверка здоровья сервиса и статуса загруженных моделей
 @app.get("/health", response_model=HealthResponse)
 async def health():
     return HealthResponse(
@@ -80,6 +91,7 @@ async def health():
     )
 
 
+# Перевод текста (ru↔en) через MarianMT
 @app.post("/translate", response_model=TranslateResponse)
 async def translate(req: TranslateRequest):
     if not translation_service or not translation_service.is_available():
@@ -92,6 +104,7 @@ async def translate(req: TranslateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Получение векторного эмбеддинга текста (multilingual-e5-small, 384 dim)
 @app.post("/embed", response_model=EmbedResponse)
 async def embed(req: EmbedRequest):
     if not embedding_service or not embedding_service.is_available():
@@ -104,6 +117,7 @@ async def embed(req: EmbedRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Пакетное получение эмбеддингов для нескольких текстов
 @app.post("/embed/batch", response_model=EmbedBatchResponse)
 async def embed_batch(req: EmbedBatchRequest):
     if not embedding_service or not embedding_service.is_available():

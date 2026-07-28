@@ -3,6 +3,11 @@ package com.jenikmax.game.library.model.dto.api;
 import java.sql.Timestamp;
 import java.util.List;
 
+/**
+ * DTO для отображения игры в списке (библиотека).
+ * Содержит краткую информацию: название, платформа, жанры,
+ * теги, средний рейтинг и статус избранного.
+ */
 public class GameListResponse {
 
     private Long id;

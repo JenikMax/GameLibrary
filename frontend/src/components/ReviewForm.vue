@@ -1,7 +1,9 @@
+<!-- Форма отзыва об игре. Четыре рейтинга (геймплей/графика/сюжет/музыка) по шкале 1-10, текстовое описание, плюсы и минусы. Поддерживает редактирование существующего отзыва. -->
 <template>
   <div class="review-form">
     <h4 class="mb-2">{{ review ? t('review.edit') : t('review.write') }}</h4>
 
+    <!-- Оценки по 4 категориям -->
     <div class="field">
       <label>{{ t('review.gameplay') }}</label>
       <div class="flex align-items-center gap-2">
@@ -34,6 +36,7 @@
       </div>
     </div>
 
+    <!-- Текст отзыва -->
     <div class="field">
       <label for="review-text">{{ t('review.text') }}</label>
       <Textarea
@@ -46,6 +49,7 @@
       />
     </div>
 
+    <!-- Плюсы -->
     <div class="field">
       <label for="review-pros">{{ t('review.pros') }}</label>
       <Textarea
@@ -58,6 +62,7 @@
       />
     </div>
 
+    <!-- Минусы -->
     <div class="field">
       <label for="review-cons">{{ t('review.cons') }}</label>
       <Textarea
@@ -78,6 +83,7 @@
 </template>
 
 <script setup>
+// Форма создания/редактирования отзыва: 4 рейтинга (1-10), текст, плюсы/минусы. Инициализируется данными существующего отзыва при редактировании.
 import { ref, reactive } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import Rating from 'primevue/rating'
@@ -93,6 +99,7 @@ const props = defineProps({
 const emit = defineEmits(['submit', 'cancel'])
 
 const submitting = ref(false)
+// Форма инициализируется данными отзыва (при редактировании) или пустая
 const form = reactive({
   text: props.review?.text || '',
   pros: props.review?.pros || '',

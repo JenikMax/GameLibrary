@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Фабрика скраперов. Создаёт и кэширует инстансы скраперов по типу.
+ * Поддерживает инвалидацию кэша при изменении конфигурации.
+ */
 @Component
 public class ScraperFactory {
 
@@ -26,6 +30,10 @@ public class ScraperFactory {
         this.jsoupHelper = jsoupHelper;
     }
 
+    /**
+     * Возвращает скрапер по типу (с кэшированием). Выбрасывает исключение,
+     * если тип отключён или неизвестен.
+     */
     public Scraper getScraper(String type) {
         if (!configService.isEnabled(type)) {
             throw new IllegalArgumentException("Scraper '" + type + "' is disabled or not configured");
@@ -33,6 +41,9 @@ public class ScraperFactory {
         return instanceCache.computeIfAbsent(type, this::createScraper);
     }
 
+    /**
+     * Инвалидирует кэш всех созданных скраперов (при изменении конфигурации).
+     */
     public synchronized void invalidateCache() {
         instanceCache.clear();
     }

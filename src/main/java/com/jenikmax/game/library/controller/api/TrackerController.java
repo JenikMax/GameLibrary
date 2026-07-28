@@ -15,6 +15,13 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/tracker")
+/**
+ * Контроллер BitTorrent HTTP-трекера.
+ * Обрабатывает запросы по пути /api/tracker.
+ * Реализует протокол BitTorrent Tracke: announce (регистрация пира,
+ * обновление статуса) и scrape (статистика по торренту).
+ * Ответы возвращаются в bencoded-формате (ISO-8859-1).
+ */
 public class TrackerController {
 
     private static final Logger logger = LoggerFactory.getLogger(TrackerController.class);
@@ -25,6 +32,21 @@ public class TrackerController {
         this.trackerService = trackerService;
     }
 
+    /**
+     * Announce-эндпоинт BitTorrent трекера. Регистрирует пира в раздаче
+     * или обновляет его статус (старт, стоп, завершение).
+     * @param infoHash   хеш информационной части торрента (20 байт, raw)
+     * @param peerId     идентификатор пира
+     * @param port       порт, на котором пир принимает соединения
+     * @param uploaded   количество загруженных байт
+     * @param downloaded количество скачанных байт
+     * @param left       количество оставшихся байт
+     * @param event      событие: started, stopped, completed или пусто
+     * @param ipParam    IP-адрес пира (опционально, определяется автоматически)
+     * @param compact    флаг компактного ответа (0/1)
+     * @param request    HTTP-запрос для определения IP
+     * @return bencoded-ответ со списком пиров
+     */
     @GetMapping(value = "/announce", produces = "text/plain; charset=ISO-8859-1")
     public ResponseEntity<String> announce(
             @RequestParam("info_hash") String infoHash,
@@ -64,6 +86,12 @@ public class TrackerController {
                 .body(bencoded);
     }
 
+    /**
+     * Scrape-эндпоинт BitTorrent трекера. Возвращает статистику по торренту
+     * (количество сидов, пиров, завершивших загрузку).
+     * @param infoHash хеш информационной части (опционально; null = все торренты)
+     * @return bencoded-ответ со статистикой
+     */
     @GetMapping(value = "/scrape", produces = "text/plain; charset=ISO-8859-1")
     public ResponseEntity<String> scrape(
             @RequestParam(value = "info_hash", required = false) String infoHash) {

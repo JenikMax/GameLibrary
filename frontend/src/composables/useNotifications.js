@@ -1,3 +1,4 @@
+// Композабл для подписки на push-уведомления через SSE с fallback polling каждые 15с
 import { ref, onUnmounted } from 'vue'
 import { notificationsApi } from '../api/notifications'
 
@@ -9,6 +10,7 @@ export function useNotifications() {
   let isUnmounted = false
   let authToken = null
 
+  // Подписка через Server-Sent Events (SSE)
   function subscribe(token) {
     authToken = token
     if (!token) return
@@ -16,6 +18,7 @@ export function useNotifications() {
     const url = `/game-library/api/notifications/subscribe?token=${encodeURIComponent(token)}`
     eventSource = new EventSource(url)
 
+    // Обработка входящего уведомления
     eventSource.addEventListener('notification', (e) => {
       try {
         const notif = JSON.parse(e.data)
@@ -24,6 +27,7 @@ export function useNotifications() {
       } catch {}
     })
 
+    // При успешном подключении отключаем fallback polling
     eventSource.addEventListener('connected', () => {
       if (fallbackTimer) {
         clearInterval(fallbackTimer)
@@ -31,6 +35,7 @@ export function useNotifications() {
       }
     })
 
+    // При ошибке SSE переключаемся на polling
     eventSource.onerror = () => {
       eventSource?.close()
       eventSource = null
@@ -38,6 +43,7 @@ export function useNotifications() {
     }
   }
 
+  // Fallback polling каждые 15 секунд при недоступности SSE
   function startFallbackPolling() {
     if (fallbackTimer || !authToken) return
     fallbackTimer = setInterval(() => {
@@ -45,6 +51,7 @@ export function useNotifications() {
     }, 15000)
   }
 
+  // Принудительная загрузка уведомлений через REST API
   async function fetchNotifications() {
     try {
       const res = await notificationsApi.getNotifications()
@@ -53,6 +60,7 @@ export function useNotifications() {
     } catch {}
   }
 
+  // Отписка: закрытие SSE и остановка polling
   function unsubscribe() {
     if (eventSource) {
       eventSource.close()

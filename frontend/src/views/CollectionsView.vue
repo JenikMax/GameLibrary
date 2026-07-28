@@ -1,3 +1,4 @@
+<!-- Страница коллекций. Отображает созданные пользователем коллекции (в т.ч. смарт-коллекции) в виде сетки карточек. Диалог создания с опциями названия, описания, публичности и правил смарт-коллекции через SmartRulesForm. -->
 <template>
   <div class="collections-page">
     <div class="flex align-items-center justify-content-between mb-3">
@@ -63,6 +64,7 @@
 </template>
 
 <script setup>
+// Список коллекций: загрузка с hero-изображениями, пагинация, создание новых (обычных и smart) через диалог
 import { ref, computed, onMounted, onActivated } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { useTheme } from '../composables/useTheme'
@@ -91,10 +93,11 @@ const newName = ref('')
 const newDescription = ref('')
 const newIsPublic = ref(false)
 const newIsSmart = ref(false)
-const newSmartRulesObj = ref({})
+const newSmartRulesObj = ref({}) // Правила для смарт-коллекции
 
 const page = ref(1)
 const pageSize = 12
+// Пагинация на клиенте
 const paginatedCollections = computed(() => {
   const start = (page.value - 1) * pageSize
   return collections.value.slice(start, start + pageSize)
@@ -109,6 +112,7 @@ onMounted(async () => {
 })
 onActivated(load)
 
+// Загрузка коллекций с hero-данными для карточек
 async function load() {
   loading.value = true
   try {
@@ -122,6 +126,7 @@ async function load() {
   }
 }
 
+// Создание новой коллекции (обычной или smart)
 async function handleCreate() {
   if (!newName.value.trim()) return
   creating.value = true

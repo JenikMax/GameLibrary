@@ -1,3 +1,4 @@
+<!-- Карточка игры для отображения в сетке (grid). Содержит постер, название, платформу, год, рейтинг, жанры, теги (макс. 3 + счётчик), кнопки деталей/скачивания/избранного. -->
 <template>
   <Card class="game-card">
     <template #header>
@@ -29,6 +30,7 @@
     </template>
     <template #content>
       <div class="flex flex-wrap gap-1">
+        <!-- Жанры с преобразованием кода в название -->
         <Tag
           v-for="genre in game.genres"
           :key="genre"
@@ -37,6 +39,7 @@
           rounded
           class="genre-tag"
         />
+        <!-- Теги (макс. 3, остальные — счётчиком) -->
         <Tag
           v-for="tag in game.tags?.slice(0, 3)"
           :key="tag"
@@ -74,6 +77,7 @@
             @click="downloadGame"
           />
         </div>
+        <!-- Кнопка избранного -->
         <Button
           :icon="favIcon"
           :severity="game.favorited ? 'danger' : 'secondary'"
@@ -89,6 +93,7 @@
 </template>
 
 <script setup>
+// Карточка игры в grid-режиме: постер с lazy-loading, название, теги, рейтинг, избранное, скачивание
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '../composables/useI18n'
@@ -110,6 +115,7 @@ const { isTerminalTheme } = useTheme()
 const libraryStore = useLibraryStore()
 const imgLoaded = ref(false)
 
+// Иконка избранного: заполненное или пустое сердечко
 const favIcon = computed(() => {
   return props.game.favorited ? 'pi pi-heart-fill' : 'pi pi-heart'
 })
@@ -120,6 +126,7 @@ onMounted(() => {
   }
 })
 
+// Преобразование кода жанра в локализованное название
 function genreName(code) {
   return libraryStore.genreMap[code] || code
 }
@@ -132,6 +139,7 @@ function downloadGame() {
   window.open(gamesApi.getDownloadUrl(props.game.id), '_blank')
 }
 
+// Переключение избранного
 async function toggleFav() {
   try {
     const res = await gamesApi.toggleFavorite(props.game.id)

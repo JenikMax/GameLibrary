@@ -4,6 +4,12 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * Сущность рецензии на игру.
+ * Содержит развёрнутый отзыв с оценками по 4 категориям
+ * (геймплей, графика, сюжет, музыка), списком плюсов и минусов
+ * и текстовым описанием. Одна рецензия на пользователя на игру.
+ */
 @Entity
 @Table(name = "game_review")
 @SequenceGenerator(

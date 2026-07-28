@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.CRC32;
 
+/**
+ * Стриминговый ZIP-писатель без сжатия (STORED mode).
+ * Предварительно вычисляет манифест (размер архива) для заголовка Content-Length,
+ * затем пишет ZIP-поток с data descriptor и Central Directory.
+ * Позволяет стримить архивы >5 ГБ без буферизации в память.
+ */
 public class StreamingZipWriter {
 
     private static final int BUFFER_SIZE = 8192;
@@ -32,6 +38,9 @@ public class StreamingZipWriter {
         }
     }
 
+    /**
+     * Вычисляет манифест ZIP-архива: список файлов и итоговый размер.
+     */
     public ZipManifest buildManifest(Path baseDir) throws IOException {
         List<FileEntry> entries = new ArrayList<>();
         Files.walk(baseDir)
@@ -64,6 +73,9 @@ public class StreamingZipWriter {
         return total;
     }
 
+    /**
+     * Записывает ZIP-архив (STORED) в OutputStream по предварительно вычисленному манифесту.
+     */
     public void writeZip(ZipManifest manifest, Path baseDir, OutputStream out) throws IOException {
         List<FileEntry> entries = manifest.entries;
         int n = entries.size();
