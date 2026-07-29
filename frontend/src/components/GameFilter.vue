@@ -205,6 +205,9 @@ function resetFilters() {
   background: var(--p-primary-color) !important;
   color: var(--p-primary-contrast-color) !important;
 }
+.p-chip {
+  cursor: pointer;
+}
 .field {
   margin-bottom: 0.5rem;
 }
