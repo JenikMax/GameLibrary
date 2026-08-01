@@ -7,6 +7,7 @@ import com.jenikmax.game.library.model.exceptions.IllegalUsernameException;
 import com.jenikmax.game.library.service.data.UserDataService;
 import com.jenikmax.game.library.config.jwt.JwtTokenProvider;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest,
-                                                             HttpServletResponse response) {
+                                                             HttpServletRequest request, HttpServletResponse response) {
         logger.info("REST login request for user: {}", loginRequest.getUsername());
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -69,7 +70,7 @@ public class AuthController {
             // Set httpOnly cookie (more secure than localStorage)
             Cookie cookie = new Cookie("token", token);
             cookie.setHttpOnly(true);
-            cookie.setSecure(true);
+            cookie.setSecure(request.isSecure() || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Proto")));
             cookie.setPath("/game-library");
             cookie.setMaxAge((int) (jwtExpirationMs / 1000));
             response.addCookie(cookie);
