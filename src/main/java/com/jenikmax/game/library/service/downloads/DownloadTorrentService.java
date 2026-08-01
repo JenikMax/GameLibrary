@@ -143,6 +143,8 @@ public class DownloadTorrentService {
             Path cachedTorrent = cacheManager.getCachedTorrent(directory, files)
                     .orElseThrow(() -> new IOException("Torrent not cached for " + directoryPath));
 
+            ensureSeeding(cachedTorrent, directoryPath);
+
             try (FileInputStream fis = new FileInputStream(cachedTorrent.toFile())) {
                 byte[] buffer = new byte[8192];
                 int bytesRead;
@@ -154,6 +156,20 @@ public class DownloadTorrentService {
         } catch (Exception e) {
             logger.error("Failed to serve torrent for {}", directoryPath, e);
             completableFuture.completeExceptionally(e);
+        }
+    }
+
+    /**
+     * Добавляет закэшированный торрент в Transmission для раздачи.
+     * Повторные вызовы безопасны (torrent-duplicate → существующий ID).
+     * Ошибки не пробрасываются — раздача не должна ломать выдачу файла.
+     */
+    private void ensureSeeding(Path cachedTorrent, String directoryPath) {
+        try {
+            String seedId = transmissionService.addTorrent(cachedTorrent.toString(), directoryPath);
+            logger.info("Seeding ensured for cached torrent {} (seedId={})", directoryPath, seedId);
+        } catch (Exception e) {
+            logger.warn("Failed to start seeding for cached torrent {}: {}", directoryPath, e.getMessage());
         }
     }
 

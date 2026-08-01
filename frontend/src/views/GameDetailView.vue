@@ -560,6 +560,12 @@ async function downloadGame() {
 
   if (info.torrentCached) {
     window.open(gamesApi.getDownloadUrl(game.value.id), '_blank')
+    toast.add({
+      severity: 'success',
+      summary: t('game.seeding_started'),
+      detail: t('game.seeding_cached_detail'),
+      life: 5000
+    })
     return
   }
 
