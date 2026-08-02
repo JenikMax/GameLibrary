@@ -22,7 +22,8 @@
 7. [Первый вход в систему](#7-первый-вход-в-систему)
 8. [Добавление игр в библиотеку](#8-добавление-игр-в-библиотеку)
 9. [Настройка скраперов (IGDB, TheGamesDB)](#9-настройка-скраперов-igdb-thegamesdb)
-10. [Если что-то пошло не так](#10-типовые-проблемы)
+10. [Эмуляция в браузере](#10-эмуляция-в-браузере)
+11. [Если что-то пошло не так](#11-типовые-проблемы)
 
 ---
 
@@ -230,7 +231,7 @@ docker compose up --build -d
 `--build` — пересобрать образы (нужно при первом запуске или после изменений).  
 `-d` — запустить в фоне.
 
-**Ожидаемый результат:** Docker скачает образы (PostgreSQL, Transmission, AI-сервис) и запустит 5 контейнеров.
+**Ожидаемый результат:** Docker скачает образы (PostgreSQL, Transmission, AI-сервис, EmulatorJS) и запустит 6 контейнеров.
 
 Проверить, что всё запустилось:
 
@@ -238,7 +239,7 @@ docker compose up --build -d
 docker compose ps
 ```
 
-Должны гореть `Up` напротив всех четырёх сервисов:
+Должны гореть `Up` напротив всех шести сервисов:
 
 ```
 NAME                     STATUS
@@ -247,6 +248,7 @@ game-library-frontend    Up
 game-library-db          Up
 game-library-ai-service  Up
 game-library-transmission Up
+game-library-emulatorjs  Up
 ```
 
 ---
@@ -424,7 +426,55 @@ curl -X POST "https://id.twitch.tv/oauth2/token?client_id=ВАШ_CLIENT_ID&clien
 
 ---
 
-## 10. Типовые проблемы
+## 10. Эмуляция в браузере
+
+Приложение умеет запускать игры прямо в браузере через **EmulatorJS** (WASM-ядра, без установки программ на клиент).
+
+### Поддерживаемые платформы
+
+| Платформа | Папка платформы | Ядро по умолчанию | Поддерживаемые форматы |
+|-----------|-----------------|-------------------|------------------------|
+| PS1 / PSX | `PlayStation`, `PS1`, `PSX`, ... | pcsx_rearmed (быстрое); mednafen_psx_hw (точное, для .chd) | .cue+.bin, .pbp, .chd, .ecm, .toc, .cbn, .ccd |
+| PSP | `PSP` | ppsspp | .iso, .cso, .pbp, .elf |
+| NES / Dendy | `Dendy`, `NES`, `Famicom`, ... | fceumm (альтернатива: nestopia) | .nes, .fds, .unf, .zip |
+| N64 | `Nintendo64`, `N64`, ... | mupen64plus_next (альтернатива: parallel_n64) | .n64, .z64, .v64, .zip |
+| SNES | `SuperNintendo`, `SNES`, `SFC`, ... | snes9x | .smc, .sfc, .swc, .fig, .zip |
+
+> **PS2 не поддерживается** — кнопка «Играть» для PS2 не отображается (браузерных эмуляторов PS2 не существует).
+
+### Как играть
+
+1. Откройте карточку игры (например, PS1-игру).
+2. Нажмите **«Играть в браузере»** (красная кнопка).
+3. Если у игры несколько файлов образа (несколько дисков) — выберите нужный в диалоге.
+4. Откроется новая вкладка с эмулятором. Управление — геймпад или клавиатура:
+   - **Enter** — старт, **Escape** — пауза/меню, **Ctrl+F** — фуллскрин
+   - PS1: **Shift+F1–F9** — слоты сейвов, **F1–F9** — загрузка, **F5** — быстрый сейв
+5. **Сейвы хранятся на сервере** (per-user, автоматически синхронизируются каждые 30 секунд и при закрытии вкладки). Продолжить можно на любом устройстве под своей учёткой.
+
+### Выбор ядра PS1
+
+По умолчанию используется **pcsx_rearmed** (быстрее). Если игра глючит графически — в шапке окна эмулятора переключите ядро на **mednafen_psx_hw** (точнее) и перезапустите эмулятор. При 4+ ГБ RAM и 4+ ядрах на клиенте точное ядро включается автоматически.
+
+### Для существующих баз данных (важно!)
+
+Если библиотека уже была развёрнута раньше, примените миграцию для таблицы сейвов вручную:
+
+```bash
+docker compose exec postgresdb psql -U postgres -d game-library -f /docker-entrypoint-initdb.d/14_emulator_save.sql
+```
+
+(Для новых установок скрипты `ddl/*.sql` выполнятся автоматически.)
+
+### Не поддерживается
+
+- **PS2** — нет браузерных эмуляторов.
+- Образы PS1 в форматах `.img/.sub/.ccd/.mdf/.mds/.rar` — игнорируются; конвертируйте в `.chd` или `.pbp` (например, chdman из MAME).
+- Мультидисковые образы `.m3u` — каждый диск запускается отдельно.
+
+---
+
+## 11. Типовые проблемы
 
 | Симптом | Причина | Что делать |
 |---------|---------|------------|
@@ -459,6 +509,7 @@ curl -X POST "https://id.twitch.tv/oauth2/token?client_id=ВАШ_CLIENT_ID&clien
 | **Docker Compose** | Инструмент для запуска нескольких контейнеров сразу |
 | **Скрапер** | Программа, которая собирает информацию об игре с сайта (описание, жанры, скриншоты) |
 | **Transmission** | Торрент-клиент для раздачи игр |
+| **EmulatorJS** | Браузерный эмулятор (WASM-ядра), запускает игры без установки программ |
 | **PostgreSQL** | База данных, где хранятся игры, пользователи, настройки |
 | **uTP** | Протокол для P2P-соединений; без него uTorrent не может скачивать |
 | **JWT** | Токен для входа — приложение запоминает его и вы не вводите пароль каждый раз |
@@ -581,7 +632,7 @@ Check containers:
 docker compose ps
 ```
 
-All 5 services should show `Up`.
+All 6 services should show `Up` (backend, frontend, db, ai-service, transmission, emulatorjs).
 
 ## 7. First login
 
@@ -627,7 +678,53 @@ Place games in `/mnt/nas/gameLibrary/games/<Platform>/<Game Name>/`, then go to 
 2. Get key at https://api.thegamesdb.net/key.php
 3. Admin panel → TheGamesDB → set `encryptedApiKey`
 
-## 10. Common issues
+## 10. Browser emulation
+
+The app can launch games directly in the browser via **EmulatorJS** (WASM cores, no client software needed).
+
+### Supported platforms
+
+| Platform | Platform folder | Default core | Supported formats |
+|----------|-----------------|--------------|-------------------|
+| PS1 / PSX | `PlayStation`, `PS1`, `PSX`, ... | pcsx_rearmed (fast); mednafen_psx_hw (accurate, for .chd) | .cue+.bin, .pbp, .chd, .ecm, .toc, .cbn, .ccd |
+| PSP | `PSP` | ppsspp | .iso, .cso, .pbp, .elf |
+| NES / Dendy | `Dendy`, `NES`, `Famicom`, ... | fceumm (alternate: nestopia) | .nes, .fds, .unf, .zip |
+| N64 | `Nintendo64`, `N64`, ... | mupen64plus_next (alternate: parallel_n64) | .n64, .z64, .v64, .zip |
+| SNES | `SuperNintendo`, `SNES`, `SFC`, ... | snes9x | .smc, .sfc, .swc, .fig, .zip |
+
+> **PS2 is not supported** — the Play button is hidden for PS2 (no browser-based PS2 emulator exists).
+
+### How to play
+
+1. Open a game page (e.g. a PS1 game).
+2. Click **Play in browser** (red button).
+3. If the game has multiple image files (multi-disc) — pick one in the dialog.
+4. A new tab opens with the emulator. Controls — gamepad or keyboard:
+   - **Enter** — start, **Escape** — pause/menu, **Ctrl+F** — fullscreen
+   - PS1: **Shift+F1–F9** — save states, **F1–F9** — load, **F5** — quick save
+5. **Saves are stored on the server** (per-user, auto-synced every 30 s and on tab close). Continue on any device with your account.
+
+### PS1 core selection
+
+The default is **pcsx_rearmed** (faster). If a game has graphics glitches — switch to **mednafen_psx_hw** (more accurate) in the emulator header and restart it. On clients with 8+ GB RAM and 4+ cores the accurate core is chosen automatically.
+
+### Existing databases (important!)
+
+If your library was deployed before, apply the save-table migration manually:
+
+```bash
+docker compose exec postgresdb psql -U postgres -d game-library -f /docker-entrypoint-initdb.d/14_emulator_save.sql
+```
+
+(Fresh installs run `ddl/*.sql` automatically.)
+
+### Not supported
+
+- **PS2** — no browser emulator exists.
+- PS1 images in `.img/.sub/.ccd/.mdf/.mds/.rar` — ignored; convert to `.chd` or `.pbp` (e.g. chdman from MAME).
+- Multi-disc `.m3u` images — each disc launches separately.
+
+## 11. Common issues
 
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|

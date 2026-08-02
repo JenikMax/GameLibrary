@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<!--
+  player.html — страница браузерной эмуляции (EmulatorJS).
+  Открывается из карточки игры: ?game=<id>&file=<относительный путь ROM>.
+  Сам загружает /api/games/{id}/emulation (ядро, альтернативы, валидация файла),
+  выбирает ядро (автоопределение или выбор пользователя, сохраняется в localStorage),
+  синхронизирует сейвы (srm/state) с сервером.
+  Требует COOP/COEP-заголовки (выставляются Nginx'ом на /game-library/emu/) для
+  многопоточных ядер (PSP/PPSSPP, N64, PSX).
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emulator</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #0d1117; color: #e6edf3;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  #emu-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 14px; height: 46px;
+    background: #161b22; border-bottom: 1px solid #30363d;
+  }
+  #emu-header button, #emu-header select {
+    background: #21262d; color: #e6edf3;
+    border: 1px solid #30363d; border-radius: 6px;
+    padding: 6px 12px; font-size: 13px; cursor: pointer;
+  }
+  #emu-header button:hover { background: #30363d; }
+  #emu-title { flex: 1; font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #emu-save-status { font-size: 12px; color: #8b949e; white-space: nowrap; }
+  #game { position: absolute; top: 46px; left: 0; right: 0; bottom: 0; }
+  #game .ejs_parent { width: 100%; height: 100%; }
+  #emu-error, #emu-core-panel {
+    position: absolute; top: 46px; left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 24px;
+  }
+  #emu-core-panel { flex-direction: column; gap: 16px; background: #0d1117; z-index: 10; }
+  #emu-core-panel h2 { margin: 0; font-size: 18px; }
+  #emu-core-panel .core-row { display: flex; gap: 10px; align-items: center; }
+  #emu-core-panel select {
+    background: #21262d; color: #e6edf3; border: 1px solid #30363d;
+    border-radius: 6px; padding: 8px 12px; font-size: 14px;
+  }
+  .btn-primary {
+    background: #238636 !important; border-color: #2ea043 !important;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div id="emu-header">
+  <button id="btn-back" title="Close">&larr; Exit</button>
+  <span id="emu-title">Loading...</span>
+  <select id="core-select" style="display:none" title="Emulator core"></select>
+  <span id="emu-save-status"></span>
+</div>
+<div id="game"></div>
+<div id="emu-core-panel" style="display:none">
+  <h2 id="core-panel-title">Select emulator core</h2>
+  <div class="core-row">
+    <select id="core-panel-select"></select>
+    <button id="core-panel-start" class="btn-primary">Start</button>
+  </div>
+</div>
+<div id="emu-error" style="display:none"></div>
+
+<script>
+(function() {
+  "use strict";
+
+  var API = "/game-library/api";
+  var SAVE_INTERVAL_MS = 30000;
+  var STATE_SLOT = 0;
+  var SRM_SLOT = 0;
+
+  var params = new URLSearchParams(location.search);
+  var gameId = params.get("game");
+  var filePath = params.get("file");
+
+  var emulation = null;      // ответ GET /api/games/{id}/emulation
+  var saveList = [];         // ответ GET /api/games/{id}/save-list
+  var corePrefs = null;      // localStorage: выбор ядра per system
+  var lastSrmHash = null;
+  var saveTimer = null;
+  var srmLoaded = false;
+
+  var $ = function(id) { return document.getElementById(id); };
+  var el = function(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  };
+
+  function setStatus(text) {
+    $("emu-save-status").textContent = text || "";
+  }
+  function setError(text) {
+    var box = $("emu-error");
+    box.style.display = "flex";
+    box.textContent = text;
+  }
+
+  // ─── Ядро: prefs в localStorage (per system), автоопределение ───
+  function loadCorePrefs() {
+    try {
+      corePrefs = JSON.parse(localStorage.getItem("gl-emu-core-prefs") || "{}");
+    } catch (e) { corePrefs = {}; }
+  }
+  function saveCorePref(core) {
+    loadCorePrefs();
+    corePrefs[emulation.system] = core;
+    try { localStorage.setItem("gl-emu-core-prefs", JSON.stringify(corePrefs)); } catch (e) {}
+  }
+  function pickCore() {
+    loadCorePrefs();
+    var stored = corePrefs[emulation.system];
+    if (stored) return stored;
+    // автоопределение: мощный клиент → последнее ядро (точность), слабый → дефолт (скорость)
+    var cores = (emulation.alternateCores || []).length ? [emulation.core].concat(emulation.alternateCores) : [emulation.core];
+    if (cores.length <= 1) return cores[0];
+    var powerful = (navigator.deviceMemory || 8) >= 8 && (navigator.hardwareConcurrency || 4) >= 4;
+    // .chd поддерживается только mednafen_psx_hw (psx)
+    if (emulation.system === "psx" && /\.chd$/i.test(filePath)) return "mednafen_psx_hw";
+    return powerful ? cores[cores.length - 1] : cores[0];
+  }
+
+  // ─── Серверные сейвы ───
+  function fetchSave(kind, slot) {
+    return fetch(API + "/games/" + gameId + "/save?kind=" + encodeURIComponent(kind) + "&slot=" + (slot || 0))
+      .then(function(r) { return r.ok ? r.arrayBuffer() : null; });
+  }
+  function putSave(kind, slot, bytes, silent) {
+    return fetch(API + "/games/" + gameId + "/save?kind=" + encodeURIComponent(kind) + "&slot=" + (slot || 0), {
+      method: "PUT",
+      headers: { "Content-Type": "application/octet-stream" },
+      body: bytes
+    }).then(function(r) {
+      if (r.ok) {
+        if (!silent) setStatus(kind === "srm" ? "Save synced to server" : "State saved to server");
+        return true;
+      }
+      setStatus(kind === "srm" ? "Save sync failed" : "State save failed");
+      return false;
+    }).catch(function() {
+      setStatus("Server save error");
+      return false;
+    });
+  }
+  function sha256(data) {
+    if (!window.crypto || !crypto.subtle) return Promise.resolve(null);
+    return crypto.subtle.digest("SHA-256", data).then(function(h) {
+      return Array.from(new Uint8Array(h)).map(function(b) { return b.toString(16).padStart(2, "0"); }).join("");
+    });
+  }
+  function writeSaveFile(bytes) {
+    // паттерн из emulator.js (кнопка load SAV files): запись в FS ядра + перезагрузка
+    try {
+      var gm = EJS_emulator.gameManager;
+      var path = gm.getSaveFilePath();
+      if (!path) return false;
+      var parts = path.split("/");
+      var cp = "";
+      for (var i = 0; i < parts.length - 1; i++) {
+        if (parts[i] === "") continue;
+        cp += "/" + parts[i];
+        if (!gm.FS.analyzePath(cp).exists) gm.FS.mkdir(cp);
+      }
+      if (gm.FS.analyzePath(path).exists) gm.FS.unlink(path);
+      gm.FS.writeFile(path, new Uint8Array(bytes));
+      gm.loadSaveFiles();
+      return true;
+    } catch (e) {
+      console.error("writeSaveFile failed", e);
+      return false;
+    }
+  }
+  function autoSyncSrm() {
+    try {
+      var file = EJS_emulator.gameManager.getSaveFile();
+      if (!file || !file.length) return;
+      sha256(file).then(function(h) {
+        if (!h || h === lastSrmHash) return;
+        putSave("srm", SRM_SLOT, file, true).then(function(ok) {
+          if (ok) lastSrmHash = h;
+        });
+      });
+    } catch (e) { /* ядро без srm (psp) */ }
+  }
+  function startSaveTimer() {
+    if (saveTimer) clearInterval(saveTimer);
+    saveTimer = setInterval(autoSyncSrm, SAVE_INTERVAL_MS);
+    window.addEventListener("beforeunload", function() {
+      try {
+        var file = EJS_emulator.gameManager.getSaveFile();
+        if (file && file.length) {
+          fetch(API + "/games/" + gameId + "/save?kind=srm&slot=" + SRM_SLOT, {
+            method: "PUT", headers: { "Content-Type": "application/octet-stream" },
+            body: file, keepalive: true
+          });
+        }
+      } catch (e) {}
+    });
+  }
+  function loadSrmOnStart() {
+    fetchSave("srm", SRM_SLOT).then(function(buf) {
+      if (buf) writeSaveFile(buf);
+      startSaveTimer();
+    }).catch(function() { startSaveTimer(); });
+  }
+
+  // ─── Эмулятор ───
+  function startEmulator(core) {
+    $("core-select").style.display = "";
+    $("core-select").value = core;
+
+    var gameUrl = API + "/games/" + gameId + "/rom/" + filePath;
+    var threads = typeof SharedArrayBuffer !== "undefined";
+    var hasState = saveList.some(function(s) { return s.kind === "state" && s.slot === STATE_SLOT; });
+
+    // Переменные EmulatorJS должны быть установлены до подключения loader.js
+    window.EJS_player = "#game";
+    window.EJS_core = emulation.system;
+    window.EJS_gameUrl = gameUrl;
+    window.EJS_gameName = emulation.platform + " / " + (filePath.split("/").pop() || "game");
+    window.EJS_gameID = Number(gameId);
+    window.EJS_pathtodata = "/game-library/emu/data/";
+    window.EJS_startOnLoaded = true;
+    window.EJS_threads = threads;
+    window.EJS_volume = 0.7;
+    window.EJS_backgroundColor = "#0d1117";
+    window.EJS_color = "#238636";
+    window.EJS_language = "en-US";
+    window.EJS_disableAutoLang = true;
+    window.EJS_defaultOptions = { "retroarch_core": core };
+    if (hasState) {
+      window.EJS_loadStateURL = API + "/games/" + gameId + "/save?kind=state&slot=" + STATE_SLOT;
+    }
+
+    window.EJS_onGameStart = function() {
+      $("emu-title").textContent = emulation.platform + " — " + (filePath.split("/").pop() || "game");
+      loadSrmOnStart();
+    };
+    // Save State → сервер (слот state)
+    window.EJS_onSaveState = function(e) {
+      if (e && e.state) putSave("state", STATE_SLOT, e.state);
+    };
+    // Load State → с сервера
+    window.EJS_onLoadState = function() {
+      fetchSave("state", STATE_SLOT).then(function(buf) {
+        if (buf) EJS_emulator.gameManager.loadState(new Uint8Array(buf));
+        else setStatus("No server state");
+      });
+      return 1;
+    };
+    // Save SAV (srm) → сервер
+    window.EJS_onSaveSave = function(e) {
+      if (e && e.save) putSave("srm", SRM_SLOT, e.save);
+      return 1;
+    };
+    // Load SAV (srm) → с сервера
+    window.EJS_onLoadSave = function() {
+      fetchSave("srm", SRM_SLOT).then(function(buf) {
+        if (buf) writeSaveFile(buf);
+        else setStatus("No server save");
+      });
+      return 1;
+    };
+    window.EJS_onExit = function() { try { window.close(); } catch (e) {} };
+
+    var script = document.createElement("script");
+    script.src = "/game-library/emu/data/loader.js";
+    script.onerror = function() { setError("Failed to load emulator scripts (/game-library/emu/ not reachable)"); };
+    document.head.appendChild(script);
+  }
+
+  // ─── Инициализация ───
+  function init() {
+    if (!gameId || !filePath) { setError("Missing game/file parameters"); return; }
+    fetch(API + "/games/" + gameId + "/emulation")
+      .then(function(r) { return r.json(); })
+      .then(function(resp) {
+        if (!resp || !resp.success || !resp.data || !resp.data.supported) {
+          setError("This platform is not supported for in-browser emulation");
+          return;
+        }
+        emulation = resp.data;
+        var file = (emulation.files || []).find(function(f) { return f.path === filePath && f.kind === "primary"; });
+        if (!file) { setError("File not found in game: " + filePath); return; }
+
+        $("emu-title").textContent = emulation.platform + " — " + file.name;
+
+        return fetch(API + "/games/" + gameId + "/save-list").then(function(r) { return r.json(); })
+          .then(function(saveResp) {
+            saveList = saveResp && saveResp.success ? (saveResp.data || []) : [];
+            return saveList;
+          })
+          .catch(function() { saveList = []; });
+      })
+      .then(function() {
+        var cores = (emulation.alternateCores || []).length ? [emulation.core].concat(emulation.alternateCores) : [emulation.core];
+        var chosen = pickCore();
+
+        var headerSelect = $("core-select");
+        cores.forEach(function(c) {
+          var opt = el("option", null, c);
+          opt.value = c;
+          headerSelect.appendChild(opt);
+        });
+        headerSelect.value = chosen;
+        headerSelect.addEventListener("change", function() { saveCorePref(headerSelect.value); });
+
+        var wasAuto = !corePrefs[emulation.system];
+        if (cores.length > 1 && wasAuto) {
+          // первый запуск для системы с альтернативами — показать панель выбора
+          $("core-panel-title").textContent = emulation.system + ": choose emulator core";
+          $("core-panel-select").innerHTML = "";
+          cores.forEach(function(c, i) {
+            var opt = el("option", null, c + (i === 0 ? " (default)" : ""));
+            opt.value = c;
+            $("core-panel-select").appendChild(opt);
+          });
+          $("core-panel-select").value = chosen;
+          $("core-panel-start").addEventListener("click", function() {
+            $("emu-core-panel").style.display = "none";
+            saveCorePref($("core-panel-select").value);
+            startEmulator($("core-panel-select").value);
+          });
+          $("emu-core-panel").style.display = "flex";
+          // автозапуск с выбранным ядром через 3 сек, если пользователь не выбрал
+          setTimeout(function() {
+            if ($("emu-core-panel").style.display !== "none") {
+              $("emu-core-panel").style.display = "none";
+              saveCorePref(chosen);
+              startEmulator(chosen);
+            }
+          }, 3000);
+        } else {
+          startEmulator(chosen);
+        }
+      })
+      .catch(function(e) { setError("Failed to load emulation info: " + (e && e.message || e)); });
+  }
+
+  $("btn-back").addEventListener("click", function() { try { window.close(); } catch (e) { history.back(); } });
+  window.addEventListener("load", init);
+})();
+</script>
+</body>
+</html>

@@ -13,5 +13,6 @@ COPY ./postgresdb/ddl/10_smart_collection.sql /docker-entrypoint-initdb.d/
 COPY ./postgresdb/ddl/11_review.sql /docker-entrypoint-initdb.d/
 COPY ./postgresdb/ddl/12_tags.sql /docker-entrypoint-initdb.d/
 COPY ./postgresdb/ddl/13_vector.sql /docker-entrypoint-initdb.d/
+COPY ./postgresdb/ddl/14_emulator_save.sql /docker-entrypoint-initdb.d/
 
 RUN chmod 755 /docker-entrypoint-initdb.d/*.sh /docker-entrypoint-initdb.d/*.sql

@@ -2,7 +2,7 @@
 # Makefile — задачи сборки и запуска GameLibrary
 # ============================================================
 
-.PHONY: all build-backend build-frontend up down clean
+.PHONY: all build-backend build-frontend build-emulatorjs up down clean
 
 # ─── Сборка всего и запуск ──────────────────────────────
 all: build-backend build-frontend up
@@ -14,6 +14,10 @@ build-backend:
 # Сборка frontend (Vue SPA)
 build-frontend:
 	cd frontend && npm install && npm run build
+
+# Сборка образа EmulatorJS (WASM-ядра из CDN, фиксация версии в emulatorjs/Dockerfile)
+build-emulatorjs:
+	docker-compose build emulatorjs
 
 # Запуск всех сервисов в Docker
 up:

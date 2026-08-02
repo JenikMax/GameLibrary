@@ -65,6 +65,15 @@
           <small v-else class="text-color-secondary">{{ t('rating.login_to_rate') }}</small>
         </div>
         <div class="flex gap-2 mb-3 flex-wrap">
+          <Button
+            v-if="emulation?.supported"
+            :label="t('emu.play')"
+            icon="pi pi-play"
+            severity="danger"
+            class="rt-btn-play"
+            @click="playGame"
+            v-tooltip.bottom="t('emu.play_tooltip')"
+          />
           <Button :label="t('game.download')" icon="pi pi-download" severity="success"
             @click="downloadGame" :loading="preparing" />
           <Button
@@ -344,6 +353,30 @@
       :game-id="route.params.id"
       @close="showCollectionPicker = false"
     />
+
+    <!-- Выбор ROM-файла для браузерного эмулятора (если их несколько) -->
+    <Dialog v-model:visible="showRomDialog" :header="t('emu.select_rom')"
+      :style="{ width: '540px', maxWidth: '94vw' }" modal>
+      <div class="flex flex-column gap-2">
+        <button
+          v-for="f in romFiles"
+          :key="f.path"
+          type="button"
+          class="rom-option"
+          :class="{ 'rom-option-selected': selectedRom === f.path }"
+          @click="selectedRom = f.path"
+        >
+          <i class="pi pi-disc"></i>
+          <div class="flex flex-column align-items-start">
+            <span class="font-semibold">{{ f.name }}</span>
+            <small class="text-color-secondary" v-if="f.size">{{ formatSize(f.size) }}</small>
+          </div>
+        </button>
+      </div>
+      <template #footer>
+        <Button :label="t('emu.launch')" icon="pi pi-play" severity="danger" autofocus @click="launchSelectedRom" />
+      </template>
+    </Dialog>
   </div>
   <div v-else class="text-center p-5">
     <i class="pi pi-exclamation-triangle text-6xl"></i>
@@ -379,6 +412,7 @@ import Badge from 'primevue/badge'
 import ReviewForm from '../components/ReviewForm.vue'
 import { useToast } from 'primevue/usetoast'
 import { downloadsApi } from '../api/downloads'
+import { emulationApi } from '../api/emulation'
 
 const route = useRoute()
 const router = useRouter()
@@ -419,6 +453,10 @@ const showReviewForm = ref(false)
 const userReview = ref(null) // Отзыв текущего пользователя (если есть)
 const showingTranslation = ref(false)
 const translating = ref(false)
+const emulation = ref(null) // Данные эмуляции: supported, system, files
+const showRomDialog = ref(false) // Видимость диалога выбора ROM-файла
+const romFiles = ref([]) // Primary-файлы для запуска (если несколько)
+const selectedRom = ref(null) // Выбранный путь в диалоге
 
 // Переключение избранного (сердечко)
 async function toggleFav() {
@@ -531,7 +569,8 @@ onMounted(async () => {
       gamesApi.getGame(route.params.id),
       libraryStore.filterOptions.genres?.length ? Promise.resolve() : libraryStore.fetchFilterOptions(),
       loadComments(),
-      loadReviews()
+      loadReviews(),
+      loadEmulation()
     ])
     game.value = gameRes.data.data
     userRating.value = game.value.userRating || 0
@@ -543,6 +582,60 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+// Загрузка данных эмуляции (поддержка платформы + список ROM). Не критична:
+// при ошибке кнопка «Играть» просто не отображается.
+async function loadEmulation() {
+  try {
+    const res = await emulationApi.getEmulation(route.params.id)
+    emulation.value = res.data.data
+  } catch {
+    emulation.value = null
+  }
+}
+
+// Запуск игры в браузерном эмуляторе: один primary-файл — сразу,
+// несколько (мультифайловые образы/несколько дисков) — диалог выбора.
+async function playGame() {
+  if (!emulation.value?.supported) return
+  const primaries = (emulation.value.files || []).filter(f => f.kind === 'primary')
+  if (!primaries.length) {
+    toast.add({ severity: 'info', summary: t('emu.no_roms'), life: 4000 })
+    return
+  }
+  if (primaries.length === 1) {
+    launchPlayer(primaries[0].path)
+    return
+  }
+  romFiles.value = primaries
+  selectedRom.value = primaries[0].path
+  showRomDialog.value = true
+}
+
+// Открытие страницы игрока EmulatorJS в новой вкладке
+function launchPlayer(path) {
+  window.open(emulationApi.getPlayerUrl(game.value.id, path), '_blank')
+}
+
+// Запуск выбранного в диалоге ROM-файла
+function launchSelectedRom() {
+  if (!selectedRom.value) return
+  showRomDialog.value = false
+  launchPlayer(selectedRom.value)
+}
+
+// Форматирование размера в человекочитаемый вид (B, KB, MB, GB, TB)
+function formatSize(bytes) {
+  if (!bytes) return ''
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  let i = 0
+  let size = bytes
+  while (size >= 1024 && i < units.length - 1) {
+    size /= 1024
+    i++
+  }
+  return `${size.toFixed(1)} ${units[i]}`
+}
 
 // Скачивание игры: если размер <5 ГБ — прямая ссылка, иначе подготовка торрента
 async function downloadGame() {
@@ -821,6 +914,33 @@ function onViewerKeydown(e) {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
+}
+/* Строка-опция выбора ROM в диалоге запуска эмулятора */
+.rom-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--p-content-border-radius);
+  background: transparent;
+  color: var(--p-content-color);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.rom-option:hover {
+  background: var(--p-content-hover-background);
+}
+.rom-option-selected {
+  border-color: var(--p-primary-color);
+  background: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
+}
+.rom-option-selected .text-color-secondary {
+  color: var(--p-primary-contrast-color);
+  opacity: 0.85;
 }
 .game-main {
   display: flex;
