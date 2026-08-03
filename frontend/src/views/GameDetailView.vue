@@ -50,7 +50,7 @@
           <Tag v-for="g in game.genres" :key="g" :value="genreName(g)" severity="secondary" />
         </div>
         <div v-if="game.tags?.length" class="flex gap-2 flex-wrap mb-3">
-          <Tag v-for="tag in game.tags" :key="tag" :value="tag" severity="info" rounded />
+          <Tag v-for="tag in game.tags" :key="tag" :value="tagName(tag)" severity="info" rounded />
         </div>
         <div class="flex align-items-center gap-3 mb-3">
           <div class="flex align-items-center gap-1">
@@ -491,6 +491,10 @@ async function toggleTranslation() {
 // Преобразует код жанра в локализованное название
 function genreName(code) {
   return libraryStore.genreMap[code] || code
+}
+
+function tagName(code) {
+  return libraryStore.tagMap[code] || code
 }
 
 // Заголовок галереи: "Скриншоты 3 / 10"

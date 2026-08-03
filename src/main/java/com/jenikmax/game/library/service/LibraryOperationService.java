@@ -223,6 +223,11 @@ public class LibraryOperationService implements LibraryService {
         return gameService.getTags();
     }
 
+    @Override
+    public Map<String, String> getTagLocalizedNames(Locale locale) {
+        return gameService.getTagLocalizedNames(locale);
+    }
+
     /**
      * Возвращает полную информацию об игре по ID, включая переведённое описание.
      */
@@ -239,7 +244,12 @@ public class LibraryOperationService implements LibraryService {
      */
     @Override
     public GameDto updateGameInfo(GameDto gameDto) {
-        gameService.ensureTagsExist(gameDto.getTags());
+        Map<String, String> codeMap = gameService.ensureTagsExist(gameDto.getTags());
+        if (!codeMap.isEmpty() && gameDto.getTags() != null) {
+            gameDto.setTags(gameDto.getTags().stream()
+                    .map(tag -> codeMap.getOrDefault(tag, tag))
+                    .collect(Collectors.toList()));
+        }
         Game game = GameConverter.dtoToGameEntityConverter(gameDto);
         gameService.updateGame(game);
         gameService.resetDescriptionTranslated(game.getId());

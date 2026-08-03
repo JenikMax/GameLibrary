@@ -43,7 +43,7 @@
         <Tag
           v-for="tag in game.tags?.slice(0, 3)"
           :key="tag"
-          :value="tag"
+          :value="tagName(tag)"
           severity="info"
           rounded
           class="genre-tag"
@@ -129,6 +129,10 @@ onMounted(() => {
 // Преобразование кода жанра в локализованное название
 function genreName(code) {
   return libraryStore.genreMap[code] || code
+}
+
+function tagName(code) {
+  return libraryStore.tagMap[code] || code
 }
 
 function goToGame() {

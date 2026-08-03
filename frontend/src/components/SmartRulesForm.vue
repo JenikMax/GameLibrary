@@ -73,6 +73,8 @@
       <MultiSelect
         v-model="localRules.tags"
         :options="tagOptions"
+        optionLabel="name"
+        optionValue="code"
         display="chip"
         class="w-full"
         @update:modelValue="emitUpdate"
@@ -90,11 +92,13 @@
 // Правила смарт-коллекции: v-model поддерживает как объект, так и JSON-строку. В режиме readonly отображает правила текстом, в режиме edit — форму с MultiSelect/InputNumber/InputText.
 import { reactive, computed, watch } from 'vue'
 import { useI18n } from '../composables/useI18n'
+import { useLibraryStore } from '../stores/library'
 import MultiSelect from 'primevue/multiselect'
 import InputNumber from 'primevue/inputnumber'
 import InputText from 'primevue/inputtext'
 
 const { t } = useI18n()
+const libraryStore = useLibraryStore()
 
 const props = defineProps({
   modelValue: { type: [Object, String], default: () => ({}) },
@@ -137,7 +141,7 @@ function emitUpdate() {
 }
 
 const genreOptions = computed(() => props.options.genres || [])
-const tagOptions = computed(() => props.options.tags || [])
+const tagOptions = computed(() => props.options.tagItems || [])
 
 // Маппинг кода жанра → локализованное название
 const genreMap = computed(() => {
@@ -149,7 +153,7 @@ const genreMap = computed(() => {
 })
 
 const genreNames = computed(() => (localRules.genres || []).map(c => genreMap.value[c] || c).join(', '))
-const tagNames = computed(() => (localRules.tags || []).join(', '))
+const tagNames = computed(() => (localRules.tags || []).map(c => libraryStore.tagMap[c] || c).join(', '))
 
 // Проверка: пустые ли все правила
 const isEmpty = computed(() => {

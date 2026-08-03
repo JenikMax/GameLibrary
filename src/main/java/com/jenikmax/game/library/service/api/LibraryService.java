@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -45,6 +46,8 @@ public interface LibraryService {
     boolean isSemanticSearchAvailable();
 
     List<String> getTags();
+
+    Map<String, String> getTagLocalizedNames(Locale locale);
 
     GameDto getGameInfo(Long gameId);
 

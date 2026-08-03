@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import org.springframework.context.MessageSource;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -26,13 +29,16 @@ public class ImageAnalysisService {
 
     private final AiClient aiClient;
     private final JdbcTemplate jdbc;
+    private final MessageSource messageSource;
     private final String imagesDirectory;
 
     public ImageAnalysisService(AiClient aiClient,
                                  JdbcTemplate jdbc,
+                                 MessageSource messageSource,
                                  @Value("${game-library.images.directory:/gameLibrary/images}") String imagesDirectory) {
         this.aiClient = aiClient;
         this.jdbc = jdbc;
+        this.messageSource = messageSource;
         this.imagesDirectory = imagesDirectory;
     }
 
@@ -40,7 +46,7 @@ public class ImageAnalysisService {
         return aiClient.isVisionAvailable();
     }
 
-    public Map<String, Object> analyzeGameScreenshots(Long gameId, int maxScreenshots) {
+    public Map<String, Object> analyzeGameScreenshots(Long gameId, int maxScreenshots, Locale locale) {
         List<byte[]> screenshots = loadScreenshotData(gameId, maxScreenshots);
         if (screenshots.isEmpty()) {
             logger.info("Screenshot analysis for game {}: no screenshots found", gameId);
@@ -91,10 +97,33 @@ public class ImageAnalysisService {
             }
         }
 
+        Map<String, String> tagNames = getTagLocalizedNames(locale);
+        Map<String, String> genreNames = new LinkedHashMap<>();
+        for (String code : suggestedGenres) {
+            genreNames.put(code, messageSource.getMessage("enum.genre." + code, null, code, locale));
+        }
+
         return Map.of("suggestedTags", suggestedTags, "suggestedGenres", suggestedGenres,
+                "tagNames", suggestedTags.stream().collect(Collectors.toMap(t -> t, t -> tagNames.getOrDefault(t, t))),
+                "genreNames", genreNames,
                 "matches", matches.stream()
                         .map(m -> Map.of("label", m.label(), "score", m.score()))
                         .collect(Collectors.toList()));
+    }
+
+    private Map<String, String> getTagLocalizedNames(Locale locale) {
+        String col = "ru".equals(locale.getLanguage()) ? "description_ru" : "description";
+        List<Map<String, Object>> rows = jdbc.queryForList(
+                "SELECT code, " + col + " as name FROM library.game_tag");
+        Map<String, String> result = new LinkedHashMap<>();
+        for (Map<String, Object> row : rows) {
+            String code = (String) row.get("code");
+            String name = (String) row.get("name");
+            if (code != null) {
+                result.put(code, name != null ? name : code);
+            }
+        }
+        return result;
     }
 
     private List<String> buildLabelList() {

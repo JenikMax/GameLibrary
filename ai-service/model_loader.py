@@ -1,5 +1,5 @@
 # Загрузчик моделей HuggingFace с кэшированием на диск
-# Поддерживает 2 модели перевода (MarianMT ru-en, en-ru), 1 модель эмбеддингов (multilingual-e5-small)
+# Поддерживает 1 модель перевода (NLLB-200 ru-en), 1 модель эмбеддингов (multilingual-e5-small)
 # и 1 модель компьютерного зрения CLIP для анализа скриншотов
 import logging
 import os
@@ -11,60 +11,71 @@ logger = logging.getLogger(__name__)
 
 
 class ModelLoader:
-    # Словарь направлений перевода и соответствующих моделей HuggingFace
-    TRANSLATION_MODELS = {
-        "ru-en": "Helsinki-NLP/opus-mt-ru-en",
-        "en-ru": "Helsinki-NLP/opus-mt-en-ru",
-    }
+    TRANSLATION_MODEL = "facebook/nllb-200-distilled-600M"
     EMBEDDING_MODEL = "intfloat/multilingual-e5-small"
     CLIP_MODEL = "openai/clip-vit-base-patch32"
 
+    # ISO 639-3 + script коды для NLLB-200
+    LANG_CODES = {
+        "ru-en": ("rus_Cyrl", "eng_Latn"),
+        "en-ru": ("eng_Latn", "rus_Cyrl"),
+    }
+
     def __init__(self, models_dir: str):
         self.models_dir = models_dir
-        self.translation_tokenizers: dict = {}
-        self.translation_models: dict = {}
+        self.translation_tokenizer = None
+        self.translation_model = None
         self.embedding_model: SentenceTransformer = None
         self.clip_model: CLIPModel = None
         self.clip_processor: CLIPProcessor = None
-        self._status: dict = {}  # Статус загрузки каждой модели
+        self._status: dict = {}
 
-    # Загрузка всех моделей: создание директорий, загрузка переводчиков и эмбеддинга
+    # Загрузка всех моделей: создание директорий, загрузка переводчика и эмбеддинга
     def load_all(self):
         os.makedirs(self.models_dir, exist_ok=True)
         cache_dir = os.path.join(self.models_dir, "hf_cache")
         os.makedirs(cache_dir, exist_ok=True)
 
-        for direction, model_name in self.TRANSLATION_MODELS.items():
-            self._load_translation_model(direction, model_name, cache_dir)
-
+        self._load_translation_model(cache_dir)
         self._load_embedding_model(cache_dir)
         self._load_clip_model(cache_dir)
 
-    # Загрузка одной модели перевода: проверка кэша, скачивание при необходимости
-    def _load_translation_model(self, direction: str, model_name: str, cache_dir: str):
-        logger.info("Loading translation model [%s]: %s", direction, model_name)
+    # Загрузка модели перевода NLLB-200: проверка кэша, скачивание при необходимости
+    def _load_translation_model(self, cache_dir: str):
+        model_name = self.TRANSLATION_MODEL
+        logger.info("Loading translation model: %s", model_name)
         try:
-            local_dir = os.path.join(self.models_dir, direction.replace("-", "_"))
+            local_dir = os.path.join(self.models_dir, "nllb-200-distilled-600M")
             if os.path.isdir(local_dir):
                 logger.info("  Using cached model at: %s", local_dir)
-                tokenizer = AutoTokenizer.from_pretrained(local_dir, local_files_only=True)
-                model = AutoModelForSeq2SeqLM.from_pretrained(local_dir, local_files_only=True)
+                self.translation_tokenizer = AutoTokenizer.from_pretrained(
+                    local_dir, local_files_only=True,
+                    src_lang="eng_Latn",
+                )
+                self.translation_model = AutoModelForSeq2SeqLM.from_pretrained(
+                    local_dir, local_files_only=True,
+                    torch_dtype="float32",
+                )
             else:
                 logger.info("  Downloading from HuggingFace...")
-                tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=cache_dir)
-                model = AutoModelForSeq2SeqLM.from_pretrained(model_name, cache_dir=cache_dir)
+                self.translation_tokenizer = AutoTokenizer.from_pretrained(
+                    model_name, cache_dir=cache_dir,
+                    src_lang="eng_Latn",
+                )
+                self.translation_model = AutoModelForSeq2SeqLM.from_pretrained(
+                    model_name, cache_dir=cache_dir,
+                    torch_dtype="float32",
+                )
                 logger.info("  Saving to: %s", local_dir)
-                tokenizer.save_pretrained(local_dir)
-                model.save_pretrained(local_dir)
+                self.translation_tokenizer.save_pretrained(local_dir)
+                self.translation_model.save_pretrained(local_dir)
 
-            model.eval()
-            self.translation_tokenizers[direction] = tokenizer
-            self.translation_models[direction] = model
-            self._status[direction] = "loaded"
-            logger.info("  [OK] Translation model [%s] loaded", direction)
+            self.translation_model.eval()
+            self._status["nllb"] = "loaded"
+            logger.info("  [OK] Translation model loaded")
         except Exception as e:
-            logger.error("  [FAIL] Translation model [%s]: %s", direction, e)
-            self._status[direction] = f"error: {e}"
+            logger.error("  [FAIL] Translation model: %s", e)
+            self._status["nllb"] = f"error: {e}"
 
     # Загрузка модели эмбеддингов SentenceTransformer
     def _load_embedding_model(self, cache_dir: str):

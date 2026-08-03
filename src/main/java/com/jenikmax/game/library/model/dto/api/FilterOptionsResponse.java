@@ -13,6 +13,7 @@ public class FilterOptionsResponse {
     private List<String> platforms;
     private List<GenreItem> genres;
     private List<String> tags;
+    private List<TagItem> tagItems;
     private boolean semanticAvailable;
     private boolean recommendationsAvailable;
 
@@ -24,6 +25,8 @@ public class FilterOptionsResponse {
     public void setGenres(List<GenreItem> genres) { this.genres = genres; }
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
+    public List<TagItem> getTagItems() { return tagItems; }
+    public void setTagItems(List<TagItem> tagItems) { this.tagItems = tagItems; }
     public boolean isSemanticAvailable() { return semanticAvailable; }
     public void setSemanticAvailable(boolean semanticAvailable) { this.semanticAvailable = semanticAvailable; }
     public boolean isRecommendationsAvailable() { return recommendationsAvailable; }
@@ -38,6 +41,19 @@ public class FilterOptionsResponse {
 
         public GenreItem() {}
         public GenreItem(String code, String name) { this.code = code; this.name = name; }
+
+        public String getCode() { return code; }
+        public void setCode(String code) { this.code = code; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+    }
+
+    public static class TagItem {
+        private String code;
+        private String name;
+
+        public TagItem() {}
+        public TagItem(String code, String name) { this.code = code; this.name = name; }
 
         public String getCode() { return code; }
         public void setCode(String code) { this.code = code; }

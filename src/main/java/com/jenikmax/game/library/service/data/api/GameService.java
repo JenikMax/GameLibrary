@@ -7,6 +7,7 @@ import com.jenikmax.game.library.model.entity.enums.Genre;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Интерфейс сервиса для работы с данными игр.
@@ -32,6 +33,8 @@ public interface GameService {
 
     List<String> getTags();
 
+    Map<String, String> getTagLocalizedNames(Locale locale);
+
     List<Long> semanticSearchGameIds(String query, int limit);
 
     List<Long> filterGameIdsByCriteria(List<Long> candidateIds, List<String> selectedPlatforms, List<String> selectedYears, List<String> selectedGenres, List<String> selectedTags);
@@ -46,7 +49,7 @@ public interface GameService {
 
     int getMissingEmbeddingCount();
 
-    void ensureTagsExist(List<String> tagCodes);
+    Map<String, String> ensureTagsExist(List<String> tagCodes);
 
     List<Game> getGameList();
 

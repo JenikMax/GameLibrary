@@ -206,7 +206,7 @@
         <div v-for="tag in suggestedTags" :key="tag" class="flex align-items-center gap-2 mb-1">
           <Checkbox v-model="selectedSuggestedTags" :value="tag" :inputId="'stag-' + tag" />
           <label :for="'stag-' + tag">
-            <Tag :value="tag" severity="info" rounded />
+            <Tag :value="tagName(tag)" severity="info" rounded />
           </label>
         </div>
       </div>
@@ -315,6 +315,11 @@ const selectedSuggestedGenres = ref([])
 // Преобразует код жанра в локализованное название
 function genreName(code) {
   return libraryStore.genreMap[code] || code
+}
+
+// Преобразует код тега в локализованное название
+function tagName(code) {
+  return libraryStore.tagMap[code] || code
 }
 
 // Запрос к AI для авто-подбора тегов и жанров по описанию

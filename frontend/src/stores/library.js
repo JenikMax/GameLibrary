@@ -114,6 +114,15 @@ export const useLibraryStore = defineStore('library', () => {
     return map
   })
 
+  // Маппинг кодов тегов в локализованные названия для отображения
+  const tagMap = computed(() => {
+    const map = {}
+    for (const t of filterOptions.value.tagItems || []) {
+      map[t.code] = t.name
+    }
+    return map
+  })
+
   // Перезагрузка опций фильтра при смене языка
   const localeStore = useLocaleStore()
   watch(() => localeStore.locale, () => {
@@ -123,7 +132,7 @@ export const useLibraryStore = defineStore('library', () => {
   return {
     games, totalItems, totalPages, currentPage, loading,
     searchText, selectedPlatforms, selectedYears, selectedGenres, selectedTags,
-    sortField, sortType, favoritesOnly, semanticSearch, filterOptions, pageSize, viewMode, genreMap,
+    sortField, sortType, favoritesOnly, semanticSearch, filterOptions, pageSize, viewMode, genreMap, tagMap,
     fetchGames, fetchFilterOptions, setSearch, setFilters, setSort, resetFilters, setViewMode
   }
 })

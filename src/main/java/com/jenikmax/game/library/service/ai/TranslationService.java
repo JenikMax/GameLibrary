@@ -96,6 +96,56 @@ public class TranslationService {
         return translateText(cleanText, direction);
     }
 
+    /**
+     * Локализует название тега: определяет язык, переводит в EN/RU,
+     * генерирует нормализованный код из английского текста.
+     * Если AI недоступен — все поля заполняются исходным текстом.
+     */
+    public TagLocalization processTag(String rawInput) {
+        String input = rawInput.trim();
+        String direction = detectDirection(input);
+        boolean isRussian = "ru-en".equals(direction);
+
+        String enText, ruText;
+
+        if (isRussian) {
+            ruText = input;
+            enText = translateText(input, "ru-en");
+        } else {
+            enText = input;
+            ruText = translateText(input, "en-ru");
+        }
+
+        boolean aiAvailable = isAvailable();
+        String code;
+        if (aiAvailable) {
+            code = generateTagCode(enText);
+            if (code.isEmpty()) {
+                code = "tag_" + Integer.toHexString(input.hashCode());
+            }
+        } else {
+            code = input;
+        }
+
+        return new TagLocalization(code,
+                aiAvailable ? enText : input,
+                aiAvailable ? ruText : input);
+    }
+
+    /**
+     * Генерирует нормализованный код тега из английского текста:
+     * lowercase, пробелы и не-ASCII → подчёркивания, сжатие.
+     */
+    public static String generateTagCode(String text) {
+        if (text == null || text.isBlank()) return "";
+        return text.toLowerCase()
+                .replaceAll("[^a-z0-9]+", "_")
+                .replaceAll("_+", "_")
+                .replaceAll("^_|_$", "");
+    }
+
+    public record TagLocalization(String code, String description, String descriptionRu) {}
+
     private String detectDirection(String text) {
         long cyrillicLetters = 0;
         long latinLetters = 0;

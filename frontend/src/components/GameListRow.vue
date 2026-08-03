@@ -24,7 +24,7 @@
         <span v-if="game.genres?.length > 4" class="text-color-secondary text-xs">+{{ game.genres.length - 4 }}</span>
       </div>
       <div v-if="game.tags?.length" class="row-tags">
-        <Tag v-for="tag in game.tags.slice(0, 3)" :key="tag" :value="tag" severity="info" size="small" rounded />
+        <Tag v-for="tag in game.tags.slice(0, 3)" :key="tag" :value="tagName(tag)" severity="info" size="small" rounded />
         <span v-if="game.tags.length > 3" class="text-color-secondary text-xs">+{{ game.tags.length - 3 }}</span>
       </div>
     </div>
@@ -79,6 +79,10 @@ const favIcon = computed(() => {
 
 function genreName(code) {
   return libraryStore.genreMap[code] || code
+}
+
+function tagName(code) {
+  return libraryStore.tagMap[code] || code
 }
 
 function goToGame() {

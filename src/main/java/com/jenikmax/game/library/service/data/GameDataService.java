@@ -14,6 +14,7 @@ import com.jenikmax.game.library.model.entity.Screenshot;
 import com.jenikmax.game.library.model.entity.enums.Genre;
 import com.jenikmax.game.library.service.data.api.GameService;
 import com.jenikmax.game.library.service.ai.EmbeddingService;
+import com.jenikmax.game.library.service.ai.TranslationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
@@ -47,11 +48,12 @@ public class GameDataService implements GameService {
     private final ScreenshotRepository screenshotRepository;
     private final JdbcTemplate jdbcTemplate;
     private final EmbeddingService embeddingService;
+    private final TranslationService translationService;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, GameTagRepository gameTagRepository, ScreenshotRepository screenshotRepository, JdbcTemplate jdbcTemplate, EmbeddingService embeddingService) {
+    public GameDataService(SqlDao sqlDao, GameRepository gameRepository, GameGenreRepository gameGenreRepository, GameTagRepository gameTagRepository, ScreenshotRepository screenshotRepository, JdbcTemplate jdbcTemplate, EmbeddingService embeddingService, TranslationService translationService) {
         this.sqlDao = sqlDao;
         this.gameRepository = gameRepository;
         this.gameGenreRepository = gameGenreRepository;
@@ -59,6 +61,7 @@ public class GameDataService implements GameService {
         this.screenshotRepository = screenshotRepository;
         this.jdbcTemplate = jdbcTemplate;
         this.embeddingService = embeddingService;
+        this.translationService = translationService;
     }
 
 
@@ -292,19 +295,49 @@ public class GameDataService implements GameService {
     }
 
     /**
-     * Гарантирует существование указанных тегов в таблице game_tag (upsert).
+     * Возвращает Map code → localizedName для всех тегов из game_tag.
      */
-    public void ensureTagsExist(List<String> tagCodes) {
-        if (tagCodes == null || tagCodes.isEmpty()) return;
-        for (String code : tagCodes) {
-            if (code != null && !code.isBlank()) {
-                String trimmed = code.trim();
-                jdbcTemplate.update(
-                    "INSERT INTO library.game_tag (code, description, description_ru) VALUES (?, ?, ?) ON CONFLICT (code) DO NOTHING",
-                    trimmed, trimmed, trimmed
-                );
+    public Map<String, String> getTagLocalizedNames(Locale locale) {
+        String col = "ru".equals(locale.getLanguage()) ? "description_ru" : "description";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+                "SELECT code, " + col + " as name FROM library.game_tag");
+        Map<String, String> result = new LinkedHashMap<>();
+        for (Map<String, Object> row : rows) {
+            String code = (String) row.get("code");
+            String name = (String) row.get("name");
+            if (code != null) {
+                result.put(code, name != null ? name : code);
             }
         }
+        return result;
+    }
+
+    /**
+     * Гарантирует существование указанных тегов в таблице game_tag (upsert).
+     * Для новых тегов использует AI-перевод для заполнения description/description_ru.
+     * Возвращает Map rawInput → code для замены кодов в DTO.
+     */
+    public Map<String, String> ensureTagsExist(List<String> tagCodes) {
+        Map<String, String> codeMap = new LinkedHashMap<>();
+        if (tagCodes == null || tagCodes.isEmpty()) return codeMap;
+        for (String rawInput : tagCodes) {
+            if (rawInput == null || rawInput.isBlank()) continue;
+            String input = rawInput.trim();
+
+            TranslationService.TagLocalization loc = translationService.processTag(input);
+
+            boolean exists = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM library.game_tag WHERE code = ?",
+                    Integer.class, loc.code()) > 0;
+            if (!exists) {
+                jdbcTemplate.update(
+                        "INSERT INTO library.game_tag (code, description, description_ru) VALUES (?, ?, ?) ON CONFLICT (code) DO NOTHING",
+                        loc.code(), loc.description(), loc.descriptionRu());
+            }
+
+            codeMap.put(input, loc.code());
+        }
+        return codeMap;
     }
 
     // ─── helpers ───────────────────────────────────────────────────────────────

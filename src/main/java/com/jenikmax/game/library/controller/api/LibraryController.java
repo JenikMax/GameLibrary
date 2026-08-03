@@ -199,6 +199,9 @@ public class LibraryController {
                         messageSource.getMessage("enum.genre." + g.name(), null, g.getName(), locale)))
                 .collect(Collectors.toList()));
         options.setTags(tags);
+        options.setTagItems(libraryService.getTagLocalizedNames(locale).entrySet().stream()
+                .map(e -> new FilterOptionsResponse.TagItem(e.getKey(), e.getValue()))
+                .collect(Collectors.toList()));
         options.setSemanticAvailable(libraryService.isSemanticSearchAvailable());
         options.setRecommendationsAvailable(recommendationService.isAvailable());
 
@@ -356,11 +359,12 @@ public class LibraryController {
     @PostMapping("/{id}/analyze-screenshots")
     public ResponseEntity<ApiResponse<Map<String, Object>>> analyzeScreenshots(
             @PathVariable Long id,
-            @RequestParam(defaultValue = "10") int maxScreenshots) {
+            @RequestParam(defaultValue = "10") int maxScreenshots,
+            Locale locale) {
         if (!imageAnalysisService.isAvailable()) {
             return ResponseEntity.ok(ApiResponse.error("Vision model not available. CLIP model must be installed."));
         }
-        Map<String, Object> result = imageAnalysisService.analyzeGameScreenshots(id, maxScreenshots);
+        Map<String, Object> result = imageAnalysisService.analyzeGameScreenshots(id, maxScreenshots, locale);
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 

@@ -74,11 +74,13 @@
         </div>
 
         <!-- Теги через MultiSelect -->
-        <div class="field" v-if="options.tags && options.tags.length">
+        <div class="field" v-if="options.tagItems && options.tagItems.length">
           <label>{{ t('filter.tags') }}</label>
           <MultiSelect
             v-model="selectedTags"
-            :options="options.tags"
+            :options="options.tagItems"
+            optionLabel="name"
+            optionValue="code"
             :placeholder="t('filter.tags_placeholder')"
             filter
             display="chip"

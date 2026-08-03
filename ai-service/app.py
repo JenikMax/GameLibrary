@@ -110,7 +110,7 @@ async def health():
     )
 
 
-# Перевод текста (ru↔en) через MarianMT
+# Перевод текста (ru↔en) через NLLB-200
 @app.post("/translate", response_model=TranslateResponse)
 async def translate(req: TranslateRequest):
     if not translation_service or not translation_service.is_available():

@@ -8,7 +8,7 @@
         :key="tag"
         class="tag-chip flex align-items-center gap-1 px-2 py-1 border-round"
       >
-        {{ tag }}
+        {{ tagDisplay(tag) }}
         <i class="pi pi-times-circle tag-chip-remove" @click.stop="removeTag(tag)" />
       </span>
     </div>
@@ -55,7 +55,7 @@
           class="tag-dropdown-item px-2 py-1 cursor-pointer border-round"
           @click="selectTag(tag)"
         >
-          {{ tag }}
+          {{ tagDisplay(tag) }}
         </div>
         <div v-if="!filteredTags.length" class="px-2 py-1 text-color-secondary text-sm text-center">
           {{ emptyText }}
@@ -68,6 +68,7 @@
 <script setup>
 // Компонент ввода тегов: поддерживает добавление через Enter/кнопку, выбор из выпадающего списка с фильтрацией, удаление через крестик
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useLibraryStore } from '../stores/library'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 
@@ -81,19 +82,26 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+const libraryStore = useLibraryStore()
+
+function tagDisplay(code) {
+  return libraryStore.tagMap[code] || code
+}
+
 const newTag = ref('')
 const filterQuery = ref('')
 const showDropdown = ref(false)
 const containerRef = ref(null)
 
-// Фильтрация доступных тегов: исключаем уже выбранные, применяем текстовый поиск
+// Фильтрация доступных тегов: исключаем уже выбранные, применяем текстовый поиск (и по коду, и по локализованному названию)
 const filteredTags = computed(() => {
   const selected = new Set(props.modelValue || [])
   const q = filterQuery.value.toLowerCase().trim()
   return props.allTags.filter(tag => {
     if (selected.has(tag)) return false
-    if (q && !tag.toLowerCase().includes(q)) return false
-    return true
+    if (!q) return true
+    const display = libraryStore.tagMap[tag] || tag
+    return tag.toLowerCase().includes(q) || display.toLowerCase().includes(q)
   })
 })
 
