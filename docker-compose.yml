@@ -22,7 +22,7 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
-    restart: unless-stopped
+    restart: always
     mem_limit: 512m
 
   # ─── Spring Boot Backend ─────────────────────────────────
@@ -70,7 +70,7 @@ services:
         condition: service_healthy
       transmission:
         condition: service_started
-    restart: unless-stopped
+    restart: always
     mem_limit: 1024m
 
   # ─── AI-сервис (Python FastAPI) ──────────────────────────
@@ -91,8 +91,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 120s
-    restart: unless-stopped
-    mem_limit: 3072m  # PyTorch + модели (MarianMT×2 + e5 + CLIP ≈ 1.3GB, runtime buffer)
+    restart: always
+    mem_limit: 3072m  # PyTorch + модели (NLLB-200 + e5 ≈ 2.5GB, runtime buffer)
     cpu_shares: 512
 
   # ─── Frontend (Vue SPA → Nginx) ─────────────────────────
@@ -144,4 +144,4 @@ services:
       - LPD=true   # Локальное обнаружение пиров
       - PEX=true   # Обмен пирами через PEX
     mem_limit: 256m
-    restart: unless-stopped
+    restart: always

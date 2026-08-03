@@ -91,8 +91,8 @@ Semantic search & translation are powered by a separate Python AI service (`ai-s
 
 **AI models:**
 - Embedding (semantic search): [`intfloat/multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) — 384-dim vectors
-- Translation ru→en: [`Helsinki-NLP/opus-mt-ru-en`](https://huggingface.co/Helsinki-NLP/opus-mt-ru-en)
-- Translation en→ru: [`Helsinki-NLP/opus-mt-en-ru`](https://huggingface.co/Helsinki-NLP/opus-mt-en-ru)
+- Translation ru→en: [`facebook/nllb-200-distilled-600M`](https://huggingface.co/facebook/nllb-200-distilled-600M) — одна модель для обоих направлений (NLLB-200)
+- Translation en→ru: [`facebook/nllb-200-distilled-600M`](https://huggingface.co/facebook/nllb-200-distilled-600M)
 
 AI models are downloaded automatically from HuggingFace on first start. No manual setup required. Just run:
 
@@ -117,7 +117,7 @@ The `semantic search` toggle appears in the filter sidebar after the first scan/
 | Scraping | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
 | Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
 | Images | DB bytea + FS override, ETag + Cache-Control (24h), lazy loading |
-| AI / ML | Python AI service (FastAPI + PyTorch + HuggingFace), pgvector. Models: [`multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) (embeddings), [`opus-mt-ru-en`](https://huggingface.co/Helsinki-NLP/opus-mt-ru-en) + [`opus-mt-en-ru`](https://huggingface.co/Helsinki-NLP/opus-mt-en-ru) (translation) |
+| AI / ML | Python AI service (FastAPI + PyTorch + HuggingFace), pgvector. Models: [`multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) (embeddings), [`nllb-200-distilled-600M`](https://huggingface.co/facebook/nllb-200-distilled-600M) (translation ru↔en) |
 | Build | Maven (JAR) + npm / Vite |
 | Containerization | Docker, docker-compose (5 services) |
 
@@ -388,7 +388,7 @@ Each scraper provides localized `inputHintRu` / `inputHintEn` displayed as place
 | Resource | Minimum |
 |----------|---------|
 | CPU | 2 cores (Intel N4505 / ARM Cortex-A55 or better) |
-| RAM | 4 GB (Docker containers: postgres 512m + backend 1024m + ai-service 2048m + frontend 64m + transmission 256m) |
+| RAM | 4 GB (Docker containers: postgres 512m + backend 1024m + ai-service 3072m + frontend 64m + transmission 256m) |
 | Storage | 2 GB for app + AI models (auto-downloaded from HuggingFace on first start) + space for game library |
 | PostgreSQL | pgvector extension (`pgvector/pgvector:pg16` image) |
 
@@ -637,8 +637,8 @@ make all                      # сборка backend + frontend, запуск do
 
 **AI-модели:**
 - Embedding (семантический поиск): [`intfloat/multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) — 384-мерные векторы
-- Перевод ru→en: [`Helsinki-NLP/opus-mt-ru-en`](https://huggingface.co/Helsinki-NLP/opus-mt-ru-en)
-- Перевод en→ru: [`Helsinki-NLP/opus-mt-en-ru`](https://huggingface.co/Helsinki-NLP/opus-mt-en-ru)
+- Перевод ru→en: [`facebook/nllb-200-distilled-600M`](https://huggingface.co/facebook/nllb-200-distilled-600M) — одна модель для обоих направлений (NLLB-200)
+- Перевод en→ru: [`facebook/nllb-200-distilled-600M`](https://huggingface.co/facebook/nllb-200-distilled-600M)
 
 Модели скачиваются автоматически с HuggingFace при первом запуске. Никакой ручной настройки не требуется. Просто запустите:
 
@@ -663,7 +663,7 @@ docker compose up -d
 | Скрапинг | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
 | Rate Limiting | bucket4j 8.7.0 (in-memory token bucket, per-IP) |
 | Изображения | DB bytea + FS override, ETag + Cache-Control (24ч), lazy loading |
-| AI / ML | Python AI сервис (FastAPI + PyTorch + HuggingFace), pgvector. Модели: [`multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) (эмбеддинги), [`opus-mt-ru-en`](https://huggingface.co/Helsinki-NLP/opus-mt-ru-en) + [`opus-mt-en-ru`](https://huggingface.co/Helsinki-NLP/opus-mt-en-ru) (перевод) |
+| AI / ML | Python AI сервис (FastAPI + PyTorch + HuggingFace), pgvector. Модели: [`multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) (эмбеддинги), [`nllb-200-distilled-600M`](https://huggingface.co/facebook/nllb-200-distilled-600M) (перевод ru↔en) |
 | Сборка | Maven (JAR) + npm / Vite |
 | Контейнеризация | Docker, docker-compose (5 сервисов) |
 
@@ -934,7 +934,7 @@ cp .env.example .env   # отредактировать перед первым 
 | Ресурс | Минимум |
 |--------|---------|
 | CPU | 2 ядра (Intel N4505 / ARM Cortex-A55 или лучше) |
-| RAM | 4 ГБ (Docker-контейнеры: postgres 512m + backend 1024m + ai-service 2048m + frontend 64m + transmission 256m) |
+| RAM | 4 ГБ (Docker-контейнеры: postgres 512m + backend 1024m + ai-service 3072m + frontend 64m + transmission 256m) |
 | Диск | 2 ГБ (приложение + AI-модели, авто-загрузка с HuggingFace при первом запуске) + библиотека игр |
 | PostgreSQL | расширение pgvector (образ `pgvector/pgvector:pg16`) |
 
