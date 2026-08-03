@@ -33,7 +33,6 @@ public class TranslationService implements DisposableBean {
 
     private static final Logger log = LoggerFactory.getLogger(TranslationService.class);
     private static final Pattern SENTENCE_SPLIT = Pattern.compile("(?<=[.!?])\\s+(?=[A-ZА-ЯЁ0-9])");
-    private static final int TRANSLATE_BATCH_SIZE = 2;
 
     private final AiClient aiClient;
     private final AiConfig aiConfig;
@@ -223,8 +222,8 @@ public class TranslationService implements DisposableBean {
         task.total.set(total);
         tasks.put(taskId, task);
 
-        log.info("Translation task {} started for game {}: {} sentences, batch size {}", 
-                taskId, gameId, total, TRANSLATE_BATCH_SIZE);
+        log.info("Translation task {} started for game {}: {} sentences",
+                taskId, gameId, total);
 
         executor.submit(() -> doTranslate(task, sentences, direction, gameId));
 
@@ -255,8 +254,8 @@ public class TranslationService implements DisposableBean {
         task.total.set(total);
         tasks.put(taskId, task);
 
-        log.info("Translation task {} started for arbitrary text: {} sentences, batch size {}",
-                taskId, total, TRANSLATE_BATCH_SIZE);
+        log.info("Translation task {} started for arbitrary text: {} sentences",
+                taskId, total);
 
         executor.submit(() -> doTranslate(task, sentences, direction, null));
 
@@ -268,23 +267,13 @@ public class TranslationService implements DisposableBean {
             task.status = TranslateTask.Status.RUNNING;
             List<String> translatedParts = new ArrayList<>();
             int total = sentences.size();
-            int batchCount = (int) Math.ceil((double) total / TRANSLATE_BATCH_SIZE);
 
-            for (int i = 0, batchIdx = 0; i < total; i += TRANSLATE_BATCH_SIZE, batchIdx++) {
-                int end = Math.min(i + TRANSLATE_BATCH_SIZE, total);
-                List<String> batch = sentences.subList(i, end);
-                String batchText = String.join(" ", batch);
-                String batchResult = aiClient.translate(batchText, direction);
-
-                List<String> batchTranslated = splitSentences(batchResult);
-                if (batchTranslated.size() == batch.size()) {
-                    translatedParts.addAll(batchTranslated);
-                } else {
-                    translatedParts.add(batchResult);
-                }
-                task.done.set(end);
-                log.info("Translate progress [{}/{}] sentences, batch {}/{} for game {}",
-                        end, total, batchIdx + 1, batchCount, gameId != null ? gameId : "text");
+            for (int i = 0; i < total; i++) {
+                String translated = aiClient.translateSentence(sentences.get(i), direction);
+                translatedParts.add(translated);
+                task.done.incrementAndGet();
+                log.info("Translate progress [{}/{}] sentences for game {}",
+                        task.done.get(), total, gameId != null ? gameId : "text");
             }
 
             String result = String.join(" ", translatedParts);

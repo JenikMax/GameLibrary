@@ -85,6 +85,30 @@ public class AiClient {
     }
 
     /**
+     * Отправляет одно предложение на перевод. Возвращает оригинал при ошибке.
+     */
+    public String translateSentence(String text, String direction) {
+        try {
+            String body = objectMapper.writeValueAsString(new TranslateSentenceRequest(text, direction));
+            Request request = new Request.Builder()
+                    .url(aiConfig.getServiceUrl() + "/translate/sentence")
+                    .post(RequestBody.create(JSON, body))
+                    .build();
+            try (Response response = slowHttpClient.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    log.error("Sentence translation failed: HTTP {}", response.code());
+                    return text;
+                }
+                JsonNode json = objectMapper.readTree(response.body().string());
+                return json.get("translated").asText();
+            }
+        } catch (Exception e) {
+            log.error("Sentence translation request failed", e);
+            return text;
+        }
+    }
+
+    /**
      * Генерирует эмбеддинг для одного текста через AI-сервис.
      */
     public float[] embed(String text) {
@@ -232,6 +256,7 @@ public class AiClient {
     public record LabelMatch(String label, float score) {}
 
     private record TranslateRequest(String text, String direction) {}
+    private record TranslateSentenceRequest(String text, String direction) {}
     private record EmbedRequest(String text) {}
     private record EmbedBatchRequest(List<String> texts) {}
     private record VisionClassifyRequest(String image_base64, List<String> labels, int top_k) {}

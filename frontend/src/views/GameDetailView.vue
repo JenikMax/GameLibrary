@@ -117,10 +117,7 @@
             @click="toggleTranslation"
           />
         </div>
-        <ProgressBar v-if="translateState.running" :value="translatePercent" class="mb-2" style="height: 4px" />
-        <small v-if="translateState.running && translateState.total > 0" class="text-muted mb-1" style="display: block">
-          {{ translateState.done }} / {{ translateState.total }} {{ t('game.sentences') }}
-        </small>
+        <ProgressBar v-if="translateState.running" :value="translatePercent" :showValue="false" class="mb-2" style="height: 4px" />
         <Transition name="fade" mode="out-in">
           <p :key="showingTranslation ? 'translated' : 'original'" v-html="showingTranslation ? game.descriptionTranslated : game.description" class="description-text"></p>
         </Transition>

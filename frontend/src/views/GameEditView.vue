@@ -105,11 +105,8 @@
                       @click="translateDescription"
                     />
                   </div>
-                  <ProgressBar v-if="translateDescState.running" :value="translateDescPercent" class="mb-1" style="height: 4px" />
-                  <small v-if="translateDescState.running && translateDescState.total > 0" class="text-muted mb-1" style="display: block">
-                    {{ translateDescState.done }} / {{ translateDescState.total }} {{ t('game.sentences') }}
-                  </small>
-                <QuillEditor v-model:content="form.description" content-type="html"
+                  <ProgressBar v-if="translateDescState.running" :value="translateDescPercent" :showValue="false" class="mb-1" style="height: 4px" />
+                  <QuillEditor v-model:content="form.description" content-type="html"
                   :options="editorOptions" class="quill-editor"
                   style="height:250px;display:flex;flex-direction:column" />
               </div>
@@ -247,6 +244,7 @@ import { gamesApi } from '../api/games'
 import { useLocaleStore } from '../stores/locale'
 import { useLibraryStore } from '../stores/library'
 import ProgressSpinner from 'primevue/progressspinner'
+import ProgressBar from 'primevue/progressbar'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
 import InputText from 'primevue/inputtext'

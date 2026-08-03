@@ -62,6 +62,22 @@ class TranslationService:
             for ids in output_ids
         ]
 
+    # Перевод одного предложения без разбивки (для прогресс-бара)
+    def translate_sentence(self, text: str, direction: str) -> str:
+        tokenizer = self.model_loader.translation_tokenizer
+        model = self.model_loader.translation_model
+
+        if tokenizer is None or model is None:
+            raise ValueError("Translation model not loaded")
+
+        lang_codes = self.model_loader.LANG_CODES.get(direction)
+        if lang_codes is None:
+            raise ValueError(f"Unknown direction: {direction}")
+
+        src_lang, tgt_lang = lang_codes
+        text = _HTML_TAG.sub('', text).strip()
+        return self._translate_batch([text], src_lang, tgt_lang)[0]
+
     # Полный перевод текста: очистка HTML, разбивка, пакетный перевод, сборка
     def translate(self, text: str, direction: str) -> str:
         tokenizer = self.model_loader.translation_tokenizer

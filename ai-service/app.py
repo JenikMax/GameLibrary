@@ -64,6 +64,15 @@ class TranslateResponse(BaseModel):
     translated: str
 
 
+class TranslateSentenceRequest(BaseModel):
+    text: str
+    direction: str
+
+
+class TranslateSentenceResponse(BaseModel):
+    translated: str
+
+
 class EmbedRequest(BaseModel):
     text: str
 
@@ -120,6 +129,19 @@ async def translate(req: TranslateRequest):
         return TranslateResponse(translated=translated)
     except Exception as e:
         logger.error("Translation failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Перевод одного предложения (ru↔en) без разбивки
+@app.post("/translate/sentence", response_model=TranslateSentenceResponse)
+async def translate_sentence(req: TranslateSentenceRequest):
+    if not translation_service or not translation_service.is_available():
+        raise HTTPException(status_code=503, detail="Translation model not available")
+    try:
+        translated = translation_service.translate_sentence(req.text, req.direction)
+        return TranslateSentenceResponse(translated=translated)
+    except Exception as e:
+        logger.error("Sentence translation failed: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 
