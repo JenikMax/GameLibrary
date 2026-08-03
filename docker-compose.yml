@@ -92,7 +92,7 @@ services:
       retries: 3
       start_period: 120s
     restart: unless-stopped
-    mem_limit: 2048m  # PyTorch + модели занимают ~1.5GB RAM
+    mem_limit: 3072m  # PyTorch + модели (MarianMT×2 + e5 + CLIP ≈ 1.3GB, runtime buffer)
     cpu_shares: 512
 
   # ─── Frontend (Vue SPA → Nginx) ─────────────────────────

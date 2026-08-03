@@ -11,6 +11,8 @@ import com.jenikmax.game.library.service.api.LibraryService;
 import com.jenikmax.game.library.service.data.api.UserService;
 import com.jenikmax.game.library.service.ai.AutoTagService;
 import com.jenikmax.game.library.service.ai.TranslationService;
+import com.jenikmax.game.library.service.RecommendationService;
+import com.jenikmax.game.library.service.ImageAnalysisService;
 import com.jenikmax.game.library.service.scraper.ScraperConfigService;
 import com.jenikmax.game.library.service.scraper.api.ScrapInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,6 +59,8 @@ public class LibraryController {
     private final UserService userService;
     private final AutoTagService autoTagService;
     private final TranslationService translationService;
+    private final RecommendationService recommendationService;
+    private final ImageAnalysisService imageAnalysisService;
 
     public LibraryController(LibraryService libraryService,
                              ScreenshotRepository screenshotRepository,
@@ -67,6 +71,8 @@ public class LibraryController {
                              UserService userService,
                              AutoTagService autoTagService,
                              TranslationService translationService,
+                             RecommendationService recommendationService,
+                             ImageAnalysisService imageAnalysisService,
                              @Value("${game-library.images.directory:/gameLibrary/images}") String imagesDirectory) {
         this.libraryService = libraryService;
         this.screenshotRepository = screenshotRepository;
@@ -77,6 +83,8 @@ public class LibraryController {
         this.userService = userService;
         this.autoTagService = autoTagService;
         this.translationService = translationService;
+        this.recommendationService = recommendationService;
+        this.imageAnalysisService = imageAnalysisService;
         this.imagesDirectory = imagesDirectory;
     }
 
@@ -192,6 +200,7 @@ public class LibraryController {
                 .collect(Collectors.toList()));
         options.setTags(tags);
         options.setSemanticAvailable(libraryService.isSemanticSearchAvailable());
+        options.setRecommendationsAvailable(recommendationService.isAvailable());
 
         return ResponseEntity.ok(ApiResponse.ok(options));
     }
@@ -336,6 +345,32 @@ public class LibraryController {
         String text = body.getOrDefault("text", "");
         AutoTagService.AutoTagResult result = autoTagService.preview(text);
         return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
+    /**
+     * AI-анализ скриншотов игры через CLIP для предложения тегов и жанров.
+     * @param id идентификатор игры
+     * @param maxScreenshots максимальное количество скриншотов для анализа (по умолчанию 5)
+     * @return предложенные теги и жанры на основе анализа изображений
+     */
+    @PostMapping("/{id}/analyze-screenshots")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> analyzeScreenshots(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "5") int maxScreenshots) {
+        if (!imageAnalysisService.isAvailable()) {
+            return ResponseEntity.ok(ApiResponse.error("Vision model not available. CLIP model must be installed."));
+        }
+        Map<String, Object> result = imageAnalysisService.analyzeGameScreenshots(id, maxScreenshots);
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
+    /**
+     * Проверить доступность AI-анализа скриншотов (CLIP-модель).
+     * @return { available: true/false }
+     */
+    @GetMapping("/analyze-screenshots/available")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> analyzeScreenshotsAvailable() {
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("available", imageAnalysisService.isAvailable())));
     }
 
     /**

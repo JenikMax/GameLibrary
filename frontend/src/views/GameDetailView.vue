@@ -319,6 +319,38 @@
             </div>
           </div>
         </TabPanel>
+        <TabPanel v-if="aiAvailable">
+          <template #header>
+            <span>{{ t('recommendations.similar_ai') }}</span>
+            <Badge v-if="aiSimilar.length" :value="aiSimilar.length" severity="info" size="small" />
+          </template>
+          <div v-if="aiSimilarLoading" class="flex justify-content-center p-3">
+            <ProgressBar mode="indeterminate" style="max-width: 300px" />
+          </div>
+          <div v-else-if="aiSimilar.length > 0" class="related-strip">
+            <div
+              v-for="g in aiSimilar"
+              :key="g.id"
+              class="game-card-item"
+              @click="router.push('/game/' + g.id)"
+            >
+              <div class="game-card-img-wrap">
+                <img
+                  :src="'/game-library/api/images/games/' + g.id + '/logo'"
+                  :alt="g.name"
+                  class="game-card-img"
+                  loading="lazy"
+                  @error="$event.target.src = '/game-library/img/default.jpg'"
+                />
+              </div>
+              <span class="game-card-name">{{ g.name }}</span>
+              <small v-if="g.platform" class="text-muted">{{ g.platform }}</small>
+            </div>
+          </div>
+          <div v-else class="text-center p-3 text-muted">
+            {{ t('recommendations.no_similar') }}
+          </div>
+        </TabPanel>
       </TabView>
     </div>
 
@@ -362,6 +394,7 @@ import { useI18n } from '../composables/useI18n'
 import { useTheme } from '../composables/useTheme'
 import { useViewHistory } from '../composables/useViewHistory'
 import { gamesApi } from '../api/games'
+import { recommendationsApi } from '../api/recommendations'
 import CollectionPicker from '../components/CollectionPicker.vue'
 import Skeleton from 'primevue/skeleton'
 import ProgressBar from 'primevue/progressbar'
@@ -412,6 +445,9 @@ const comments = ref([])
 const commentsLoading = ref(false)
 const newCommentText = ref('')
 const related = ref({ sameGenre: [], sameSeries: [] }) // Похожие игры
+const aiSimilar = ref([]) // AI-похожие игры (content-based)
+const aiSimilarLoading = ref(false)
+const aiAvailable = ref(false)
 const reviews = ref([])
 const reviewsLoading = ref(false)
 const reviewsAggregated = ref(null) // Агрегированные средние оценки по категориям
@@ -496,6 +532,23 @@ async function loadRelated() {
   }
 }
 
+// Загрузка AI-похожих игр (content-based)
+async function loadAiSimilar() {
+  try {
+    const availRes = await recommendationsApi.checkAvailable()
+    aiAvailable.value = availRes.data.data?.available || false
+    if (aiAvailable.value) {
+      aiSimilarLoading.value = true
+      const res = await recommendationsApi.getSimilar(route.params.id, 10)
+      aiSimilar.value = res.data.data || []
+    }
+  } catch {
+    // silent
+  } finally {
+    aiSimilarLoading.value = false
+  }
+}
+
 // Загрузка отзывов и агрегированных оценок
 async function loadReviews() {
   reviewsLoading.value = true
@@ -537,6 +590,7 @@ onMounted(async () => {
     userRating.value = game.value.userRating || 0
     try { addToHistory(game.value) } catch {}
     loadRelated()
+    loadAiSimilar()
   } catch {
     // error handled by global axios interceptor
   } finally {

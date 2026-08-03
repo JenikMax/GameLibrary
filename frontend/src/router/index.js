@@ -14,6 +14,7 @@ import DownloadsView from '../views/DownloadsView.vue'
 import CollectionsView from '../views/CollectionsView.vue'
 import CollectionDetailView from '../views/CollectionDetailView.vue'
 import StatisticsView from '../views/StatisticsView.vue'
+import LibraryHealthView from '../views/LibraryHealthView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 
 // Определение маршрутов с мета-тегами для guards
@@ -95,6 +96,12 @@ const routes = [
     name: 'Downloads',
     component: DownloadsView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/health',
+    name: 'LibraryHealth',
+    component: LibraryHealthView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     // Catch-all для 404

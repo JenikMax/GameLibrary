@@ -35,23 +35,23 @@
         </div>
       </div>
 
-      <div v-if="history.length > 0" class="mb-3">
-        <h4 class="m-0 mb-2">{{ t('history.title') }}</h4>
+      <div v-if="recommended.length > 0" class="mb-3">
+        <h4 class="m-0 mb-2">{{ t('recommendations.title') }}</h4>
         <div class="history-strip">
           <div
-            v-for="g in history.slice(0, 12)"
+            v-for="g in recommended.slice(0, 10)"
             :key="g.id"
             class="history-item"
             @click="router.push(`/game/${g.id}`)"
           >
             <div class="history-img-wrapper glitch-trigger">
               <img
-                :src="g.logoUrl || '/game-library/api/images/games/' + g.id + '/logo'"
+                :src="'/game-library/api/images/games/' + g.id + '/logo'"
                 :alt="g.name"
                 class="history-img"
                 @error="$event.target.src = '/game-library/img/default.jpg'"
               />
-              <div class="glitch-overlay" :style="{ backgroundImage: `url(${g.logoUrl || '/game-library/api/images/games/' + g.id + '/logo'})` }"></div>
+              <div class="glitch-overlay" :style="{ backgroundImage: `url('/game-library/api/images/games/' + g.id + '/logo')` }"></div>
             </div>
             <span class="history-name">{{ g.name }}</span>
           </div>
@@ -137,9 +137,32 @@
             :totalRecords="store.totalItems"
             @page="onPageChange"
           />
+          </div>
+        </div>
+
+      <div v-if="history.length > 0" class="mt-4">
+        <h4 class="m-0 mb-2">{{ t('history.title') }}</h4>
+        <div class="history-strip">
+          <div
+            v-for="g in history.slice(0, 12)"
+            :key="g.id"
+            class="history-item"
+            @click="router.push(`/game/${g.id}`)"
+          >
+            <div class="history-img-wrapper glitch-trigger">
+              <img
+                :src="g.logoUrl || '/game-library/api/images/games/' + g.id + '/logo'"
+                :alt="g.name"
+                class="history-img"
+                @error="$event.target.src = '/game-library/img/default.jpg'"
+              />
+              <div class="glitch-overlay" :style="{ backgroundImage: `url(${g.logoUrl || '/game-library/api/images/games/' + g.id + '/logo'})` }"></div>
+            </div>
+            <span class="history-name">{{ g.name }}</span>
+          </div>
         </div>
       </div>
-    </main>
+      </main>
   </div>
 </template>
 
@@ -154,6 +177,7 @@ import { useTheme } from '../composables/useTheme'
 import { useViewHistory } from '../composables/useViewHistory'
 import { adminApi } from '../api/admin'
 import { gamesApi } from '../api/games'
+import { recommendationsApi } from '../api/recommendations'
 import { useToast } from 'primevue/usetoast'
 import GameCard from '../components/GameCard.vue'
 import GameListRow from '../components/GameListRow.vue'
@@ -199,6 +223,9 @@ const scanCurrentGame = ref('')
 const scanPhase = ref('')
 let scanPollTimer = null
 const filterRef = ref(null)
+const recommended = ref([])
+const recommendedLoading = ref(false)
+const recommendationsAvailable = ref(false)
 
 // Локализованная метка фазы сканирования
 const scanPhaseLabel = computed(() => {
@@ -252,7 +279,25 @@ function toggleSort(field) {
   store.fetchGames(1)
 }
 
+async function loadRecommended() {
+  if (!authStore.isAuthenticated) return
+  try {
+    const availRes = await recommendationsApi.checkAvailable()
+    if (availRes.data.data?.available) {
+      recommendationsAvailable.value = true
+      recommendedLoading.value = true
+      const res = await recommendationsApi.getForYou(10)
+      recommended.value = res.data.data || []
+    }
+  } catch {
+    // silent
+  } finally {
+    recommendedLoading.value = false
+  }
+}
+
 onMounted(async () => {
+  loadRecommended()
   await store.fetchFilterOptions()
   const saved = sessionStorage.getItem(LIBRARY_STATE_KEY)
   if (saved) {

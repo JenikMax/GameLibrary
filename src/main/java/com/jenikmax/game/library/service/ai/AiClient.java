@@ -9,7 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -142,7 +145,95 @@ public class AiClient {
         return result;
     }
 
+    /**
+     * Проверяет доступность vision-модели (CLIP) через /health.
+     */
+    public boolean isVisionAvailable() {
+        try {
+            Request request = new Request.Builder()
+                    .url(aiConfig.getServiceUrl() + "/health")
+                    .get()
+                    .build();
+            try (Response response = httpClient.newCall(request).execute()) {
+                if (!response.isSuccessful()) return false;
+                JsonNode json = objectMapper.readTree(response.body().string());
+                JsonNode models = json.get("models");
+                return models != null && "loaded".equals(models.get("clip").asText(""));
+            }
+        } catch (Exception e) {
+            log.debug("Vision model not available: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Классификация одного скриншота по текстовым меткам через CLIP.
+     */
+    public List<LabelMatch> classifyImage(byte[] imageBytes, List<String> labels, int topK) {
+        try {
+            String imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
+            String body = objectMapper.writeValueAsString(
+                    new VisionClassifyRequest(imageBase64, labels, topK));
+            Request request = new Request.Builder()
+                    .url(aiConfig.getServiceUrl() + "/vision/classify")
+                    .post(RequestBody.create(JSON, body))
+                    .build();
+            try (Response response = slowHttpClient.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    log.error("Vision classify failed: HTTP {}", response.code());
+                    return List.of();
+                }
+                JsonNode json = objectMapper.readTree(response.body().string());
+                List<LabelMatch> result = new ArrayList<>();
+                for (JsonNode match : json.get("matches")) {
+                    result.add(new LabelMatch(match.get("label").asText(), (float) match.get("score").asDouble()));
+                }
+                return result;
+            }
+        } catch (Exception e) {
+            log.error("Vision classify request failed", e);
+            return List.of();
+        }
+    }
+
+    /**
+     * Классификация нескольких скриншотов с агрегацией через CLIP.
+     */
+    public List<LabelMatch> classifyImagesMulti(List<byte[]> imagesBytes, List<String> labels, int topK) {
+        try {
+            List<String> imagesBase64 = new ArrayList<>();
+            for (byte[] img : imagesBytes) {
+                imagesBase64.add(Base64.getEncoder().encodeToString(img));
+            }
+            String body = objectMapper.writeValueAsString(
+                    new VisionClassifyMultiRequest(imagesBase64, labels, topK));
+            Request request = new Request.Builder()
+                    .url(aiConfig.getServiceUrl() + "/vision/classify-multi")
+                    .post(RequestBody.create(JSON, body))
+                    .build();
+            try (Response response = slowHttpClient.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    log.error("Vision multi-classify failed: HTTP {}", response.code());
+                    return List.of();
+                }
+                JsonNode json = objectMapper.readTree(response.body().string());
+                List<LabelMatch> result = new ArrayList<>();
+                for (JsonNode match : json.get("matches")) {
+                    result.add(new LabelMatch(match.get("label").asText(), (float) match.get("score").asDouble()));
+                }
+                return result;
+            }
+        } catch (Exception e) {
+            log.error("Vision multi-classify request failed", e);
+            return List.of();
+        }
+    }
+
+    public record LabelMatch(String label, float score) {}
+
     private record TranslateRequest(String text, String direction) {}
     private record EmbedRequest(String text) {}
     private record EmbedBatchRequest(List<String> texts) {}
+    private record VisionClassifyRequest(String image_base64, List<String> labels, int top_k) {}
+    private record VisionClassifyMultiRequest(List<String> images_base64, List<String> labels, int top_k) {}
 }

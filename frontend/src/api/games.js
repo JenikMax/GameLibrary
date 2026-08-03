@@ -97,5 +97,13 @@ export const gamesApi = {
   // Перевод произвольного текста
   translateText(text) {
     return api.post('/games/translate-text', { text })
+  },
+  // AI-анализ скриншотов через CLIP
+  analyzeScreenshots(id, maxScreenshots = 5) {
+    return api.post(`/games/${id}/analyze-screenshots`, null, { params: { maxScreenshots } })
+  },
+  // Проверка доступности анализа скриншотов
+  checkAnalyzeScreenshotsAvailable() {
+    return api.get('/games/analyze-screenshots/available', { skipToast: true })
   }
 }

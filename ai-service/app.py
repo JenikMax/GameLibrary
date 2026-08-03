@@ -1,5 +1,5 @@
 # FastAPI-приложение AI-сервиса GameLibrary
-# Предоставляет 4 эндпоинта: health, translate, embed, embed/batch
+# Предоставляет эндпоинты: health, translate, embed, embed/batch, vision/classify
 # Модели загружаются при старте приложения через lifespan-обработчик
 
 import logging
@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from model_loader import ModelLoader
 from translation_service import TranslationService
 from embedding_service import EmbeddingService
+from vision_service import VisionService
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -21,12 +22,13 @@ logger = logging.getLogger(__name__)
 model_loader: ModelLoader = None
 translation_service: TranslationService = None
 embedding_service: EmbeddingService = None
+vision_service: VisionService = None
 
 
 # Инициализация и завершение работы приложения
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global model_loader, translation_service, embedding_service
+    global model_loader, translation_service, embedding_service, vision_service
 
     models_dir = os.environ.get("MODELS_DIR", "/models")
     logger.info("Loading AI models from: %s", models_dir)
@@ -41,6 +43,7 @@ async def lifespan(app: FastAPI):
     # Инициализация сервисов перевода и эмбеддингов
     translation_service = TranslationService(model_loader)
     embedding_service = EmbeddingService(model_loader)
+    vision_service = VisionService(model_loader)
 
     yield
 
@@ -75,6 +78,22 @@ class EmbedBatchRequest(BaseModel):
 
 class EmbedBatchResponse(BaseModel):
     embeddings: list[list[float]]
+
+
+class VisionClassifyRequest(BaseModel):
+    image_base64: str
+    labels: list[str]
+    top_k: int = 10
+
+
+class VisionClassifyMultiRequest(BaseModel):
+    images_base64: list[str]
+    labels: list[str]
+    top_k: int = 10
+
+
+class VisionClassifyResponse(BaseModel):
+    matches: list[dict]
 
 
 class HealthResponse(BaseModel):
@@ -127,4 +146,30 @@ async def embed_batch(req: EmbedBatchRequest):
         return EmbedBatchResponse(embeddings=[e.tolist() for e in embeddings])
     except Exception as e:
         logger.error("Batch embedding failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Классификация скриншота по текстовым меткам через CLIP (zero-shot)
+@app.post("/vision/classify", response_model=VisionClassifyResponse)
+async def classify_image(req: VisionClassifyRequest):
+    if not vision_service or not vision_service.is_available():
+        raise HTTPException(status_code=503, detail="Vision model not available")
+    try:
+        matches = vision_service.classify(req.image_base64, req.labels, req.top_k)
+        return VisionClassifyResponse(matches=matches)
+    except Exception as e:
+        logger.error("Vision classification failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Классификация нескольких скриншотов с агрегацией результатов
+@app.post("/vision/classify-multi", response_model=VisionClassifyResponse)
+async def classify_images_multi(req: VisionClassifyMultiRequest):
+    if not vision_service or not vision_service.is_available():
+        raise HTTPException(status_code=503, detail="Vision model not available")
+    try:
+        matches = vision_service.classify_multi(req.images_base64, req.labels, req.top_k)
+        return VisionClassifyResponse(matches=matches)
+    except Exception as e:
+        logger.error("Vision multi-classify failed: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))

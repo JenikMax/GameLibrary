@@ -70,6 +70,16 @@
                     :loading="autoTagLoading"
                     @click="suggestTags"
                   />
+                  <Button
+                    :label="t('game.analyze_screenshots')"
+                    icon="pi pi-image"
+                    size="small"
+                    severity="info"
+                    text
+                    :loading="analyzeScreenshotsLoading"
+                    @click="analyzeGameScreenshots"
+                    v-if="analyzeScreenshotsAvailable"
+                  />
                 </div>
                 <TagInput
                   v-model="form.tags"
@@ -294,6 +304,8 @@ const allTags = ref([])
 
 const autoTagLoading = ref(false)
 const autoTagDialog = ref(false)
+const analyzeScreenshotsLoading = ref(false)
+const analyzeScreenshotsAvailable = ref(false)
 const translatingDesc = ref(false)
 const suggestedTags = ref([])
 const suggestedGenres = ref([])
@@ -325,6 +337,29 @@ async function suggestTags() {
     error.value = t('game.auto_tag_failed')
   } finally {
     autoTagLoading.value = false
+  }
+}
+
+// AI-анализ скриншотов через CLIP для предложения тегов и жанров
+async function analyzeGameScreenshots() {
+  analyzeScreenshotsLoading.value = true
+  try {
+    const res = await gamesApi.analyzeScreenshots(route.params.id)
+    const data = res.data.data
+    suggestedTags.value = (data.suggestedTags || []).filter(t => !form.value.tags.includes(t))
+    suggestedGenres.value = (data.suggestedGenres || []).filter(g => !form.value.genres.includes(g))
+
+    if (suggestedTags.value.length || suggestedGenres.value.length) {
+      selectedSuggestedTags.value = [...suggestedTags.value]
+      selectedSuggestedGenres.value = [...suggestedGenres.value]
+      autoTagDialog.value = true
+    } else {
+      autoTagDialog.value = false
+    }
+  } catch {
+    error.value = t('game.analyze_failed')
+  } finally {
+    analyzeScreenshotsLoading.value = false
   }
 }
 
@@ -430,6 +465,12 @@ onMounted(async () => {
     scrapeSources.value = sources
     if (sources.length > 0 && !scrape.value.source) {
       scrape.value.source = sources[0].value
+    }
+    try {
+      const availRes = await gamesApi.checkAnalyzeScreenshotsAvailable()
+      analyzeScreenshotsAvailable.value = availRes.data.data?.available || false
+    } catch {
+      analyzeScreenshotsAvailable.value = false
     }
   } finally {
     loading.value = false

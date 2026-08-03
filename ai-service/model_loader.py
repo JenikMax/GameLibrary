@@ -1,9 +1,10 @@
 # Загрузчик моделей HuggingFace с кэшированием на диск
-# Поддерживает 2 модели перевода (MarianMT ru-en, en-ru) и 1 модель эмбеддингов (multilingual-e5-small)
+# Поддерживает 2 модели перевода (MarianMT ru-en, en-ru), 1 модель эмбеддингов (multilingual-e5-small)
+# и 1 модель компьютерного зрения CLIP для анализа скриншотов
 import logging
 import os
 
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, CLIPModel, CLIPProcessor
 from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
@@ -16,12 +17,15 @@ class ModelLoader:
         "en-ru": "Helsinki-NLP/opus-mt-en-ru",
     }
     EMBEDDING_MODEL = "intfloat/multilingual-e5-small"
+    CLIP_MODEL = "openai/clip-vit-base-patch32"
 
     def __init__(self, models_dir: str):
         self.models_dir = models_dir
         self.translation_tokenizers: dict = {}
         self.translation_models: dict = {}
         self.embedding_model: SentenceTransformer = None
+        self.clip_model: CLIPModel = None
+        self.clip_processor: CLIPProcessor = None
         self._status: dict = {}  # Статус загрузки каждой модели
 
     # Загрузка всех моделей: создание директорий, загрузка переводчиков и эмбеддинга
@@ -34,6 +38,7 @@ class ModelLoader:
             self._load_translation_model(direction, model_name, cache_dir)
 
         self._load_embedding_model(cache_dir)
+        self._load_clip_model(cache_dir)
 
     # Загрузка одной модели перевода: проверка кэша, скачивание при необходимости
     def _load_translation_model(self, direction: str, model_name: str, cache_dir: str):
@@ -80,6 +85,30 @@ class ModelLoader:
         except Exception as e:
             logger.error("  [FAIL] Embedding model: %s", e)
             self._status["embedding"] = f"error: {e}"
+
+    # Загрузка CLIP модели для анализа изображений
+    def _load_clip_model(self, cache_dir: str):
+        logger.info("Loading CLIP model: %s", self.CLIP_MODEL)
+        try:
+            local_dir = os.path.join(self.models_dir, "clip-vit-base-patch32")
+            if os.path.isdir(local_dir):
+                logger.info("  Using cached model at: %s", local_dir)
+                self.clip_processor = CLIPProcessor.from_pretrained(local_dir, local_files_only=True)
+                self.clip_model = CLIPModel.from_pretrained(local_dir, local_files_only=True)
+            else:
+                logger.info("  Downloading from HuggingFace...")
+                self.clip_processor = CLIPProcessor.from_pretrained(self.CLIP_MODEL, cache_dir=cache_dir)
+                self.clip_model = CLIPModel.from_pretrained(self.CLIP_MODEL, cache_dir=cache_dir)
+                logger.info("  Saving to: %s", local_dir)
+                self.clip_processor.save_pretrained(local_dir)
+                self.clip_model.save_pretrained(local_dir)
+
+            self.clip_model.eval()
+            self._status["clip"] = "loaded"
+            logger.info("  [OK] CLIP model loaded")
+        except Exception as e:
+            logger.error("  [FAIL] CLIP model: %s", e)
+            self._status["clip"] = f"error: {e}"
 
     # Возвращает копию словаря статусов загрузки моделей
     def get_status(self) -> dict:

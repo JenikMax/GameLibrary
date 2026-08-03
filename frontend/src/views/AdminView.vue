@@ -97,6 +97,13 @@
               class="rt-btn-admin-link w-full"
               @click="$router.push('/admin/scrapers')"
             />
+            <Button
+              :label="t('admin.health_section')"
+              icon="pi pi-heart-fill"
+              severity="secondary"
+              class="rt-btn-admin-link w-full"
+              @click="$router.push('/health')"
+            />
           </div>
         </template>
       </Card>
