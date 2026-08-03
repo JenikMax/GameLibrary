@@ -47,7 +47,7 @@ public class RecommendationController {
 
     @GetMapping("/for-you")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getForYou(
-            @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(defaultValue = "12") int limit) {
         if (!recommendationService.isAvailable()) {
             return ResponseEntity.ok(ApiResponse.error("AI recommendations are not available"));
         }

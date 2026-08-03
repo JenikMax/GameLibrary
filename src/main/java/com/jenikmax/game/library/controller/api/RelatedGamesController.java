@@ -49,7 +49,7 @@ public class RelatedGamesController {
                 "where g.id != ? " +
                 "and dg.genre_code in (select genre_code from library.game_data_genre where game_id = ?) " +
                 "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date " +
-                "order by count(*) desc, g.name limit 6";
+                "order by count(*) desc, g.name limit 10";
         return sqlDao.executeShortGame(sql, new Object[]{gameId, gameId});
     }
 
@@ -86,7 +86,7 @@ public class RelatedGamesController {
                 "left join library.game_data_genre dg on dg.game_id = g.id " +
                 "where g.id != ? and g.name ilike ? " +
                 "group by g.id, g.create_ts, g.name, g.directory_path, g.platform, g.release_date " +
-                "order by g.name limit 6";
+                "order by g.name limit 10";
         return sqlDao.executeShortGame(sql, new Object[]{gameId, prefix + "%"});
     }
 

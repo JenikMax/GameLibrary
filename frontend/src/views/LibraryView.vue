@@ -39,7 +39,7 @@
         <h4 class="m-0 mb-2">{{ t('recommendations.title') }}</h4>
         <div class="history-strip">
           <div
-            v-for="g in recommended.slice(0, 10)"
+            v-for="g in recommended.slice(0, 12)"
             :key="g.id"
             class="history-item"
             @click="router.push(`/game/${g.id}`)"
@@ -286,7 +286,7 @@ async function loadRecommended() {
     if (availRes.data.data?.available) {
       recommendationsAvailable.value = true
       recommendedLoading.value = true
-      const res = await recommendationsApi.getForYou(10)
+      const res = await recommendationsApi.getForYou(12)
       recommended.value = res.data.data || []
     }
   } catch {
