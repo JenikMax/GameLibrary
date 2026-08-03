@@ -94,7 +94,19 @@ export const gamesApi = {
   translateGame(id) {
     return api.post(`/games/${id}/translate`)
   },
-  // Перевод произвольного текста
+  // Статус задачи перевода (polling)
+  translateGameStatus(id, taskId) {
+    return api.get(`/games/${id}/translate/status/${taskId}`)
+  },
+  // Асинхронный перевод произвольного текста
+  translateTextAsync(text) {
+    return api.post('/games/translate-text-async', { text })
+  },
+  // Статус задачи перевода текста (polling)
+  translateTextStatus(taskId) {
+    return api.get(`/games/translate-text/status/${taskId}`)
+  },
+  // Перевод произвольного текста (синхронный)
   translateText(text) {
     return api.post('/games/translate-text', { text })
   },

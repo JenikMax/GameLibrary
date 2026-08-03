@@ -92,19 +92,23 @@
                 />
               </div>
               <div class="field col-12">
-                <div class="flex align-items-center justify-content-between mb-1">
-                  <label for="description" class="m-0">{{ t('game.field.description') }}</label>
-                  <Button
-                    :label="t('game.translate_description')"
-                    icon="pi pi-language"
-                    size="small"
-                    severity="help"
-                    text
-                    class="rt-btn-muted"
-                    :loading="translatingDesc"
-                    @click="translateDescription"
-                  />
-                </div>
+                  <div class="flex align-items-center justify-content-between mb-1">
+                    <label for="description" class="m-0">{{ t('game.field.description') }}</label>
+                    <Button
+                      :label="t('game.translate_description')"
+                      icon="pi pi-language"
+                      size="small"
+                      severity="help"
+                      text
+                      class="rt-btn-muted"
+                      :loading="translateDescState.running"
+                      @click="translateDescription"
+                    />
+                  </div>
+                  <ProgressBar v-if="translateDescState.running" :value="translateDescPercent" class="mb-1" style="height: 4px" />
+                  <small v-if="translateDescState.running && translateDescState.total > 0" class="text-muted mb-1" style="display: block">
+                    {{ translateDescState.done }} / {{ translateDescState.total }} {{ t('game.sentences') }}
+                  </small>
                 <QuillEditor v-model:content="form.description" content-type="html"
                   :options="editorOptions" class="quill-editor"
                   style="height:250px;display:flex;flex-direction:column" />
@@ -308,7 +312,12 @@ const autoTagLoading = ref(false)
 const autoTagDialog = ref(false)
 const analyzeScreenshotsLoading = ref(false)
 const analyzeScreenshotsAvailable = ref(false)
-const translatingDesc = ref(false)
+const translateDescState = reactive({ running: false, taskId: null, done: 0, total: 0 })
+
+const translateDescPercent = computed(() => {
+  if (!translateDescState.total) return 0
+  return Math.round(translateDescState.done / translateDescState.total * 100)
+})
 const suggestedTags = ref([])
 const suggestedGenres = ref([])
 const selectedSuggestedTags = ref([])
@@ -536,17 +545,57 @@ function removeNewScreenshot(index) {
   newScreenshotPreviews.value.splice(index, 1)
 }
 
-// Перевод описания через AI-сервис
+// Перевод описания через AI-сервис (async с прогресс-баром)
 async function translateDescription() {
   if (!form.value.description) return
-  translatingDesc.value = true
+
+  translateDescState.running = true
+  translateDescState.done = 0
+  translateDescState.total = 0
+  translateDescState.taskId = null
+
+  let taskId = null
   try {
-    const res = await gamesApi.translateText(form.value.description)
-    form.value.description = res.data.data.translatedText
+    const res = await gamesApi.translateTextAsync(form.value.description)
+    const d = res.data.data
+
+    if (d.status === 'COMPLETED') {
+      form.value.description = d.translatedText || ''
+      translateDescState.running = false
+      return
+    }
+
+    taskId = d.taskId
+    translateDescState.taskId = taskId
+    translateDescState.total = d.total
+
+    const poll = async () => {
+      const statusRes = await gamesApi.translateTextStatus(taskId)
+      const s = statusRes.data.data
+
+      if (s.status === 'COMPLETED') {
+        translateDescState.done = s.done
+        translateDescState.total = s.total
+        form.value.description = s.translatedText || ''
+        translateDescState.running = false
+        return
+      }
+
+      if (s.status === 'FAILED') {
+        translateDescState.running = false
+        toast.add({ severity: 'error', summary: t('game.translate_failed'), life: 3000 })
+        return
+      }
+
+      translateDescState.done = s.done
+      translateDescState.total = s.total
+      setTimeout(poll, 300)
+    }
+
+    poll()
   } catch {
+    translateDescState.running = false
     toast.add({ severity: 'error', summary: t('game.translate_failed'), life: 3000 })
-  } finally {
-    translatingDesc.value = false
   }
 }
 

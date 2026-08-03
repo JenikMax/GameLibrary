@@ -112,12 +112,15 @@
             severity="secondary"
             text
             class="rt-btn-muted"
-            :loading="translating"
-            :disabled="translating"
+            :loading="translateState.running"
+            :disabled="translateState.running"
             @click="toggleTranslation"
           />
         </div>
-        <ProgressBar v-if="translating" mode="indeterminate" class="mb-2" style="height: 4px" />
+        <ProgressBar v-if="translateState.running" :value="translatePercent" class="mb-2" style="height: 4px" />
+        <small v-if="translateState.running && translateState.total > 0" class="text-muted mb-1" style="display: block">
+          {{ translateState.done }} / {{ translateState.total }} {{ t('game.sentences') }}
+        </small>
         <Transition name="fade" mode="out-in">
           <p :key="showingTranslation ? 'translated' : 'original'" v-html="showingTranslation ? game.descriptionTranslated : game.description" class="description-text"></p>
         </Transition>
@@ -464,7 +467,12 @@ const reviewsAggregated = ref(null) // Агрегированные средни
 const showReviewForm = ref(false)
 const userReview = ref(null) // Отзыв текущего пользователя (если есть)
 const showingTranslation = ref(false)
-const translating = ref(false)
+const translateState = reactive({ running: false, taskId: null, done: 0, total: 0 })
+
+const translatePercent = computed(() => {
+  if (!translateState.total) return 0
+  return Math.round(translateState.done / translateState.total * 100)
+})
 
 // Переключение избранного (сердечко)
 async function toggleFav() {
@@ -476,7 +484,7 @@ async function toggleFav() {
   }
 }
 
-// Переключение перевода описания ru↔en через AI-сервис
+// Переключение перевода описания ru↔en через AI-сервис (async с прогресс-баром)
 async function toggleTranslation() {
   if (showingTranslation.value) {
     showingTranslation.value = false
@@ -486,15 +494,59 @@ async function toggleTranslation() {
     showingTranslation.value = true
     return
   }
-  translating.value = true
+
+  translateState.running = true
+  translateState.done = 0
+  translateState.total = 0
+  translateState.taskId = null
+
+  let taskId = null
+  let gameId = game.value.id
+
   try {
-    const res = await gamesApi.translateGame(game.value.id)
-    game.value.descriptionTranslated = res.data.data.translatedText
-    showingTranslation.value = true
+    const res = await gamesApi.translateGame(gameId)
+    const d = res.data.data
+
+    if (d.status === 'COMPLETED') {
+      game.value.descriptionTranslated = d.translatedText || ''
+      showingTranslation.value = true
+      translateState.running = false
+      return
+    }
+
+    taskId = d.taskId
+    translateState.taskId = taskId
+    translateState.total = d.total
+
+    const poll = async () => {
+      const statusRes = await gamesApi.translateGameStatus(gameId, taskId)
+      const s = statusRes.data.data
+
+      if (s.status === 'COMPLETED') {
+        translateState.done = s.done
+        translateState.total = s.total
+        game.value.descriptionTranslated = s.translatedText || ''
+        showingTranslation.value = true
+        translateState.running = false
+        return
+      }
+
+      if (s.status === 'FAILED') {
+        translateState.running = false
+        toast.add({ severity: 'error', summary: t('game.translate_failed'), life: 3000 })
+        return
+      }
+
+      translateState.done = s.done
+      translateState.total = s.total
+
+      setTimeout(poll, 300)
+    }
+
+    poll()
   } catch {
+    translateState.running = false
     toast.add({ severity: 'error', summary: t('game.translate_failed'), life: 3000 })
-  } finally {
-    translating.value = false
   }
 }
 

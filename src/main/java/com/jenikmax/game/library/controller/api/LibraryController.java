@@ -378,18 +378,122 @@ public class LibraryController {
     }
 
     /**
-     * Перевести описание игры (авто-определение направления ru↔en).
+     * Запустить асинхронный перевод описания игры (авто-определение направления ru↔en).
      * Результат кэшируется в поле description_translated.
      * @param id идентификатор игры
-     * @return переведённый текст
+     * @return taskId, totalSentences и statusUrl для отслеживания прогресса;
+     *         если перевод уже закэширован — сразу translatedText
      */
     @PostMapping("/{id}/translate")
-    public ResponseEntity<ApiResponse<Map<String, String>>> translateDescription(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> translateDescription(@PathVariable Long id) {
         if (!translationService.isAvailable()) {
             return ResponseEntity.ok(ApiResponse.error("Translation models not installed. Run: bash scripts/download-models.sh"));
         }
-        String translated = translationService.translateAndCache(id);
-        return ResponseEntity.ok(ApiResponse.ok(Map.of("translatedText", translated)));
+
+        TranslationService.TranslateTaskInfo info = translationService.translateGameAsync(id);
+
+        Map<String, Object> data = new HashMap<>();
+        if ("COMPLETED".equals(info.status())) {
+            data.put("status", "COMPLETED");
+            data.put("done", info.totalSentences());
+            data.put("total", info.totalSentences());
+            data.put("translatedText", info.translatedText());
+            return ResponseEntity.ok(ApiResponse.ok(data));
+        }
+
+        data.put("taskId", info.taskId());
+        data.put("status", info.status());
+        data.put("done", 0);
+        data.put("total", info.totalSentences());
+        data.put("statusUrl", "/game-library/api/games/" + id + "/translate/status/" + info.taskId());
+        return ResponseEntity.accepted().body(ApiResponse.ok(data));
+    }
+
+    /**
+     * Получить статус задачи асинхронного перевода описания игры.
+     * @param id идентификатор игры
+     * @param taskId идентификатор задачи перевода
+     * @return статус, прогресс (done/total) и результат при завершении
+     */
+    @GetMapping("/{id}/translate/status/{taskId}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> translateStatus(@PathVariable Long id,
+                                                                             @PathVariable String taskId) {
+        TranslationService.TranslateTask task = translationService.getTranslateTask(taskId);
+        if (task == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("taskId", task.taskId);
+        data.put("status", task.status.name());
+        data.put("done", task.done.get());
+        data.put("total", task.total.get());
+        if (task.result != null) {
+            data.put("translatedText", task.result);
+        }
+        if (task.errorMessage != null) {
+            data.put("errorMessage", task.errorMessage);
+        }
+
+        return ResponseEntity.ok(ApiResponse.ok(data));
+    }
+
+    /**
+     * Запустить асинхронный перевод произвольного текста с прогрессом.
+     * @param body JSON с полем text
+     * @return taskId, totalSentences и statusUrl для polling'а
+     */
+    @PostMapping("/translate-text-async")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> translateTextAsync(@RequestBody Map<String, String> body) {
+        if (!translationService.isAvailable()) {
+            return ResponseEntity.ok(ApiResponse.error("Translation models not installed. Run: bash scripts/download-models.sh"));
+        }
+        String text = body.getOrDefault("text", "");
+
+        TranslationService.TranslateTaskInfo info = translationService.translateTextAsync(text);
+
+        Map<String, Object> data = new HashMap<>();
+        if ("COMPLETED".equals(info.status())) {
+            data.put("status", "COMPLETED");
+            data.put("done", info.totalSentences());
+            data.put("total", info.totalSentences());
+            data.put("translatedText", info.translatedText());
+            return ResponseEntity.ok(ApiResponse.ok(data));
+        }
+
+        data.put("taskId", info.taskId());
+        data.put("status", info.status());
+        data.put("done", 0);
+        data.put("total", info.totalSentences());
+        data.put("statusUrl", "/game-library/api/games/translate-text/status/" + info.taskId());
+        return ResponseEntity.accepted().body(ApiResponse.ok(data));
+    }
+
+    /**
+     * Получить статус задачи асинхронного перевода произвольного текста.
+     * @param taskId идентификатор задачи
+     * @return статус, прогресс (done/total) и результат при завершении
+     */
+    @GetMapping("/translate-text/status/{taskId}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> translateTextStatus(@PathVariable String taskId) {
+        TranslationService.TranslateTask task = translationService.getTranslateTask(taskId);
+        if (task == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("taskId", task.taskId);
+        data.put("status", task.status.name());
+        data.put("done", task.done.get());
+        data.put("total", task.total.get());
+        if (task.result != null) {
+            data.put("translatedText", task.result);
+        }
+        if (task.errorMessage != null) {
+            data.put("errorMessage", task.errorMessage);
+        }
+
+        return ResponseEntity.ok(ApiResponse.ok(data));
     }
 
     /**
