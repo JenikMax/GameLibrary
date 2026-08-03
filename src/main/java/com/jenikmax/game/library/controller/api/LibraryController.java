@@ -356,7 +356,7 @@ public class LibraryController {
     @PostMapping("/{id}/analyze-screenshots")
     public ResponseEntity<ApiResponse<Map<String, Object>>> analyzeScreenshots(
             @PathVariable Long id,
-            @RequestParam(defaultValue = "5") int maxScreenshots) {
+            @RequestParam(defaultValue = "10") int maxScreenshots) {
         if (!imageAnalysisService.isAvailable()) {
             return ResponseEntity.ok(ApiResponse.error("Vision model not available. CLIP model must be installed."));
         }

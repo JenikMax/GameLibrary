@@ -43,23 +43,38 @@ public class ImageAnalysisService {
     public Map<String, Object> analyzeGameScreenshots(Long gameId, int maxScreenshots) {
         List<byte[]> screenshots = loadScreenshotData(gameId, maxScreenshots);
         if (screenshots.isEmpty()) {
+            logger.info("Screenshot analysis for game {}: no screenshots found", gameId);
             return Map.of("suggestedTags", List.of(), "suggestedGenres", List.of(),
                     "message", "No screenshots found for this game");
         }
 
+        logger.info("Screenshot analysis for game {}: loaded {} screenshots ({} bytes total), labels: {}",
+                gameId, screenshots.size(),
+                screenshots.stream().mapToLong(b -> b.length).sum(),
+                buildLabelList().size());
+
         List<String> allLabels = buildLabelList();
+        logger.debug("Label list for game {}: {} genres + {} tags = {} total labels",
+                gameId, Genre.values().length, getTagCodes().size(), allLabels.size());
 
         List<AiClient.LabelMatch> matches;
         if (screenshots.size() == 1) {
+            logger.info("Screenshot analysis for game {}: using single-image classify", gameId);
             matches = aiClient.classifyImage(screenshots.get(0), allLabels, 10);
         } else {
+            logger.info("Screenshot analysis for game {}: using multi-image classify ({} images)", gameId, screenshots.size());
             matches = aiClient.classifyImagesMulti(screenshots, allLabels, 10);
         }
 
         if (matches.isEmpty()) {
+            logger.warn("Screenshot analysis for game {}: CLIP returned no matches", gameId);
             return Map.of("suggestedTags", List.of(), "suggestedGenres", List.of(),
                     "message", "Vision model returned no matches");
         }
+
+        logger.info("Screenshot analysis for game {}: CLIP returned {} matches: {}",
+                gameId, matches.size(),
+                matches.stream().map(m -> m.label() + "=" + m.score()).collect(Collectors.joining(", ")));
 
         List<String> suggestedTags = new ArrayList<>();
         List<String> suggestedGenres = new ArrayList<>();
@@ -115,6 +130,8 @@ public class ImageAnalysisService {
                                 logger.warn("Failed to read screenshot: {}", p, e);
                             }
                         });
+                logger.info("Screenshot analysis for game {}: loaded {} screenshots from filesystem (dir: {})",
+                        gameId, data.size(), gameDir);
             } catch (IOException e) {
                 logger.warn("Failed to list screenshot dir: {}", gameDir, e);
             }
@@ -124,6 +141,7 @@ public class ImageAnalysisService {
                     "SELECT source FROM library.game_screenshot WHERE game_id = ? LIMIT ?",
                     byte[].class, gameId, maxCount);
             data.addAll(dbImages);
+            logger.info("Screenshot analysis for game {}: loaded {} screenshots from database", gameId, data.size());
         }
         return data;
     }
