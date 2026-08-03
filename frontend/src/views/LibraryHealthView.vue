@@ -184,7 +184,7 @@ async function showIssueList(code) {
   background: var(--p-surface-100);
 }
 
-.app-dark .health-summary {
+[data-color-scheme="dark"] .health-summary {
   background: var(--p-surface-800);
 }
 
