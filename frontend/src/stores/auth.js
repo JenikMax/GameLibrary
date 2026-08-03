@@ -29,7 +29,23 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // Регистрация (без сохранения токена — пользователь должен войти)
+  async function refreshAccessToken() {
+    try {
+      const response = await authApi.refresh()
+      const data = response.data
+      if (data.success) {
+        token.value = data.data.token
+        user.value = data.data.user
+        localStorage.setItem('token', data.data.token)
+        localStorage.setItem('user', JSON.stringify(data.data.user))
+        return true
+      }
+    } catch {
+      // refresh failed
+    }
+    return false
+  }
+
   async function register(username, password) {
     const response = await authApi.register(username, password)
     const data = response.data
@@ -55,13 +71,18 @@ export const useAuthStore = defineStore('auth', () => {
     return false
   }
 
-  // Выход: очистка всех данных аутентификации
-  function logout() {
+  // Выход: очистка всех данных аутентификации и вызов API logout
+  async function logout() {
+    try {
+      await authApi.logout()
+    } catch {
+      // ignore
+    }
     token.value = ''
     user.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('user')
   }
 
-  return { user, token, isAuthenticated, isAdmin, username, userId, avatarUrl, login, register, checkAuth, logout }
+  return { user, token, isAuthenticated, isAdmin, username, userId, avatarUrl, login, register, checkAuth, logout, refreshAccessToken }
 })

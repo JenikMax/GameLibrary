@@ -26,6 +26,20 @@ const api = axios.create({
 const MAX_RETRIES = 1
 const RETRY_DELAY = 1000
 
+let isRefreshing = false
+let failedQueue = []
+
+function processQueue(error, token = null) {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
 // Перехватчик запросов: добавляет JWT-токен и язык
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
@@ -50,6 +64,49 @@ api.interceptors.response.use(
     if (!config) return Promise.reject(error)
 
     const status = error.response?.status
+    const url = config.url || ''
+    const isAuthUrl = url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/auth/refresh')
+
+    // При 401 (кроме auth-эндпоинтов) — пробуем refresh
+    if (status === 401 && !isAuthUrl && !config._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        }).then(token => {
+          config.headers.Authorization = `Bearer ${token}`
+          return api(config)
+        }).catch(err => Promise.reject(err))
+      }
+
+      isRefreshing = true
+      config._retry = true
+
+      try {
+        const { useAuthStore } = await import('../stores/auth.js')
+        const authStore = useAuthStore()
+        const refreshed = await authStore.refreshAccessToken()
+        if (refreshed) {
+          const newToken = localStorage.getItem('token')
+          processQueue(null, newToken)
+          config.headers.Authorization = `Bearer ${newToken}`
+          return api(config)
+        }
+        processQueue(new Error('refresh failed'))
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        window.location.href = '/game-library/login'
+        return Promise.reject(error)
+      } catch (refreshError) {
+        processQueue(refreshError)
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        window.location.href = '/game-library/login'
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
+    }
+
     const isGet = config.method === 'get' || config.method === 'GET'
     const isNetworkError = !error.response
     const isServerOrNetworkError = status >= 500 || isNetworkError
@@ -61,15 +118,7 @@ api.interceptors.response.use(
       return api(config)
     }
 
-    // При 401 (кроме логина/регистрации) — сброс токена и редирект
-    if (status === 401) {
-      const url = config.url || ''
-      if (!url.includes('/auth/login') && !url.includes('/auth/register')) {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        window.location.href = '/game-library/login'
-      }
-    } else if (config.skipToast !== true) {
+    if (config.skipToast !== true && status !== 401) {
       const message = getErrorMessage(error)
       window.dispatchEvent(new CustomEvent('api-error', { detail: message }))
     }

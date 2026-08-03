@@ -70,8 +70,8 @@ public class UserDataService implements UserService {
     }
 
     private void checkUserForm(RegistrationForm userForm) throws IllegalPassException,IllegalUsernameException{
-        if(userForm.getUsername() == null || userForm.getUsername().isEmpty()) throw new IllegalPassException("Incorrect Password");
-        if(userForm.getPassword() == null || userForm.getPassword().isEmpty()) throw new IllegalUsernameException("Incorrect Username");
+        if(userForm.getUsername() == null || userForm.getUsername().isEmpty()) throw new IllegalUsernameException("Incorrect Username");
+        if(userForm.getPassword() == null || userForm.getPassword().isEmpty()) throw new IllegalPassException("Incorrect Password");
         User checkUser = userRepository.findByUsername(userForm.getUsername());
         if(checkUser != null) throw new IllegalUsernameException("A user with the name " + userForm.getUsername() + " already exists. Contact your administrator.");
     }
@@ -93,7 +93,7 @@ public class UserDataService implements UserService {
 
     @Transactional
     public UserDto updateUserPass(UserDto user) {
-        if(user.getPass() == null && user.getPass().isEmpty()) throw new IllegalPassException("IncorrectPass");
+        if(user.getPass() == null || user.getPass().isEmpty()) throw new IllegalPassException("IncorrectPass");
         Optional<User> findResult = userRepository.findById(user.getId());
         if(!findResult.isPresent()) throw new IllegalArgumentException("UserNotFound");
         User currentUser = findResult.get();

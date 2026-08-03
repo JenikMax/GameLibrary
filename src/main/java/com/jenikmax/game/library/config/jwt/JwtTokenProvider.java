@@ -12,61 +12,90 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
-/**
- * Провайдер JWT-токенов: генерация, парсинг, валидация.
- * Использует HMAC-SHA (алгоритм выбирается по длине ключа).
- * Срок жизни токена — из конфигурации (по умолч. 24ч).
- */
 @Component
 public class JwtTokenProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-    /** Секретный ключ подписи JWT. */
     private final SecretKey key;
-    /** Время жизни токена в миллисекундах. */
-    private final long expirationMs;
+    private final long accessExpirationMs;
+    private final long refreshExpirationMs;
 
     public JwtTokenProvider(
             @Value("${game-library.jwt.secret}") String secret,
-            @Value("${game-library.jwt.expiration-ms:86400000}") long expirationMs) {
+            @Value("${game-library.jwt.access-expiration-ms:900000}") long accessExpirationMs,
+            @Value("${game-library.jwt.refresh-expiration-ms:604800000}") long refreshExpirationMs) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.expirationMs = expirationMs;
+        this.accessExpirationMs = accessExpirationMs;
+        this.refreshExpirationMs = refreshExpirationMs;
     }
 
-    /** Создать JWT-токен для аутентифицированного пользователя. */
-    public String generateToken(Authentication authentication) {
+    public String generateAccessToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return buildToken(userDetails.getUsername(), "ACCESS", accessExpirationMs);
+    }
+
+    public String generateRefreshToken(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return buildToken(userDetails.getUsername(), "REFRESH", refreshExpirationMs);
+    }
+
+    private String buildToken(String username, String type, long expirationMs) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
-                .subject(userDetails.getUsername())
+                .subject(username)
                 .issuedAt(now)
                 .expiration(expiryDate)
+                .claim("type", type)
+                .id(UUID.randomUUID().toString())
                 .signWith(key)
                 .compact();
     }
 
-    /** Извлечь имя пользователя из JWT-токена. */
-    public String getUsernameFromToken(String token) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+    @Deprecated
+    public String generateToken(Authentication authentication) {
+        return generateAccessToken(authentication);
     }
 
-    /** Проверить валидность JWT-токена (подпись + срок). */
+    public String generateAccessTokenInternal(String username) {
+        return buildToken(username, "ACCESS", accessExpirationMs);
+    }
+
+    public String getUsernameFromToken(String token) {
+        return parseClaims(token).getSubject();
+    }
+
+    public String getJtiFromToken(String token) {
+        return parseClaims(token).getId();
+    }
+
+    public String getTokenType(String token) {
+        return parseClaims(token).get("type", String.class);
+    }
+
+    public Date getExpirationFromToken(String token) {
+        return parseClaims(token).getExpiration();
+    }
+
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+            parseClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
             logger.warn("Невалидный JWT-токен: {}", ex.getMessage());
             return false;
         }
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }

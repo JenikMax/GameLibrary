@@ -587,7 +587,7 @@ async function translateDescription() {
 
       translateDescState.done = s.done
       translateDescState.total = s.total
-      setTimeout(poll, 300)
+      setTimeout(poll, 1000)
     }
 
     poll()

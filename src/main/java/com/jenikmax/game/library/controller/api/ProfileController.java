@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -43,6 +44,7 @@ public class ProfileController {
     private final FavoriteGameRepository favoriteGameRepository;
     private final GameCollectionRepository gameCollectionRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final PasswordEncoder passwordEncoder;
 
     public ProfileController(UserDataService userService,
                              UserRepository userRepository,
@@ -51,7 +53,8 @@ public class ProfileController {
                              GameCommentRepository gameCommentRepository,
                              FavoriteGameRepository favoriteGameRepository,
                              GameCollectionRepository gameCollectionRepository,
-                             JdbcTemplate jdbcTemplate) {
+                             JdbcTemplate jdbcTemplate,
+                             PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.gameRatingRepository = gameRatingRepository;
@@ -60,6 +63,7 @@ public class ProfileController {
         this.favoriteGameRepository = favoriteGameRepository;
         this.gameCollectionRepository = gameCollectionRepository;
         this.jdbcTemplate = jdbcTemplate;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -108,9 +112,15 @@ public class ProfileController {
     @PostMapping("/pass")
     public ResponseEntity<ApiResponse<Void>> changePassword(@Valid @RequestBody PasswordChangeRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        ShortUser currentUser = userService.getUserInfoByName(auth.getName());
+        User user = userRepository.findByUsername(auth.getName());
+        if (user == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Unauthorized"));
+        }
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Current password is incorrect"));
+        }
         UserDto userDto = new UserDto();
-        userDto.setId(currentUser.getId());
+        userDto.setId(user.getId());
         userDto.setPass(request.getNewPassword());
         try {
             userService.updateUserPass(userDto);

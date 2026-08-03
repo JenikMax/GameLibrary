@@ -119,14 +119,14 @@
         </div>
         <ProgressBar v-if="translateState.running" :value="translatePercent" :showValue="false" class="mb-2" style="height: 4px" />
         <Transition name="fade" mode="out-in">
-          <p :key="showingTranslation ? 'translated' : 'original'" v-html="showingTranslation ? game.descriptionTranslated : game.description" class="description-text"></p>
+          <p :key="showingTranslation ? 'translated' : 'original'" v-html="sanitizedDescription" class="description-text"></p>
         </Transition>
         <div v-if="trailerEmbedUrl" class="video-wrapper">
           <iframe :src="trailerEmbedUrl" frameborder="0" allowfullscreen></iframe>
         </div>
         <Divider v-if="game.instruction" />
         <h3 v-if="game.instruction">{{ t('game.instructions') }}</h3>
-        <p v-if="game.instruction" v-html="game.instruction" class="description-text"></p>
+        <p v-if="game.instruction" v-html="sanitizedInstruction" class="description-text"></p>
       </div>
     </div>
 
@@ -403,6 +403,7 @@ import { useLibraryStore } from '../stores/library'
 import { useI18n } from '../composables/useI18n'
 import { useTheme } from '../composables/useTheme'
 import { useViewHistory } from '../composables/useViewHistory'
+import { sanitizeHtml } from '../composables/useSanitizeHtml'
 import { gamesApi } from '../api/games'
 import { recommendationsApi } from '../api/recommendations'
 import CollectionPicker from '../components/CollectionPicker.vue'
@@ -471,6 +472,9 @@ const translatePercent = computed(() => {
   return Math.round(translateState.done / translateState.total * 100)
 })
 
+const sanitizedDescription = computed(() => sanitizeHtml(showingTranslation.value ? game.value?.descriptionTranslated : game.value?.description))
+const sanitizedInstruction = computed(() => sanitizeHtml(game.value?.instruction))
+
 // Переключение избранного (сердечко)
 async function toggleFav() {
   try {
@@ -537,7 +541,7 @@ async function toggleTranslation() {
       translateState.done = s.done
       translateState.total = s.total
 
-      setTimeout(poll, 300)
+      setTimeout(poll, 1000)
     }
 
     poll()

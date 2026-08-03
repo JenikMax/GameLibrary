@@ -61,6 +61,7 @@ public class LibraryController {
     private final TranslationService translationService;
     private final RecommendationService recommendationService;
     private final ImageAnalysisService imageAnalysisService;
+    private final String gamesDirectory;
 
     public LibraryController(LibraryService libraryService,
                              ScreenshotRepository screenshotRepository,
@@ -73,7 +74,8 @@ public class LibraryController {
                              TranslationService translationService,
                              RecommendationService recommendationService,
                              ImageAnalysisService imageAnalysisService,
-                             @Value("${game-library.images.directory:/gameLibrary/images}") String imagesDirectory) {
+                             @Value("${game-library.images.directory:/gameLibrary/images}") String imagesDirectory,
+                             @Value("${game-library.games.directory:/gameLibrary}") String gamesDirectory) {
         this.libraryService = libraryService;
         this.screenshotRepository = screenshotRepository;
         this.scraperConfigService = scraperConfigService;
@@ -86,6 +88,7 @@ public class LibraryController {
         this.recommendationService = recommendationService;
         this.imageAnalysisService = imageAnalysisService;
         this.imagesDirectory = imagesDirectory;
+        this.gamesDirectory = gamesDirectory;
     }
 
     /**
@@ -268,6 +271,10 @@ public class LibraryController {
             gameDto.setTrailerUrl(gameEdit.getTrailerUrl());
             gameDto.setGenres(gameEdit.getGenres() != null ? gameEdit.getGenres() : new ArrayList<>());
             gameDto.setTags(gameEdit.getTags() != null ? gameEdit.getTags() : existing.getTags());
+            if (!isValidDirectoryPath(gameEdit.getDirectoryPath())) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("Directory path must be inside the games library directory"));
+            }
             gameDto.setDirectoryPath(gameEdit.getDirectoryPath());
 
             // Handle logo: use new one if provided, else keep existing
@@ -611,5 +618,16 @@ public class LibraryController {
         if (auth == null || !auth.isAuthenticated()) return null;
         var userDto = userService.getUserInfoByName(auth.getName());
         return userDto != null ? userDto.getId() : null;
+    }
+
+    private boolean isValidDirectoryPath(String directoryPath) {
+        if (directoryPath == null || directoryPath.isEmpty()) return true;
+        try {
+            Path resolved = Paths.get(directoryPath).toRealPath();
+            Path gamesRoot = Paths.get(gamesDirectory, "games").toRealPath();
+            return resolved.startsWith(gamesRoot);
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

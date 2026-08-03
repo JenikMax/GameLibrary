@@ -8,8 +8,13 @@ export const authApi = {
   register(username, password) {
     return api.post('/auth/register', { username, password })
   },
-  // Получение данных текущего аутентифицированного пользователя
   me() {
     return api.get('/auth/me')
+  },
+  refresh() {
+    return api.post('/auth/refresh')
+  },
+  logout() {
+    return api.post('/auth/logout')
   }
 }

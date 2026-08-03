@@ -122,6 +122,9 @@ public class CommentController {
             return ResponseEntity.notFound().build();
         }
         GameComment comment = opt.get();
+        if (!comment.getGame().getId().equals(gameId)) {
+            return ResponseEntity.notFound().build();
+        }
         if (!userId.equals(comment.getUser().getId()) && !isAdmin()) {
             return ResponseEntity.status(403).body(ApiResponse.error("Forbidden"));
         }

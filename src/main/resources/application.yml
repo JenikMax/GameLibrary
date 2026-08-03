@@ -73,7 +73,8 @@ game-library:
     directory: ${IMAGES_DIRECTORY:/gameLibrary/images}   # Директория изображений
   jwt:
     secret: ${JWT_SECRET}                                # Секрет для подписи JWT
-    expiration-ms: ${JWT_EXPIRATION_MS:86400000}         # Время жизни токена (24ч)
+    access-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:900000}      # Время жизни access-токена (15 мин)
+    refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000} # Время жизни refresh-токена (7 дней)
   tracker:
     announce-base-url: ${TRACKER_ANNOUNCE_URL:http://localhost:8080/game-library/api/tracker/announce}
   transmission:

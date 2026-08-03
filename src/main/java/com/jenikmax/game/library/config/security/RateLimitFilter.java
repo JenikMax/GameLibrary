@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Фильтр ограничения запросов (rate limiting) на основе bucket4j.
  * Login: 5 запросов в минуту на IP+User-Agent.
- * API: 100 запросов в минуту на IP.
+ * API: 500 запросов в минуту на IP (через X-Forwarded-For / remoteAddr).
  * Возвращает HTTP 429 при превышении.
  */
 @Order(1799)
@@ -33,18 +33,19 @@ public class RateLimitFilter extends OncePerRequestFilter {
     /** Лимит для /api/auth/login: 5 запросов в минуту. */
     private static final int LOGIN_MAX_REQUESTS = 5;
     private static final Duration LOGIN_WINDOW = Duration.ofMinutes(1);
-    /** Глобальный лимит для /api/: 100 запросов в минуту на IP. */
-    private static final int GLOBAL_API_MAX = 100;
+    /** Глобальный лимит для /api/: 500 запросов в минуту на IP. */
+    private static final int GLOBAL_API_MAX = 500;
     private static final Duration GLOBAL_API_WINDOW = Duration.ofMinutes(1);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
         String path = request.getRequestURI();
+        String clientIp = getClientIp(request);
 
         // Лимит на логин — по IP + User-Agent
         if (path.contains("/api/auth/login")) {
-            String key = request.getRemoteAddr() + ":" + request.getHeader("User-Agent");
+            String key = clientIp + ":" + request.getHeader("User-Agent");
             Bucket bucket = buckets.computeIfAbsent("login:" + key, k ->
                     Bucket.builder()
                             .addLimit(Bandwidth.classic(LOGIN_MAX_REQUESTS, Refill.intervally(LOGIN_MAX_REQUESTS, LOGIN_WINDOW)))
@@ -60,14 +61,27 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         // Глобальный лимит API — по IP
         if (path.contains("/api/")) {
-            String key = request.getRemoteAddr();
-            Bucket bucket = buckets.computeIfAbsent("api:" + key, k ->
+            Bucket bucket = buckets.computeIfAbsent("api:" + clientIp, k ->
                     Bucket.builder()
                             .addLimit(Bandwidth.classic(GLOBAL_API_MAX, Refill.intervally(GLOBAL_API_MAX, GLOBAL_API_WINDOW)))
                             .build());
-            bucket.tryConsume(1);
+            if (!bucket.tryConsume(1)) {
+                logger.warn("Превышен глобальный лимит API: {}", clientIp);
+                response.setStatus(429);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"success\":false,\"message\":\"Too many requests. Try again in 1 minute.\"}");
+                return;
+            }
         }
 
         chain.doFilter(request, response);
+    }
+
+    private static String getClientIp(HttpServletRequest request) {
+        String xff = request.getHeader("X-Forwarded-For");
+        if (xff != null && !xff.isEmpty()) {
+            return xff.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 }
