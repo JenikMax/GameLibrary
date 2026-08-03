@@ -30,15 +30,6 @@
                 {{ info.count }}
               </span>
               <div class="flex flex-column gap-1">
-                <Button v-if="info.count > 0 && info.fixable"
-                  :label="t('health.fix_all')"
-                  icon="pi pi-wrench"
-                  severity="warn"
-                  size="small"
-                  @click="fixIssueType(code)"
-                  :loading="fixingCode === code"
-                  :disabled="!!fixingCode"
-                />
                 <Button v-if="info.count > 0"
                   :label="t('health.view_list')"
                   icon="pi pi-list"
@@ -66,19 +57,6 @@
               </template>
             </Column>
             <Column field="platform" :header="navItems.platform || 'Platform'" style="width: 120px" />
-            <Column v-if="currentIssueFixable" style="width: 80px">
-              <template #body="{ data }">
-                <Button
-                  :label="t('health.fix_single')"
-                  icon="pi pi-wrench"
-                  severity="warn"
-                  size="small"
-                  variant="outlined"
-                  @click="fixSingleGame(data.gameId)"
-                  :disabled="!!fixingCode"
-                />
-              </template>
-            </Column>
           </DataTable>
         </div>
         <div v-else-if="dialogLoading" class="flex justify-content-center p-5">
@@ -115,7 +93,6 @@ const toast = useToast()
 
 const report = ref(null)
 const loading = ref(true)
-const fixingCode = ref(null)
 const issueDialogVisible = ref(false)
 const issueDialogTitle = ref('')
 const issueGames = ref([])
@@ -126,12 +103,6 @@ const navItems = computed(() => ({
   name: t('game.name') || 'Name',
   platform: t('game.platform') || 'Platform'
 }))
-
-const currentIssueFixable = computed(() => {
-  if (!currentIssueType.value || !report.value) return false
-  const info = report.value.issueCounts[currentIssueType.value]
-  return info ? info.fixable : false
-})
 
 const scoreColorClass = computed(() => {
   if (!report.value) return ''
@@ -196,37 +167,6 @@ async function showIssueList(code) {
     issueGames.value = []
   } finally {
     dialogLoading.value = false
-  }
-}
-
-async function fixIssueType(code) {
-  fixingCode.value = code
-  try {
-    const res = await healthApi.fixIssueType(code)
-    const data = res.data.data
-    if (data.fixedCount > 0) {
-      toast.add({ severity: 'success', summary: t('health.fix_complete').replace('{n}', data.fixedCount), life: 3000 })
-    } else {
-      toast.add({ severity: 'info', summary: 'No games to fix', life: 2000 })
-    }
-    await loadReport()
-  } catch {
-    toast.add({ severity: 'error', summary: 'Fix failed', life: 3000 })
-  } finally {
-    fixingCode.value = null
-  }
-}
-
-async function fixSingleGame(gameId) {
-  if (!currentIssueType.value) return
-  try {
-    await healthApi.fixSingleGame(currentIssueType.value, gameId)
-    toast.add({ severity: 'success', summary: t('health.fix_complete').replace('{n}', 1), life: 2000 })
-    const res = await healthApi.getIssues(currentIssueType.value)
-    issueGames.value = res.data.data || []
-    await loadReport()
-  } catch {
-    toast.add({ severity: 'error', summary: 'Fix failed', life: 2000 })
   }
 }
 </script>

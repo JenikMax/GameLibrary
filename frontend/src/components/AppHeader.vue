@@ -226,6 +226,14 @@ const items = computed(() => {
           label: t('nav.scrapers'),
           icon: 'pi pi-cloud-download',
           command: () => router.push('/admin/scrapers')
+        },
+        {
+          separator: true
+        },
+        {
+          label: t('nav.health'),
+          icon: 'pi pi-heart-fill',
+          command: () => router.push('/health')
         }
       ]
     })

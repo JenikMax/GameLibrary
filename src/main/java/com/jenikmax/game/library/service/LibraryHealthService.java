@@ -1,9 +1,6 @@
 package com.jenikmax.game.library.service;
 
 import com.jenikmax.game.library.model.dto.api.LibraryHealthReport;
-import com.jenikmax.game.library.service.ai.AutoTagService;
-import com.jenikmax.game.library.service.ai.EmbeddingService;
-import com.jenikmax.game.library.service.ai.TranslationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,18 +17,9 @@ public class LibraryHealthService {
     private static final Logger logger = LoggerFactory.getLogger(LibraryHealthService.class);
 
     private final JdbcTemplate jdbc;
-    private final EmbeddingService embeddingService;
-    private final TranslationService translationService;
-    private final AutoTagService autoTagService;
 
-    public LibraryHealthService(JdbcTemplate jdbc,
-                                 EmbeddingService embeddingService,
-                                 TranslationService translationService,
-                                 AutoTagService autoTagService) {
+    public LibraryHealthService(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
-        this.embeddingService = embeddingService;
-        this.translationService = translationService;
-        this.autoTagService = autoTagService;
     }
 
     public LibraryHealthReport getHealthReport() {
@@ -45,16 +33,16 @@ public class LibraryHealthService {
                 "NO_GENRES", "No genres",
                 count("SELECT COUNT(DISTINCT gd.id) FROM library.game_data gd " +
                       "WHERE NOT EXISTS (SELECT 1 FROM library.game_data_genre dg WHERE dg.game_id = gd.id)"),
-                true));
+                false));
         counts.put("NO_DESCRIPTION", new LibraryHealthReport.IssueCount(
                 "NO_DESCRIPTION", "No description",
-                count("SELECT COUNT(*) FROM library.game_data WHERE description IS NULL OR LENGTH(COALESCE(description, '')) < 50"),
+                count("SELECT COUNT(*) FROM library.game_data WHERE description IS NULL OR description = '' OR description = 'N/A'"),
                 false));
         counts.put("NO_TAGS", new LibraryHealthReport.IssueCount(
                 "NO_TAGS", "No tags",
                 count("SELECT COUNT(DISTINCT gd.id) FROM library.game_data gd " +
                       "WHERE NOT EXISTS (SELECT 1 FROM library.game_data_tag dt WHERE dt.game_id = gd.id)"),
-                true));
+                false));
         counts.put("NO_SCREENSHOTS", new LibraryHealthReport.IssueCount(
                 "NO_SCREENSHOTS", "No screenshots",
                 count("SELECT COUNT(DISTINCT gd.id) FROM library.game_data gd " +
@@ -62,16 +50,16 @@ public class LibraryHealthService {
                 false));
         counts.put("NO_YEAR", new LibraryHealthReport.IssueCount(
                 "NO_YEAR", "No release year",
-                count("SELECT COUNT(*) FROM library.game_data WHERE release_date IS NULL OR release_date = ''"),
+                count("SELECT COUNT(*) FROM library.game_data WHERE release_date IS NULL OR release_date = '' OR release_date = 'N/A'"),
                 false));
         counts.put("NO_EMBEDDING", new LibraryHealthReport.IssueCount(
                 "NO_EMBEDDING", "No embedding",
                 count("SELECT COUNT(*) FROM library.game_data WHERE embedding IS NULL AND description IS NOT NULL AND LENGTH(description) >= 50"),
-                true));
+                false));
         counts.put("NO_TRANSLATION", new LibraryHealthReport.IssueCount(
                 "NO_TRANSLATION", "No translation",
                 count("SELECT COUNT(*) FROM library.game_data WHERE description_translated IS NULL AND description IS NOT NULL AND LENGTH(description) >= 50"),
-                true));
+                false));
         counts.put("PLACEHOLDER_DESC", new LibraryHealthReport.IssueCount(
                 "PLACEHOLDER_DESC", "Placeholder description",
                 count("SELECT COUNT(*) FROM library.game_data WHERE LOWER(COALESCE(description, '')) IN ('...', 'no description', '[no description]', 'описание отсутствует', 'n/a')"),
@@ -98,7 +86,7 @@ public class LibraryHealthService {
                 "ORDER BY gd.name LIMIT ? OFFSET ?";
             case "NO_DESCRIPTION" ->
                 "SELECT gd.id, gd.name, COALESCE(gd.platform, '') as platform FROM library.game_data gd " +
-                "WHERE description IS NULL OR LENGTH(COALESCE(description, '')) < 50 " +
+                "WHERE description IS NULL OR description = '' OR description = 'N/A' " +
                 "ORDER BY gd.name LIMIT ? OFFSET ?";
             case "NO_TAGS" ->
                 "SELECT gd.id, gd.name, COALESCE(gd.platform, '') as platform FROM library.game_data gd " +
@@ -110,7 +98,7 @@ public class LibraryHealthService {
                 "ORDER BY gd.name LIMIT ? OFFSET ?";
             case "NO_YEAR" ->
                 "SELECT gd.id, gd.name, COALESCE(gd.platform, '') as platform FROM library.game_data gd " +
-                "WHERE release_date IS NULL OR release_date = '' ORDER BY gd.name LIMIT ? OFFSET ?";
+                "WHERE release_date IS NULL OR release_date = '' OR release_date = 'N/A' ORDER BY gd.name LIMIT ? OFFSET ?";
             case "NO_EMBEDDING" ->
                 "SELECT gd.id, gd.name, COALESCE(gd.platform, '') as platform FROM library.game_data gd " +
                 "WHERE embedding IS NULL AND description IS NOT NULL AND LENGTH(description) >= 50 " +
@@ -137,140 +125,8 @@ public class LibraryHealthService {
                         rs.getString("platform"),
                         issueType,
                         null,
-                        isTypeFixable(issueType)),
+                        false),
                 limit, offset);
-    }
-
-    public int fixIssueType(String issueType) {
-        logger.info("Starting auto-fix for issue type: {}", issueType);
-        int fixed = 0;
-
-        try {
-            switch (issueType) {
-                case "NO_GENRES", "NO_TAGS": {
-                    List<Long> gameIds = jdbc.queryForList(
-                            "SELECT gd.id FROM library.game_data gd WHERE description IS NOT NULL AND LENGTH(COALESCE(description, '')) >= 50 " +
-                            (issueType.equals("NO_GENRES")
-                                ? "AND NOT EXISTS (SELECT 1 FROM library.game_data_genre dg WHERE dg.game_id = gd.id)"
-                                : "AND NOT EXISTS (SELECT 1 FROM library.game_data_tag dt WHERE dt.game_id = gd.id)"),
-                            Long.class);
-                    for (Long gameId : gameIds) {
-                        try {
-                            String description = jdbc.queryForObject(
-                                    "SELECT description FROM library.game_data WHERE id = ?", String.class, gameId);
-                            if (description != null && !description.isBlank()) {
-                                var result = autoTagService.suggest(description);
-                                if (!result.suggestedTags().isEmpty() || !result.suggestedGenres().isEmpty()) {
-                                    if (issueType.equals("NO_TAGS")) {
-                                        for (String tag : result.suggestedTags()) {
-                                            jdbc.update("INSERT INTO library.game_tag (code, description, description_ru) VALUES (?, ?, ?) ON CONFLICT (code) DO NOTHING",
-                                                    tag, tag, tag);
-                                            jdbc.update("INSERT INTO library.game_data_tag (game_id, tag_code) VALUES (?, ?) ON CONFLICT (game_id, tag_code) DO NOTHING",
-                                                    gameId, tag);
-                                        }
-                                    }
-                                    if (issueType.equals("NO_GENRES")) {
-                                        for (String genre : result.suggestedGenres()) {
-                                            jdbc.update("INSERT INTO library.game_data_genre (game_id, genre_code) VALUES (?, ?) ON CONFLICT (game_id, genre_code) DO NOTHING",
-                                                    gameId, genre);
-                                        }
-                                    }
-                                    fixed++;
-                                }
-                            }
-                        } catch (Exception e) {
-                            logger.warn("Failed to auto-tag game {}: {}", gameId, e.getMessage());
-                        }
-                    }
-                    break;
-                }
-                case "NO_EMBEDDING": {
-                    List<Long> gameIds = jdbc.queryForList(
-                            "SELECT id FROM library.game_data WHERE embedding IS NULL AND description IS NOT NULL AND LENGTH(description) >= 50",
-                            Long.class);
-                    for (Long gameId : gameIds) {
-                        try {
-                            embeddingService.generateAndStore(gameId);
-                            fixed++;
-                        } catch (Exception e) {
-                            logger.warn("Failed to generate embedding for game {}: {}", gameId, e.getMessage());
-                        }
-                    }
-                    break;
-                }
-                case "NO_TRANSLATION": {
-                    List<Long> gameIds = jdbc.queryForList(
-                            "SELECT id FROM library.game_data WHERE description_translated IS NULL AND description IS NOT NULL AND LENGTH(description) >= 50",
-                            Long.class);
-                    for (Long gameId : gameIds) {
-                        try {
-                            translationService.translateAndCache(gameId);
-                            fixed++;
-                        } catch (Exception e) {
-                            logger.warn("Failed to translate game {}: {}", gameId, e.getMessage());
-                        }
-                    }
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Auto-fix failed for issue type {}: {}", issueType, e.getMessage(), e);
-        }
-
-        logger.info("Auto-fix for {} complete: {} games fixed", issueType, fixed);
-        return fixed;
-    }
-
-    public int fixSingleGame(Long gameId, String issueType) {
-        try {
-            switch (issueType) {
-                case "NO_GENRES": {
-                    String description = jdbc.queryForObject(
-                            "SELECT description FROM library.game_data WHERE id = ?", String.class, gameId);
-                    if (description != null && !description.isBlank()) {
-                        var result = autoTagService.suggest(description);
-                        for (String genre : result.suggestedGenres()) {
-                            jdbc.update("INSERT INTO library.game_data_genre (game_id, genre_code) VALUES (?, ?) ON CONFLICT DO NOTHING",
-                                    gameId, genre);
-                        }
-                    }
-                    break;
-                }
-                case "NO_TAGS": {
-                    String description = jdbc.queryForObject(
-                            "SELECT description FROM library.game_data WHERE id = ?", String.class, gameId);
-                    if (description != null && !description.isBlank()) {
-                        var result = autoTagService.suggest(description);
-                        for (String tag : result.suggestedTags()) {
-                            jdbc.update("INSERT INTO library.game_tag (code, description, description_ru) VALUES (?, ?, ?) ON CONFLICT (code) DO NOTHING",
-                                    tag, tag, tag);
-                            jdbc.update("INSERT INTO library.game_data_tag (game_id, tag_code) VALUES (?, ?) ON CONFLICT DO NOTHING",
-                                    gameId, tag);
-                        }
-                    }
-                    break;
-                }
-                case "NO_EMBEDDING": {
-                    embeddingService.generateAndStore(gameId);
-                    break;
-                }
-                case "NO_TRANSLATION": {
-                    translationService.translateAndCache(gameId);
-                    break;
-                }
-            }
-            return 1;
-        } catch (Exception e) {
-            logger.warn("Failed to fix single game {} for {}: {}", gameId, issueType, e.getMessage());
-            return 0;
-        }
-    }
-
-    private boolean isTypeFixable(String issueType) {
-        return switch (issueType) {
-            case "NO_GENRES", "NO_TAGS", "NO_EMBEDDING", "NO_TRANSLATION" -> true;
-            default -> false;
-        };
     }
 
     private List<LibraryHealthReport.GameIssue> collectTopIssues(int totalGames) {
