@@ -150,12 +150,16 @@
       </div>
     </div>
 
-    <Divider v-if="related.sameGenre.length || related.sameSeries.length" />
-    <div v-if="related.sameGenre.length || related.sameSeries.length" class="related-section">
+    <Divider />
+    <div class="related-section">
       <h3>{{ t('game.related') }}</h3>
-        <div v-if="related.sameGenre.length" class="mb-3">
-          <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_genre') }}</h4>
-          <div class="related-strip">
+      <TabView>
+        <TabPanel>
+          <template #header>
+            <span>{{ t('game.related_genre') }}</span>
+            <Badge v-if="related.sameGenre.length" :value="related.sameGenre.length" severity="info" size="small" />
+          </template>
+          <div v-if="related.sameGenre.length" class="related-strip">
             <div v-for="g in related.sameGenre" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
               <div class="related-img-wrapper glitch-trigger">
                 <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" loading="lazy" @error="$event.target.src = '/game-library/img/default.jpg'" />
@@ -164,10 +168,14 @@
               <span class="related-name">{{ g.name }}</span>
             </div>
           </div>
-        </div>
-        <div v-if="related.sameSeries.length">
-          <h4 class="text-sm text-color-secondary mb-2">{{ t('game.related_series') }}</h4>
-          <div class="related-strip">
+          <div v-else class="text-center p-3 text-muted">{{ t('recommendations.no_similar') }}</div>
+        </TabPanel>
+        <TabPanel>
+          <template #header>
+            <span>{{ t('game.related_series') }}</span>
+            <Badge v-if="related.sameSeries.length" :value="related.sameSeries.length" severity="info" size="small" />
+          </template>
+          <div v-if="related.sameSeries.length" class="related-strip">
             <div v-for="g in related.sameSeries" :key="g.id" class="related-item" @click="router.push(`/game/${g.id}`)">
               <div class="related-img-wrapper glitch-trigger">
                 <img :src="'/game-library/api/images/games/' + g.id + '/logo'" :alt="g.name" class="related-img" loading="lazy" @error="$event.target.src = '/game-library/img/default.jpg'" />
@@ -176,7 +184,41 @@
               <span class="related-name">{{ g.name }}</span>
             </div>
           </div>
-        </div>
+          <div v-else class="text-center p-3 text-muted">{{ t('recommendations.no_similar') }}</div>
+        </TabPanel>
+        <TabPanel v-if="aiAvailable">
+          <template #header>
+            <span>{{ t('recommendations.similar_ai') }}</span>
+            <Badge v-if="aiSimilar.length" :value="aiSimilar.length" severity="info" size="small" />
+          </template>
+          <div v-if="aiSimilarLoading" class="flex justify-content-center p-3">
+            <ProgressBar mode="indeterminate" style="max-width: 300px" />
+          </div>
+          <div v-else-if="aiSimilar.length > 0" class="related-strip">
+            <div
+              v-for="g in aiSimilar"
+              :key="g.id"
+              class="related-item"
+              @click="router.push('/game/' + g.id)"
+            >
+              <div class="related-img-wrapper glitch-trigger">
+                <img
+                  :src="'/game-library/api/images/games/' + g.id + '/logo'"
+                  :alt="g.name"
+                  class="related-img"
+                  loading="lazy"
+                  @error="$event.target.src = '/game-library/img/default.jpg'"
+                />
+                <div class="glitch-overlay" :style="{ backgroundImage: `url(/game-library/api/images/games/${g.id}/logo)` }"></div>
+              </div>
+              <span class="related-name">{{ g.name }}</span>
+            </div>
+          </div>
+          <div v-else class="text-center p-3 text-muted">
+            {{ t('recommendations.no_similar') }}
+          </div>
+        </TabPanel>
+      </TabView>
     </div>
 
     <Divider />
@@ -317,38 +359,6 @@
                 @click="deleteComment(comment.id)"
               />
             </div>
-          </div>
-        </TabPanel>
-        <TabPanel v-if="aiAvailable">
-          <template #header>
-            <span>{{ t('recommendations.similar_ai') }}</span>
-            <Badge v-if="aiSimilar.length" :value="aiSimilar.length" severity="info" size="small" />
-          </template>
-          <div v-if="aiSimilarLoading" class="flex justify-content-center p-3">
-            <ProgressBar mode="indeterminate" style="max-width: 300px" />
-          </div>
-          <div v-else-if="aiSimilar.length > 0" class="related-strip">
-            <div
-              v-for="g in aiSimilar"
-              :key="g.id"
-              class="game-card-item"
-              @click="router.push('/game/' + g.id)"
-            >
-              <div class="game-card-img-wrap">
-                <img
-                  :src="'/game-library/api/images/games/' + g.id + '/logo'"
-                  :alt="g.name"
-                  class="game-card-img"
-                  loading="lazy"
-                  @error="$event.target.src = '/game-library/img/default.jpg'"
-                />
-              </div>
-              <span class="game-card-name">{{ g.name }}</span>
-              <small v-if="g.platform" class="text-muted">{{ g.platform }}</small>
-            </div>
-          </div>
-          <div v-else class="text-center p-3 text-muted">
-            {{ t('recommendations.no_similar') }}
           </div>
         </TabPanel>
       </TabView>
@@ -982,7 +992,6 @@ function onViewerKeydown(e) {
   margin-top: 1rem;
 }
 .related-section {
-  margin-top: 1rem;
 }
 .related-strip {
   display: flex;
