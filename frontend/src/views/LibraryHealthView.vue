@@ -38,9 +38,6 @@
                   variant="outlined"
                   @click="showIssueList(code)"
                 />
-                <span v-if="info.count > 0 && !info.fixable" class="text-xs text-muted">
-                  {{ t('health.needs_scraper') }}
-                </span>
               </div>
             </div>
           </template>
@@ -208,6 +205,11 @@ async function showIssueList(code) {
 
 .health-grid .p-card:hover {
   transform: translateY(-2px);
+}
+
+[data-theme="retro-terminal"] .health-grid .p-card,
+[data-theme="yellowed-crt"] .health-grid .p-card {
+  border-radius: 0;
 }
 
 .game-link {
