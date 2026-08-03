@@ -61,25 +61,27 @@
               <div class="field col-12">
                 <div class="flex align-items-center justify-content-between mb-1">
                   <label>{{ t('filter.tags') }}</label>
-                  <Button
-                    :label="t('game.auto_tag')"
-                    icon="pi pi-sparkles"
-                    size="small"
-                    severity="help"
-                    text
-                    :loading="autoTagLoading"
-                    @click="suggestTags"
-                  />
-                  <Button
-                    :label="t('game.analyze_screenshots')"
-                    icon="pi pi-image"
-                    size="small"
-                    severity="info"
-                    text
-                    :loading="analyzeScreenshotsLoading"
-                    @click="analyzeGameScreenshots"
-                    v-if="analyzeScreenshotsAvailable"
-                  />
+                  <div class="flex gap-1">
+                    <Button
+                      :label="t('game.auto_tag')"
+                      icon="pi pi-sparkles"
+                      size="small"
+                      severity="help"
+                      text
+                      :loading="autoTagLoading"
+                      @click="suggestTags"
+                    />
+                    <Button
+                      :label="t('game.analyze_screenshots')"
+                      icon="pi pi-image"
+                      size="small"
+                      severity="info"
+                      text
+                      :loading="analyzeScreenshotsLoading"
+                      @click="analyzeGameScreenshots"
+                      v-if="analyzeScreenshotsAvailable"
+                    />
+                  </div>
                 </div>
                 <TagInput
                   v-model="form.tags"
