@@ -98,8 +98,28 @@ Never create migration files — add new scripts to `postgresdb/ddl/` with the n
 - **Backend package:** `com.jenikmax.game.library` — all new code goes here or in sub-packages
 - **No code generation** — no OpenAPI codegen, protobuf, or GraphQL schemas
 
+## Системные требования
+
+Приложение рассчитано для работы на NAS серверах в локальной сети на слабых процессорах.
+
+### Минимальные (без AI)
+
+| Ресурс | Минимум |
+|--------|---------|
+| CPU | 1 ядро |
+| RAM | 2 ГБ (контейнеры: postgres 512m + backend 1024m + frontend 64m + transmission 256m) |
+| Диск | 100 МБ (приложение) + место под библиотеку игр |
+
+### С AI-фичами (рекомендуется)
+
+| Ресурс | Минимум |
+|--------|---------|
+| CPU | 2 ядра (Intel N4505 / ARM Cortex-A55 или лучше) |
+| RAM | 4 ГБ (контейнеры: postgres 512m + backend 1024m + ai-service 3072m + frontend 64m + transmission 256m) |
+| Диск | 2 ГБ (приложение + AI-модели) + место под библиотеку игр |
+
+Embedding inference: ~200-500ms/игру на 2-ядерном CPU. Перевод: ~1-5s/описание. Всё на CPU — GPU не требуется.
+
 ## Прочее
-- ** Приложение расчитано для работы на NAS серверах в локальной сети на слабых процессорах
-- ** Минимальные системные требования TODO
 - ** Бэкенд приложения не собирать
 - ** Отвечать в переписке на русском 

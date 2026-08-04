@@ -3,7 +3,15 @@
 > Полное руководство для тех, кто впервые запускает приложение.
 > Если что-то пошло не так — смотрите раздел [Типовые проблемы](#10-типовые-проблемы).
 
+<p align="center">
+  <a href="#ru">🇷🇺 Русский</a> &nbsp;|&nbsp; <a href="#en">🇬🇧 English</a>
+</p>
+
 ---
+
+<a name="ru"></a>
+
+# 🇷🇺 Русский
 
 ## 1. Что нужно для запуска
 
@@ -73,7 +81,7 @@ openssl rand -base64 32       # SCRAPER_ENCRYPTION_KEY
 ## 4. Создание структуры папок
 
 ```bash
-mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,tracker/{config,watch,complete,incomplete,torrents}}}
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,models,tracker/{config,watch,complete,incomplete,torrents}}}
 ```
 
 Результат:
@@ -85,6 +93,7 @@ mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers
 └── gameLibraryConfigs/
     ├── db/data/                    # файлы БД (создадутся сами)
     ├── scrapers/                   # scrapers-config.json
+    ├── models/                     # HuggingFace модели (если AI включён)
     └── tracker/
         ├── config/                 # settings.json Transmission
         ├── watch/                  # авто-подхват .torrent
@@ -301,3 +310,307 @@ docker compose logs -f
 | **uTP** | P2P-протокол (нужен для uTorrent) |
 | **JWT** | Токен авторизации |
 | **pgvector** | Расширение PostgreSQL для векторного поиска |
+
+---
+
+<a name="en"></a>
+
+# 🇬🇧 English
+
+## 1. Prerequisites
+
+| Software | Version | Purpose |
+|----------|---------|---------|
+| **Git** | any | download project |
+| **Docker** | 19.03+ | run containers |
+| **Docker Compose** | included in Docker | manage services |
+
+**Optional** (only if building manually): Java 25 (JDK), Maven 3.6+, Node.js 18+.
+
+Check what's installed:
+
+```bash
+git --version
+docker --version
+docker compose version
+```
+
+Install if missing:
+
+```bash
+# Ubuntu / Debian
+sudo apt install git docker.io docker-compose-v2
+
+# Windows — Docker Desktop: https://www.docker.com/products/docker-desktop/
+# macOS — Docker Desktop or: brew install --cask docker
+```
+
+---
+
+## 2. Get the project
+
+```bash
+git clone <repository-url>
+cd GameLibrary
+```
+
+---
+
+## 3. Configure secrets (.env)
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` and **fill in 4 required fields**:
+
+```
+POSTGRES_PASSWORD=your_postgres_password
+DB_PASSWORD=your_app_password
+JWT_SECRET=openssl rand -hex 32
+SCRAPER_ENCRYPTION_KEY=openssl rand -base64 32
+```
+
+Generate strong values:
+
+```bash
+openssl rand -hex 32          # for JWT_SECRET
+openssl rand -base64 32       # for SCRAPER_ENCRYPTION_KEY
+```
+
+> Don't use example passwords. At least 12 characters, letters + digits.
+
+---
+
+## 4. Create directory structure
+
+```bash
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,models,tracker/{config,watch,complete,incomplete,torrents}}}
+```
+
+Result:
+
+```
+/mnt/nas/gameLibrary/
+├── games/                          # put game folders here
+├── images/                         # covers and screenshots (auto-created)
+└── gameLibraryConfigs/
+    ├── db/data/                    # DB files (auto-created)
+    ├── scrapers/                   # scrapers-config.json
+    ├── models/                     # HuggingFace models (if AI enabled)
+    └── tracker/
+        ├── config/                 # Transmission settings.json
+        ├── watch/                  # auto-add .torrent
+        ├── complete/               # completed downloads
+        ├── incomplete/             # incomplete downloads
+        └── torrents/               # .torrent files from GameLibrary
+```
+
+**Windows (PowerShell):**
+
+```powershell
+mkdir D:\GameLibrary\games
+mkdir D:\GameLibrary\images
+mkdir D:\GameLibrary\gameLibraryConfigs\db\data
+mkdir D:\GameLibrary\gameLibraryConfigs\scrapers
+mkdir D:\GameLibrary\gameLibraryConfigs\tracker\config
+mkdir D:\GameLibrary\gameLibraryConfigs\tracker\watch
+mkdir D:\GameLibrary\gameLibraryConfigs\tracker\complete
+mkdir D:\GameLibrary\gameLibraryConfigs\tracker\incomplete
+mkdir D:\GameLibrary\gameLibraryConfigs\tracker\torrents
+```
+
+> Docker Desktop → Settings → Resources → File Sharing — add `D:\GameLibrary`.
+
+---
+
+## 5. Build & run
+
+### Option A: Quick (Makefile)
+
+```bash
+make all
+```
+
+### Option B: Step by step
+
+```bash
+# 1. Backend
+mvn clean package -DskipTests
+
+# 2. Frontend
+cd frontend && npm install && npm run build && cd ..
+
+# 3. Docker
+docker compose up --build -d
+```
+
+**If Maven/Node.js is not installed** — Docker builds everything inside containers with `docker compose up --build`.
+
+Verify:
+
+```bash
+docker compose ps
+```
+
+All 5 services should show `Up`:
+
+```
+NAME                      STATUS
+game-library-backend      Up
+game-library-frontend     Up
+game-library-db           Up
+game-library-ai-service   Up
+game-library-transmission Up
+```
+
+### Disabling the AI service (resource saving)
+
+If you don't need AI:
+
+1. Comment out the `ai-service:` block in `docker-compose.yml`
+2. Replace `pgvector/pgvector:pg16` with `postgres:16` in `postgresdb/Dockerfile` (optional)
+3. Restart: `docker compose up -d`
+
+Without ai-service everything works except: semantic search, ru↔en translation.
+
+---
+
+## 6. Verify it works
+
+Open in browser:
+
+```
+http://localhost:8090
+```
+
+On NAS or another computer — replace `localhost` with IP address:
+
+```
+http://192.168.1.100:8090
+```
+
+If the page doesn't open — check logs:
+
+```bash
+docker compose logs -f
+```
+
+---
+
+## 7. First login
+
+| Field | Value |
+|-------|-------|
+| Login | `admin` |
+| Password | `password` |
+
+**What to do immediately:**
+
+1. Change password: Profile → "Change Password"
+2. Users can self-register at `/register` or be created by admin
+
+---
+
+## 8. Add games
+
+### Option A: Scan filesystem
+
+Place games in platform folders:
+
+```
+/mnt/nas/gameLibrary/games/
+├── PC/
+│   ├── Half-Life 2/
+│   │   ├── hl2.exe
+│   │   └── ...
+│   └── Portal/
+│       └── ...
+├── PlayStation/
+│   └── ...
+└── Xbox/
+    └── ...
+```
+
+The game folder name becomes the library entry name.
+
+Then: Admin → Scan → "Start Scan".
+
+### Option B: Manually + scrape
+
+1. Go to `/game/0/edit` — game creation page
+2. Fill in name, platform, year
+3. Select a scraper → "Scrape" → description, genres, screenshots load automatically
+4. "Save"
+
+---
+
+## 9. Configure scrapers
+
+Some scrapers work without a key (Playground, Steam, World-Art, PsxDataCenter). IGDB and TheGamesDB require API keys.
+
+### IGDB (via Twitch)
+
+1. https://dev.twitch.tv/console/apps/create
+2. Create an app (OAuth Redirect: `http://localhost`)
+3. Copy **Client-ID**
+4. **New Secret** → copy **Client Secret**
+5. Get access token:
+   ```bash
+   curl -X POST "https://id.twitch.tv/oauth2/token?client_id=ID&client_secret=SECRET&grant_type=client_credentials"
+   ```
+6. Admin panel → `/admin/scrapers` → IGDB:
+   - `headers.Client-ID` = Client-ID
+   - `encryptedApiKey` = access_token from curl response
+
+### TheGamesDB
+
+1. https://thegamesdb.net/register.php → confirm email
+2. https://api.thegamesdb.net/key.php → copy key
+3. Admin panel → TheGamesDB → `encryptedApiKey`
+
+### PsxDataCenter
+
+No key required. Works for PS1 and PS2. Supports serial number search (SLUS-12345, SCES-54321).
+
+---
+
+## 10. Common issues
+
+| Symptom | Likely cause | Fix |
+|---------|-------------|-----|
+| `docker compose` not found | Old Docker | Use `docker-compose` (with hyphen) or update Docker |
+| Containers crash | Empty `.env` | Verify all 4 required variables are set |
+| Connection refused | Containers not running | `docker compose ps`, `docker compose logs -f` |
+| 403 Forbidden (API) | CORS | `.env` → `CORS_ALLOWED_ORIGINS=http://localhost` |
+| Can't open admin panel | Not admin | Login as `admin` / `password` |
+| Scraper finds nothing | No API key | Configure IGDB or TheGamesDB (section 9) |
+| Torrent stuck at 0% | uTP disabled | `settings.json` → `"preferred_transports": ["utp", "tcp"]` |
+| DB not initializing | CRLF in SQL | `git config core.autocrlf false` |
+| AI not working | Service not running | `docker compose ps` — is ai-service Up? |
+
+---
+
+## Important notes
+
+- **Change the admin password immediately** after first login
+- `.env` contains passwords — never commit it (already in `.gitignore`)
+- Port 8090 in use? — change `"8090:80"` in `docker-compose.yml`
+- After editing `.env`: `docker compose down && docker compose up -d`
+
+---
+
+## Glossary
+
+| Term | Meaning |
+|------|---------|
+| **Backend** | Java server — handles requests, works with DB |
+| **Frontend** | Vue.js web interface in the browser |
+| **Docker** | Containerization system |
+| **Docker Compose** | Tool to run multiple containers |
+| **Scraper** | Program that collects game info from websites |
+| **Transmission** | Torrent client for game seeding |
+| **PostgreSQL** | Database |
+| **uTP** | P2P protocol (required for uTorrent) |
+| **JWT** | Authorization token |
+| **pgvector** | PostgreSQL extension for vector search |
