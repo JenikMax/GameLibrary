@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <b>RU:</b> Каталогизатор компьютерных игр для NAS — сканирование файловой системы, сбор метаданных из 7 скраперов, просмотр и скачивание через P2P-торренты.
-  <br>
   <b>EN:</b> Game catalog manager for NAS — filesystem scanning, metadata from 7 scrapers, browse & download via P2P torrents.
+  <br>
+  <b>RU:</b> Каталогизатор компьютерных игр для NAS — сканирование файловой системы, сбор метаданных из 7 скраперов, просмотр и скачивание через P2P-торренты.
 </p>
 
 <p align="center">
@@ -19,22 +19,332 @@
 </p>
 
 <p align="center">
-  <a href="#ru">🇷🇺 Русский</a> &nbsp;|&nbsp; <a href="#en">🇬🇧 English</a>
+  <a href="#en">🇬🇧 English</a> &nbsp;|&nbsp; <a href="#ru">🇷🇺 Русский</a>
 </p>
 
 <p align="center">
-  <a href="#-возможности">Возможности</a> &nbsp;•&nbsp;
-  <a href="#-быстрый-старт">Быстрый старт</a> &nbsp;•&nbsp;
-  <a href="docs/INSTRUCTION.md">Инструкция</a> &nbsp;•&nbsp;
+  <a href="#-features">Features</a> &nbsp;•&nbsp;
+  <a href="#-quick-start">Quick Start</a> &nbsp;•&nbsp;
+  <a href="docs/INSTRUCTION.md">Instruction</a> &nbsp;•&nbsp;
   <a href="docs/API.md">API</a> &nbsp;•&nbsp;
-  <a href="#-технологический-стек">Стек</a> &nbsp;•&nbsp;
-  <a href="#-архитектура">Архитектура</a> &nbsp;•&nbsp;
-  <a href="#-конфигурация">Конфигурация</a> &nbsp;•&nbsp;
-  <a href="#-скраперы">Скраперы</a> &nbsp;•&nbsp;
-  <a href="#-развёртывание">Развёртывание</a>
+  <a href="#-tech-stack">Tech Stack</a> &nbsp;•&nbsp;
+  <a href="#-architecture">Architecture</a> &nbsp;•&nbsp;
+  <a href="#-configuration">Configuration</a> &nbsp;•&nbsp;
+  <a href="#-scrapers">Scrapers</a> &nbsp;•&nbsp;
+  <a href="#-deployment">Deployment</a>
 </p>
 
 ---
+
+<a name="en"></a>
+
+# 🇬🇧 English
+
+## ✨ Features
+
+| For users | For admins |
+|-----------|-----------|
+| Game grid with posters & filters | Filesystem scanning & auto-indexing |
+| Search by name, platform, genre, year | Metadata scraping (7 scrapers) |
+| Sorting & pagination | Game editor with Quill rich text |
+| ZIP download (<5 GB) / .torrent download (≥5 GB) | User management (roles, block, reset password) |
+| P2P seeding via Transmission | Scraper config panel (API keys, enable/disable) |
+| | 🖥️ Admin dashboard (library state, scan progress, disk usage) |
+| Profile, avatar, password change | |
+| Russian / English UI | |
+| ⭐ Rating 1-10 per game | |
+| ❤️ Favorites collection with filter | |
+| 🌓 Dark mode (system-preference auto-detect, manual toggle) | |
+| 🖥️ 4 visual themes (default light/dark, retro terminal, yellowed CRT) | |
+| 💬 Comments on game pages | |
+| 🔔 Notifications (torrent ready, scan done, etc.) | |
+| 👁 View history (last 20, localStorage) | |
+| 🔗 Related games (same genre or similar name) | |
+| 📊 Statistics dashboard (charts by platform/genre/year, top lists) | |
+| 📂 Game collections (playlists, public/private, reorder) | |
+| 📝 Detailed reviews (gameplay/graphics/story/music scores 1-10, pros/cons) | |
+| 🏷️ Tags (custom labels, filter in sidebar) | |
+| 🧠 Smart collections (server-side rules evaluation, auto-matched games) | |
+| 🔍 Semantic search (vector search by description meaning, Python AI + pgvector) | |
+| 🌐 Translation ru↔en (game descriptions via Python AI, cached in DB) | |
+| 🏷️ Auto-tagging (keyword-based tag & genre suggestions from description) | |
+| 🧠 AI recommendations (personalized game suggestions) | |
+| 🖼️ Screenshot auto-tagging (AI analysis of game screenshots) | |
+
+
+## ⚡ Quick Start
+
+```bash
+cp .env.example .env          # set secrets first
+make all                      # builds backend + frontend, starts docker-compose
+```
+
+Open `http://localhost:8090` — login as `admin` / `password`.
+
+> 📖 **Step-by-step guide** — [docs/INSTRUCTION.md](docs/INSTRUCTION.md)
+> 📋 **API Reference** — [docs/API.md](docs/API.md)
+
+### AI Features (Optional)
+
+Semantic search & translation are powered by a separate Python AI service (`ai-service`). Auto-tagging works without AI.
+
+**AI models** (auto-downloaded from HuggingFace on first start):
+- Embedding: [`intfloat/multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) — 384-dim vectors
+- Translation: [`facebook/nllb-200-distilled-600M`](https://huggingface.co/facebook/nllb-200-distilled-600M) — single model for both directions
+
+If you don't need AI — comment out the `ai-service:` block in `docker-compose.yml` (saves ~2 GB RAM and ~2 GB disk).
+
+## 📦 Tech Stack
+
+| Component | Technology |
+|-----------|-----------|
+| Backend | Spring Boot 4.0.7, Java 25, Virtual Threads (Project Loom) |
+| Frontend | Vue 3 + Vite 5, PrimeVue 4, Pinia, VueQuill (Quill 2) |
+| Database | PostgreSQL 16 (schema `library`) + pgvector |
+| ORM / JDBC | Hibernate, Spring Data JPA, HikariCP |
+| REST API | Spring MVC, JWT + form login |
+| API Docs | Swagger UI at `/game-library/swagger-ui.html` |
+| Downloads | ZIP (STORED, no compression) + BitTorrent via Transmission |
+| P2P Tracker | Built-in HTTP tracker at `/api/tracker/announce` |
+| Scraping | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
+| Rate Limiting | bucket4j 8.7.0 (in-memory per-IP token bucket) |
+| Images | DB bytea + FS override, ETag + Cache-Control (24h), lazy loading |
+| AI / ML | Python FastAPI, PyTorch, HuggingFace |
+| Containerization | Docker, docker-compose (5 services) |
+
+## 🏗 Architecture
+
+<p align="center">
+  <img src="docs/img/schema(eng).png" alt="GameLibrary Architecture" width="800">
+</p>
+
+### Frontend Routes
+
+| URL | Access | Description |
+|-----|--------|-------------|
+| `/login` | all | Login form |
+| `/register` | all | Registration |
+| `/` | USER, ADMIN | Library grid — filters, sorting, pagination |
+| `/game/:id` | USER, ADMIN | Game detail page |
+| `/game/:id/edit` | ADMIN | Editor + scraping panel |
+| `/profile` | USER | Profile (avatar, password, stats) |
+| `/admin/users` | ADMIN | User management |
+| `/admin/scrapers` | ADMIN | Scraper config (API keys, on/off) |
+| `/downloads` | USER, ADMIN | Transmission seeding status |
+| `/statistics` | USER, ADMIN | Statistics dashboard |
+| `/collections` | USER, ADMIN | Game collections |
+| `/collections/:id` | USER, ADMIN | Collection detail |
+
+## 🔧 Configuration
+
+### Filesystem Layout
+
+```
+<games_directory>/games/
+└── <platform>/                       (e.g. PC, PlayStation, Xbox)
+    └── <game_name>/
+        ├── <game files>...
+        └── information/              (created during scan)
+            ├── logo.jpg              (poster)
+            ├── information.json      (name, year, genres, description, trailer)
+            └── img/                  (screenshots .jpg)
+```
+
+### Environment Variables
+
+#### Required (no defaults — must be set in `.env`)
+
+| Variable | Description |
+|----------|-------------|
+| `POSTGRES_PASSWORD` | PostgreSQL superuser password |
+| `DB_PASSWORD` | PostgreSQL application user (`library-manager-user`) password |
+| `JWT_SECRET` | JWT signing secret (`openssl rand -hex 32`) |
+| `SCRAPER_ENCRYPTION_KEY` | AES-256 base64 key for scraper API key encryption (`openssl rand -base64 32`) |
+
+#### Optional (with defaults)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SERVER_PORT` | `8080` | Backend port |
+| `DB_HOST` | `localhost` | PostgreSQL host |
+| `DB_PORT` | `5432` | PostgreSQL port |
+| `GAMES_DIRECTORY` | `/gameLibrary` | Game files root |
+| `IMAGES_DIRECTORY` | `/gameLibrary/images` | Images on filesystem |
+| `TRACKER_ANNOUNCE_URL` | `http://localhost:8080/game-library/api/tracker/announce` | Announce URL in .torrent files |
+| `TRANSMISSION_RPC_URL` | `http://transmission:9091/transmission/rpc` | Transmission RPC endpoint |
+| `TRANSMISSION_DOWNLOAD_DIR` | `/downloads` | Download dir in Transmission container |
+| `CORS_ALLOWED_ORIGINS` | *(empty — same-origin only)* | Allowed CORS origins (comma-separated) |
+| `AI_SERVICE_URL` | `http://ai-service:8000` | Python AI service endpoint |
+| `JWT_EXPIRATION_MS` | `86400000` | Token TTL (24 hours) |
+| `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Directory with `scrapers-config.json` |
+| `RESET_PASSWORD_DEFAULT` | *(auto-generated)* | Override default password for admin password-reset |
+
+### Database Schema
+
+Schema `library`:
+
+| Table | Purpose |
+|-------|---------|
+| `game_data` | Games (name, platform, description, embedding vector(384), size) |
+| `game_genre` | Genre dictionary (~70 entries) |
+| `game_data_genre` | M:N game ↔ genre |
+| `game_screenshot` | Screenshots (bytea) |
+| `game_rating` | Ratings 1-10 (unique user+game) |
+| `favorite_game` | User favorites |
+| `game_comment` | Comments |
+| `notification` | Notifications |
+| `game_collection` | Collections (regular + smart) |
+| `game_collection_entry` | M:N collection ↔ game |
+| `game_tag` | Tag dictionary |
+| `game_data_tag` | M:N game ↔ tag |
+| `game_review` | Reviews (4 category scores 1-10, pros/cons) |
+| `library_user` | Users (BCrypt, roles) |
+
+DDL: `postgresdb/ddl/` — execute at first container start in alphabetical order.
+
+## 🔒 Security
+
+All credentials are externalized via `.env` (`.env` is in `.gitignore` — **never commit it**).
+
+| Secret | Path |
+|--------|------|
+| `POSTGRES_PASSWORD` | `.env` → docker-compose → postgres |
+| `DB_PASSWORD` | `.env` → docker-compose → backend → `application.yml` |
+| `JWT_SECRET` | `.env` → docker-compose → backend → JWT signing |
+| `SCRAPER_ENCRYPTION_KEY` | `.env` → docker-compose → backend → AES-256 scraper key encryption |
+
+- JWT access token (15 min) + refresh token (7 days), refresh handled silently by Axios interceptor
+- Rate limiting: login 5 req/min (IP+User-Agent), API 100 req/min (IP) → HTTP 429
+- DB password never stored in `application.yml` in plaintext
+- Admin password reset: `SecureRandom` generates 8-byte base64 password
+
+## 🕷 Scrapers
+
+Config: `${SCRAPER_CONFIG_DIR}/scrapers-config.json`, managed via `/api/admin/scraper-config`.
+
+| Scraper | Method | Auth | What it scrapes |
+|---------|--------|------|----------------|
+| **Playground** (playground.ru) | CSS selectors + search API | — | Name, description, genres, screenshots |
+| **Igromania** (igromania.ru) | JSON Path | — | Game data via `initialStoreState` |
+| **Steam** (store.steampowered.com) | Storefront API | — | Name, description, screenshots, genres |
+| **IGDB** (api.igdb.com) | REST API | Twitch OAuth 2.0 | Full metadata |
+| **TheGamesDB** (api.thegamesdb.net) | REST API | API key | Full metadata (1000 req/month) |
+| **World-Art** (world-art.ru) | CSS selectors | — | Card parsing + search |
+| **PsxDataCenter** (psxdatacenter.com) | JSoup (HTML parsing) | — | PS1/PS2: description, genres, screenshots, serial number |
+
+### IGDB Setup
+
+1. Create app at https://dev.twitch.tv/console/apps/create
+2. Copy **Client-ID**, create **Client Secret**
+3. Get access token:
+   ```bash
+   curl -X POST "https://id.twitch.tv/oauth2/token?client_id=ID&client_secret=SECRET&grant_type=client_credentials"
+   ```
+4. Admin panel (`/admin/scrapers`) → IGDB → `headers.Client-ID` and `encryptedApiKey`
+
+### TheGamesDB Setup
+
+1. Register at https://thegamesdb.net/register.php
+2. Get key at https://api.thegamesdb.net/key.php
+3. Admin panel → TheGamesDB → `encryptedApiKey`
+
+## 🚀 Deployment
+
+### System Requirements
+
+#### Minimum (AI features disabled)
+
+| Resource | Minimum |
+|----------|---------|
+| CPU | 1 core |
+| RAM | 2 GB |
+| Storage | 100 MB (application) + game library |
+
+#### With AI features (recommended)
+
+| Resource | Minimum |
+|----------|---------|
+| CPU | 2 cores (Intel N4505 / ARM Cortex-A55 or better) |
+| RAM | 4 GB |
+| Storage | 2 GB (application + AI models) + game library |
+| PostgreSQL | pgvector extension (`pgvector/pgvector:pg16`) |
+
+Embedding inference: ~200-500ms per game. Translation: ~1-5s per description. CPU only — no GPU required.
+
+### Docker (recommended)
+
+```bash
+# 1. Prepare secrets
+cp .env.example .env
+# Edit .env — set all required variables
+
+# 2. Create directory structure
+mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,models,tracker/{config,watch,complete,incomplete,torrents}}}
+
+# 3. Start
+make all
+```
+
+Host directory structure:
+
+```
+/mnt/nas/gameLibrary/
+├── games/                             # Game files
+├── images/                            # Screenshots and covers
+└── gameLibraryConfigs/
+    ├── db/data/                       # PostgreSQL data
+    ├── scrapers/                      # scrapers-config.json
+    ├── models/                        # HuggingFace models
+    └── tracker/
+        ├── config/                    # Transmission settings.json
+        ├── watch/                     # Auto-add .torrent files
+        ├── complete/                  # Completed downloads
+        ├── incomplete/                # Incomplete downloads
+        └── torrents/                  # .torrent files
+```
+
+Ports:
+
+| Port | Service | Purpose |
+|------|---------|---------|
+| `:8090` | Nginx | Vue SPA + API proxy |
+| `:8080` | Backend | REST API + HTTP tracker |
+| `:8000` | AI service | Translation + embedding inference |
+| `:9091` | Transmission | RPC web UI |
+| `:51413` | Transmission | P2P traffic (TCP/UDP) |
+| `:5432` | PostgreSQL | Database |
+
+### Local Development
+
+```bash
+export $(grep -v '^#' .env | xargs)
+
+# Backend (requires local PostgreSQL)
+mvn spring-boot:run -Dspring.profiles.active=alone
+
+# Frontend (Vite dev server, proxies /game-library/* to :8080)
+cd frontend && npm run dev
+```
+
+Makefile helpers:
+
+```bash
+make dev-backend    # mvn spring-boot:run
+make dev-frontend   # npm run dev
+make logs           # docker compose logs -f
+make clean          # docker compose down -v + mvn clean + rm -rf frontend/dist
+```
+
+## 🔍 Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---------|-------------|-----|
+| Blank page | nginx proxy misconf | Check nginx.conf `/game-library` location |
+| Backend can't connect to DB | Wrong host/port/password | Check `DB_HOST`, `DB_PORT` |
+| Torrent download stuck at 0% | uTP disabled | `"preferred_transports": ["utp", "tcp"]` in `settings.json` |
+| `403 Invalid CORS request` | `CORS_ALLOWED_ORIGINS` not set | Add to `.env` and `docker-compose.yml` |
+| Containers crash | Empty `.env` | Verify all 4 required variables are set |
+| AI not working | Models not downloaded | Wait for first HuggingFace download (~2 GB) |
 
 <a name="ru"></a>
 
@@ -49,6 +359,7 @@
 | Сортировка и пагинация | Редактор игр с Quill (rich text) |
 | Скачивание ZIP (<5 ГБ) / .torrent (≥5 ГБ) | Управление пользователями (роли, блокировка, сброс пароля) |
 | P2P-раздача через Transmission | Панель конфигурации скраперов (API-ключи, вкл/выкл) |
+| | 🖥️ Панель администратора (состояние библиотеки, прогресс сканирования, занятое место) |
 | Профиль, аватар, смена пароля | |
 | Русский / английский интерфейс | |
 | ⭐ Рейтинг игр 1-10 | |
@@ -67,6 +378,8 @@
 | 🔍 Семантический поиск (векторный поиск по смыслу, Python AI + pgvector) | |
 | 🌐 Перевод ru↔en (описания игр через Python AI, кешируется в БД) | |
 | 🏷️ Авто-теги (подбор тегов и жанров по ключевым словам) | |
+| 🧠 AI-рекомендации (персональные рекомендации игр) | |
+| 🖼️ Авто-теги по скриншотам (AI-анализ скриншотов игры) | |
 
 
 ## ⚡ Быстрый старт
@@ -343,311 +656,3 @@ make clean          # docker compose down -v + mvn clean + rm -rf frontend/dist
 | Контейнеры падают | Не заполнен `.env` | Проверить все 4 обязательные переменные |
 | AI не работает | Модели не загружены | Дождаться первой загрузки с HuggingFace (~2 ГБ) |
 
----
-
-<a name="en"></a>
-
-# 🇬🇧 English
-
-## ✨ Features
-
-| For users | For admins |
-|-----------|-----------|
-| Game grid with posters & filters | Filesystem scanning & auto-indexing |
-| Search by name, platform, genre, year | Metadata scraping (7 scrapers) |
-| Sorting & pagination | Game editor with Quill rich text |
-| ZIP download (<5 GB) / .torrent download (≥5 GB) | User management (roles, block, reset password) |
-| P2P seeding via Transmission | Scraper config panel (API keys, enable/disable) |
-| Profile, avatar, password change | |
-| Russian / English UI | |
-| ⭐ Rating 1-10 per game | |
-| ❤️ Favorites collection with filter | |
-| 🌓 Dark mode (system-preference auto-detect, manual toggle) | |
-| 🖥️ 4 visual themes (default light/dark, retro terminal, yellowed CRT) | |
-| 💬 Comments on game pages | |
-| 🔔 Notifications (torrent ready, scan done, etc.) | |
-| 👁 View history (last 20, localStorage) | |
-| 🔗 Related games (same genre or similar name) | |
-| 📊 Statistics dashboard (charts by platform/genre/year, top lists) | |
-| 📂 Game collections (playlists, public/private, reorder) | |
-| 📝 Detailed reviews (gameplay/graphics/story/music scores 1-10, pros/cons) | |
-| 🏷️ Tags (custom labels, filter in sidebar) | |
-| 🧠 Smart collections (server-side rules evaluation, auto-matched games) | |
-| 🔍 Semantic search (vector search by description meaning, Python AI + pgvector) | |
-| 🌐 Translation ru↔en (game descriptions via Python AI, cached in DB) | |
-| 🏷️ Auto-tagging (keyword-based tag & genre suggestions from description) | |
-
-
-## ⚡ Quick Start
-
-```bash
-cp .env.example .env          # set secrets first
-make all                      # builds backend + frontend, starts docker-compose
-```
-
-Open `http://localhost:8090` — login as `admin` / `password`.
-
-> 📖 **Step-by-step guide** — [docs/INSTRUCTION.md](docs/INSTRUCTION.md)
-> 📋 **API Reference** — [docs/API.md](docs/API.md)
-
-### AI Features (Optional)
-
-Semantic search & translation are powered by a separate Python AI service (`ai-service`). Auto-tagging works without AI.
-
-**AI models** (auto-downloaded from HuggingFace on first start):
-- Embedding: [`intfloat/multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) — 384-dim vectors
-- Translation: [`facebook/nllb-200-distilled-600M`](https://huggingface.co/facebook/nllb-200-distilled-600M) — single model for both directions
-
-If you don't need AI — comment out the `ai-service:` block in `docker-compose.yml` (saves ~2 GB RAM and ~2 GB disk).
-
-## 📦 Tech Stack
-
-| Component | Technology |
-|-----------|-----------|
-| Backend | Spring Boot 4.0.7, Java 25, Virtual Threads (Project Loom) |
-| Frontend | Vue 3 + Vite 5, PrimeVue 4, Pinia, VueQuill (Quill 2) |
-| Database | PostgreSQL 16 (schema `library`) + pgvector |
-| ORM / JDBC | Hibernate, Spring Data JPA, HikariCP |
-| REST API | Spring MVC, JWT + form login |
-| API Docs | Swagger UI at `/game-library/swagger-ui.html` |
-| Downloads | ZIP (STORED, no compression) + BitTorrent via Transmission |
-| P2P Tracker | Built-in HTTP tracker at `/api/tracker/announce` |
-| Scraping | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
-| Rate Limiting | bucket4j 8.7.0 (in-memory per-IP token bucket) |
-| Images | DB bytea + FS override, ETag + Cache-Control (24h), lazy loading |
-| AI / ML | Python FastAPI, PyTorch, HuggingFace |
-| Containerization | Docker, docker-compose (5 services) |
-
-## 🏗 Architecture
-
-<p align="center">
-  <img src="docs/img/schema(eng).png" alt="GameLibrary Architecture" width="800">
-</p>
-
-### Frontend Routes
-
-| URL | Access | Description |
-|-----|--------|-------------|
-| `/login` | all | Login form |
-| `/register` | all | Registration |
-| `/` | USER, ADMIN | Library grid — filters, sorting, pagination |
-| `/game/:id` | USER, ADMIN | Game detail page |
-| `/game/:id/edit` | ADMIN | Editor + scraping panel |
-| `/profile` | USER | Profile (avatar, password, stats) |
-| `/admin/users` | ADMIN | User management |
-| `/admin/scrapers` | ADMIN | Scraper config (API keys, on/off) |
-| `/downloads` | USER, ADMIN | Transmission seeding status |
-| `/statistics` | USER, ADMIN | Statistics dashboard |
-| `/collections` | USER, ADMIN | Game collections |
-| `/collections/:id` | USER, ADMIN | Collection detail |
-
-## 🔧 Configuration
-
-### Filesystem Layout
-
-```
-<games_directory>/games/
-└── <platform>/                       (e.g. PC, PlayStation, Xbox)
-    └── <game_name>/
-        ├── <game files>...
-        └── information/              (created during scan)
-            ├── logo.jpg              (poster)
-            ├── information.json      (name, year, genres, description, trailer)
-            └── img/                  (screenshots .jpg)
-```
-
-### Environment Variables
-
-#### Required (no defaults — must be set in `.env`)
-
-| Variable | Description |
-|----------|-------------|
-| `POSTGRES_PASSWORD` | PostgreSQL superuser password |
-| `DB_PASSWORD` | PostgreSQL application user (`library-manager-user`) password |
-| `JWT_SECRET` | JWT signing secret (`openssl rand -hex 32`) |
-| `SCRAPER_ENCRYPTION_KEY` | AES-256 base64 key for scraper API key encryption (`openssl rand -base64 32`) |
-
-#### Optional (with defaults)
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `SERVER_PORT` | `8080` | Backend port |
-| `DB_HOST` | `localhost` | PostgreSQL host |
-| `DB_PORT` | `5432` | PostgreSQL port |
-| `GAMES_DIRECTORY` | `/gameLibrary` | Game files root |
-| `IMAGES_DIRECTORY` | `/gameLibrary/images` | Images on filesystem |
-| `TRACKER_ANNOUNCE_URL` | `http://localhost:8080/game-library/api/tracker/announce` | Announce URL in .torrent files |
-| `TRANSMISSION_RPC_URL` | `http://transmission:9091/transmission/rpc` | Transmission RPC endpoint |
-| `TRANSMISSION_DOWNLOAD_DIR` | `/downloads` | Download dir in Transmission container |
-| `CORS_ALLOWED_ORIGINS` | *(empty — same-origin only)* | Allowed CORS origins (comma-separated) |
-| `AI_SERVICE_URL` | `http://ai-service:8000` | Python AI service endpoint |
-| `JWT_EXPIRATION_MS` | `86400000` | Token TTL (24 hours) |
-| `SCRAPER_CONFIG_DIR` | `/gameLibrary/gameLibraryConfigs/scrapers` | Directory with `scrapers-config.json` |
-| `RESET_PASSWORD_DEFAULT` | *(auto-generated)* | Override default password for admin password-reset |
-
-### Database Schema
-
-Schema `library`:
-
-| Table | Purpose |
-|-------|---------|
-| `game_data` | Games (name, platform, description, embedding vector(384), size) |
-| `game_genre` | Genre dictionary (~70 entries) |
-| `game_data_genre` | M:N game ↔ genre |
-| `game_screenshot` | Screenshots (bytea) |
-| `game_rating` | Ratings 1-10 (unique user+game) |
-| `favorite_game` | User favorites |
-| `game_comment` | Comments |
-| `notification` | Notifications |
-| `game_collection` | Collections (regular + smart) |
-| `game_collection_entry` | M:N collection ↔ game |
-| `game_tag` | Tag dictionary |
-| `game_data_tag` | M:N game ↔ tag |
-| `game_review` | Reviews (4 category scores 1-10, pros/cons) |
-| `library_user` | Users (BCrypt, roles) |
-
-DDL: `postgresdb/ddl/` — execute at first container start in alphabetical order.
-
-## 🔒 Security
-
-All credentials are externalized via `.env` (`.env` is in `.gitignore` — **never commit it**).
-
-| Secret | Path |
-|--------|------|
-| `POSTGRES_PASSWORD` | `.env` → docker-compose → postgres |
-| `DB_PASSWORD` | `.env` → docker-compose → backend → `application.yml` |
-| `JWT_SECRET` | `.env` → docker-compose → backend → JWT signing |
-| `SCRAPER_ENCRYPTION_KEY` | `.env` → docker-compose → backend → AES-256 scraper key encryption |
-
-- JWT access token (15 min) + refresh token (7 days), refresh handled silently by Axios interceptor
-- Rate limiting: login 5 req/min (IP+User-Agent), API 100 req/min (IP) → HTTP 429
-- DB password never stored in `application.yml` in plaintext
-- Admin password reset: `SecureRandom` generates 8-byte base64 password
-
-## 🕷 Scrapers
-
-Config: `${SCRAPER_CONFIG_DIR}/scrapers-config.json`, managed via `/api/admin/scraper-config`.
-
-| Scraper | Method | Auth | What it scrapes |
-|---------|--------|------|----------------|
-| **Playground** (playground.ru) | CSS selectors + search API | — | Name, description, genres, screenshots |
-| **Igromania** (igromania.ru) | JSON Path | — | Game data via `initialStoreState` |
-| **Steam** (store.steampowered.com) | Storefront API | — | Name, description, screenshots, genres |
-| **IGDB** (api.igdb.com) | REST API | Twitch OAuth 2.0 | Full metadata |
-| **TheGamesDB** (api.thegamesdb.net) | REST API | API key | Full metadata (1000 req/month) |
-| **World-Art** (world-art.ru) | CSS selectors | — | Card parsing + search |
-| **PsxDataCenter** (psxdatacenter.com) | JSoup (HTML parsing) | — | PS1/PS2: description, genres, screenshots, serial number |
-
-### IGDB Setup
-
-1. Create app at https://dev.twitch.tv/console/apps/create
-2. Copy **Client-ID**, create **Client Secret**
-3. Get access token:
-   ```bash
-   curl -X POST "https://id.twitch.tv/oauth2/token?client_id=ID&client_secret=SECRET&grant_type=client_credentials"
-   ```
-4. Admin panel (`/admin/scrapers`) → IGDB → `headers.Client-ID` and `encryptedApiKey`
-
-### TheGamesDB Setup
-
-1. Register at https://thegamesdb.net/register.php
-2. Get key at https://api.thegamesdb.net/key.php
-3. Admin panel → TheGamesDB → `encryptedApiKey`
-
-## 🚀 Deployment
-
-### System Requirements
-
-#### Minimum (AI features disabled)
-
-| Resource | Minimum |
-|----------|---------|
-| CPU | 1 core |
-| RAM | 2 GB |
-| Storage | 100 MB (application) + game library |
-
-#### With AI features (recommended)
-
-| Resource | Minimum |
-|----------|---------|
-| CPU | 2 cores (Intel N4505 / ARM Cortex-A55 or better) |
-| RAM | 4 GB |
-| Storage | 2 GB (application + AI models) + game library |
-| PostgreSQL | pgvector extension (`pgvector/pgvector:pg16`) |
-
-Embedding inference: ~200-500ms per game. Translation: ~1-5s per description. CPU only — no GPU required.
-
-### Docker (recommended)
-
-```bash
-# 1. Prepare secrets
-cp .env.example .env
-# Edit .env — set all required variables
-
-# 2. Create directory structure
-mkdir -p /mnt/nas/gameLibrary/{games,images,gameLibraryConfigs/{db/data,scrapers,models,tracker/{config,watch,complete,incomplete,torrents}}}
-
-# 3. Start
-make all
-```
-
-Host directory structure:
-
-```
-/mnt/nas/gameLibrary/
-├── games/                             # Game files
-├── images/                            # Screenshots and covers
-└── gameLibraryConfigs/
-    ├── db/data/                       # PostgreSQL data
-    ├── scrapers/                      # scrapers-config.json
-    ├── models/                        # HuggingFace models
-    └── tracker/
-        ├── config/                    # Transmission settings.json
-        ├── watch/                     # Auto-add .torrent files
-        ├── complete/                  # Completed downloads
-        ├── incomplete/                # Incomplete downloads
-        └── torrents/                  # .torrent files
-```
-
-Ports:
-
-| Port | Service | Purpose |
-|------|---------|---------|
-| `:8090` | Nginx | Vue SPA + API proxy |
-| `:8080` | Backend | REST API + HTTP tracker |
-| `:8000` | AI service | Translation + embedding inference |
-| `:9091` | Transmission | RPC web UI |
-| `:51413` | Transmission | P2P traffic (TCP/UDP) |
-| `:5432` | PostgreSQL | Database |
-
-### Local Development
-
-```bash
-export $(grep -v '^#' .env | xargs)
-
-# Backend (requires local PostgreSQL)
-mvn spring-boot:run -Dspring.profiles.active=alone
-
-# Frontend (Vite dev server, proxies /game-library/* to :8080)
-cd frontend && npm run dev
-```
-
-Makefile helpers:
-
-```bash
-make dev-backend    # mvn spring-boot:run
-make dev-frontend   # npm run dev
-make logs           # docker compose logs -f
-make clean          # docker compose down -v + mvn clean + rm -rf frontend/dist
-```
-
-## 🔍 Troubleshooting
-
-| Symptom | Likely cause | Fix |
-|---------|-------------|-----|
-| Blank page | nginx proxy misconf | Check nginx.conf `/game-library` location |
-| Backend can't connect to DB | Wrong host/port/password | Check `DB_HOST`, `DB_PORT` |
-| Torrent download stuck at 0% | uTP disabled | `"preferred_transports": ["utp", "tcp"]` in `settings.json` |
-| `403 Invalid CORS request` | `CORS_ALLOWED_ORIGINS` not set | Add to `.env` and `docker-compose.yml` |
-| Containers crash | Empty `.env` | Verify all 4 required variables are set |
-| AI not working | Models not downloaded | Wait for first HuggingFace download (~2 GB) |

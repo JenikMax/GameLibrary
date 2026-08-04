@@ -232,13 +232,6 @@ docker compose logs -f
 
 Затем: Администрирование → Сканирование → «Запустить сканирование».
 
-### Способ B: Вручную + скрапинг
-
-1. `/game/0/edit` — страница создания игры
-2. Заполните название, платформу, год
-3. Выберите скрапер → «Скрапить» → описание, жанры, скриншоты подтянутся
-4. «Сохранить»
-
 ---
 
 ## 9. Настройка скраперов
@@ -535,13 +528,6 @@ Place games in platform folders:
 The game folder name becomes the library entry name.
 
 Then: Admin → Scan → "Start Scan".
-
-### Option B: Manually + scrape
-
-1. Go to `/game/0/edit` — game creation page
-2. Fill in name, platform, year
-3. Select a scraper → "Scrape" → description, genres, screenshots load automatically
-4. "Save"
 
 ---
 
