@@ -76,6 +76,16 @@ openssl rand -base64 32       # SCRAPER_ENCRYPTION_KEY
 
 > Не используйте пароли из примеров. Минимум 12 символов, буквы + цифры.
 
+### Опционально: CORS
+
+Если вы обращаетесь к API напрямую (не через Nginx на порту 8090), укажите в `.env`:
+
+```
+CORS_ALLOWED_ORIGINS=http://ваш-хост:порт
+```
+
+Без этой переменной прямой доступ к API будет заблокирован (HTTP 403). При использовании через Nginx CORS не требуется.
+
 ---
 
 ## 4. Создание структуры папок
@@ -372,6 +382,16 @@ openssl rand -base64 32       # for SCRAPER_ENCRYPTION_KEY
 ```
 
 > Don't use example passwords. At least 12 characters, letters + digits.
+
+### Optional: CORS
+
+If you access the API directly (not via Nginx on port 8090), set in `.env`:
+
+```
+CORS_ALLOWED_ORIGINS=http://your-host:port
+```
+
+Without this variable, direct API access will be blocked (HTTP 403). When using Nginx, CORS is not needed.
 
 ---
 
