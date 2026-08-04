@@ -1,207 +1,105 @@
-# GameLibrary — Agent Instructions
+# AGENTS.md
 
-## Build & Run
+## Project overview
 
-```bash
-mvn clean package -DskipTests              # builds target/game-library.jar
-cd frontend && npm install && npm run build  # builds dist/ with Vue SPA
-make all                                     # or docker-compose up --build -d
-mvn spring-boot:run                          # run backend locally (needs PostgreSQL)
-cd frontend && npm run dev                   # run frontend dev server (:5173, proxies to :8080)
+Three distinct services in one repo — not a monorepo toolchain, not a monolith:
+- **Backend:** Java 25 + Spring Boot 4.0.7 (Maven), serving at `/game-library/`
+- **Frontend:** Vue 3 + Vite 5 (plain JS, no TypeScript), served at `/game-library/`
+- **AI service:** Python 3.12 + FastAPI, HuggingFace models (CPU)
+- **DB:** PostgreSQL 16 + pgvector, schema `library`
+
+All five services run via `docker compose` (adds transmission + nginx).
+
+## Working directories
+
+```
+Command                           Run from
+-------                           -------
+mvn *                             repo root
+npm *                             frontend/
+pip / python / uvicorn            ai-service/
+docker compose *                  repo root
+make *                            repo root
 ```
 
-No Maven wrapper — `mvn` must be on PATH. Java 25 target, `eclipse-temurin:25-jre` runtime. No tests, no lint/format/typecheck config.
+## Commands
 
-## Docker
+### Build & run
 
-`docker-compose.yml` starts five services: `frontend` (Nginx + Vue SPA, `:8090`), `backend` (Spring Boot REST, `:8080`), `ai-service` (Python FastAPI, `:8000`), `transmission` (torrent seeder, `:9091` RPC, `:51413`), `postgresdb` (`:5432`).  
-Memory limits: postgresdb 512m, backend 1024m, ai-service 3072m, frontend 64m, transmission 256m. postgresdb has healthcheck.
-DB lifecycle scripts in `postgresdb/`. Schema in `ddl/*.sql`, copied into `/docker-entrypoint-initdb.d/`.
+```
+make all                 # build-backend → build-frontend → docker compose up -d
+make build-backend       # mvn clean package -DskipTests
+make build-frontend      # npm install && npm run build (in frontend/)
+make up / make down      # docker compose up/down
+make dev-backend         # mvn spring-boot:run (with Java dev tools)
+make dev-frontend        # npm run dev (Vite on :5173, proxies API to :8080)
+make clean               # docker compose down -v + mvn clean + rm -rf frontend/dist
+```
 
-## System Requirements
+### Run backend alone (no Docker)
 
-### Minimum (with AI features disabled)
-| Resource | Minimum |
-|----------|---------|
-| CPU | 1 core |
-| RAM | 2 GB (for containers: postgresdb 512m, backend 1024m, frontend 64m, transmission 256m) |
-| Storage | 100 MB for app + space for game library |
+```
+mvn spring-boot:run -Dspring.profiles.active=alone
+```
 
-### With AI features (recommended)
-| Resource | Minimum |
-|----------|---------|
-| CPU | 2 cores (Intel N4505 / ARM Cortex-A55 or better) |
-| RAM | 4 GB (containers: postgresdb 512m + backend 1024m + ai-service 3072m + frontend 64m + transmission 256m) |
-| Storage | 2 GB for app + AI models (auto-downloaded on first start) + space for game library |
-| PostgreSQL | pgvector extension (use `pgvector/pgvector:pg16` Docker image) |
+Uses `application-alone.yml` — connects to localhost DB, expects Windows paths for torrents.
 
-Embedding inference: ~200-500ms/game on 2-core CPU. Translation: ~1-5s/description.
+### Lint & format (frontend only)
 
-## Architecture
+```
+npm run lint             # ESLint + vue3-recommended + prettier, auto-fix
+```
 
-- Spring Boot 4.0.7 → `jar` packaging, embedded Tomcat (max 10 threads).
-- Context path `/game-library` (`application.yml:server.servlet.context-path`).
-- Frontend: separate Vue 3 + Vite 5 + PrimeVue 4 project in `frontend/`, served via Nginx.
-- API: JSON REST (`/game-library/api/**`) with JWT auth; Swagger UI at `/game-library/swagger-ui.html`.
-- Legacy Thymeleaf views still work alongside REST (dual auth: form login + JWT).
-- PostgreSQL 16 schema `library`, JPA (Hibernate managed by Boot 4.x) + HikariCP pool.
-- Auth: Spring Security, form login + JWT, BCrypt, `ROLE_ADMIN`/`ROLE_USER`.
-- Torrent: embedded HTTP tracker (`/api/tracker/announce`) + Transmission 4.1.2 RPC for seeding.
-- Images: DB bytea with optional filesystem override at `images.directory/games/{id}/logo.jpg` (or `screenshots/`, `avatars/`).
-- Scrapers (7 active): Playground (CSS selectors + search API), Igromania (JSON paths), WorldArt (CSS selectors), Steam (Storefront API, no key required), IGDB (Twitch OAuth), TheGamesDB (API key), PsxDataCenter (JSoup, PS1/PS2, no key). Каждый скрапер имеет локализованные `inputHintRu`/`inputHintEn` в `ScraperConfig`, отображаемые как placeholder в поле ввода на фронтенде.
-- **PsxDataCenter serial number search** (`PsxDataCenterScraper.java`). Помимо поиска по названию, поддерживает поиск по серийному номеру (формат `SLUS-12345`, `SCES-54321` и т.д.). Авто-определение: если в URL или названии игры распознан серийный номер — используется `searchBySerial()`.
-- **AI features (Python AI service + pgvector):**
-  - **AI service** (`ai-service/`) — separate Python FastAPI container (`:8000`) with PyTorch + HuggingFace. Preloads all models at startup, auto-downloads from HuggingFace on first run. Endpoints: `GET /health`, `POST /translate`, `POST /embed`, `POST /embed/batch`. Java backend calls it via `AiClient` (OkHttp). Models stored in Docker volume `ai-models`.
-  - **Semantic search** (`EmbeddingService` + pgvector `vector(384)` + HNSW index). Embedding model: [`intfloat/multilingual-e5-small`](https://huggingface.co/intfloat/multilingual-e5-small) (sentence-transformers, 384-dim vectors). Toggle in `GameFilter.vue` (gated by `semanticAvailable` flag from backend). Async batch generation via `POST /api/embeddings/generate` (ADMIN, polling `/status/{taskId}`). Embedding auto-generated on game save.
-  - **Translation ru↔en** (`TranslationService`). Model: [`facebook/nllb-200-distilled-600M`](https://huggingface.co/facebook/nllb-200-distilled-600M) (NLLB-200, ~1.2GB). Auto-detect direction (Cyrillic text → ru→en, else en→ru). Cached in `game_data.description_translated`. Button in `GameDetailView.vue`.
-  - **Auto-tagging** (`AutoTagService` + `KeywordTagMapper`). Rules-based keyword→tag/genre matching (~125 rules). Reuses existing ~220 WorldArt genre mappings from `ScraperConfigService`. Button in `GameEditView.vue` → dialog with suggested tags/genres.
-  - **`AiClient.java`** — HTTP client to Python AI service. Uses OkHttp with 120s timeout for inference calls. Graceful degradation: returns original text / null on AI service failure.
-  - Application starts without AI service — AI features gracefully disabled until `ai-service` is available.
-  - ai-service Docker mem_limit: 3072m (PyTorch + models). Backend mem_limit: 1024m.
-  - PostgreSQL base image: `pgvector/pgvector:pg16` (includes pgvector extension).
-- State: Pinia stores for auth, library, locale.
-- Rich text: VueQuill + Quill 2 for game description editing.
-- **Themes** (`useTheme.js`). 4 темы: `default-light`, `default-dark`, `retro-terminal` (зелёный моноширинный CRT), `yellowed-crt` (жёлтый/янтарный CRT). Переключение через Popover в AppHeader. Сохранение в `localStorage.theme`. Композабл `isTerminalTheme` — true для всех CRT-тем, используется для условного отображения терминальных элементов (префикс `>` с мигающим курсором).
-- **RetroCrtDisplay.vue** — SVG-компонент ретро-монитора с настраиваемыми строками, сканлайнами, виньеткой и мерцающим курсором. Используется на странице авторизации.
-- **Profile page** (`ProfileView.vue`). Переписана: 3 таба (аватар/пароль/инфо), статистика (игры, рейтинги, коллекции, рецензии, комментарии, избранное), `memberSince`. Бэкенд: `ProfileController` собирает 7 агрегированных счётчиков через DAO. Все 4 репозитория получили `countByUserId()`.
-- **Maket directory** (`maket/`). 23 standalone HTML-файла — дизайн-прототипы для ретро-терминальной темы. Не являются частью приложения.
-- **Phase 3 features**: rating 1-10 (`GameRating.java` + `RatingController`), favorites (`FavoriteController` + heart toggle, filter via `?favorites=1` URL param + store), comments (`CommentController` with ownership check), notifications (`NotificationService` + bell icon with 15s polling + click-outside close), view history (composable `useViewHistory.js`, localStorage, max 20 items, error handling for quota exceeded, отображается 12), related games (`RelatedGamesController`, 2 SQL queries: same genre, similar name with first-word fallback), statistics (`StatisticsController` + `StatisticsView.vue`, Chart.js dashboard with platform/genre/year charts + top lists), collections (`CollectionController` + `CollectionService` + `CollectionsView.vue`, user-created game playlists, public/private, reorder), tags (`GameTag.java` + `GameTagRepository`, managed via `LibraryController` filter-options and `GameEditView`, filter in `GameFilter`), reviews (`GameReview.java` + `ReviewController`, 4 category scores 1-10 (gameplay/graphics/story/music) + pros/cons + text, ownership check for delete), smart collections (`GameCollection.isSmart` + `smartRules` fields, rules **evaluated server-side** via `CollectionService.buildSmartRulesConditions()` — supports `platforms`, `genres`, `yearFrom`, `yearTo`, `minRating`, `tags`, `nameContains`; frontend uses structured `SmartRulesForm.vue` with MultiSelect/InputNumber/InputText).
-- Package root: `com.jenikmax.game.library`.
+No semicolons, single quotes, trailing commas, 120-char width, 2-space indent (see `frontend/.prettierrc`).
 
-## IGDB Scraper Setup
+### Tests
 
-IGDB требует OAuth 2.0 через Twitch. Чтобы получить **Client-ID** и **Access Token**:
+```
+mvn test                           # all backend tests
+mvn test -Dtest=ClassName          # single test class
+npm run test                       # all frontend tests (Vitest + happy-dom)
+npx vitest run src/file.test.js    # single frontend test
+```
 
-1. Зайди на https://dev.twitch.tv/console/apps/create
-2. Создай приложение (Name — любое, OAuth Redirect URLs — `http://localhost`, Category — любой)
-3. После создания скопируй **Client-ID** (показывается в списке приложений)
-4. Там же нажми **New Secret** → скопируй **Client Secret**
-5. Обменяй на access token:
-   ```bash
-   curl -X POST "https://id.twitch.tv/oauth2/token?client_id=ВАШ_CLIENT_ID&client_secret=ВАШ_SECRET&grant_type=client_credentials"
-   ```
-6. Из JSON-ответа скопируй значение поля `access_token`.
+**Currently there are zero test files in the repo** — JUnit and Vitest are configured but unused.
 
-Куда прописать:
-- **Client-ID** → в админке (`GET /api/admin/scraper-config/igdb`) → поле `headers.Client-ID`
-- **access_token** → в админке → поле `encryptedApiKey` (админка зашифрует сама)
-- Либо отредактировать файл конфигурации скрапера (`${SCRAPER_CONFIG_DIR}/scrapers-config.json`, по умолчанию `/gameLibrary/gameLibraryConfigs/scrapers/scrapers-config.json`) напрямую — но тогда токен будет в plaintext, т.к. шифрование происходит только при записи через API.
+## Environment & secrets
 
-## TheGamesDB Scraper Setup
+Copy `.env.example` → `.env` before first build. Four required secrets:
+- `GAME_LIBRARY_JWT_SECRET` — JWT signing key
+- `GAME_LIBRARY_ADMIN_PASSWORD` — initial admin password
+- `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` — optional, for IGDB scraper
+- `SCRAPER_ENCRYPTION_KEY` — AES-256 key for encrypting scraper API keys in DB
 
-TheGamesDB требует API-ключ. Чтобы получить его:
+## Database migrations
 
-1. Зарегистрируйся на https://thegamesdb.net/register.php
-2. Подтверди email
-3. Войди на сайт
-4. Перейди на https://api.thegamesdb.net/key.php — ключ будет отображён
-5. Скопируй ключ
+**No Flyway, no Liquibase.** DDL scripts in `postgresdb/ddl/` execute alphabetically via PostgreSQL's `docker-entrypoint-initdb.d` at first container start. For bare-metal: run them manually in order with `psql`.
 
-Куда прописать:
-- В админке (`GET /api/admin/scraper-config/thegamesdb`) → поле `encryptedApiKey`
-- Либо отредактировать файл конфигурации скрапера (`${SCRAPER_CONFIG_DIR}/scrapers-config.json`, по умолчанию `/gameLibrary/gameLibraryConfigs/scrapers/scrapers-config.json`) напрямую (будет в plaintext)
+Never create migration files — add new scripts to `postgresdb/ddl/` with the next numeric prefix.
 
-Лимит: 1000 запросов в месяц. Один поиск игры может использовать 2-3 запроса (поиск + жанры + скриншоты).
+## Architecture notes
 
-## PsxDataCenter Scraper
+- **Base path:** Everything is under `/game-library/` (Spring `context-path`, Vite `base`, Vue Router `createWebHistory`, nginx `location`). Never add routes without this prefix.
+- **Auth:** JWT access token (15min) + refresh token (7d) with in-memory blacklist. Refresh is handled silently by the Axios interceptor (`frontend/src/api/axios.js`).
+- **Rate limiting:** In-memory bucket4j — 5 req/min for login per IP+User-Agent, 100 req/min for general API. Returns 429.
+- **Virtual threads:** Enabled via `spring.threads.virtual.enabled: true`. All servlet requests run on virtual threads.
+- **API docs:** Swagger UI at `/game-library/swagger-ui.html`, OpenAPI groups: `public` and `admin`.
+- **Images:** Stored as `bytea` in DB with optional filesystem override. Support ETag + Cache-Control (24h).
+- **ZIP downloads:** Custom `StreamingZipWriter` using STORED method (no compression) for files < 5 GB.
+- **i18n:** Backend uses `messages_{en,ru}.properties`. Frontend uses `useI18n.js` composable + Pinia locale store. Two languages: Russian (default) and English.
+- **Scrapers:** 7 sources (Playground, Igromania, Steam, IGDB, TheGamesDB, World-Art, PsxDataCenter). API keys encrypted with AES-256 in DB via `ConfigEncryptionService`.
+- **BitTorrent tracker:** Built-in HTTP tracker at `/api/tracker/announce`. Transmission handles P2P seeding. `.torrent` files generated via `ttorrent` library (version 1.5).
 
-PsxDataCenter (psxdatacenter.com) — скрапер для PS1 и PS2 без ключа. Использует JSoup для парсинга фреймовой структуры сайта.
+## Style conventions
 
-- **Поиск по серийному номеру** (`SLUS-12345`, `SCES-54321`). Если в URL или названии игры распознан серийный номер (regex `^[A-Za-z]{3,5}-\d{4,5}$`), используется `searchBySerial()` — проходит по всем 6 list-страницам и ищет совпадение серийного номера во втором `<td>`.
+- **No TypeScript** — write plain JavaScript for all frontend code
+- **Vue component names:** `vue/multi-word-component-names` is turned off — single-word component names are fine
+- **`v-html`:** Allowed but emits a warning; must sanitize with DOMPurify first (use `useSanitizeHtml` composable)
+- **Backend package:** `com.jenikmax.game.library` — all new code goes here or in sub-packages
+- **No code generation** — no OpenAPI codegen, protobuf, or GraphQL schemas
 
-- **Поиск по названию**: скрапит 6 list-страниц (3 региона × 2 платформы PS1/PS2), первое совпадение.
-- **Две версии разметки** карточки игры:
-  - **Version A** (старая): метки в `<b>` — `Game Name:`, `Genre:`, `Release Date:`
-  - **Version B** (н овая): текст метки напрямую в `<td>` — `Common Title`, `Genre / Style`, `Date Released`
-  - Какая версия отдаётся, зависит от User-Agent / Referer. `jsoupHelper` (OkHttp + Mozilla UA) → Version B.
-- **PS2**: метки **ВЕРХНИМ РЕГИСТРОМ** (`GENRE / STYLE`, `COMMON TITLE`, `DATE RELEASED`) — сравнение через `equalsIgnoreCase`.
-- **Кодировка**: windows-1252.
-- **Описание**: `table#table16 td[style*="#333333"]`, fallback на самый длинный `<td>`.
-- **Instruction**: `table#table25 td.bluecell:matchesOwn((?i)emulator)`.
-- **PSP исключён**: на PSP list-страницах все INFO-кнопки пустые.
-- **Genre mappings** (~40 записей) в `ScraperConfigService.buildPsxDataCenterGenreMappings()`.
-- **Screenshots**: URL извлекается из `td[onclick*="Select("]` через regex.
-- **NBSP-очистка**: `cleanText()` заменяет `\u00A0` и типографские кавычки.
-
-## Gotchas
-
-- **Plaintext DB passwords** in `application.yml` and `postgresdb/ddl/1_init.sql`.
-- **Torrent download limit is 5 GB** (not 1 GB). Code at `LibraryOperationService.java:368` uses `5L * 1024 * 1024 * 1024` as the boundary for ZIP vs .torrent download.
-- **TTORRENT_HASHING_THREADS** env var defined in `docker-compose.yml:54` with default `2`. **Not currently read by any Java code** — exists as placeholder for future torrent hashing parallelism control. Set lower on low-CPU NAS to avoid I/O saturation if wired up.
-- `Game.java` is a decompiled `.class` → `@Entity` uses annotated getters, not fields. Keep this pattern.
-- **Frontend must be built separately** before Docker (`npm run build` or `make build-frontend`). Dev server (`npm run dev`) proxies `/game-library/*` to `:8080`.
-- **OkHttp 4.x API order**: `RequestBody.create(MediaType, String)` — MediaType first.
-- **Transmission must be running** for torrent seeding. In Docker it starts automatically; for local dev run `docker run lscr.io/linuxserver/transmission`.
-- **Multi-stage Docker build** requires Docker 19.03+ and BuildKit.
-- **Tracker announce URL** must be reachable from user torrent clients. Set `TRACKER_ANNOUNCE_URL` to your NAS IP/hostname in `docker-compose.yml`.
-- **uTP must be enabled** in Transmission for P2P connections with uTorrent on Windows. Without it, even though the tracker correctly returns the seeder, data transfer fails because uTorrent cannot connect over pure TCP.
-  - The modern key is `preferred_transports`, set **both** in `gameLibraryConfigs/tracker/config/settings.json` (монтируется в `/config` контейнера transmission):
-    ```json
-    "preferred_transports": ["utp", "tcp"],
-    "utp-enabled": true
-    ```
-  - The container does NOT process `TRANSMISSION_*` env vars (only `USER`, `PASS`, `WHITELIST`, etc.), so `TRANSMISSION_UTP_ENABLED=true` in docker-compose.yml has **no effect**. The fix must be done directly in the host `settings.json`.
-  - After editing, `docker-compose restart transmission`.
-- **WorldArt screenshot bucket formula**: `((id + 9999) / 10000) * 10000` in `WorldArtScraper.java:220`. World-art.ru stores images in `img/{bucket}/{id}/{num}.jpg` where bucket is a rounded `10000 * ceil(id/10000)`. The optimize_b path format is `img/converted_images_{bucket}/optimize_b/{id}-{num}-optimize_b.jpg`.
-- **Images**: served from DB bytea. Optionally, files at `images.directory/games/{id}/logo.jpg` (or `screenshots/`, `avatars/`) override DB — useful for manual replacement.
-- **Local dev profile** in `application-alone.yml` overrides games/images/gameLibraryConfigs paths for local development. Activate with `--spring.profiles.active=alone`.
-- **SCRAPER_ENCRYPTION_KEY** must be set in `docker-compose.yml` (backend → environment). API-ключи скраперов шифруются этим ключом; при его смене нужно **пересохранить все API-ключи** в админке. Сгенерировать новый: `openssl rand -base64 32`.
-- **Playground screenshot URL normalization** (`PlaygroundScraper.java:235, 262`). На странице игры Playground каждая скриншота = `<a href="//i/screenshot/{id}/img.jpg">` (фулсайз) + `<img src="/i/screenshot/{id}/img.jpg?1200x675">` (превью с query-параметром). `extractScreenshotsFromDocument` собирает URL из обоих аттрибутов в `LinkedHashSet`, но из-за разницы в `//` и `?query` они не дедуплицируются. Метод `normalizeScreenshotUrl()` убирает `//`, `.webp?`-мусор и всё после `?` **до** добавления в Set, что превращает оба URL в идентичную строку и устраняет дубликаты.
-- **GameConverter genre fallback** (`GameConverter.java:123-127`). `dtoToGameGenreEntityConverter` обёрнут в try-catch(`IllegalArgumentException`) и возвращает `null` для неизвестных жанров. Вызывающие методы фильтруют `null` перед добавлением в список жанров игры.
-- **Playground Cyrillic genre mappings** (`ScraperConfigService.java:219-221`). Playground дополнительно к 7 английским slug-маппингам получает все русские маппинги из `buildWorldArtGenreMappings()` (~220 записей) + специфичные `"рогалик"→roguelike`, `"глобальная_стратегия"→_4X`. JSON-LD жанры в PlaygroundScraper валидируются через `Genre.valueOf()`, неизвестные тихо пропускаются.
-- **Playground search-by-name** (`PlaygroundScraper.java:44-55, 93-103`). Если поле URL в панели скрапера оставить пустым или ввести название игры (не ссылку), PlaygroundScraper делает GET-запрос к `https://www.playground.ru/api/game.search?query={name}&include_addons=1`, получает `slug` первого результата и строит URL `https://www.playground.ru/{slug}` для полного скрапа. Если поиск ничего не вернул — выбрасывается `RuntimeException("Game not found on Playground: ...")`, которое не заворачивается в `catch (Exception)`, а пробрасывается как есть.
-- **Scrape checkbox inputId prefix** (`GameEditView.vue:126-127`). Чекбоксы в панели скрапера имеют `:inputId="'scrape-' + opt.key"`, чтобы избежать конфликта с `id="genres"` на компоненте `MultiSelect`. `<label :for="'scrape-' + opt.key">` соответственно.
-- **Screenshot save = replacement** (`LibraryController.java:150-155`). `editGame()` использует `gameEdit.getScreenshots()` как полную замену существующих скриншотов (а не merge). Если `null` — сохраняет старые.
-- **Frontend scrape screenshot handling** (`GameEditView.vue:339,346`). `handleScrape()` заменяет `newScreenshotPreviews` (не push) и дедуплицирует `form.screenshots` через `new Set()`.
-- **Save redirects to game card** (`GameEditView.vue:299-301`). `handleSave()` при успехе делает `router.replace(\`/game/\${route.params.id}\`)` — уходит на карточку, а не остаётся на странице редактирования. `replace` вместо `push`, чтобы кнопка «назад» вела в Library, не возвращаясь на редактор.
-- **Back-to-library arrow** (`GameDetailView.vue:19`). На карточке игры есть кнопка `←` (`router.push('/')`).
-- **Library state сохраняется в sessionStorage** (`LibraryView.vue`). Перед уходом со страницы Library (`onBeforeUnmount`) состояние (страница, поиск, платформы, годы, жанры, сортировка) пишется в `sessionStorage.libraryState`. При монтировании Library проверяет наличие сохранённого состояния и восстанавливает его. При сбросе фильтров сохранённое состояние удаляется. Это позволяет вернуться на ту же страницу с теми же фильтрами после просмотра/редактирования игры, даже после F5.
-- **Сортировка вынесена из GameFilter в LibraryView** (`LibraryView.vue:54-72`). `SelectButton` для сортировки (название, год, дата добавления, рейтинг) и направления отображается над сеткой игр, а не в боковой панели фильтра. Применяется сразу по `@change` без debounce.
-- **Virtual threads enabled** (`application.yml:spring.threads.virtual.enabled: true`). Все сервлетные запросы и асинхронные задачи используют виртуальные треды Java 25 (Project Loom). Это даёт высокую конкурентность при малом пуле потоков Tomcat (max 10).
-- **Streaming ZIP без сжатия** (`StreamingZipWriter.java`). ZIP-архив пишется методом STORED (без compression), с CRC32 data descriptor. `ZipManifest` предвычисляет размер на лету для заголовка Content-Length. Это позволяет стримить архивы >5 ГБ без буферизации.
-- **Download preview (prepare-download)**. Для игр ≥5 ГБ запускается асинхронная задача `TorrentTaskService`, которая готовит .torrent-файл в фоне. Статус проверяется через `GET /api/download/prepare-status/{taskId}`. После готовности клиенту отдаётся .torrent для скачивания через Transmission.
-- **Admin password reset — случайная генерация** (`UserDataService.java:102-110`). При сбросе пароля админом генерируется новый пароль (8 байт, base64) через `SecureRandom`. Новый пароль возвращается в API-ответе и отображается в диалоговом окне на фронтенде. Можно переопределить через переменную окружения `RESET_PASSWORD_DEFAULT`.
-- **`GET /downloads/aria2-version` проверяет Transmission, не Aria2**. Эндпоинт назван legacy, но на самом деле проверяет connectivity с Transmission RPC. Возвращает `"Transmission is connected"` / `"Transmission is not available"`.
-- **Route transition — cross-fade** (`App.vue:9`). Переходы между страницами используют `<Transition name="route-fade" mode="out-in">`. Старый контент затухает, затем появляется новый — без белых вспышек. `.main-container` имеет `background-color: var(--p-surface-50)` (light) / `var(--p-surface-950)` (dark).
-- **AppHeader — full-width background + centered content + подменю** (`AppHeader.vue`). Меню фиксировано сверху, фон растянут на всю ширину через `app-header-wrapper`. Внутренний `Menubar` центрирован с `max-width: 1400px`. Пункт «Библиотека» содержит подменю: «Список» (`/`) и «Избранное» (`/?favorites=1`). Панель уведомлений закрывается по клику вне области.
-- **primeflex.css — кастомный utility framework** (`frontend/src/assets/styles/primeflex.css`, ~20k строк). Самописный CSS-фреймворк с классами для grid, flex, spacing, colors, surfaces. Не является npm-пакетом.
-- **i18n — кастомный composable без библиотеки** (`useI18n.js`). Встроенный словарь на ~389 ключей (RU/EN) без vue-i18n. При смене языка — `window.location.reload()` для перезапуска приложения.
-- **Debounced filter (250ms)** (`GameFilter.vue`). Все поля фильтра (поиск, платформы, годы, жанры) имеют `watch` с debounce 250ms и авто-применением. Отдельной кнопки Apply нет. Сортировка и избранное вынесены из фильтра — ими управляет `LibraryView` через URL query (`?favorites=1`) и SelectButton.
-- **Сканирование ФС в две фазы** (`GameScanerService.java`). Phase 1: запись метаданных в БД (без bytea). Phase 2: добавление изображений с ручным `EntityManager` (через `@PersistenceUnit EntityManagerFactory`) после каждой игры — предотвращает OOM при больших библиотеках. Запускается асинхронно через `POST /api/scan` → progress bar с polling'ом каждые 500ms (`ScanTaskService.java`).
-- **OkHttpClient — единый инстанс** (`AppConfig.java`). Настроен в `@Bean OkHttpClient` с 30s timeout, Mozilla User-Agent. Используется всеми скраперами через `JsoupHelper`.
-- **Notification `isRead` — JavaBean boolean naming** (`Notification.java:51`). Геттер `isRead()` → Hibernate выводит имя свойства `read`, а не `isRead`. JPQL-запросы и derived query methods обязаны использовать `read` (например `n.read`, `countByUserIdAndReadFalse`). Поле БД `is_read` задаётся через `@Column(name = "is_read")`.
-- **Dark mode CSS: `.app-dark`, не `.dark`** (`main.js:23`). PrimeVue настроен с `darkModeSelector: '.app-dark'`. Все кастомные CSS-правила для тёмной темы должны использовать `.app-dark` (не `.dark`), иначе они не сработают.
-- **View history — localStorage + composable** (`useViewHistory.js`). Хранит до 20 ID игр в `localStorage.viewHistory`. Композабл подмешивается в `GameDetailView.vue` (добавление) и `LibraryView.vue` (стрип). Очистка только вручную или через localStorage API. При превышении квоты localStorage поэтапно урезает историю до 5, затем до 0.
-- **Related games — 2 SQL запроса** (`RelatedGamesController.java`). Возвращает игры: 1) с тем же жанром, 2) с похожим названием через `regexp_replace` и fallback на первое слово при пустом результате. Каждый запрос лимитирован, результаты объединяются в `LinkedHashSet` для дедупликации. «Та же платформа» удалена из-за шума.
-- **Rating 1-10** (`GameRating.java` + `RatingController`). Сущность `GameRating` использует `@Id` + `@GeneratedValue` с `@ManyToOne` связями на `Game` и `User`.
-- **Comment ownership check** (`CommentController.java:46`). DELETE проверяет `comment.getUser().getId().equals(currentUserId)`, флаг `canDelete` вычисляется на бэкенде и отдаётся в DTO. Админ может удалить любой комментарий.
-- **Favorites list — два SQL-запроса** (`LibraryController.java:91-117`). При `favoritesOnly=true` сначала выполняется `getGameIdList()` для получения всех ID (с фильтрами текста/жанров/платформ), затем `retainAll()` выделяет только ID из избранного. После этого `getGameShortListByIds()` загружает полноценные DTO **только для этих ID**, с последующей сортировкой в порядке `gameIdList` для сохранения пагинации. Ранее использовался `getGameList()` с offset/limit, который возвращал игры из общего списка, игнорируя фильтр избранного.
-- **CORS: `CORS_ALLOWED_ORIGINS` проброшен в docker-compose.yml** (`docker-compose.yml:50`). Переменная `CORS_ALLOWED_ORIGINS` присутствует в `environment` секции `backend`. Если вы обращаетесь к API напрямую (не через Nginx на порту 80), а не через reverse-proxy, браузер шлёт `Origin` и Spring CORS блокирует запрос. Исправление: `.env` → `CORS_ALLOWED_ORIGINS=http://ваш-хост:порт`.
-- **CRLF line endings: `.gitattributes`** (`postgresdb/ddl/1_init.sh`). Shell-скрипты с CRLF-окончаниями (`\r\n`) не выполняются в контейнере — шебанг `#!/bin/bash\r` не находит интерпретатор. В корне проекта добавлен `.gitattributes` с `* text=auto eol=lf` для автоматической нормализации. Если файлы продолжают появляться с CRLF, проверить `git config core.autocrlf` — должно быть `false` или `input`.
-- **Collection ownership check** (`CollectionController.java`). `canModify()` проверяет `isOwner` (userId коллекции === текущий пользователь) **или** `ROLE_ADMIN`. Админы могут изменять любую коллекцию.
-- **Collections API возвращает свои + публичные чужие** (`CollectionController.java`). `GET /api/collections` возвращает собственные коллекции пользователя (сортировка по `updatedAt` desc) И все публичные коллекции других пользователей (дедуплицированы). `CollectionPicker` также показывает все доступные коллекции.
-- **CollectionPicker загружает все membership'ы сразу** (`CollectionPicker.vue`). При открытии для каждой коллекции параллельно вызывается `getGames()`, что может быть медленно при большом числе коллекций.
-- **Reorder коллекций — полный список** (`CollectionController.java`). `PUT /{id}/games/reorder` требует полный упорядоченный список `gameId`. Каждая запись сохраняется индивидуально, а не bulk update.
-- **Статистика использует JdbcTemplate напрямую** (`StatisticsController.java`). Все агрегации — через raw SQL, минуя Hibernate и `GameRepository` (который грузил bytea-логотипы всех игр → OOM). `GameRepository` полностью исключён из контроллера статистики.
-- **`totalSizeBytes` — кэширование в БД с lazy-вычислением** (`StatisticsController.java`). В таблицу `game_data` добавлена колонка `total_size_bytes BIGINT`. При запросе статистики: `SELECT SUM(total_size_bytes) WHERE total_size_bytes IS NOT NULL` → если есть NULL-строки, для каждой вычисляется размер через `walkFileTree(maxDepth=3)` с сохранением в БД. После первого вычисления — мгновенный ответ. Размер пересчитывается: (1) при сканировании ФС — для новых игр в фазе `LOADING_IMAGES` и для существующих в фазе `REFRESHING_SIZES`, (2) по кнопке «Обновить размер» на странице статистики → `POST /api/statistics/refresh-sizes` (сбрасывает все `total_size_bytes` в NULL).
-- **Statistics refresh-sizes — ADMIN only** (`StatisticsController.java:99`, `StatisticsView.vue:6`). Кнопка «Обновить размер» на странице статистики и endpoint `POST /api/statistics/refresh-sizes` доступны только администраторам. На фронтенде кнопка скрыта через `v-if="authStore.isAdmin"`, на бэкенде метод защищён `@PreAuthorize("hasRole('ADMIN')")`.
-- **Statistics genre chart — top 12** (`StatisticsView.vue`). Круговая диаграмма жанров обрезается до первых 12 элементов с `count > 0`.
-- **Statistics — top list показывают top 5** (`StatisticsView.vue`), хотя сервер возвращает до 10.
-- **Chart.js dependency** (`StatisticsView.vue`). Импортирует `vue-chartjs` + Chart.js. Если их нет в `package.json`, вью не отрендерится.
-- **Average rating округляется до 1 знака** на бэкенде (`Math.round(avgRating * 10.0) / 10.0`).
-- **Scan progress bar** (`ScanTaskService.java` + `ScanTask.java`). Сканирование ФС переведено на асинхронную модель с progress bar: `POST /api/scan` → `202 Accepted` + `{ taskId }`, фронтенд polling'ит `GET /api/scan/status/{taskId}` каждые 500ms, отображая `ProgressBar` с детерминированным прогрессом (фазы: `SCANNING_DIRS` → `STORING_METADATA` → `LOADING_IMAGES` → `REFRESHING_SIZES` → `COMPLETED`). Выполняется в daemon-потоке `library-scanner` через `singleThreadExecutor`.
-  - **`@PersistenceUnit EntityManagerFactory`, не `@PersistenceContext`** — `EntityManagerFactory.createEntityManager()` используется для ручного управления EM в фазе загрузки изображений, потому что `@PersistenceContext` привязан к потоку HTTP-запроса и не работает в daemon-потоке. Каждая игра обрабатывается в отдельной транзакции (`em.getTransaction().begin/commit/close`).
-  - **Phase 1 metadata**: `gameService.storeGameMetadata()` — каждый вызов создаёт свою транзакцию через `@Transactional` на `GameDataService`.
-  - **Phase 2 images**: ручной EM → `find()` → модификации → commit → close → затем `gameService.updateGameImages()` с `@Transactional` делает merge+save.
-  - **Не использовать `TransactionTemplate` + `@PersistenceContext`** — эта комбинация не обеспечивает корректную привязку EntityManager к daemon-потоку. Работает только `EntityManagerFactory` с ручным управлением.
-- **Reviews** (`GameReview.java` + `ReviewController`). Сущность `game_review` с 4 категориями оценок (gameplay/graphics/story/music, 1-10), плюсы/минусы, текст. `UNIQUE(game_id, user_id)` — один ревью на пользователя. `ReviewController`: GET (со списком ревью + агрегированные средние оценки по категориям через `@Query`), POST (add/update), DELETE (ownership check — `review.getUser().getId().equals(currentUserId)` или `ROLE_ADMIN`). Фронтенд: `ReviewForm.vue` + tab в `GameDetailView.vue`. i18n-ключи в `useI18n.js` (272-291, 560-579). Визуальное оформление отзывов (`GameDetailView.vue`): отступы `0.5rem` между блоками (имя → оценки → текст → плюсы/минусы), кнопка "Удалить" в правом верхнем углу через `.review-actions` с `position: absolute; top: 0.75rem; right: 0.75rem;` внутри `.review-item` (`position: relative`).
-- **Tags** (`GameTag.java` + `GameTagRepository`). Таблицы `game_tag` (словарь: code PK, description, description_ru) и `game_data_tag` (M:N). Нет отдельного контроллера — теги управляются через `LibraryController` (filter-options) и `GameEditView` (MultiSelect). Фильтр по тегам в `GameFilter`. В `GameDetailView` отображаются как `<Tag severity="info" rounded>`.
-- **Smart collections** (`GameCollection.isSmart` + `smartRules`). DDL 10 добавляет колонки `is_smart BOOLEAN` и `smart_rules TEXT` к `game_collection`. Сущность `GameCollection` содержит эти поля. `CollectionController` возвращает/сохраняет их в `toMap()`/create/update. Фронтенд: `CollectionsView` (create dialog с чекбоксом "Smart collection" + `SmartRulesForm.vue` — структурированная форма с MultiSelect/InputNumber/InputText), `CollectionDetailView` (smart badge + правила), `CollectionCard` (бейдж "Smart collection"). Правила **оцениваются на сервере** через `CollectionService.buildSmartRulesConditions()` — поддерживаются `platforms`, `genres`, `yearFrom`, `yearTo`, `minRating`, `tags`, `nameContains`. `GET /api/collections/{id}/games` для умных коллекций вызывает `findSmartGames()`, `toMap()` вызывает `countSmartGames()` для `gameCount`. Эндпоинт `GET /api/collections/with-hero` возвращает коллекции с hero/preview данными игры для карточек.
-- **Rate limiting (bucket4j)** (`RateLimitFilter.java` + `bucket4j-core:8.7.0`). Фильтр в `SecurityConfig` (`addFilterBefore`). Login endpoint: 5 запросов/мин на IP+User-Agent. Глобальный API: 100 запросов/мин на IP. Возвращает HTTP 429. База данных не используется — `ConcurrentHashMap<String, Bucket>` в памяти.
-- **Torrent cache** (`TorrentCacheManager.java`). Кэширует сгенерированные `.torrent` файлы на диск вместе с `.torrent.meta` (JSON: file sizes, mtimes). При следующем запросе проверяет mtime/sizes — если изменились, пересоздаёт. Используется `DownloadTorrentService`.
-- **Image caching (ETag + Cache-Control)** (`ImageController.java`). Все изображения отдаются с `Cache-Control: public, max-age=86400` (24ч) + `ETag` (на основе lastModified+size для файлов, hashCode+length для bytea). Поддерживает `If-None-Match` → `304 Not Modified`. Lazy loading на фронтенде (`loading="lazy"` на `<img>`).
-- **Grid/List toggle + Page size selector** (`LibraryView.vue:78-84`). Кнопка переключения вида grid/list рядом с сортировкой. Grid — `GameCard.vue`, List — `GameListRow.vue`. Page size selector (12/24/48/96) через `store.pageSize`, состояние сохраняется в `sessionStorage`.
-- **Skeleton loaders** (`GameCardSkeleton.vue`). PrimeVue `<Skeleton>` показывается при загрузке списка игр (пока идёт запрос к API). Количество скелетонов = `store.pageSize`.
-- **Dark mode composable** (`useTheme.js`). Переключение через `toggleDarkMode()`, сохраняется в `localStorage.darkMode`. Учитывает `prefers-color-scheme: dark` при первом заходе. Применяет класс `.app-dark` на `<html>`.
-- **404 page** (`NotFoundView.vue`). Catch-all маршрут `/:pathMatch(.*)*` в router. Кнопка "назад в библиотеку".
-- **Image streaming** (`ImageController.java`). Логотипы и скриншоты с ФС отдаются через `FileSystemResource` (streaming). bytea из БД — через `InputStreamResource`. Контент-тип определяется через `Files.probeContentType()`.
+## Прочее
+- ** Приложение расчитано для работы на NAS серверах в локальной сети на слабых процессорах
+- ** Минимальные системные требования TODO
+- ** Бэкенд приложения не собирать
+- ** Отвечать в переписке на русском 
