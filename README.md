@@ -79,7 +79,7 @@ cp .env.example .env          # set secrets first
 make all                      # builds backend + frontend, starts docker-compose
 ```
 
-Open `http://localhost:8090` — login as `admin` / `password`.
+Open `http://localhost` — login as `admin` / `password`.
 
 > 📖 **Step-by-step guide** — [docs/INSTRUCTION.md](docs/INSTRUCTION.md)
 > 📋 **API Reference** — [docs/API.md](docs/API.md)
@@ -307,7 +307,7 @@ Ports:
 
 | Port | Service | Purpose |
 |------|---------|---------|
-| `:8090` | Nginx | Vue SPA + API proxy |
+| `:80` | Nginx | Vue SPA + API proxy |
 | `:8080` | Backend | REST API + HTTP tracker |
 | `:8000` | AI service | Translation + embedding inference |
 | `:9091` | Transmission | RPC web UI |
@@ -389,7 +389,7 @@ cp .env.example .env          # сначала указать секреты
 make all                      # сборка backend + frontend, запуск docker-compose
 ```
 
-Открыть `http://localhost:8090` — войти как `admin` / `password`.
+Открыть `http://localhost` — войти как `admin` / `password`.
 
 > 📖 **Пошаговая инструкция** — [docs/INSTRUCTION.md](docs/INSTRUCTION.md)
 > 📋 **Описание API** — [docs/API.md](docs/API.md)
@@ -617,7 +617,7 @@ make all
 
 | Порт | Сервис | Назначение |
 |------|--------|-----------|
-| `:8090` | Nginx | Vue SPA + прокси на API |
+| `:80` | Nginx | Vue SPA + прокси на API |
 | `:8080` | Backend | REST API + HTTP-трекер |
 | `:8000` | AI сервис | Перевод + embedding |
 | `:9091` | Transmission | RPC веб-интерфейс |

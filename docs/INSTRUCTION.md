@@ -78,7 +78,7 @@ openssl rand -base64 32       # SCRAPER_ENCRYPTION_KEY
 
 ### Опционально: CORS
 
-Если вы обращаетесь к API напрямую (не через Nginx на порту 8090), укажите в `.env`:
+Если вы обращаетесь к API напрямую (не через Nginx на порту 80), укажите в `.env`:
 
 ```
 CORS_ALLOWED_ORIGINS=http://ваш-хост:порт
@@ -187,13 +187,13 @@ game-library-transmission Up
 Откройте браузер:
 
 ```
-http://localhost:8090
+http://localhost
 ```
 
 На NAS или другом компьютере — замените `localhost` на IP-адрес:
 
 ```
-http://192.168.1.100:8090
+http://192.168.1.100
 ```
 
 Если не открывается — логи:
@@ -294,7 +294,7 @@ docker compose logs -f
 
 - **Смените пароль admin сразу** после первого входа
 - `.env` содержит пароли — не коммитить (уже в `.gitignore`)
-- Порт 8090 занят? — измените `"8090:80"` в `docker-compose.yml`
+- Порт 80 занят? — измените `"80:80"` в `docker-compose.yml`
 - После изменения `.env`: `docker compose down && docker compose up -d`
 
 ---
@@ -385,7 +385,7 @@ openssl rand -base64 32       # for SCRAPER_ENCRYPTION_KEY
 
 ### Optional: CORS
 
-If you access the API directly (not via Nginx on port 8090), set in `.env`:
+If you access the API directly (not via Nginx on port 80), set in `.env`:
 
 ```
 CORS_ALLOWED_ORIGINS=http://your-host:port
@@ -494,13 +494,13 @@ Without ai-service everything works except: semantic search, ru↔en translation
 Open in browser:
 
 ```
-http://localhost:8090
+http://localhost
 ```
 
 On NAS or another computer — replace `localhost` with IP address:
 
 ```
-http://192.168.1.100:8090
+http://192.168.1.100
 ```
 
 If the page doesn't open — check logs:
@@ -601,7 +601,7 @@ No key required. Works for PS1 and PS2. Supports serial number search (SLUS-1234
 
 - **Change the admin password immediately** after first login
 - `.env` contains passwords — never commit it (already in `.gitignore`)
-- Port 8090 in use? — change `"8090:80"` in `docker-compose.yml`
+- Port 80 in use? — change `"80:80"` in `docker-compose.yml`
 - After editing `.env`: `docker compose down && docker compose up -d`
 
 ---
