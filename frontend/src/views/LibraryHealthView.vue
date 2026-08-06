@@ -97,8 +97,8 @@ const currentIssueType = ref(null)
 const dialogLoading = ref(false)
 
 const navItems = computed(() => ({
-  name: t('game.name') || 'Name',
-  platform: t('game.platform') || 'Platform'
+  name: t('game.field.name') || 'Name',
+  platform: t('game.field.platform') || 'Platform'
 }))
 
 const scoreColorClass = computed(() => {
