@@ -2,6 +2,7 @@
 # Предоставляет эндпоинты: health, translate, embed, embed/batch, vision/classify
 # Модели загружаются при старте приложения через lifespan-обработчик
 
+import io
 import logging
 import os
 import time
@@ -25,6 +26,40 @@ embedding_service: EmbeddingService = None
 vision_service: VisionService = None
 
 
+def _warmup_models(ts, es, vs):
+    """Прогрев всех моделей холостыми инференсами для инициализации MKL-DNN/OpenMP/PyTorch-диспетчера."""
+    import torch
+
+    if ts.is_available():
+        try:
+            logger.info("Warming up translation model...")
+            ts.translate_sentence("Hello", "en-ru")
+            logger.info("  [OK] Translation warmup done")
+        except Exception as e:
+            logger.warning("  [SKIP] Translation warmup failed: %s", e)
+
+    if es.is_available():
+        try:
+            logger.info("Warming up embedding model...")
+            es.embed("warmup")
+            logger.info("  [OK] Embedding warmup done")
+        except Exception as e:
+            logger.warning("  [SKIP] Embedding warmup failed: %s", e)
+
+    if vs.is_available():
+        try:
+            logger.info("Warming up CLIP model...")
+            import base64
+            from PIL import Image
+            dummy = Image.new("RGB", (224, 224), color=(128, 128, 128))
+            buf = io.BytesIO()
+            dummy.save(buf, format="JPEG")
+            vs.classify(base64.b64encode(buf.getvalue()).decode(), ["test"], top_k=1)
+            logger.info("  [OK] CLIP warmup done")
+        except Exception as e:
+            logger.warning("  [SKIP] CLIP warmup failed: %s", e)
+
+
 # Инициализация и завершение работы приложения
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -44,6 +79,9 @@ async def lifespan(app: FastAPI):
     translation_service = TranslationService(model_loader)
     embedding_service = EmbeddingService(model_loader)
     vision_service = VisionService(model_loader)
+
+    # Прогрев моделей — первый инференс форсирует инициализацию MKL-DNN, OpenMP и диспетчера PyTorch
+    _warmup_models(translation_service, embedding_service, vision_service)
 
     yield
 

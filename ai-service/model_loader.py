@@ -4,10 +4,14 @@
 import logging
 import os
 
+import torch
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, CLIPModel, CLIPProcessor
 from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
+
+# Ограничение числа потоков PyTorch/MKL для предотвращения oversubscription на CPU
+torch.set_num_threads(2)
 
 
 class ModelLoader:
@@ -93,6 +97,9 @@ class ModelLoader:
 
             self._status["embedding"] = "loaded"
             logger.info("  [OK] Embedding model loaded (dimension=%d)", self.embedding_model.get_sentence_embedding_dimension())
+            logger.info("  Warming up embedding model...")
+            self.embedding_model.encode(["warmup"], normalize_embeddings=True, show_progress_bar=False)
+            logger.info("  [OK] Embedding warmup done")
         except Exception as e:
             logger.error("  [FAIL] Embedding model: %s", e)
             self._status["embedding"] = f"error: {e}"

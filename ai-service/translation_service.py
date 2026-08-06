@@ -48,7 +48,7 @@ class TranslationService:
 
         forced_bos = tokenizer.convert_tokens_to_ids(tgt_lang)
 
-        with torch.no_grad():
+        with torch.inference_mode():
             output_ids = model.generate(
                 **inputs,
                 forced_bos_token_id=forced_bos,

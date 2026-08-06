@@ -39,7 +39,7 @@ class VisionService:
             truncation=True,
         )
 
-        with torch.no_grad():
+        with torch.inference_mode():
             outputs = self.model_loader.clip_model(**inputs)
 
         logits_per_image = outputs.logits_per_image

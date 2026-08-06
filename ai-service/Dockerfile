@@ -18,5 +18,12 @@ COPY . .
 ENV MODELS_DIR=/models
 ENV HF_HOME=/models/hf_cache
 
+# Оптимизация CPU-инференса: ограничение потоков MKL/OpenMP для предотвращения oversubscription
+ENV OMP_NUM_THREADS=2
+ENV MKL_NUM_THREADS=2
+ENV KMP_BLOCKTIME=0
+ENV KMP_AFFINITY=granularity=fine,compact,1,0
+ENV OMP_DYNAMIC=FALSE
+
 # Запуск FastAPI приложения (один worker для избежания дублирования моделей в памяти)
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
