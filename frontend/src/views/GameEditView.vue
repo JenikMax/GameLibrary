@@ -420,7 +420,7 @@ const scrapeUrlLabel = computed(() => {
   if (type === 'psxdatacenter') return t('game.scraper.name_serial_or_url')
   if (['igdb', 'thegamesdb'].includes(type)) return t('game.scraper.game_name')
   if (type === 'steam') return t('game.scraper.app_id_or_url')
-  if (type === 'playground') return t('game.scraper.name_or_url')
+  if (['playground', 'launchbox'].includes(type)) return t('game.scraper.name_or_url')
   return t('game.scraper.url')
 })
 

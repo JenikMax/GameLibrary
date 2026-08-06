@@ -87,7 +87,7 @@ Never create migration files — add new scripts to `postgresdb/ddl/` with the n
 - **Images:** Stored as `bytea` in DB with optional filesystem override. Support ETag + Cache-Control (24h).
 - **ZIP downloads:** Custom `StreamingZipWriter` using STORED method (no compression) for files < 5 GB.
 - **i18n:** Backend uses `messages_{en,ru}.properties`. Frontend uses `useI18n.js` composable + Pinia locale store. Two languages: Russian (default) and English.
-- **Scrapers:** 7 sources (Playground, Igromania, Steam, IGDB, TheGamesDB, World-Art, PsxDataCenter). API keys encrypted with AES-256 in DB via `ConfigEncryptionService`.
+- **Scrapers:** 9 sources (Playground, Igromania, Steam, IGDB, TheGamesDB, World-Art, PsxDataCenter, LaunchBox, GOG). API keys encrypted with AES-256 in DB via `ConfigEncryptionService`.
 - **BitTorrent tracker:** Built-in HTTP tracker at `/api/tracker/announce`. Transmission handles P2P seeding. `.torrent` files generated via `ttorrent` library (version 1.5).
 
 ## Style conventions

@@ -68,6 +68,10 @@ public class ScraperFactory {
                 return new WorldArtScraper(config, okHttpClient, jsoupHelper);
             case "psxdatacenter":
                 return new PsxDataCenterScraper(config, okHttpClient, jsoupHelper);
+            case "launchbox":
+                return new LaunchBoxScraper(config, encryptionService, okHttpClient);
+            case "gog":
+                return new GOGScraper(config, encryptionService, okHttpClient, jsoupHelper);
             default:
                 throw new IllegalArgumentException("Unsupported scraper type: " + type);
         }

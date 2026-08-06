@@ -246,7 +246,7 @@ docker compose logs -f
 
 ## 9. Настройка скраперов
 
-Некоторые скраперы работают без ключа (Playground, Steam, World-Art, PsxDataCenter). Для IGDB и TheGamesDB нужны API-ключи.
+Некоторые скраперы работают без ключа (Playground, Steam, World-Art, PsxDataCenter, LaunchBox, GOG). Для IGDB и TheGamesDB нужны API-ключи.
 
 ### IGDB (через Twitch)
 
@@ -271,6 +271,10 @@ docker compose logs -f
 ### PsxDataCenter
 
 Не требует ключа. Работает для PS1 и PS2. Поддерживает поиск по серийному номеру (SLUS-12345, SCES-54321).
+
+### LaunchBox и GOG
+
+Не требуют ключа. LaunchBox использует публичный API GamesDB, поддерживает поиск по названию и прямой ссылке. GOG работает только по прямой ссылке (вставьте URL игры с gog.com).
 
 ---
 
@@ -553,7 +557,7 @@ Then: Admin → Scan → "Start Scan".
 
 ## 9. Configure scrapers
 
-Some scrapers work without a key (Playground, Steam, World-Art, PsxDataCenter). IGDB and TheGamesDB require API keys.
+Some scrapers work without a key (Playground, Steam, World-Art, PsxDataCenter, LaunchBox, GOG). IGDB and TheGamesDB require API keys.
 
 ### IGDB (via Twitch)
 
@@ -578,6 +582,10 @@ Some scrapers work without a key (Playground, Steam, World-Art, PsxDataCenter). 
 ### PsxDataCenter
 
 No key required. Works for PS1 and PS2. Supports serial number search (SLUS-12345, SCES-54321).
+
+### LaunchBox and GOG
+
+No key required. LaunchBox uses the public GamesDB API, supports search by name and direct URL. GOG works only via direct URL (paste game URL from gog.com).
 
 ---
 

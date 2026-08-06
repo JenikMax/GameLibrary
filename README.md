@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <b>EN:</b> Game catalog manager for NAS — filesystem scanning, metadata from 7 scrapers, browse & download via P2P torrents.
+  <b>EN:</b> Game catalog manager for NAS — filesystem scanning, metadata from 9 scrapers, browse & download via P2P torrents.
   <br>
-  <b>RU:</b> Каталогизатор компьютерных игр для NAS — сканирование файловой системы, сбор метаданных из 7 скраперов, просмотр и скачивание через P2P-торренты.
+  <b>RU:</b> Каталогизатор компьютерных игр для NAS — сканирование файловой системы, сбор метаданных из 9 скраперов, просмотр и скачивание через P2P-торренты.
 </p>
 
 <p align="center">
@@ -45,7 +45,7 @@
 | For users | For admins |
 |-----------|-----------|
 | Game grid with posters & filters | Filesystem scanning & auto-indexing |
-| Search by name, platform, genre, year | Metadata scraping (7 scrapers) |
+| Search by name, platform, genre, year | Metadata scraping (9 scrapers) |
 | Sorting & pagination | Game editor with Quill rich text |
 | ZIP download (<5 GB) / .torrent download (≥5 GB) | User management (roles, block, reset password) |
 | P2P seeding via Transmission | Scraper config panel (API keys, enable/disable) |
@@ -106,7 +106,7 @@ If you don't need AI — comment out the `ai-service:` block in `docker-compose.
 | API Docs | Swagger UI at `/game-library/swagger-ui.html` |
 | Downloads | ZIP (STORED, no compression) + BitTorrent via Transmission |
 | P2P Tracker | Built-in HTTP tracker at `/api/tracker/announce` |
-| Scraping | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
+| Scraping | OkHttp 4, Jsoup, Steam Storefront API, LaunchBox API, GOG HTML |
 | Rate Limiting | bucket4j 8.7.0 (in-memory per-IP token bucket) |
 | Images | DB bytea + FS override, ETag + Cache-Control (24h), lazy loading |
 | AI / ML | Python FastAPI, PyTorch, HuggingFace |
@@ -231,6 +231,8 @@ Config: `${SCRAPER_CONFIG_DIR}/scrapers-config.json`, managed via `/api/admin/sc
 | **TheGamesDB** (api.thegamesdb.net) | REST API | API key | Full metadata (1000 req/month) |
 | **World-Art** (world-art.ru) | CSS selectors | — | Card parsing + search |
 | **PsxDataCenter** (psxdatacenter.com) | JSoup (HTML parsing) | — | PS1/PS2: description, genres, screenshots, serial number |
+| **LaunchBox** (gamesdb.launchbox-app.com) | REST API | — | Name, description, screenshots (all media), genres, trailer |
+| **GOG** (gog.com) | HTML parsing | — | Name, description, screenshots, genres |
 
 ### IGDB Setup
 
@@ -355,7 +357,7 @@ make clean          # docker compose down -v + mvn clean + rm -rf frontend/dist
 | Для пользователей | Для администраторов |
 |------------------|-------------------|
 | Сетка игр с постерами и фильтрами | Сканирование ФС и авто-индексация |
-| Поиск по названию, платформе, жанру, году | Сбор метаданных из 7 скраперов |
+| Поиск по названию, платформе, жанру, году | Сбор метаданных из 9 скраперов |
 | Сортировка и пагинация | Редактор игр с Quill (rich text) |
 | Скачивание ZIP (<5 ГБ) / .torrent (≥5 ГБ) | Управление пользователями (роли, блокировка, сброс пароля) |
 | P2P-раздача через Transmission | Панель конфигурации скраперов (API-ключи, вкл/выкл) |
@@ -416,7 +418,7 @@ make all                      # сборка backend + frontend, запуск do
 | Документация API | Swagger UI — `/game-library/swagger-ui.html` |
 | Скачивание | ZIP (STORED, без сжатия) + BitTorrent через Transmission |
 | P2P-трекер | Встроенный HTTP-трекер — `/api/tracker/announce` |
-| Скрапинг | OkHttp 4, Jsoup, Steam Storefront API, Twitch OAuth (IGDB) |
+| Скрапинг | OkHttp 4, Jsoup, Steam Storefront API, LaunchBox API, GOG HTML |
 | Rate Limiting | bucket4j 8.7.0 (in-memory, per-IP) |
 | Изображения | DB bytea + FS override, ETag + Cache-Control (24ч), lazy loading |
 | AI / ML | Python FastAPI, PyTorch, HuggingFace |
@@ -541,6 +543,8 @@ DDL: `postgresdb/ddl/` — выполняются при первом запус
 | **TheGamesDB** (api.thegamesdb.net) | REST API | API-ключ | Полные метаданные (1000 запр/мес) |
 | **World-Art** (world-art.ru) | CSS | — | Карточка + поиск |
 | **PsxDataCenter** (psxdatacenter.com) | JSoup | — | PS1/PS2: описание, жанры, скриншоты, серийный номер |
+| **LaunchBox** (gamesdb.launchbox-app.com) | REST API | — | Название, описание, скриншоты (все медиа), жанры, трейлер |
+| **GOG** (gog.com) | HTML-парсинг | — | Название, описание, скриншоты, жанры |
 
 ### Настройка IGDB
 
